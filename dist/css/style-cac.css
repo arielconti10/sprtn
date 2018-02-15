@@ -16,7 +16,7 @@ body {font-family: Arial,sans-serif !important;}
 .card .nav-tabs > li > a {border: none; color: #29395f; font-size: 1.2em;}
 .card .nav-tabs > li:hover > a,
 .card .nav-tabs > li.active > a,
-.card .nav-tabs > li > a:hover {border: none !important; color: #29395f !important; background: transparent !important;}
+.card .nav-tabs > li > a:hover {border: none !important; color: #29395f !important;}
 .card .nav-tabs > li > a::after {content: ""; background: #29395f; height: 3px; position: absolute; width: 100%; left: 0px; bottom: -2px; transition: all 250ms ease 0s; transform: scale(0);}
 .card .nav-tabs > li.active > a::after,
 .card .nav-tabs > li:hover > a::after {transform: scale(1);}

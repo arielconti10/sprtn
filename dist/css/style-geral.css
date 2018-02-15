@@ -1,0 +1,220 @@
+body {font-family: Arial,sans-serif !important;}
+.clearfix {float: left !important; width: 100% !important;}
+.modal-header {background-color: #ededed; border-bottom-color: #e0e0e0; border-radius: 5px 5px 0 0;}
+.modal-footer {background-color: #ededed; border-top-color: #e0e0e0; border-radius: 0 0 5px 5px;}
+.modal-title {float: left; text-transform: uppercase; color: #6e6e6e; font-weight: normal;}
+.modal-header .close {color: #ad0000; opacity: 1;}
+
+.main-header .logo span img {max-width: 70%;}
+
+/* INÍCIO TITULO ESCOLA */
+.nome-escola h1 {font-size: 1.6em; color: #1f96e4; border-bottom: 1px solid #1f96e4; padding: 5px 0 10px 0; margin: 20px 0;}
+
+/* INÍCIO MENU ABAS */
+.card {background: #EDF0F6 none repeat scroll 0% 0%; margin-bottom: 30px;}
+.card .nav-tabs {border-bottom: 3px solid #1f96e4;}
+.card .nav-tabs > li.active > a, 
+.nav-tabs > li.active > a:focus, 
+.nav-tabs > li.active > a:hover {border: none;}
+.card .nav-tabs > li > a {border: none; color: #29395f; font-size: 1.2em;}
+.card .nav-tabs > li:hover > a,
+.card .nav-tabs > li.active > a,
+.card .nav-tabs > li > a:hover {border: none !important; color: #29395f !important;}
+.card .nav-tabs > li > a::after {content: ""; background: #29395f; height: 3px; position: absolute; width: 100%; left: 0px; bottom: -2px; transition: all 250ms ease 0s; transform: scale(0);}
+.card .nav-tabs > li.active > a::after,
+.card .nav-tabs > li:hover > a::after {transform: scale(1);}
+.card .tab-nav > li > a::after {background: #21527d none repeat scroll 0% 0%; color: #fff;}
+.card .tab-pane {padding: 15px 0;}
+.card .tab-content{padding:0 0 15px 0; float: left; width: 100%;}
+
+.card .dropdown button.menu-mob {width: 100%;}
+.card .open>.dropdown-menu {width: 100%;}
+.card .dropdown-menu>li>a {text-align: center;}
+
+/*.dropdown, .dropup {float: left; width: 100%;}*/
+
+/* BUSCA */
+.box-busca {background-color: #f8f8f8; padding: 10px 0; margin: 0 0 15px 0; width: 100%; float: left; border: 1px solid #ececec;}
+.box-busca h3.titulo {float: left; width: 100%; margin: 5px 0; padding: 0; font-size: 14px; font-weight: bold; color: #29395f; cursor: pointer;}
+.box-busca h3.titulo span.abrir-busca {float: right;}
+
+.box-busca .busca {float: left; width: 100%;}
+
+.box-busca .divisoria {float: left; width: 100%; border-top: 1px solid #ececec; margin: 15px 0;}
+.box-busca .add-campo i {color: #00af04; font-size: 35px; margin: 20px 0 0 0;}
+.box-busca .ultima-busca {border-left: 1px solid #ececec; margin-bottom: 15px;}
+.box-busca .ultima-busca h4 {font-size: 15px; color: #1f96e4; text-transform: uppercase; font-weight: normal;}
+
+/* INÍCIO ABA CADASTRO */
+#dashboard h2.seus-resultados {float: left; width: 100%; margin: 5px 0 15px 0; padding: 10px 0; font-size: 18px; font-weight: bold; color: #44a9a9; border-bottom: 1px solid #44a9a9;}
+#dashboard h2.seus-resultados span.editar-resultados {float: right; background-color: #1f96e4; color: #fff; padding: 4px 8px; border-radius: 3px; font-size: 15px;}
+#dashboard .cards .card {border-left: 2px solid #44a9a9; padding: 15px;}
+#dashboard .cards .card p {margin: 0; line-height: normal;}
+
+#dashboard .cards .card .icone {float: left; width:35%; text-align: center;}
+#dashboard .cards .card .icone.escolas {color: #ff5400;}
+#dashboard .cards .card .icone.visitas {color: #ff0000;}
+#dashboard .cards .card .icone.share {color: #717171;}
+#dashboard .cards .card .icone.alunos {color: #1f96e4;}
+#dashboard .cards .card .icone.puristas {color: #ffcc00;}
+#dashboard .cards .card .icone.tipo {color: #540000;}
+#dashboard .cards .card .icone.previsao {color: #17ba01;}
+#dashboard .cards .card .icone.devolucao {color: #c72a2a;}
+#dashboard .cards .card .icone.investimento {color: #89b000;}
+#dashboard .cards .card .icone.se {color: #00709f;}
+#dashboard .cards .card .icone.contatos {color: #073d6f;}
+
+#dashboard .cards .card .icone i {font-size: 55px; margin:15px 0;}
+
+#dashboard .cards .card .info {float: right; width:65%;}
+#dashboard .cards .card .info span.texto {color: #416181; text-transform: uppercase;}
+#dashboard .cards .card .info span.num {color: #44a9a9;}
+#dashboard .cards .card .info span.peq {font-size: 14px;}
+#dashboard .cards .card .info span.gd {font-size: 36px;}
+#dashboard .cards .card.duas-linhas .info p:nth-child(1) {margin-top: 14px;}
+#dashboard .cards .card.tres-linhas .info p:nth-child(1) {margin-top: 8px;}
+
+/* INÍCIO ABA CONTATOS */
+.dropdown.dropdown-lg .dropdown-menu {margin-top: -1px; padding: 6px 20px;}
+.input-group-btn .btn-group {display: flex !important;}
+.btn-group .btn {border-radius: 0; margin-left: -1px;}
+.btn-group .btn:last-child {border-top-right-radius: 4px; border-bottom-right-radius: 4px;}
+.btn-group .form-horizontal .btn[type="submit"] {border-top-left-radius: 4px; border-bottom-left-radius: 4px;}
+.form-horizontal .form-group {margin-left: 0; margin-right: 0;}
+.form-group .form-control:last-child {border-top-left-radius: 4px; border-bottom-left-radius: 4px;}
+
+@media screen and (min-width: 768px) {
+    #adv-search {margin: 0 auto;}
+    .dropdown.dropdown-lg {position: static !important;}
+    .dropdown.dropdown-lg .dropdown-menu {min-width: 500px;}
+}
+
+#escolas .segura-paineis {margin: 20px 0;}
+#escolas .segura-paineis .panel-heading {font-size: 1.1em; text-transform: uppercase; color: #6e6e6e;}
+#escolas .segura-paineis .panel-heading i {float: right; color: #c90005; font-size: 1.3em; text-shadow: 0px 0px 5px #fff;}
+#escolas .segura-paineis .panel-body p {color: #6e6e6e; font-size: 1.1em;}
+#escolas .segura-paineis .panel-body p.share {padding: 30px 0 0 0;}
+#escolas .segura-paineis .panel-body p.share .valor {color: #00a404;}
+#escolas button.add-contato {margin: 20px 0; text-transform: uppercase;}
+#escolas .segura-paineis .botoes-down {margin-bottom: 20px;}
+
+/* INÍCIO ABA ALUNOS */
+#pessoas .segura-paineis {margin: 20px 0;}
+#pessoas .segura-paineis .panel-heading {font-size: 1.1em; text-transform: uppercase; color: #6e6e6e;}
+#pessoas .segura-paineis .panel-body p {color: #6e6e6e; font-size: 1.1em; margin: 2px 0;}
+#pessoas .segura-paineis .panel-body span.pessoa {background-color: #1f96e4; color: #fff; padding: 5px 10px; margin: 0 5px 5px 0; border-radius: 5px; font-size: 14px; float: left;}
+#pessoas .segura-paineis .panel-body span.pessoa i {cursor: pointer;}
+
+/* INÍCIO DASHBOARD */
+#dashboard .infos-iniciais > span {margin: 0 20px 10px 0; font-size: 15px; color: #595959; float: left;}
+#dashboard .infos-iniciais span.inadimplente i {color: #d60000;}
+#dashboard .infos-iniciais span.adimplente i {color: #60d600;}
+#dashboard .infos-iniciais span.localizacao i {color: #ab0707;}
+#dashboard .infos-iniciais span.qtd-alunos i {color: #0079d6;}
+#dashboard .infos-iniciais span.desconto-medio i,
+#dashboard .infos-iniciais span.desconto-medio span {color: #00b827; font-weight: bold;}
+#dashboard .infos-iniciais span.investimento i,
+#dashboard .infos-iniciais span.investimento span {color: #e1c71a; font-weight: bold;}
+
+#dashboard .market-share {background-color: #f9f9f9; float: left; width: 100%;}
+
+/* INÍCIO ABA CADASTRO */
+#cadastro .dados-cadastrais {background-color: #f8f8f8; padding: 0 20px;}
+#cadastro .dados-cadastrais span.info {font-size:1.2em; margin: 18px 30px 0 0; float: left;}
+#cadastro .dados-cadastrais span.info span.titulo {font-weight: bold; color: #549e3b;}
+#cadastro .dados-cadastrais button.editar-cadastro {text-transform: uppercase; margin: 20px 0 ;}
+
+#cadastro .informacoes-rapidas h2.titulo {text-transform: uppercase; font-size:1.2em; color: #559e3c; text-align:center; margin: 20px 0;}
+#cadastro .informacoes-rapidas .info {background-color: #fcf8e3 !important; border-color: #ffe3b8;}
+#cadastro .informacoes-rapidas .info h3 {font-size: 1.3em; font-weight: normal; text-align: center; margin: 0 0 10px 0; color: #549e3b;}
+#cadastro .informacoes-rapidas .info p {font-size: 1.2em; text-align: center; color: #595959;}
+#cadastro .informacoes-rapidas .info.contatos i {color: #ffcc00;}
+
+/* INÍCIO ABA CONTATOS */
+.dropdown.dropdown-lg .dropdown-menu {margin-top: -1px; padding: 6px 20px;}
+.input-group-btn .btn-group {display: flex !important;}
+.btn-group .btn {border-radius: 0; margin-left: -1px;}
+.btn-group .btn:last-child {border-top-right-radius: 4px; border-bottom-right-radius: 4px;}
+.btn-group .form-horizontal .btn[type="submit"] {border-top-left-radius: 4px; border-bottom-left-radius: 4px;}
+.form-horizontal .form-group {margin-left: 0; margin-right: 0;}
+.form-group .form-control:last-child {border-top-left-radius: 4px; border-bottom-left-radius: 4px;}
+
+@media screen and (min-width: 768px) {
+    #adv-search {margin: 0 auto;}
+    .dropdown.dropdown-lg {position: static !important;}
+    .dropdown.dropdown-lg .dropdown-menu {min-width: 500px;}
+}
+
+#contatos .segura-paineis {margin: 20px 0;}
+#contatos .segura-paineis .panel-heading {font-size: 1.1em; text-transform: uppercase; color: #6e6e6e;}
+#contatos .segura-paineis .panel-heading i {float: right; color: #ffcc00; font-size: 1.3em; text-shadow: 0px 0px 5px #fff;}
+#contatos .segura-paineis .panel-body p {color: #6e6e6e; font-size: 1.1em;}
+#contatos button.add-contato {margin: 20px 0; text-transform: uppercase;}
+
+/* INÍCIO ABA ALUNOS */
+#alunos .segura-paineis {margin: 20px 0;}
+#alunos .segura-paineis .panel-heading {font-size: 1.1em; text-transform: uppercase; color: #6e6e6e;}
+#alunos .segura-paineis .censo {float: right; color: #0088df; font-size: 1em; text-shadow: 0px 0px 5px #fff; cursor: pointer;}
+#alunos .segura-paineis .panel-body p, #alunos .segura-paineis .panel-footer p {color: #6e6e6e; font-size: 1.1em; margin: 2px 0;}
+#alunos button.add-dados-escola {margin: 0 0 20px 0; text-transform: uppercase;}
+#alunos .segura-paineis .periodo {text-align: center; font-size: 1.1em; padding: 5px; margin: 15px 0 10px 0; background-color: #fcf8e3 !important; border-color: #ffe3b8; color: #595959 !important;}
+#alunos .segura-paineis .periodo i {color: #0088df; float: right; cursor: pointer; font-size: 1.5em;}
+#alunos .alert.total-alunos {text-align: center; font-size: 1.2em; padding: 8px;}
+
+/* INÍCIO ABA AGENDA */
+#agenda button.add-registro {margin: 0 0 20px 0; text-transform: uppercase;}
+#agenda .segura-paineis {margin: 20px 0;}
+#agenda .segura-paineis .panel-heading {font-size: 1.1em; text-transform: uppercase; color: #6e6e6e;}
+#agenda .segura-paineis .panel-body p, #alunos .segura-paineis .panel-footer p {color: #6e6e6e; font-size: 1.1em; margin: 2px 0;}
+#agenda .segura-paineis .alert.compromisso {float: left; width: 100%; padding: 10px; margin: 10px 0 !important;}
+#agenda .segura-paineis .alert.compromisso .dia {float: left;}
+#agenda .segura-paineis .alert.compromisso .dia span {font-size: 3.2em;}
+#agenda .segura-paineis .alert.compromisso .semana-horario {float: left; margin: 10px 0 0 12px;}
+#agenda .segura-paineis .alert.compromisso .infos {float: left; width: 100%; padding: 10px 0;}
+#agenda .segura-paineis .alert.alert.compromisso .infos span {width: 100%; float: left; margin:5px 0 0 0;}
+#agenda .segura-paineis .alert-default {color: #6e6e6e; background-color: #f4f4f4; border-color: #e0e0e0;}
+#agenda .segura-paineis .alert.alert-success.compromisso .infos {border-top: 1px solid #b2dba1;}
+#agenda .segura-paineis .alert.alert-info.compromisso .infos {border-top: 1px solid #9acfea;}
+#agenda .segura-paineis .alert.alert-warning.compromisso .infos {border-top: 1px solid #f5e79e;}
+#agenda .segura-paineis .alert.alert-default.compromisso .infos {border-top: 1px solid #e0e0e0;}
+
+/* INÍCIO ABA AÇÕES */
+#acoes h3 {color: #29395f; font-size: 1.4em; border-bottom: 1px dotted #29395f; padding-bottom: 10px; margin-bottom: 10px;}
+#acoes button.add-registro {margin: 0 0 20px 0; text-transform: uppercase;}
+#acoes .segura-paineis {margin: 20px 0;}
+#acoes .segura-paineis .panel-heading {font-size: 1.1em; text-transform: uppercase; color: #6e6e6e;}
+#acoes .segura-paineis .panel-body p, #alunos .segura-paineis .panel-footer p {color: #6e6e6e; font-size: 1.1em; margin: 2px 0;}
+#acoes .segura-paineis .alert.compromisso {float: left; width: 100%; padding: 10px; margin: 10px 0 !important;}
+#acoes .segura-paineis .alert.compromisso .dia {float: left;}
+#acoes .segura-paineis .alert.compromisso .dia span {font-size: 3.2em;}
+#acoes .segura-paineis .alert.compromisso .semana-horario {float: left; margin: 10px 0 0 12px;}
+#acoes .segura-paineis .alert.compromisso .infos {float: left; width: 100%; padding: 10px 0;}
+#acoes .segura-paineis .alert.alert.compromisso .infos span {width: 100%; float: left; margin:5px 0 0 0;}
+#acoes .segura-paineis .alert-default {color: #6e6e6e; background-color: #f4f4f4; border-color: #e0e0e0;}
+#acoes .segura-paineis .alert.alert-success.compromisso .infos {border-top: 1px solid #b2dba1;}
+#acoes .segura-paineis .alert.alert-info.compromisso .infos {border-top: 1px solid #9acfea;}
+#acoes .segura-paineis .alert.alert-warning.compromisso .infos {border-top: 1px solid #f5e79e;}
+#acoes .segura-paineis .alert.alert-default.compromisso .infos {border-top: 1px solid #e0e0e0;}
+
+/* MODAL EDITA RESULTADOS */
+#editaResultados p {font-size: 14px; color: #1f96e4; float: left; margin: 10px 0;}
+#editaResultados span.button-checkbox {margin: 10px 20px 10px 0; float: left;}
+
+/* PEQUENOS AJUSTES EM MEDIA QUERIES */
+
+@media screen and (max-width: 543px) {
+    .hidden-xs-down {display: none;}
+    #dashboard .cards .card {border-bottom: 2px solid #44a9a9; border-left: 0;}
+}
+
+@media screen and (min-width: 544px) and (max-width: 767px) {
+    .hidden-sm-down {display: none;}
+}
+
+@media screen and (min-width: 768px) and (max-width: 992px) {
+    .hidden-md-down {display: none;}
+}
+
+@media screen and (min-width: 993px) {
+    .hidden-lg-down {display: none;}
+}
