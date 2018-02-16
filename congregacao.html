@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Spartan - Selecione sua carteira</title>
+
+  <!-- STYLE CUSTOM -->
+  <link type="text/css" rel="stylesheet" href="dist/css/style-geral.css"/>
+
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="dist/css/AdminLTE.min.css">
+  <!-- AdminLTE Skins.-->
+  <link rel="stylesheet" href="dist/css/skins/skin-black.min.css">
+</head>
+
+<body class="hold-transition skin-black sidebar-mini">
+<div class="wrapper">
+
+  <!-- Main Header -->
+  <header class="main-header">
+
+    <!-- Logo -->
+    <a href="dashboard.html" class="logo">
+      <!-- mini logo for sidebar mini 50x50 pixels -->
+      <span class="logo-mini"><img src="dist/img/icon-spartan.png"></span>
+      <!-- logo for regular state and mobile devices -->
+      <span class="logo-lg"><img src="dist/img/logo-spartan.png"></span>
+    </a>
+
+    <!-- Header Navbar -->
+    <nav class="navbar navbar-static-top" role="navigation">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+    </nav>
+  </header>
+  <!-- Left side column. contains the logo and sidebar -->
+  <aside class="main-sidebar">
+
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+
+      <!-- Sidebar user panel (optional) -->
+      <div class="user-panel">
+        <div class="pull-left image">
+          <img src="https://media-exp2.licdn.com/mpr/mpr/shrink_100_100/AAEAAQAAAAAAAAfEAAAAJDBmNTdmMGY1LTczOWYtNDJhNS05NWNjLWQzZDMyMzRiYzllZA.jpg" class="img-circle" alt="User Image">
+        </div>
+        <div class="pull-left info">
+          <p>Rafael Augusto</p>
+          <!-- Status -->
+          <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+        </div>
+      </div>
+
+      <!-- Sidebar Menu -->
+      <ul class="sidebar-menu" data-widget="tree">
+        <li class="header">PRINCIPAL</li>
+        <li><a href="dashboard.html"><i class="fa fa-tachometer"></i> <span>Dashboard</span></a></li>
+        <li><a href="cadastro-comercial.html"><i class="fa fa-link"></i> <span>Cadastro Comercial</span></a></li>
+        <li class="header">CADASTROS</li>
+        <li class="active"><a href="congregacao.html"> <span>Congregação</span></a></li>
+        <li><a href="cargos.html"> <span>Cargos</span></a></li>
+        <li><a href="estados.html"> <span>Estados</span></a></li>
+        <li><a href="tipo-de-rede.html"> <span>Tipo de Rede</span></a></li>
+        <li><a href="localizacao.html"> <span>Localização</span></a></li>
+        <li><a href="disciplinas.html"> <span>Disciplinas</span></a></li>
+        <li><a href="turnos.html"> <span>Turnos</span></a></li>
+        <li><a href="filiais.html"> <span>Filiais</span></a></li>
+        <li><a href="setores.html"> <span>Setores</span></a></li>
+      </ul>
+      <!-- /.sidebar-menu -->
+    </section>
+    <!-- /.sidebar -->
+  </aside>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Congregação
+      </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content container-fluid">
+
+      <!--------------------------
+        | Your Page Content Here |
+        -------------------------->
+
+          <div class="row">
+
+            <div class="col-xs-12 col-sm-12 col-md-12">
+              <button type="button" class="btn btn-success adicionar" data-toggle="modal" data-target="#addDadosCongregacao">Adicionar <i class="fa fa-plus-circle"></i></button>
+            </div>
+              
+            <div class="col-md-12">
+              <div class="box">
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <table class="table table-bordered">
+                    <tbody>
+                      <tr>
+                        <th style="width: 10px">#</th>
+                        <th>Nome da congregação</th>
+                        <th style="width: 70px">Ações</th>
+                      </tr>
+                      <tr>
+                        <td>1.</td>
+                        <td>Nome da congregação</td>
+                        <td>
+                          <a href="/art/view/34126" title="Exibir" aria-label="Exibir" data-pjax="0">
+                            <span class="glyphicon glyphicon-eye-open"></span>
+                          </a>
+                          <a href="" title="Alterar" aria-label="Alterar" data-pjax="0">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                          </a>
+                          <a href="" title="Excluir" aria-label="Excluir" data-pjax="0" data-confirm="Deseja realmente excluir este item?" data-method="post">
+                            <span class="glyphicon glyphicon-trash"></span>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>2.</td>
+                        <td>Nome da congregação</td>
+                        <td>
+                          <a href="/art/view/34126" title="Exibir" aria-label="Exibir" data-pjax="0">
+                            <span class="glyphicon glyphicon-eye-open"></span>
+                          </a>
+                          <a href="" title="Alterar" aria-label="Alterar" data-pjax="0">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                          </a>
+                          <a href="" title="Excluir" aria-label="Excluir" data-pjax="0" data-confirm="Deseja realmente excluir este item?" data-method="post">
+                            <span class="glyphicon glyphicon-trash"></span>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>3.</td>
+                        <td>Cron job running</td>
+                        <td>
+                          <a href="/art/view/34126" title="Exibir" aria-label="Exibir" data-pjax="0">
+                            <span class="glyphicon glyphicon-eye-open"></span>
+                          </a>
+                          <a href="" title="Alterar" aria-label="Alterar" data-pjax="0">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                          </a>
+                          <a href="" title="Excluir" aria-label="Excluir" data-pjax="0" data-confirm="Deseja realmente excluir este item?" data-method="post">
+                            <span class="glyphicon glyphicon-trash"></span>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>4.</td>
+                        <td>Nome da congregação</td>
+                        <td>
+                          <a href="/art/view/34126" title="Exibir" aria-label="Exibir" data-pjax="0">
+                            <span class="glyphicon glyphicon-eye-open"></span>
+                          </a>
+                          <a href="" title="Alterar" aria-label="Alterar" data-pjax="0">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                          </a>
+                          <a href="" title="Excluir" aria-label="Excluir" data-pjax="0" data-confirm="Deseja realmente excluir este item?" data-method="post">
+                            <span class="glyphicon glyphicon-trash"></span>
+                          </a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <!-- /.box-body -->
+                <div class="box-footer clearfix">
+                  <ul class="pagination pagination-sm no-margin pull-right">
+                    <li><a href="#">«</a></li>
+                    <li><a href="#">1</a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#">3</a></li>
+                    <li><a href="#">»</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- MODAL ADICIONA DADOS -->
+            <div class="modal fade bd-example-modal-lg" id="addDadosCongregacao" tabindex="-1" role="dialog" aria-labelledby="addDadosCongregacao">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Adicionar dados de Congregação</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <i class="fa fa-times-circle" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                  <div class="modal-body row">
+                    
+                    <div class="col-xs-12 col-sm-12 col-md-12">
+                      <div class="form-group">
+                        <label for="nm_nivel_ensino" class="control-label">Nome da congregação</label>
+                        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                      </div>
+                    </div>
+                    
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-success" title="Reprovar todos os itens"><i class="fa fa-check" aria-hidden="true"></i> Salvar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Cancelar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+  <!-- Main Footer -->
+  <footer class="main-footer">
+    <!-- To the right -->
+    <div class="pull-right hidden-xs">
+      Seja bem vindo!
+    </div>
+    <!-- Default to the left -->
+    <strong>Copyright &copy; 2018 Spartan - Desenvolvido por <a href="http://www.ftd.com.br" target="_blank">FTD Educação</a>.</strong> Todos os direitos reservados.
+  </footer>
+
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED JS SCRIPTS -->
+
+<!-- jQuery 3 -->
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- AdminLTE App -->
+<script src="dist/js/adminlte.min.js"></script>
+<!-- SCRIPTS FORM -->
+<script type="text/javascript" src="dist/js/scripts-geral.js"></script>
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+
+</body>
+</html>
