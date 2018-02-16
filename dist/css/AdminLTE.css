@@ -304,6 +304,9 @@ a:focus {
 .main-header .navbar-brand {
   color: #fff;
 }
+
+.main-header .logo span img {max-width: 70%;}
+
 .content-header {
   position: relative;
   padding: 15px 15px 0 15px;
