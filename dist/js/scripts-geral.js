@@ -24,42 +24,11 @@ $(document).ready(function () {
         
     });
     
-    // GRÁFICO MARKET SHARE PIZZA
-    var ctx = document.getElementById("myChart").getContext('2d');
-	var myChart = new Chart(ctx, {
-	    type: 'polarArea',
-	    data: {
-	        labels: ["FTD", "Ática Scipione", "Moderna"],
-	        datasets: [{
-	            label: '# of Votes',
-	            data: [60, 15, 25],
-	            backgroundColor: [
-	                'rgba(255, 99, 132, 0.2)',
-	                'rgba(54, 162, 235, 0.2)',
-	                'rgba(255, 159, 64, 0.2)'
-	            ],
-	            borderColor: [
-	                'rgba(255,99,132,1)',
-	                'rgba(54, 162, 235, 1)',
-	                'rgba(255, 159, 64, 1)'
-	            ],
-	            borderWidth: 1
-	        }]
-	    },
-	    options: {
-	        scales: {
-	            yAxes: [{
-	                ticks: {
-	                    beginAtZero:true
-	                }
-	            }]
-	        }
-	    }
-	});
-
-	// SELECT DO MODAL DO DASHBOARD
-
-	$(function () {
+    
+    
+    
+    
+    $(function () {
         $('.button-checkbox').each(function () {
     
             // Settings
@@ -123,5 +92,83 @@ $(document).ready(function () {
             }
             init();
         });
+    });
+
+
+
+
+
+    // GRÁFICO MARKET SHARE PIZZA
+    var ctx = document.getElementById("myChart").getContext('2d');
+	var myChart = new Chart(ctx, {
+	    type: 'polarArea',
+	    data: {
+	        labels: ["FTD", "Ática Scipione", "Moderna"],
+	        datasets: [{
+	            label: '# of Votes',
+	            data: [60, 15, 25],
+	            backgroundColor: [
+	                'rgba(255, 99, 132, 0.2)',
+	                'rgba(54, 162, 235, 0.2)',
+	                'rgba(255, 159, 64, 0.2)'
+	            ],
+	            borderColor: [
+	                'rgba(255,99,132,1)',
+	                'rgba(54, 162, 235, 1)',
+	                'rgba(255, 159, 64, 1)'
+	            ],
+	            borderWidth: 1
+	        }]
+	    },
+	    options: {
+	        scales: {
+	            yAxes: [{
+	                ticks: {
+	                    beginAtZero:true
+	                }
+	            }]
+	        }
+	    }
+	});
+
+	// GRÁFICO MARKET SHARE BARRAS
+	var ctxBar = document.getElementById("myBarChart").getContext('2d');
+	var myBarChart = new Chart(ctxBar, {
+	    type: 'bar',
+	    data: {
+	        labels: ["2013", "2014", "2015", "2016", "2017", "2018"],
+	        datasets: [{
+	            label: '# of Votes',
+	            data: [60, 15, 25, 60, 15, 25],
+	            backgroundColor: [
+	                'rgba(255, 99, 132, 0.2)',
+	                'rgba(54, 162, 235, 0.2)',
+	                'rgba(255, 159, 64, 0.2)',
+	                'rgba(255, 99, 132, 0.2)',
+	                'rgba(54, 162, 235, 0.2)',
+	                'rgba(255, 159, 64, 0.2)'
+	            ],
+	            borderColor: [
+	                'rgba(255,99,132,1)',
+	                'rgba(54, 162, 235, 1)',
+	                'rgba(255, 159, 64, 1)',
+	                'rgba(255,99,132,1)',
+	                'rgba(54, 162, 235, 1)',
+	                'rgba(255, 159, 64, 1)'
+	            ],
+	            borderWidth: 1
+	        }]
+	    },
+	    options: {
+	        scales: {
+	            yAxes: [{
+	                ticks: {
+	                    beginAtZero:true
+	                }
+	            }]
+	        }
+	    }
+	});
+
     
 });
