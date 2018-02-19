@@ -16,8 +16,9 @@ Node, Bower
 
 ~~~~
 $ sudo apt-get update
-$ sudo apt-get install nodejs
+$ sudo apt-get install nodejs-legacy
 $ sudo apt-get install npm
+$ sudo npm install -g bower
 ~~~~
 
 Depois da execução dos comandos acima vá até a pasta do projeto
