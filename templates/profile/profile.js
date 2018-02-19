@@ -1,9 +1,7 @@
-
-
-var url = "hapi.spartan.ftd.com.br/api/profile";
+var url = "http://hapi.spartan.ftd.com.br/api/profile";
 var data = [];
 
-$.ajax(url, data, function(data){
+$.getJSON(url, data, function(data){
     
     $.get('templates/profile/profile.html', function(template) {
         var rendered = Mustache.render(template, data);
@@ -12,4 +10,5 @@ $.ajax(url, data, function(data){
 
 });
 
-
+// renderTpl('templates/discipline/discipline.js');
+// renderTpl('templates/chain/chain.js');
