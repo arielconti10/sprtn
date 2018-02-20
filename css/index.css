@@ -13,6 +13,8 @@ span.amarelo {color: #ddc000; font-weight: bold;}
 
 button.adicionar {margin: 5px 0 20px 0;}
 
+.skin-black .sidebar-menu>li>a {cursor: pointer;}
+
 /* INÍCIO TITULO ESCOLA */
 .nome-escola h1 {font-size: 1.6em; color: #1f96e4; border-bottom: 1px solid #1f96e4; padding: 5px 0 10px 0; margin: 20px 0;}
 
