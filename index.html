@@ -46,19 +46,12 @@
             <nav class="navbar navbar-static-top" role="navigation">
                 <!-- Sidebar toggle button-->
                 <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
-        <span class="sr-only">Toggle navigation</span>
-      </a>
-                <!-- Navbar Right Menu -->
-                <div class="navbar-custom-menu">
-                    <ul class="nav navbar-nav">
-                        <!-- Control Sidebar Toggle Button -->
-                        <li>
-                            <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
-                        </li>
-                    </ul>
-                </div>
+                    <span class="sr-only">Toggle navigation</span>
+                </a>
             </nav>
+			
         </header>
+		
         <!-- Left side column. contains the logo and sidebar -->
         <aside class="main-sidebar">
 
@@ -82,9 +75,9 @@
                     <div class="input-group">
                         <input type="text" name="q" class="form-control" placeholder="Faça uma busca">
                         <span class="input-group-btn">
-              <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-              </button>
-            </span>
+                          <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                          </button>
+                        </span>
                     </div>
                 </form>
                 <!-- /.search form -->
@@ -94,10 +87,21 @@
                     <li class="header">MENU</li>
                     <!-- Optionally, you can add icons to the links -->
                     <li class="active"><a><i class="fa fa-tachometer"></i> <span>Dashboard</span></a></li>
-                    <li><a id="templates/school/school.js"><i class="fa fa-link"></i> <span>Escolas</span></a></li>
-                    <li><a id="templates/profile/profile.js"><i class="fa fa-link"></i> <span>Perfis</span></a></li>
-                    <li><a id="templates/chain/chain.js"><i class="fa fa-link"></i> <span>Redes de ensino</span></a></li>
-                    <li><a id="templates/discipline/discipline.js"><i class="fa fa-link"></i> <span>Disciplinas</span></a></li>
+					<li class="header">CADASTROS</li>
+					<li><a id="templates/event/event.js"><i class="fa fa-bookmark"></i> <span>Agendas</span></a></li>
+					<li><a id="templates/student/student.js"><i class="fa fa-book"></i> <span>Alunos</span></a></li>
+                    <li><a id="templates/jobtitle/jobtitle.js"><i class="fa fa-briefcase"></i> <span>Cargos</span></a></li>
+					<li><a id="templates/congregation/congregation.js"><i class="fa fa-child"></i> <span>Congregação</span></a></li>
+					<li><a id="templates/contact/contact.js"><i class="fa fa-commenting"></i> <span>Contatos</span></a></li>
+					<li><a id="templates/discipline/discipline.js"><i class="fa fa-graduation-cap"></i> <span>Disciplinas</span></a></li>
+					<li><a id="templates/school/school.js"><i class="fa fa-university"></i> <span>Escolas</span></a></li>
+					<li><a id="templates/state/state.js"><i class="fa fa-map-signs"></i> <span>Estados</span></a></li>
+					<li><a id="templates/subsidiary/subsidiary.js"><i class="fa fa-building"></i> <span>Filiais</span></a></li>
+					<li><a id="templates/localization/localization.js"><i class="fa fa-map-marker"></i> <span>Localização</span></a></li>
+                    <li><a id="templates/profile/profile.js"><i class="fa fa-users"></i> <span>Perfis</span></a></li>
+					<li><a id="templates/sector/sector.js"><i class="fa fa-flag"></i> <span>Setores</span></a></li>
+                    <li><a id="templates/chain/chain.js"><i class="fa fa-sitemap"></i> <span>Tipo de rede</span></a></li>
+					<li><a id="templates/shift/shift.js"><i class="fa fa-refresh"></i> <span>Turnos</span></a></li>
                 </ul>  <!-- /.sidebar-menu -->
             </section>
             <!-- /.sidebar -->
@@ -117,82 +121,6 @@
             <strong>Copyright &copy; 2018 Spartan - Desenvolvido por <a href="http://www.ftd.com.br" target="_blank">FTD Educação</a>.</strong> Todos os direitos reservados.
         </footer>
 
-        <!-- Control Sidebar -->
-        <aside class="control-sidebar control-sidebar-dark">
-            <!-- Create the tabs -->
-            <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
-                <li class="active"><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-home"></i></a></li>
-                <li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>
-            </ul>
-            <!-- Tab panes -->
-            <div class="tab-content">
-                <!-- Home tab content -->
-                <div class="tab-pane active" id="control-sidebar-home-tab">
-                    <h3 class="control-sidebar-heading">Recent Activity</h3>
-                    <ul class="control-sidebar-menu">
-                        <li>
-                            <a href="javascript:;">
-              <i class="menu-icon fa fa-birthday-cake bg-red"></i>
-
-              <div class="menu-info">
-                <h4 class="control-sidebar-subheading">Langdon's Birthday</h4>
-
-                <p>Will be 23 on April 24th</p>
-              </div>
-            </a>
-                        </li>
-                    </ul>
-                    <!-- /.control-sidebar-menu -->
-
-                    <h3 class="control-sidebar-heading">Tasks Progress</h3>
-                    <ul class="control-sidebar-menu">
-                        <li>
-                            <a href="javascript:;">
-                                <h4 class="control-sidebar-subheading">
-                                    Custom Template Design
-                                    <span class="pull-right-container">
-                    <span class="label label-danger pull-right">70%</span>
-                                    </span>
-                                </h4>
-
-                                <div class="progress progress-xxs">
-                                    <div class="progress-bar progress-bar-danger" style="width: 70%"></div>
-                                </div>
-                            </a>
-                        </li>
-                    </ul>
-                    <!-- /.control-sidebar-menu -->
-
-                </div>
-                <!-- /.tab-pane -->
-                <!-- Stats tab content -->
-                <div class="tab-pane" id="control-sidebar-stats-tab">Stats Tab Content</div>
-                <!-- /.tab-pane -->
-                <!-- Settings tab content -->
-                <div class="tab-pane" id="control-sidebar-settings-tab">
-                    <form method="post">
-                        <h3 class="control-sidebar-heading">General Settings</h3>
-
-                        <div class="form-group">
-                            <label class="control-sidebar-subheading">
-              Report panel usage
-              <input type="checkbox" class="pull-right" checked>
-            </label>
-
-                            <p>
-                                Some information about this general settings option
-                            </p>
-                        </div>
-                        <!-- /.form-group -->
-                    </form>
-                </div>
-                <!-- /.tab-pane -->
-            </div>
-        </aside>
-        <!-- /.control-sidebar -->
-        <!-- Add the sidebar's background. This div must be placed
-  immediately after the control sidebar -->
-        <div class="control-sidebar-bg"></div>
     </div>
     <!-- ./wrapper -->
 
