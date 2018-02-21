@@ -1,11 +1,12 @@
-function loadTpl() {
 
-    $.get('templates/profile/profile.html', function(template) {
-        var rendered = Mustache.render(template);
-        $('#content-wrapper').html(rendered);
-    });
-
+function renderTpl(jsFile) {
+    // var jsFile = 'templates/profile/' + tplName + '.js';
+    $.getScript(jsFile);
 }
 
-loadTpl();
+$(document).ready(function(){
+    $('ul.sidebar-menu li a').on('click', function(){
+        renderTpl($(this).attr('id'));
+    });
 
+});

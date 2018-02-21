@@ -13,6 +13,10 @@ span.amarelo {color: #ddc000; font-weight: bold;}
 
 button.adicionar {margin: 5px 0 20px 0;}
 
+.has-error {display: block; color: red;}
+
+.has-success {display: none !important;}
+
 /* INÍCIO TITULO ESCOLA */
 .nome-escola h1 {font-size: 1.6em; color: #1f96e4; border-bottom: 1px solid #1f96e4; padding: 5px 0 10px 0; margin: 20px 0;}
 

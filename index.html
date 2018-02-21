@@ -18,7 +18,8 @@
     <link rel="stylesheet" href="bower_components/admin-lte/dist/css/AdminLTE.min.css">
     <!-- AdminLTE Skins.-->
     <link rel="stylesheet" href="bower_components/admin-lte/dist/css/skins/skin-black.min.css">
-    
+    <link rel="stylesheet" href="bower_components/select2/dist/css/select2.min.css" />
+
     <script type="text/javascript" src="bower_components/mustache.js/mustache.min.js" ></script>
 
 
@@ -92,10 +93,12 @@
                 <ul class="sidebar-menu" data-widget="tree">
                     <li class="header">MENU</li>
                     <!-- Optionally, you can add icons to the links -->
-                    <li><a href="dashboard.html"><i class="fa fa-tachometer"></i> <span>Dashboard</span></a></li>
-                    <li class="active"><a href="cadastro-comercial.html"><i class="fa fa-link"></i> <span>Cadastro Comercial</span></a></li>
-                </ul>
-                <!-- /.sidebar-menu -->
+                    <li class="active"><a><i class="fa fa-tachometer"></i> <span>Dashboard</span></a></li>
+                    <li><a id="templates/school/school.js"><i class="fa fa-link"></i> <span>Escolas</span></a></li>
+                    <li><a id="templates/profile/profile.js"><i class="fa fa-link"></i> <span>Perfis</span></a></li>
+                    <li><a id="templates/chain/chain.js"><i class="fa fa-link"></i> <span>Redes de ensino</span></a></li>
+                    <li><a id="templates/discipline/discipline.js"><i class="fa fa-link"></i> <span>Disciplinas</span></a></li>
+                </ul>  <!-- /.sidebar-menu -->
             </section>
             <!-- /.sidebar -->
         </aside>
@@ -198,8 +201,13 @@
     <!-- jQuery 3 -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="bower_components/admin-lte/dist/js/AdminLTE.min.js"></script>
+    <script src="bower_components/admin-lte/dist/js/adminlte.min.js"></script>
+    <script src="bower_components/select2/dist/js/select2.min.js"></script>
+    <script src="bower_components/inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+    <script src="bower_components/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="bower_components/twbs-pagination/jquery.twbsPagination.min.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="js/utils.js"></script>
 
 </body>
 

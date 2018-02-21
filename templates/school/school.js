@@ -1,174 +1,43 @@
-$(document).ready(function () {
-    
-    // ESPELHO DO MENU DO MOBILE PARA O DESKTOP
-    $(".dropdown ul.dropdown-menu li a").click(function(){
-        
-        var btMenuMob = $(this).attr("class");
-        var btMenuDesk = btMenuMob.replace("mob-", "desk-");
-        $(".card .nav-tabs>li").removeClass("active");
-        $(".card .nav-tabs>li." + btMenuDesk).addClass("active");
-        var contentAtual = btMenuDesk.replace("desk-", "");
-        $(".conteudo-atual .tab-pane").removeClass("active");
-        $(".conteudo-atual .tab-pane#" + contentAtual).addClass("active");
-         
-        var textMenuMob = $(this).text();
-        $("span#label_menu").text(textMenuMob);
-        
+function callConfigureMask()
+{
+    configureMask("#cnpj", "99.999.999/9999-99");
+    configureMask("#zip_code", "99999-999");
+    // configureMask("#phone", "(99) 9999-9999");
+}
+
+function callLoadSelect()
+{
+    loadSelectBox("http://hapi.spartan.ftd.com.br/api/schooltype", "#school_type_id");
+    loadSelectBox("http://hapi.spartan.ftd.com.br/api/subsidiary", "#subsidiary_id");
+    loadSelectBox("http://hapi.spartan.ftd.com.br/api/sector", "#sector_id");
+    loadSelectBox("http://hapi.spartan.ftd.com.br/api/state", "#state_id");
+    loadSelectBox("http://hapi.spartan.ftd.com.br/api/chain", "#chain_id");
+    loadSelectBox("http://hapi.spartan.ftd.com.br/api/congregation", "#congregation_id");
+    loadSelectBox("http://hapi.spartan.ftd.com.br/api/localization", "#type_locatization_id");
+    loadSelectBox("http://hapi.spartan.ftd.com.br/api/profile", "#profile_id");
+}
+
+$(document).ready(function(){
+    var url = "http://hapi.spartan.ftd.com.br/api/school?page=1";
+    var template = "templates/school/school.html";
+    loadInitial(url, template);
+});
+
+$(document).on("click",".paginate_button a",function (event){
+    event.preventDefault();
+    var elemento = $(this);
+    var page = elemento.data("dt-idx");
+    loadData(page);
+});
+
+$(document).on("click", ".inserir-cadastro", function(event) {
+    $.get('templates/school/modal.html', function(template) {
+        var rendered = Mustache.render(template);
+        $(".content").append(rendered);
+        $('#insereCadastro').modal('show');
+        callLoadSelect();
+        configureSelect2(".select2_class", "#insereCadastro");
+        callConfigureMask();
+        validateForm("#schoolform");
     });
-    
-    // ESPELHO DO MENU DO DESKTOP PARA O MOBILE
-    $(".card .nav-tabs>li a").click(function(){
-         
-        var textMenuDesk = $(this).text();
-        $("span#label_menu").text(textMenuDesk);
-        
-    });
-    
-    
-    
-    
-    
-    $(function () {
-        $('.button-checkbox').each(function () {
-    
-            // Settings
-            var $widget = $(this),
-                $button = $widget.find('button'),
-                $checkbox = $widget.find('input:checkbox'),
-                color = $button.data('color'),
-                settings = {
-                    on: {
-                        icon: 'glyphicon glyphicon-check'
-                    },
-                    off: {
-                        icon: 'glyphicon glyphicon-unchecked'
-                    }
-                };
-    
-            // Event Handlers
-            $button.on('click', function () {
-                $checkbox.prop('checked', !$checkbox.is(':checked'));
-                $checkbox.triggerHandler('change');
-                updateDisplay();
-            });
-            $checkbox.on('change', function () {
-                updateDisplay();
-            });
-    
-            // Actions
-            function updateDisplay() {
-                var isChecked = $checkbox.is(':checked');
-    
-                // Set the button's state
-                $button.data('state', (isChecked) ? "on" : "off");
-    
-                // Set the button's icon
-                $button.find('.state-icon')
-                    .removeClass()
-                    .addClass('state-icon ' + settings[$button.data('state')].icon);
-    
-                // Update the button's color
-                if (isChecked) {
-                    $button
-                        .removeClass('btn-default')
-                        .addClass('btn-' + color + ' active');
-                }
-                else {
-                    $button
-                        .removeClass('btn-' + color + ' active')
-                        .addClass('btn-default');
-                }
-            }
-    
-            // Initialization
-            function init() {
-    
-                updateDisplay();
-    
-                // Inject the icon if applicable
-                if ($button.find('.state-icon').length == 0) {
-                    $button.prepend('<i class="state-icon ' + settings[$button.data('state')].icon + '"></i> ');
-                }
-            }
-            init();
-        });
-    });
-
-
-
-
-
-    // GRÁFICO MARKET SHARE PIZZA
-    var ctx = document.getElementById("myChart").getContext('2d');
-	var myChart = new Chart(ctx, {
-	    type: 'polarArea',
-	    data: {
-	        labels: ["FTD", "Ática Scipione", "Moderna"],
-	        datasets: [{
-	            label: '# of Votes',
-	            data: [60, 15, 25],
-	            backgroundColor: [
-	                'rgba(255, 99, 132, 0.2)',
-	                'rgba(54, 162, 235, 0.2)',
-	                'rgba(255, 159, 64, 0.2)'
-	            ],
-	            borderColor: [
-	                'rgba(255,99,132,1)',
-	                'rgba(54, 162, 235, 1)',
-	                'rgba(255, 159, 64, 1)'
-	            ],
-	            borderWidth: 1
-	        }]
-	    },
-	    options: {
-	        scales: {
-	            yAxes: [{
-	                ticks: {
-	                    beginAtZero:true
-	                }
-	            }]
-	        }
-	    }
-	});
-
-	// GRÁFICO MARKET SHARE BARRAS
-	var ctxBar = document.getElementById("myBarChart").getContext('2d');
-	var myBarChart = new Chart(ctxBar, {
-	    type: 'bar',
-	    data: {
-	        labels: ["2013", "2014", "2015", "2016", "2017", "2018"],
-	        datasets: [{
-	            label: '# of Votes',
-	            data: [60, 15, 25, 60, 15, 25],
-	            backgroundColor: [
-	                'rgba(255, 99, 132, 0.2)',
-	                'rgba(54, 162, 235, 0.2)',
-	                'rgba(255, 159, 64, 0.2)',
-	                'rgba(255, 99, 132, 0.2)',
-	                'rgba(54, 162, 235, 0.2)',
-	                'rgba(255, 159, 64, 0.2)'
-	            ],
-	            borderColor: [
-	                'rgba(255,99,132,1)',
-	                'rgba(54, 162, 235, 1)',
-	                'rgba(255, 159, 64, 1)',
-	                'rgba(255,99,132,1)',
-	                'rgba(54, 162, 235, 1)',
-	                'rgba(255, 159, 64, 1)'
-	            ],
-	            borderWidth: 1
-	        }]
-	    },
-	    options: {
-	        scales: {
-	            yAxes: [{
-	                ticks: {
-	                    beginAtZero:true
-	                }
-	            }]
-	        }
-	    }
-	});
-
-    
 });

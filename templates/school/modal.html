@@ -1,0 +1,222 @@
+<form class="formToValidate" id="schoolform" method="post" action="http://hapi.spartan.ftd.com.br/api/school">
+  <!-- MODAL INSERIR CADASTRO -->
+  <div class="modal fade bd-example-modal-lg" id="insereCadastro" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Nova Escola</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <i class="fa fa-times-circle" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body row">
+
+          <div class="col-xs-6 col-sm-6 col-md-3">
+                <div class="form-group">
+                      <label for="sector_id" class="control-label">Setor</label>
+                       <select class="form-control select2_class" id="sector_id" name="sector_id">
+                          <option value="">Selecione</option>
+                      </select>
+                      <span class="help-block has-success">Algo de errado ocorreu. Contate o desenvolvedor!</span>
+                </div>
+          </div>
+
+          <div class="col-xs-6 col-sm-6 col-md-3">
+                <div class="form-group">
+                      <label for="profile_id" class="control-label">Setor</label>
+                       <select class="form-control select2_class" id="profile_id" name="profile_id">
+                          <option value="">Selecione</option>
+                      </select>
+                      <span class="help-block has-success">Algo de errado ocorreu. Contate o desenvolvedor!</span>
+                </div>
+          </div>
+
+          <div class="col-xs-6 col-sm-6 col-md-3">
+            <div class="form-group">
+              <label for="school_code_totvs" class="control-label">Código escola</label>
+              <input type="text" class="form-control" id="school_code_totvs" name="school_code_totvs" />
+              <span class="help-block has-success">Algo de errado ocorreu. Contate o desenvolvedor!</span>
+            </div>
+          </div>
+
+            <div class="col-xs-12 col-sm-12 col-md-12">
+              <div class="form-group">
+                <label for="active" class="control-label">Ativo</label>
+                <select class="form-control select2_class" id="active" name="active"> 
+                    <option value="1">Ativo</option> 
+                    <option value="0">Inativo</option> 
+                </select>
+              </div>
+            </div>
+          
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                <div class="form-group">
+                      <label for="subsidiary_id" class="control-label">Filial</label>
+                       <select class="form-control select2_class" id="subsidiary_id" name="subsidiary_id">
+                          <option value="">Selecione</option>
+                      </select>
+                      <span class="help-block has-success">Algo de errado ocorreu. Contate o desenvolvedor!</span>
+
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                <div class="form-group">
+                  <label for="congregation_id" class="control-label">Congregaçāo</label>
+                  <select class="form-control select2_class" id="congregation_id" name="congregation_id">
+                      <option value="">Selecione</option>
+                  </select>
+
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-12 col-md-12">
+              <div class="form-group">
+                  <div class="form-group">
+                      <label for="type_locatization_id" class="control-label">Tipo de Localizaçāo</label>
+                       <select class="form-control select2_class" id="type_locatization_id" name="type_locatization_id">
+                          <option value="">Selecione</option>
+                      </select>
+                      <span class="help-block has-success">Algo de errado ocorreu. Contate o desenvolvedor!</span>
+
+                    </div>
+              </div>
+            </div>
+
+          <div class="clearfix"></div>
+          
+          <div class="col-xs-12 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="name" class="control-label">Instituição</label>
+              <input type="text" class="form-control" id="name" name="name"/>
+            </div>
+          </div>
+          
+          <div class="col-xs-12 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="trading_name" class="control-label">Nome fantasia</label>
+              <input type="text" class="form-control" id="trading_name" name="trading_name"/>
+            </div>
+          </div>
+          
+          <div class="col-xs-12 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="cnpj" class="control-label">CNPJ</label>
+              <input type="text" class="form-control" id="cnpj" name="cnpj"/>
+            </div>
+          </div>
+          
+          <div class="col-xs-6 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="mec_inep_code" class="control-label">Código MEC/INEP</label>
+              <input type="text" class="form-control" id="mec_inep_code" name="mec_inep_code"/>
+            </div>
+          </div>
+          
+          <div class="col-xs-6 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="address" class="control-label">Endereço</label>
+              <input type="text" class="form-control" id="address" name="address"/>
+            </div>
+          </div>
+          
+          <div class="col-xs-6 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="number" class="control-label">Número</label>
+              <input type="text" class="form-control" id="number" name="number"/>
+            </div>
+          </div>
+          
+            <div class="col-xs-6 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="complement" class="control-label">Complemento</label>
+              <input type="text" class="form-control" id="complement" name="complement"/>
+            </div>
+          </div>
+
+          <div class="col-xs-6 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="neighborhood" class="control-label">Bairro</label>
+              <input type="text" class="form-control" id="neighborhood" name="neighborhood"/>
+            </div>
+          </div>
+          
+          <div class="col-xs-6 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="city" class="control-label">Cidade</label>
+              <input type="text" class="form-control" id="city" name="city"/>
+            </div>
+          </div>
+          
+          <div class="col-xs-6 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="state_id" class="control-label">Estado</label>
+              <select class="form-control" id="state_id" name="state_id"> 
+                <option value="estado">Selecione</option> 
+              </select>
+            </div>
+          </div>
+          
+          <div class="col-xs-6 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="zip_code" class="control-label">CEP</label>
+              <input type="text" class="form-control" id="zip_code" name="zip_code"/>
+            </div>
+          </div>
+          
+          <div class="col-xs-6 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="phone" class="control-label">Telefone 1</label>
+              <input type="text" class="form-control" id="phone" name="phone"/>
+            </div>
+          </div>
+          
+          <div class="col-xs-6 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="email" class="control-label">E-mail</label>
+              <input type="text" class="form-control" id="email" name="email"/>
+            </div>
+          </div>
+
+          <div class="col-xs-6 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="school_type_id" class="control-label">Tipo de Escola</label>
+               <select class="form-control select2_class" id="school_type_id" name="school_type_id">
+                  <option value="">Selecione</option>
+              </select>
+              <span class="help-block has-success">Algo de errado ocorreu. Contate o desenvolvedor!</span>
+
+            </div>
+          </div>
+
+          <div class="col-xs-12 col-sm-12 col-md-4">
+            <div class="form-group">
+              <label for="chain_id" class="control-label">Tipo de Rede</label>
+               <select class="form-control select2_class" id="chain_id" name="chain_id">
+                  <option value="">Selecione</option>
+              </select>
+              <span class="help-block has-success">Algo de errado ocorreu. Contate o desenvolvedor!</span>
+
+            </div>
+          </div>
+
+          <div class="col-xs-6 col-sm-6 col-md-4">
+            <div class="form-group">
+              <label for="maintainer" class="control-label">Mantenedora</label>
+              <input type="text" class="form-control" id="maintainer" name="maintainer" />
+            </div>
+          </div>
+
+          <div class="clearfix"></di>
+
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success btn-primary"><i class="fa fa-check-circle" aria-hidden="true"></i> Salvar</button>
+          <button type="button" class="btn btn-danger btn-secondary" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</form>

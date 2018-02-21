@@ -1,19 +1,14 @@
+var url = "http://hapi.spartan.ftd.com.br/api/profile";
+var data = [];
 
-// $(document).ready(function(event){
+$.getJSON(url, data, function(data){
 
-	var url = "http://dapi.spartan.ftd.com.br:81/api/profile";
-	var data = {};
+    $.get('templates/profile/profile.html', function(template) {
+        var rendered = Mustache.render(template, data);
+        $('#content-wrapper').html(rendered);
+    });
 
-	$.getJSON(url, data, function(retorno){
+});
 
-	    $.get('templates/profile/profile.html', function(template) {
-	        var rendered = Mustache.render(template, retorno, {
-	        	templateRef: template
-	        });
-	        $('#content-wrapper').html(rendered);
-	    }, 'text');
-
-	});
-	// event.preventDefault();
-// });
-
+// renderTpl('templates/discipline/discipline.js');
+// renderTpl('templates/chain/chain.js');
