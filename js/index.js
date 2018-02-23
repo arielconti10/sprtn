@@ -1,6 +1,5 @@
 
 function renderTpl(jsFile) {
-    // var jsFile = 'templates/profile/' + tplName + '.js';
     $.getScript(jsFile);
 }
 
