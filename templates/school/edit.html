@@ -1,0 +1,1456 @@
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        <i class="fa fa-building-o" aria-hidden="true"></i> {{record.name}}
+        <small>Informação Opcional</small>
+      </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content container-fluid">
+
+      <!--------------------------
+        | Your Page Content Here |
+        -------------------------->
+
+          <div class="row">
+            <!-- zanzo -->
+
+            <div class="col-md-12">
+              
+              <div class="card">
+                
+                <ul class="nav nav-tabs hidden-xs-down" role="tablist">
+                  <!-- <li class="desk-dashboard active" role="presentation"><a href="#dashboard" aria-controls="dashboard" role="tab" data-toggle="tab">Dashboard</a></li> -->
+                  <li class="desk-cadastro active" role="presentation"><a href="#cadastro" aria-controls="cadastro" role="tab" data-toggle="tab">Cadastro</a></li>
+                  <li class="desk-contatos" role="presentation"><a href="#contatos" aria-controls="contatos" role="tab" data-toggle="tab">Contatos</a></li>
+                  <li class="desk-alunos" role="presentation"><a href="#alunos" aria-controls="alunos" role="tab" data-toggle="tab">Alunos</a></li>
+                  <li class="desk-agenda" role="presentation"><a href="#agenda" aria-controls="agenda" role="tab" data-toggle="tab">Agenda</a></li>
+                  <!-- <li class="desk-acoes" role="presentation"><a href="#acoes" aria-controls="acoes" role="tab" data-toggle="tab">Ações</a></li> -->
+                </ul>
+
+                <div class="dropdown hidden-md-down hidden-lg-down">
+                  <button class="btn btn-info dropdown-toggle menu-mob" type="button" data-toggle="dropdown">
+                    <span id="label_menu">Dashboard</span>
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a href="#" class="mob-dashboard">Dashboard</a></li>
+                    <li><a href="#" class="mob-cadastro">Cadastro</a></li>
+                    <li><a href="#" class="mob-contatos">Contatos</a></li>
+                    <li><a href="#" class="mob-alunos">Alunos</a></li>
+                    <li><a href="#" class="mob-agenda">Agenda</a></li>
+                    <li><a href="#" class="mob-acoes">Ações</a></li>
+                  </ul>
+                </div>
+
+                <!-- Tab panes -->
+                <div class="tab-content conteudo-atual">
+
+                  <!-- INÍCIO ABA DASHBOARD -->
+                  <div role="tabpanel" class="tab-pane" id="dashboard">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="infos-iniciais">
+                          <span class=""><i class="{{active_icon}}"></i> {{active_text}}</span>
+                          <span class="localizacao"><i class="fa fa-map-marker"></i> {{record.city}} - {{record.state.abbrev}}</span>
+                          <span class="qtd-alunos"><i class="fa fa-users"></i> 0.000 alunos</span>
+                          <span class="desconto-medio"><i class="fa fa-percent"></i> Desconto médio de <span>12%</span> para esta escola</span>
+                          <span class="investimento"><i class="fa fa-money"></i> Investimento de <span>R$5.323,00</span> nesta escola</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="row">
+
+                      <div class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="market-share">
+                        
+                          <div class="col-md-12"><h3><i class="fa fa-dot-circle-o"></i> Market Share</h3></div>
+                          
+                          <div class="col-md-8">
+                            <div class="grafico"><div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
+                              <canvas id="myChart" width="508" height="508" class="chartjs-render-monitor" style="display: block; width: 508px; height: 508px;"></canvas>
+                            </div>
+                          </div>
+                          
+                          <div class="col-md-12">
+                            <div class="infos">
+                              <p>Ensino Infantil: <span class="azul">370 alunos</span> | <span class="verde">FTD 36%</span> | <span class="vermelho">Concorrentes 64%</span> - <span class="verde"><i class="fa fa-smile-o"></i> +3%</span></p>
+                              <p>Ensino Fundamental 1 : <span class="azul">370 alunos</span> | <span class="verde">FTD 36%</span> | <span class="vermelho">Concorrentes 64%</span> - <span class="vermelho"><i class="fa fa-frown-o"></i> -2%</span></p>
+                              <p>Ensino Fundamental 2: <span class="azul">370 alunos</span> | <span class="verde">FTD 36%</span> | <span class="vermelho">Concorrentes 64%</span> - <span class="amarelo"><i class="fa fa-meh-o"></i> 0%</span></p>
+                              <p>Ensino Médio: <span class="azul">370 alunos</span> | <span class="verde">FTD 36%</span> | <span class="vermelho">Concorrentes 64%</span> - <span class="verde"><i class="fa fa-smile-o"></i> +3%</span></p>
+                            </div>
+                          </div>
+                        
+                        </div>
+                      </div>
+
+                      <div class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="market-share">
+                        
+                          <div class="col-md-12"><h3><i class="fa fa-dot-circle-o"></i> Índice de faturamento/devolução no setor desta Escola </h3></div>
+                          
+                          <div class="col-md-8">
+                            <div class="grafico"><div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
+                              <canvas id="myBarChart" width="508" height="508" class="chartjs-render-monitor" style="display: block; width: 508px; height: 508px;"></canvas>
+                            </div>
+                          </div>
+                          
+                          <div class="col-md-12">
+                            <div class="infos">
+                              <p><i class="fa fa-info-circle"></i> Média de devolução de <span class="vermelho">13%</span> para este setor.</p>
+                            </div>
+                          </div>
+                        
+                        </div>  
+                      </div>
+
+                      <div class="clearfix"></div>
+
+                      <div class="ultimas-adocoes">
+
+                        <div class="col-md-12"><h3>Últimas Adoções 2018</h3></div>
+
+                        <div class="col-md-12">
+                          <div class="box">
+                                          
+                            <div class="col-md-12">
+                              <h4 class="titulo" data-toggle="collapse" data-target="#ensinoInfantil" aria-expanded="false" aria-controls="busca">
+                                <span class="verde">Ensino infantil - 370 alunos <i class="fa fa-arrow-circle-up" aria-hidden="true"></i> +3%</span>
+                                <span class="abrir-busca"><i class="fa fa-plus-circle" aria-hidden="true"></i></span>
+                              </h4>
+                            </div>
+                            
+                            <div id="ensinoInfantil" class="collapse cont">
+
+                              <div class="col-md-12"><div class="divisoria"></div></div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-success">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-warning">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-success">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-warning">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+
+                              <div class="clearfix"></div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-success">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-warning">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-success">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-warning">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+                                
+                            </div>
+                            
+                          </div>
+                        </div>
+
+                        <div class="col-md-12">
+                          <div class="box">
+                                          
+                            <div class="col-md-12">
+                              <h4 class="titulo" data-toggle="collapse" data-target="#ensinoFundamental" aria-expanded="false" aria-controls="busca">
+                                <span class="vermelho">Ensino Fundamental - 370 alunos <i class="fa fa-arrow-circle-down" aria-hidden="true"></i> +3%</span>
+                                <span class="abrir-busca"><i class="fa fa-plus-circle" aria-hidden="true"></i></span>
+                              </h4>
+                            </div>
+                            
+                            <div id="ensinoFundamental" class="collapse cont">
+
+                              <div class="col-md-12"><div class="divisoria"></div></div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-success">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-warning">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-success">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-warning">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+
+                              <div class="clearfix"></div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-success">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-warning">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-success">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-warning">
+                                  Matéria: <b>Inglês</b> | Livro: <b>Hello! Pre book 1</b> | Editora: <b>Ática</b> | Autor: <b>Rita Brugin de Faria, Eliete Canesi Morino</b> | Tempo de adoção: <b>3 anos</b>
+                                </div>
+                              </div>
+                                
+                            </div>
+                            
+                          </div>
+                        </div>
+
+                      </div>
+
+                    </div>
+                  </div>
+                  <!-- FIM ABA DASHBOARD -->
+
+                  <!-- INÍCIO ABA CADASTRO -->
+                  <div role="tabpanel" class="tab-pane active" id="cadastro">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="dados-cadastrais formulario-edicao">
+
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="row">
+                      <div class="informacoes-rapidas">
+                        <div class="col-md-12"><h2 class="titulo">Informações rápidas</h2></div>
+                        
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                          <div class="alert alert-warning info alunos-adotantes" role="alert">
+                            <h3><strong>Alunos adotantes FTD</strong></h3>
+                            <p>{{total_students}}</p>
+                          </div>
+                          <div class="alert alert-warning info valor-mensalidade" role="alert">
+                            <h3><strong>Valor médio da mensalidade</strong></h3>
+                            <p>R$000,00</p>
+                          </div>
+                        </div>
+                        
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                          <div class="alert alert-warning info contatos" role="alert">
+                            <h3><strong>Contatos</strong></h3>
+                            <p>{{total_contacts}}</p>
+                            {{#contacts}}
+                            <p><i class="fa fa-star" aria-hidden="true"></i>{{data.name}} | {{data.job_title.name}}</p>
+                            {{/contacts}}
+                          </div>
+                        </div>
+                        
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                          <div class="alert alert-warning info datas-agenda" role="alert">
+                            <h3><strong>Última visita</strong></h3>
+                            <p>{{last_event}}</p>
+                            <br>
+                            <h3><strong>Próxima visita</strong></h3>
+                            <p>{{next_event}}</p>
+                          </div>
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <!-- FIM ABA CADASTRO -->
+
+                  <!-- INÍCIO ABA CONTATOS -->
+                  <div role="tabpanel" class="tab-pane" id="contatos">
+                    <div class="row">
+                      <div class="col-md-12">
+                          <div class="input-group" id="adv-search">
+                              <input type="text" class="form-control" placeholder="Buscar um contato">
+                              <div class="input-group-btn">
+                                  <div class="btn-group" role="group">
+                                      <button type="button" class="btn btn-info"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                                  </div>
+                              </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="row">
+                        
+                        <div class="col-md-12">
+                          <button type="button" class="btn btn-success add-contato" data-toggle="modal" data-target="#addContato"><i class="fa fa-user-plus" aria-hidden="true"></i> Adicionar contato</button>
+                        </div>
+                        
+                        <div class="segura-paineis">
+                        {{#contacts}}  
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                          <div class="panel panel-default">
+                            <div class="panel-heading">{{data.name}} <i class="fa fa-star" aria-hidden="true"></i></div>
+                            <div class="panel-body">
+                              <p><b>Nome:</b> {{data.name}}</p>
+                              <p><b>E-mail:</b> <a href="mailto:{{data.email}}">{{data.email}}</a></p>
+                              <p>
+                                <b>Telefone:</b> 
+                                {{work}}
+                              </p>
+                              <p>
+                                <b>Celular:</b>
+                                {{mobile}}
+                               </p>
+                              <p><b>CPF:</b> {{data.cpf}}</p>
+                            </div>
+                            <div class="panel-footer">
+                              <button type="button" class="btn btn-info" data-toggle="modal" data-target="#alteraContato">Editar</button>
+                              <button type="button" class="btn btn-danger">Excluir</button>
+                            </div>
+                          </div>
+                        </div>
+                        {{/contacts}}
+                        
+                        <div class="clearfix hidden-md-down"></div>
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <!-- FIM ABA CONTATOS -->
+
+                  <!-- INÍCIO ABA ALUNOS -->
+                  <div role="tabpanel" class="tab-pane" id="alunos">
+                    <div class="row">
+                        
+                        <div class="col-md-12">
+                          <button type="button" class="btn btn-success add-dados-escola" data-toggle="modal" data-target="#addDadosEscola"><i class="fa fa-user-plus" aria-hidden="true"></i> Adicionar dados</button>
+                        </div>
+                        
+                        <div class="segura-paineis">
+                          
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                          <div class="panel panel-default">
+                            <div class="panel-heading">Educação infantil <span class="censo" data-toggle="modal" data-target="#dadosCenso"><i class="fa fa-info-circle" aria-hidden="true"></i> CENSO</span></div>
+                            <div class="panel-body">
+                              <div class="alert alert-warning periodo" role="alert">Manhã <i class="fa fa-pencil-square" aria-hidden="true" data-toggle="modal" data-target="#alteraDadosEscola"></i></div>
+                              <p><b>Maternal:</b> 20</p>
+                              <p><b>Educação infantil 1:</b> 300</p>
+                              <p><b>Educação infantil 2:</b> 300</p>
+                              
+                              <div class="alert alert-warning periodo" role="alert">Tarde <i class="fa fa-pencil-square" aria-hidden="true" data-toggle="modal" data-target="#alteraDadosEscola"></i></div>
+                              <p><b>Maternal:</b> 20</p>
+                              <p><b>Educação infantil 1:</b> 300</p>
+                              <p><b>Educação infantil 2:</b> 300</p>
+                              
+                              <div class="alert alert-warning periodo" role="alert">Noite <i class="fa fa-pencil-square" aria-hidden="true" data-toggle="modal" data-target="#alteraDadosEscola"></i></div>
+                              <p><b>Maternal:</b> 20</p>
+                              <p><b>Educação infantil 1:</b> 300</p>
+                              <p><b>Educação infantil 2:</b> 300</p>
+                            </div>
+                            <div class="panel-footer">
+                              <p><b>Total:</b> 1292 alunos</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                          <div class="panel panel-default">
+                            <div class="panel-heading">Educação infantil <span class="censo" data-toggle="modal" data-target="#dadosCenso"><i class="fa fa-info-circle" aria-hidden="true"></i> CENSO</span></div>
+                            <div class="panel-body">
+                              <div class="alert alert-warning periodo" role="alert">Manhã <i class="fa fa-pencil-square" aria-hidden="true" data-toggle="modal" data-target="#alteraDadosEscola"></i></div>
+                              <p><b>Maternal:</b> 20</p>
+                              <p><b>Educação infantil 1:</b> 300</p>
+                              <p><b>Educação infantil 2:</b> 300</p>
+                              
+                              <div class="alert alert-warning periodo" role="alert">Tarde <i class="fa fa-pencil-square" aria-hidden="true" data-toggle="modal" data-target="#alteraDadosEscola"></i></div>
+                              <p><b>Maternal:</b> 20</p>
+                              <p><b>Educação infantil 1:</b> 300</p>
+                              <p><b>Educação infantil 2:</b> 300</p>
+                              
+                              <div class="alert alert-warning periodo" role="alert">Noite <i class="fa fa-pencil-square" aria-hidden="true" data-toggle="modal" data-target="#alteraDadosEscola"></i></div>
+                              <p><b>Maternal:</b> 20</p>
+                              <p><b>Educação infantil 1:</b> 300</p>
+                              <p><b>Educação infantil 2:</b> 300</p>
+                            </div>
+                            <div class="panel-footer">
+                              <p><b>Total:</b> 1292 alunos</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                          <div class="panel panel-default">
+                            <div class="panel-heading">Educação infantil <span class="censo" data-toggle="modal" data-target="#dadosCenso"><i class="fa fa-info-circle" aria-hidden="true"></i> CENSO</span></div>
+                            <div class="panel-body">
+                              <div class="alert alert-warning periodo" role="alert">Manhã <i class="fa fa-pencil-square" aria-hidden="true" data-toggle="modal" data-target="#alteraDadosEscola"></i></div>
+                              <p><b>Maternal:</b> 20</p>
+                              <p><b>Educação infantil 1:</b> 300</p>
+                              <p><b>Educação infantil 2:</b> 300</p>
+                              
+                              <div class="alert alert-warning periodo" role="alert">Tarde <i class="fa fa-pencil-square" aria-hidden="true" data-toggle="modal" data-target="#alteraDadosEscola"></i></div>
+                              <p><b>Maternal:</b> 20</p>
+                              <p><b>Educação infantil 1:</b> 300</p>
+                              <p><b>Educação infantil 2:</b> 300</p>
+                              
+                              <div class="alert alert-warning periodo" role="alert">Noite <i class="fa fa-pencil-square" aria-hidden="true" data-toggle="modal" data-target="#alteraDadosEscola"></i></div>
+                              <p><b>Maternal:</b> 20</p>
+                              <p><b>Educação infantil 1:</b> 300</p>
+                              <p><b>Educação infantil 2:</b> 300</p>
+                            </div>
+                            <div class="panel-footer">
+                              <p><b>Total:</b> 1292 alunos</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="clearfix hidden-md-down"></div>
+                        
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                          <div class="panel panel-default">
+                            <div class="panel-heading">Educação infantil <span class="censo" data-toggle="modal" data-target="#dadosCenso"><i class="fa fa-info-circle" aria-hidden="true"></i> CENSO</span></div>
+                            <div class="panel-body">
+                              <div class="alert alert-warning periodo" role="alert">Manhã <i class="fa fa-pencil-square" aria-hidden="true" data-toggle="modal" data-target="#alteraDadosEscola"></i></div>
+                              <p><b>Maternal:</b> 20</p>
+                              <p><b>Educação infantil 1:</b> 300</p>
+                              <p><b>Educação infantil 2:</b> 300</p>
+                              
+                              <div class="alert alert-warning periodo" role="alert">Tarde <i class="fa fa-pencil-square" aria-hidden="true" data-toggle="modal" data-target="#alteraDadosEscola"></i></div>
+                              <p><b>Maternal:</b> 20</p>
+                              <p><b>Educação infantil 1:</b> 300</p>
+                              <p><b>Educação infantil 2:</b> 300</p>
+                              
+                              <div class="alert alert-warning periodo" role="alert">Noite <i class="fa fa-pencil-square" aria-hidden="true" data-toggle="modal" data-target="#alteraDadosEscola"></i></div>
+                              <p><b>Maternal:</b> 20</p>
+                              <p><b>Educação infantil 1:</b> 300</p>
+                              <p><b>Educação infantil 2:</b> 300</p>
+                            </div>
+                            <div class="panel-footer">
+                              <p><b>Total:</b> 1292 alunos</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="clearfix"></div>
+                        
+                        <div class="col-md-12">
+                          <div class="alert alert-info total-alunos" role="alert"><b>Número total de alunos matriculados na escola:</b> 3298</div>
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <!-- FIM ABA ALUNOS -->
+
+                  <!-- INÍCIO ABA ALUNOS -->
+                  <div role="tabpanel" class="tab-pane" id="agenda">
+                    <div class="row">
+                        <div class="col-md-12">
+                          <button type="button" class="btn btn-success add-registro" data-toggle="modal" data-target="#addRegistroAgenda"><i class="fa fa-calendar-check-o" aria-hidden="true"></i> Adicionar registro</button>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                      <div class="col-xs-12 col-sm-6 col-md-3">
+                        <div class="form-group">
+                          <label for="nu_ano" class="control-label">Ano</label>
+                          <select class="form-control" id="nu_ano"> 
+                            <option value="estado">Selecione</option> 
+                            <option value="ac">2017</option> 
+                            <option value="al">2018</option> 
+                          </select>
+                        </div>
+                      </div>
+                      
+                      <div class="col-xs-12 col-sm-6 col-md-3">
+                        <div class="form-group">
+                          <label for="nm_mes" class="control-label">Mês</label>
+                          <select class="form-control" id="nm_mes"> 
+                            <option value="mes">Selecione</option> 
+                            <option value="agosto">Agosto</option> 
+                            <option value="setembro">Setembro</option> 
+                            <option value="outubro">Outubro</option> 
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="row">
+                        
+                        <div class="segura-paineis">
+                          
+                            <div class="col-xs-12 col-sm-12 col-md-12">
+                          <div class="panel panel-default">
+                            <div class="panel-heading">Agosto / 2017 </div>
+                            <div class="panel-body">
+                              
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-success compromisso" role="alert" style="float:left;">
+                                  <div class="dia">
+                                    <span>06</span>
+                                  </div>
+                                  <div class="semana-horario">
+                                    <span class="dia-semana">Sábado</span><br>
+                                    <span class="horario"><b>Início as:</b> 13h e 30m</span>
+                                  </div>
+                                  <div class="clearfix"></div>
+                                  <div class="infos">
+                                    <span><b>Responsável:</b> Nome do usuário</span>
+                                    <span><b>Tipo de visita:</b> Consultor educacional</span>
+                                    <span><b>Contato:</b> Nome Contato Escola</span>
+                                    <span><b>Ação:</b> Início do planejamento de adoções</span>
+                                    <span><b>Observações:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a vehicula augue, vitae auctor augue. Mauris pellentesque mollis lacus dapibus dignissim.</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-info compromisso" role="alert" style="float:left;">
+                                  <div class="dia">
+                                    <span>06</span>
+                                  </div>
+                                  <div class="semana-horario">
+                                    <span class="dia-semana">Sábado</span><br>
+                                    <span class="horario"><b>Início as:</b> 13h e 30m</span>
+                                  </div>
+                                  <div class="clearfix"></div>
+                                  <div class="infos">
+                                    <span><b>Responsável:</b> Nome do usuário</span>
+                                    <span><b>Tipo de visita:</b> Consultor educacional</span>
+                                    <span><b>Contato:</b> Nome Contato Escola</span>
+                                    <span><b>Ação:</b> Início do planejamento de adoções</span>
+                                    <span><b>Observações:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a vehicula augue, vitae auctor augue. Mauris pellentesque mollis lacus dapibus dignissim.</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-warning compromisso" role="alert" style="float:left;">
+                                  <div class="dia">
+                                    <span>06</span>
+                                  </div>
+                                  <div class="semana-horario">
+                                    <span class="dia-semana">Sábado</span><br>
+                                    <span class="horario"><b>Início as:</b> 13h e 30m</span>
+                                  </div>
+                                  <div class="clearfix"></div>
+                                  <div class="infos">
+                                    <span><b>Responsável:</b> Nome do usuário</span>
+                                    <span><b>Tipo de visita:</b> Consultor educacional</span>
+                                    <span><b>Contato:</b> Nome Contato Escola</span>
+                                    <span><b>Ação:</b> Início do planejamento de adoções</span>
+                                    <span><b>Observações:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a vehicula augue, vitae auctor augue. Mauris pellentesque mollis lacus dapibus dignissim.</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-default compromisso" role="alert" style="float:left;">
+                                  <div class="dia">
+                                    <span>06</span>
+                                  </div>
+                                  <div class="semana-horario">
+                                    <span class="dia-semana">Sábado</span><br>
+                                    <span class="horario"><b>Início as:</b> 13h e 30m</span>
+                                  </div>
+                                  <div class="clearfix"></div>
+                                  <div class="infos">
+                                    <span><b>Responsável:</b> Nome do usuário</span>
+                                    <span><b>Tipo de visita:</b> Consultor educacional</span>
+                                    <span><b>Contato:</b> Nome Contato Escola</span>
+                                    <span><b>Ação:</b> Início do planejamento de adoções</span>
+                                    <span><b>Observações:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a vehicula augue, vitae auctor augue. Mauris pellentesque mollis lacus dapibus dignissim.</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="col-xs-12 col-sm-12 col-md-12">
+                          <div class="panel panel-default">
+                            <div class="panel-heading">Setembro / 2017 </div>
+                            <div class="panel-body">
+                              
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-success compromisso" role="alert" style="float:left;">
+                                  <div class="dia">
+                                    <span>06</span>
+                                  </div>
+                                  <div class="semana-horario">
+                                    <span class="dia-semana">Sábado</span><br>
+                                    <span class="horario"><b>Início as:</b> 13h e 30m</span>
+                                  </div>
+                                  <div class="clearfix"></div>
+                                  <div class="infos">
+                                    <span><b>Responsável:</b> Nome do usuário</span>
+                                    <span><b>Tipo de visita:</b> Consultor educacional</span>
+                                    <span><b>Contato:</b> Nome Contato Escola</span>
+                                    <span><b>Ação:</b> Início do planejamento de adoções</span>
+                                    <span><b>Observações:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a vehicula augue, vitae auctor augue. Mauris pellentesque mollis lacus dapibus dignissim.</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-info compromisso" role="alert" style="float:left;">
+                                  <div class="dia">
+                                    <span>06</span>
+                                  </div>
+                                  <div class="semana-horario">
+                                    <span class="dia-semana">Sábado</span><br>
+                                    <span class="horario"><b>Início as:</b> 13h e 30m</span>
+                                  </div>
+                                  <div class="clearfix"></div>
+                                  <div class="infos">
+                                    <span><b>Responsável:</b> Nome do usuário</span>
+                                    <span><b>Tipo de visita:</b> Consultor educacional</span>
+                                    <span><b>Contato:</b> Nome Contato Escola</span>
+                                    <span><b>Ação:</b> Início do planejamento de adoções</span>
+                                    <span><b>Observações:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a vehicula augue, vitae auctor augue. Mauris pellentesque mollis lacus dapibus dignissim.</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-warning compromisso" role="alert" style="float:left;">
+                                  <div class="dia">
+                                    <span>06</span>
+                                  </div>
+                                  <div class="semana-horario">
+                                    <span class="dia-semana">Sábado</span><br>
+                                    <span class="horario"><b>Início as:</b> 13h e 30m</span>
+                                  </div>
+                                  <div class="clearfix"></div>
+                                  <div class="infos">
+                                    <span><b>Responsável:</b> Nome do usuário</span>
+                                    <span><b>Tipo de visita:</b> Consultor educacional</span>
+                                    <span><b>Contato:</b> Nome Contato Escola</span>
+                                    <span><b>Ação:</b> Início do planejamento de adoções</span>
+                                    <span><b>Observações:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a vehicula augue, vitae auctor augue. Mauris pellentesque mollis lacus dapibus dignissim.</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div class="col-xs-12 col-sm-6 col-md-3">
+                                <div class="alert alert-default compromisso" role="alert" style="float:left;">
+                                  <div class="dia">
+                                    <span>06</span>
+                                  </div>
+                                  <div class="semana-horario">
+                                    <span class="dia-semana">Sábado</span><br>
+                                    <span class="horario"><b>Início as:</b> 13h e 30m</span>
+                                  </div>
+                                  <div class="clearfix"></div>
+                                  <div class="infos">
+                                    <span><b>Responsável:</b> Nome do usuário</span>
+                                    <span><b>Tipo de visita:</b> Consultor educacional</span>
+                                    <span><b>Contato:</b> Nome Contato Escola</span>
+                                    <span><b>Ação:</b> Início do planejamento de adoções</span>
+                                    <span><b>Observações:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a vehicula augue, vitae auctor augue. Mauris pellentesque mollis lacus dapibus dignissim.</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                            </div>
+                          </div>
+                        </div>
+                        
+                      </div>
+                      
+                    </div>
+                  </div>
+                  <!-- FIM ABA ALUNOS -->
+
+                  <!-- INÍCIO ABA AÇÕES -->
+                  <div role="tabpanel" class="tab-pane" id="acoes">
+                    <div class="row">
+                      
+                      <div class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="form-group">
+                          <label for="nm_cargo" class="control-label">Selecione a ação a ser tomada</label>
+                          <select class="form-control" id="nm_cargo"> 
+                            <option value="estado">Selecione</option> 
+                            <option value="ac">Ação 1</option> 
+                            <option value="al">Ação 2</option> 
+                          </select>
+                        </div>
+                      </div>
+                      
+                      <div class="clearfix"></div>
+                      
+                      <div class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="form-group">
+                          <label for="nm_motivo_encerramento" class="control-label">Qual o motivo do encerramento?</label>
+                          <select class="form-control" id="nm_motivo_encerramento"> 
+                            <option value="estado">Selecione</option> 
+                            <option value="ac">Ação 1</option> 
+                            <option value="al">Ação 2</option> 
+                          </select>
+                        </div>
+                      </div>
+                      
+                      <div class="clearfix"></div>
+                      
+                      <div class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="form-group">
+                          <label for="nm_observacoes_encerramento" class="control-label">Observações de encerramento</label>
+                          <textarea class="form-control" id="nm_observacoes_encerramento" rows="5" style="resize: none;"></textarea>
+                        </div>
+                      </div>
+                      
+                      <div class="clearfix"></div>
+                      
+                      <div class="col-xs-12 col-sm-12 col-md-12">
+                        <h3>Histórico de ações</h3>
+                      </div>
+                      
+                      <div class="segura-paineis">
+                        
+                        <div class="col-xs-12 col-sm-12 col-md-12">
+                          <div class="panel panel-default">
+                            <div class="panel-heading">Nome da ação</div>
+                            <div class="panel-body">
+                              
+                              <p><b>Titulo:</b> Nonon nono nononononoon noo nno nonono nononono noon nono no nonononono.</p>
+                              
+                            </div>
+                          </div>
+                        </div>
+                      
+                      </div>
+                        
+                    </div>
+                  </div>
+                  <!-- FIM ABA AÇÕES -->
+
+                  <!-- MODAL ALTERAR CADASTRO -->
+                  <div class="modal fade bd-example-modal-lg" id="editaCadastro" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Editar cadastro</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times-circle" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                        <div class="modal-body row">
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-3">
+                            <div class="form-group">
+                              <label for="nu_nivel_cadastro" class="control-label">Nível de cadastro</label>
+                              <input type="text" class="form-control" id="nu_nivel_cadastro">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-3">
+                            <div class="form-group">
+                              <label for="nu_filial" class="control-label">Filial</label>
+                              <input type="text" class="form-control" id="nu_filial">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-3">
+                            <div class="form-group">
+                              <label for="nu_setor" class="control-label">Setor</label>
+                              <input type="text" class="form-control" id="nu_setor">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-3">
+                            <div class="form-group">
+                              <label for="nu_codigo_escola" class="control-label">Código escola</label>
+                              <input type="text" class="form-control" id="nu_codigo_escola">
+                            </div>
+                          </div>
+                          
+                          <div class="clearfix"></div>
+                          
+                          <div class="col-xs-12 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nm_instituicao" class="control-label">Instituição</label>
+                              <input type="text" class="form-control" id="nm_instituicao">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nm_nome_fantasia" class="control-label">Nome fantasia</label>
+                              <input type="text" class="form-control" id="nm_nome_fantasia">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nu_cnpj" class="control-label">CNPJ</label>
+                              <input type="text" class="form-control" id="nu_cnpj">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nu_codigo_mec_inep" class="control-label">Código MEC/INEP</label>
+                              <input type="text" class="form-control" id="nu_codigo_mec_inep">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nm_endereco" class="control-label">Endereço</label>
+                              <input type="text" class="form-control" id="nm_endereco">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nu_numero" class="control-label">Número</label>
+                              <input type="text" class="form-control" id="nu_numero">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nm_bairro" class="control-label">Bairro</label>
+                              <input type="text" class="form-control" id="nm_bairro">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nm_cidade" class="control-label">Cidade</label>
+                              <input type="text" class="form-control" id="nm_cidade">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nm_estado" class="control-label">Estado</label>
+                              <select class="form-control" id="nm_estado"> 
+                                <option value="estado">Selecione</option> 
+                                <option value="ac">Acre</option> 
+                                <option value="al">Alagoas</option> 
+                                <option value="am">Amazonas</option> 
+                                <option value="ap">Amapá</option> 
+                                <option value="ba">Bahia</option> 
+                                <option value="ce">Ceará</option> 
+                                <option value="df">Distrito Federal</option> 
+                                <option value="es">Espírito Santo</option> 
+                                <option value="go">Goiás</option> 
+                                <option value="ma">Maranhão</option> 
+                                <option value="mt">Mato Grosso</option> 
+                                <option value="ms">Mato Grosso do Sul</option> 
+                                <option value="mg">Minas Gerais</option> 
+                                <option value="pa">Pará</option> 
+                                <option value="pb">Paraíba</option> 
+                                <option value="pr">Paraná</option> 
+                                <option value="pe">Pernambuco</option> 
+                                <option value="pi">Piauí</option> 
+                                <option value="rj">Rio de Janeiro</option> 
+                                <option value="rn">Rio Grande do Norte</option> 
+                                <option value="ro">Rondônia</option> 
+                                <option value="rs">Rio Grande do Sul</option> 
+                                <option value="rr">Roraima</option> 
+                                <option value="sc">Santa Catarina</option> 
+                                <option value="se">Sergipe</option> 
+                                <option value="sp">São Paulo</option> 
+                                <option value="to">Tocantins</option> 
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nu_cep" class="control-label">CEP</label>
+                              <input type="text" class="form-control" id="nu_cep">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nu_telefone_1" class="control-label">Telefone 1</label>
+                              <input type="text" class="form-control" id="nu_telefone_1">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nm_email" class="control-label">E-mail</label>
+                              <input type="text" class="form-control" id="nm_email">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nm_tipo" class="control-label">Tipo</label>
+                              <input type="text" class="form-control" id="nm_tipo">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nm_tipo_rede" class="control-label">Tipo de rede</label>
+                              <input type="text" class="form-control" id="nm_tipo_rede">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nm_mantenedora" class="control-label">Mantenedora</label>
+                              <input type="text" class="form-control" id="nm_mantenedora">
+                            </div>
+                          </div>
+                          
+                          <di class="clearfix"></di>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nu_cadastrado_em" class="control-label">Cadastrado em</label>
+                              <input type="text" class="form-control" id="nu_cadastrado_em">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nm_alterado_em" class="control-label">Alterado em</label>
+                              <input type="text" class="form-control" id="nm_alterado_em">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="form-group">
+                              <label for="nm_por" class="control-label">Por</label>
+                              <input type="text" class="form-control" id="nm_por">
+                            </div>
+                          </div>
+                          
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-success btn-primary"><i class="fa fa-check-circle" aria-hidden="true"></i> Salvar alterações</button>
+                          <button type="button" class="btn btn-danger btn-secondary" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Cancelar</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- MODAL ADICIONAR NOVO CONTATO -->
+                  <div class="modal fade bd-example-modal-lg" id="addContato" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title"><i class="fa fa-user-plus" aria-hidden="true"></i> Adicionar novo contato</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times-circle" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                        <div class="modal-body row">
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="checkbox">
+                              <label><input type="checkbox" value="" id="nm_contato_favorito"></label>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_nome" class="control-label">Nome</label>
+                              <input type="text" class="form-control" id="nm_nome">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_cpf" class="control-label">CPF</label>
+                              <input type="text" class="form-control" id="nu_cpf">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_email" class="control-label">E-mail</label>
+                              <input type="text" class="form-control" id="nm_email">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_celular" class="control-label">Celular</label>
+                              <input type="text" class="form-control" id="nu_celular">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_cargo" class="control-label">Cargo</label>
+                              <select class="form-control" id="nm_cargo"> 
+                                <option value="estado">Selecione</option> 
+                                <option value="ac">Cargo 1</option> 
+                                <option value="al">Cargo 2</option> 
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_turno" class="control-label">Turno</label>
+                              <select class="form-control" id="nm_turno"> 
+                                <option value="estado">Selecione</option> 
+                                <option value="ac">Turno 1</option> 
+                                <option value="al">Turno 2</option> 
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                              <label for="nm_consultor" class="control-label">Consultor</label>
+                              <input type="text" class="form-control" id="nm_consultor" disabled="" value="Nome do Consultor">
+                            </div>
+                          </div>
+                          
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-success btn-primary"><i class="fa fa-check-circle" aria-hidden="true"></i> Adicionar</button>
+                          <button type="button" class="btn btn-danger btn-secondary" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Cancelar</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- MODAL ALTERAR CONTATO -->
+                  <div class="modal fade bd-example-modal-lg" id="alteraContato" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title"><i class="fa fa-pencil" aria-hidden="true"></i> Editar contato</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times-circle" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                        <div class="modal-body row">
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="checkbox">
+                              <label><input type="checkbox" value="" id="nm_contato_favorito" checked=""></label>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_nome" class="control-label">Nome</label>
+                              <input type="text" class="form-control" id="nm_nome">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_cpf" class="control-label">CPF</label>
+                              <input type="text" class="form-control" id="nu_cpf">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_email" class="control-label">E-mail</label>
+                              <input type="text" class="form-control" id="nm_email">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_celular" class="control-label">Celular</label>
+                              <input type="text" class="form-control" id="nu_celular">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_cargo" class="control-label">Cargo</label>
+                              <select class="form-control" id="nm_cargo"> 
+                                <option value="estado">Selecione</option> 
+                                <option value="ac">Cargo 1</option> 
+                                <option value="al">Cargo 2</option> 
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_turno" class="control-label">Turno</label>
+                              <select class="form-control" id="nm_turno"> 
+                                <option value="estado">Selecione</option> 
+                                <option value="ac">Turno 1</option> 
+                                <option value="al">Turno 2</option> 
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                              <label for="nm_consultor" class="control-label">Consultor</label>
+                              <input type="text" class="form-control" id="nm_consultor" disabled="" value="Nome do Consultor">
+                            </div>
+                          </div>
+                          
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-success" title="Salvar" data-dismiss="modal"><i class="fa fa-check-circle" aria-hidden="true"></i> Salvar</button>
+                          <button type="button" class="btn btn-danger" title="Cancelar" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Cancelar</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- MODAL ADICIONA DADOS DE ALUNOS -->
+                  <div class="modal fade bd-example-modal-lg" id="addDadosEscola" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title"><i class="fa fa-user-plus" aria-hidden="true"></i> Adicionar dados de alunos</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times-circle" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                        <div class="modal-body row">
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_nivel_ensino" class="control-label">Nível de ensino</label>
+                              <select class="form-control" id="nm_nivel_ensino"> 
+                                <option value="estado">Selecione</option> 
+                                <option value="ac">Nível de ensino 1</option> 
+                                <option value="al">Nível de ensino 2</option> 
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_turno" class="control-label">Turno</label>
+                              <select class="form-control" id="nm_turno"> 
+                                <option value="turno">Selecione</option> 
+                                <option value="manha">Manhã</option> 
+                                <option value="tarde">Tarde</option> 
+                                <option value="noite">Noite</option> 
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_nome" class="control-label">1º ano:</label>
+                              <input type="text" class="form-control" id="nm_nome">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_cpf" class="control-label">2º ano:</label>
+                              <input type="text" class="form-control" id="nu_cpf">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_email" class="control-label">3º ano:</label>
+                              <input type="text" class="form-control" id="nm_email">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_celular" class="control-label">4º ano:</label>
+                              <input type="text" class="form-control" id="nu_celular">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                              <label for="nm_consultor" class="control-label">Total</label>
+                              <input type="text" class="form-control" id="nm_consultor" disabled="" value="632">
+                            </div>
+                          </div>
+                          
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-success" title="Reprovar todos os itens"><i class="fa fa-user-plus" aria-hidden="true"></i> Adicionar</button>
+                          <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Cancelar</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- MODAL MODIFICA DADOS DE ALUNOS -->
+                  <div class="modal fade bd-example-modal-lg" id="alteraDadosEscola" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title"><i class="fa fa-pencil" aria-hidden="true"></i> Alterar dados de alunos</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times-circle" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                        <div class="modal-body row">
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_nivel_ensino" class="control-label">Nível de ensino</label>
+                              <select class="form-control" id="nm_nivel_ensino" disabled=""> 
+                                <option value="ac">Nível de ensino 1</option> 
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_turno" class="control-label" disabled="">Turno</label>
+                              <select class="form-control" id="nm_turno"> 
+                                <option value="noite">Noite</option> 
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_1ano" class="control-label">1º ano:</label>
+                              <input type="text" class="form-control" id="nu_1ano">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_2ano" class="control-label">2º ano:</label>
+                              <input type="text" class="form-control" id="nu_2ano">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_3ano" class="control-label">3º ano:</label>
+                              <input type="text" class="form-control" id="nu_3ano">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_4ano" class="control-label">4º ano:</label>
+                              <input type="text" class="form-control" id="nu_4ano">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                              <label for="nm_consultor" class="control-label">Total</label>
+                              <input type="text" class="form-control" id="nm_consultor" disabled="" value="632">
+                            </div>
+                          </div>
+                          
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-success" title="Reprovar todos os itens"><i class="fa fa-check" aria-hidden="true"></i> Salvar</button>
+                          <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Cancelar</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- MODAL DADOS CENSO -->
+                  <div class="modal fade bd-example-modal-lg" id="dadosCenso" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title"><i class="fa fa-info-circle" aria-hidden="true"></i> Censo - Educação Infantil</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times-circle" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                        <div class="modal-body row">
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_1ano" class="control-label">1º ano:</label>
+                              <input type="text" class="form-control" id="nu_1ano" value="300" disabled="">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_2ano" class="control-label">2º ano:</label>
+                              <input type="text" class="form-control" id="nu_2ano" value="300" disabled="">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_3ano" class="control-label">3º ano:</label>
+                              <input type="text" class="form-control" id="nu_3ano" value="300" disabled="">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_4ano" class="control-label">4º ano:</label>
+                              <input type="text" class="form-control" id="nu_4ano" value="300" disabled="">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                              <label for="nu_total" class="control-label">Total</label>
+                              <input type="text" class="form-control" id="nu_total" disabled="" value="632">
+                            </div>
+                          </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- MODAL ADICIONA DADOS DE ALUNOS -->
+                  <div class="modal fade bd-example-modal-lg" id="addRegistroAgenda" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title"><i class="fa fa-calendar-check-o" aria-hidden="true"></i> Adicionar registro</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times-circle" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                        <div class="modal-body row">
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_data" class="control-label">Data</label>
+                              <select class="form-control" id="nu_data"> 
+                                <option value="data">Selecione</option> 
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nu_horario" class="control-label">Horário</label>
+                              <select class="form-control" id="nu_horario"> 
+                                <option value="horario">Selecione</option> 
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_tipo_visita" class="control-label">Tipo de visita</label>
+                              <select class="form-control" id="nm_turno"> 
+                                <option value="tipo_visita">Selecione</option> 
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_acao" class="control-label">Ação</label>
+                              <select class="form-control" id="nm_acao"> 
+                                <option value="acao">Selecione</option> 
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_contato" class="control-label">Contato</label>
+                              <select class="form-control" id="nm_contato"> 
+                                <option value="contato">Selecione</option> 
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-6">
+                            <div class="form-group">
+                              <label for="nm_responsavel" class="control-label">Responsável</label>
+                              <input type="text" class="form-control" id="nm_responsavel" disabled="" value="Nome do usuário">
+                            </div>
+                          </div>
+                          
+                          <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                              <label for="nm_responsavel" class="control-label">Observações</label>
+                              <textarea class="form-control" id="nm_observacoes" rows="4"></textarea>
+                            </div>
+                          </div>
+                          
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-success" title="Reprovar todos os itens"><i class="fa fa-plus-circle" aria-hidden="true"></i> Adicionar</button>
+                          <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Cancelar</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+    </section>
+    <!-- /.content -->
+
+
+
+<!-- REQUIRED JS SCRIPTS -->
+
+<!-- jQuery 3 -->
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="bower_components/select2/dist/js/select2.min.js"></script>
+<script src="bower_components/inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+<script src="bower_components/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="bower_components/twbs-pagination/jquery.twbsPagination.min.js"></script>
+<!-- SCRIPTS FORM -->
+<!-- <script type="text/javascript" src="js/chart.js"></script> -->
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
