@@ -2,7 +2,7 @@
  * realiza a validaçāo de formulario de acordo com o plugin jQuery Validation
  * @param {String} selector seletor a ser utilizado
  * @param {String} method método a ser chamado pela API. Exemplos: POST, PUT, DELETE
- * @param {String} caminho do template a ser chamado caso a validacao ocorra corretamente
+ * @param {String} template do template a ser chamado caso a validacao ocorra corretamente
  * @return void
  */
 function validateForm(selector, method, template)
@@ -106,18 +106,21 @@ function getNumbersPagination(paginacao)
  * renderiza um template Mustache
  * @param String template template a ser chamado
  * @param Array response resposta json a ser renderizada
+ * @param String seletor seletor que irá renderizar a view. Um ID ou classe, por exemplo
  * @param Function callback funçāo contendo ações a serem executadas após execucao dessa funcao
  * @return void
  */
-function renderMustache(template, response, callback) {
-    var r = $.Deferred();
+function renderMustache(template, response, seletor ,callback) {
+    $(seletor).empty();
+
     $.get(template, function(template) {
         var rendered = Mustache.render(template, response);
-        $('.content').html(rendered);
-        callback();
+        $(seletor).html(rendered);
+        if (callback !== undefined) {
+            callback();
+        }
     });
 
-    return r;
 }
 
 /**
@@ -144,4 +147,17 @@ function verifySelected(id, list) {
         }
     });
     return list;
+}
+
+/**
+ * formata uma data para o padrāo brasileiro
+ * @param String date_american data em formato americano. Exemplo: "2018-02-28"
+ * @return String date_brazilian data em formato brasileiro. Exemplo: "28/02/2018"
+ */
+function formatDateToBrazilian(date_american)
+{
+    var date_split = date_american.toString().split("-");
+    var date_brazilian = date_split[2]+"/"+date_split[1]+"/"+date_split[0];
+
+    return date_brazilian;
 }

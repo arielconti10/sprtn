@@ -8,8 +8,9 @@
  */
 function submitAjax(action, params, method, class_template)
 {
-    $(".form-group").find(".help-block").remove()
-    $(".form-group").removeClass("has-error")
+    $(".form-group").find(".help-block").remove();
+    $(".form-group").removeClass("has-error");
+
     $.ajax({
         url: action,
         method: method,
@@ -41,6 +42,8 @@ function loadInitial(url, template) {
 
    var data = [];
 
+   $('#content-wrapper').empty();
+   
    $.getJSON(url, data, function(data){
        $.get(template, function(template) {
             var rendered = Mustache.render(template, data);
