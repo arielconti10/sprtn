@@ -1,32 +1,11 @@
-
-function submitAjax(action, params)
-{
-    $(".form-group").find(".help-block").remove()
-    $(".form-group").removeClass("has-error")
-    $.ajax({
-        url: action,
-        method: "POST",
-        dataType: 'json',
-        data: params,
-        success: function(response) {
-            //fechar dialog aqui
-            console.log(response);
-        }, error: function(jqXHR, textStatus, errorThrown) {
-            var errors = jqXHR.responseJSON.errors;
-            $.each(errors, function(key,val) {
-                var elemento = "#" + key;
-                var mensagem = val;
-                showErrorAPI(elemento, mensagem)
-            })
-        }
-    });
-}
 /**
  * realiza a validaçāo de formulario de acordo com o plugin jQuery Validation
- * @param  {String} selector seletor a ser utilizado
+ * @param {String} selector seletor a ser utilizado
+ * @param {String} method método a ser chamado pela API. Exemplos: POST, PUT, DELETE
+ * @param {String} template do template a ser chamado caso a validacao ocorra corretamente
  * @return void
  */
-function validateForm(selector)
+function validateForm(selector, method, template)
 {
     configureValidationMessages();
     $(selector).validate({
@@ -34,7 +13,7 @@ function validateForm(selector)
        submitHandler: function(form) {
             var action = $(form).attr("action");
             var data = $(form).serialize();
-            submitAjax(action,data);
+            submitAjax(action, data, method, template);
        }
     });
 }
@@ -56,10 +35,9 @@ function configureMask(selector,format)
  * @param  {String} modal_id seletor do modal, geralmente um ID, a ser utilizado
  * @return void
  */
-function configureSelect2(selector,modal_id)
+function configureSelect2(selector)
 {
     $(selector).select2({
-        dropdownParent: $(modal_id),
         width: 'resolve' // need to override the changed default
     });
 }
@@ -124,72 +102,25 @@ function getNumbersPagination(paginacao)
     $(".total_page").text(paginacao.total);
 }
 
-
 /**
- * carrega os dados da selectbox enviada por parametro
- * @param String action açāo da API a ser chamada
- * @param String seletor seletor a ser enviado (no qual será preenchido pela funçāo)
+ * renderiza um template Mustache
+ * @param String template template a ser chamado
+ * @param Array response resposta json a ser renderizada
+ * @param String seletor seletor que irá renderizar a view. Um ID ou classe, por exemplo
+ * @param Function callback funçāo contendo ações a serem executadas após execucao dessa funcao
  * @return void
  */
-function loadSelectBox(action, selector) {
-    var params = {};
-    $(selector).find("option").remove();
-    $.ajax({
-        "url" :action,
-        "data": params,
-        "dataType":"json",
-        "success": function(retorno) {
-            $.each(retorno.data, function(key,val){
-                var option = $("<option>").val(val.id).text(val.name);
-                $(selector).append(option);
-            });
-        },
-        "error": function(jqXHR, textStatus, errorThrown) {
-            showAjaxError(selector, jqXHR);
+function renderMustache(template, response, seletor ,callback) {
+    $(seletor).empty();
+
+    $.get(template, function(template) {
+        var rendered = Mustache.render(template, response);
+        $(seletor).html(rendered);
+        if (callback !== undefined) {
+            callback();
         }
     });
-}
 
-/**
- * realiza o carregamento de dados inicial
- * @param String url açāo da API a ser chamada
- * @param String template url da template a ser chamada
- * @return void
- */
-function loadInitial(url, template) {
-
-   var data = [];
-
-   $.getJSON(url, data, function(data){
-       $.get(template, function(template) {
-            var rendered = Mustache.render(template, data);
-            $('#content-wrapper').html(rendered);
-            configurePagination(data.meta.pagination);
-            getNumbersPagination(data.meta.pagination);
-        });
-    });
-}
-
-/**
- * realiza o carregamento de dados, de acordo com a página enviada
- * @param {String} url action da API a ser chamada
- * @param {String} template action do template a ser chamado
- * @param  {Integer} page número da página a ser buscada na API
- * @return void
- */
-function loadPage(url, template, page) {
-
-   var complete_url = url + page;
-   var data = [];
-
-    $.getJSON(complete_url, data, function(data){
-        $.get('templates/school/school-table.html', function(template) {
-            var rendered = Mustache.render(template, data);
-            $("tbody tr").remove();
-            $(".table tbody").append(rendered);
-            getNumbersPagination(data.meta.pagination);
-        });
-    });
 }
 
 /**
@@ -203,3 +134,30 @@ function configureValidationMessages()
     });
 }
 
+/**
+ * verifica a opcao selecionada em um selectbox
+ * @param {Integer} id ID de comparacao
+ * @param {Array} list de tipos a serem comparados
+ * @return {boolean} selected flag dizendo se é o selecionado ou nao
+ */
+function verifySelected(id, list) {
+    $.each(list, function(key,item){
+        if (id == item.id) {
+            $(item).attr("selected", true);
+        }
+    });
+    return list;
+}
+
+/**
+ * formata uma data para o padrāo brasileiro
+ * @param String date_american data em formato americano. Exemplo: "2018-02-28"
+ * @return String date_brazilian data em formato brasileiro. Exemplo: "28/02/2018"
+ */
+function formatDateToBrazilian(date_american)
+{
+    var date_split = date_american.toString().split("-");
+    var date_brazilian = date_split[2]+"/"+date_split[1]+"/"+date_split[0];
+
+    return date_brazilian;
+}

@@ -1,27 +1,38 @@
 <section class="content-header">
-    <h1>
-      Cadastro de escolas
-    </h1>
-    <ol class="breadcrumb">
-      <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-      <li><a href="#">Escolas</a></li>
-    </ol>
+	<h1>
+		<i class="fa fa-university"></i> Escolas
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+		<li class="active">Escolas</li>
+	</ol>
 </section>
 <section class="content">
+		<div class="col-xs-12 col-sm-12 col-md-12">
+			<button type="button" class="btn btn-success inserir-cadastro" data-toggle="modal" data-target="#insereCadastro">Adicionar <i class="fa fa-plus-circle"></i></button>
+		</div>
         <div class="row">
           <div class="col-xs-12">
             <div class="box">
-              <div class="box-header">
-                <h3 class="box-title">Resultado da Pesquisa</h3>
-              </div>
-              <!-- /.box-header -->
               <div class="box-body">
-                <button type="button" data-toggle="modal" data-target="#insereCadastro" class="btn btn-primary inserir-cadastro">Nova Escola</button>
                 <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap"><div class="row"><div class="col-sm-6"></div><div class="col-sm-6"></div></div><div class="row"><div class="col-sm-12"><table id="example2" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
                   <thead>
                   <tr role="row">
-                      <th class="sorting_desc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Rendering engine: activate to sort column ascending" aria-sort="descending">Rendering engine</th>
-                      <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Browser</th>
+                      <th>
+              			Escola
+                      </th>
+                      <th>
+                  		Endereço
+                  	  </th>
+                  	  <th>
+                  	  	Cidade
+                      </th>
+                      <th>
+                          Estado
+                      </th>  
+                  	  <th>
+                  	  	Ações
+                  	  </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -47,116 +58,6 @@
         </div>
         <!-- /.row -->
 </section>
-	<h1>
-		<i class="fa fa-university"></i> Escolas
-	</h1>
-	<ol class="breadcrumb">
-		<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-		<li class="active">Escolas</li>
-	</ol>
+
 </section>
 
-
-<section class="content">
-	<div class="row">
-		
-		<div class="col-xs-12 col-sm-12 col-md-12">
-			<button type="button" class="btn btn-success adicionar" data-toggle="modal" data-target="#addDados">Adicionar <i class="fa fa-plus-circle"></i></button>
-		</div>
-		
-		<div class="col-xs-12">
-			<div class="box">
-				<div class="box-body">
-					<div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
-						<div class="row">
-							<div class="col-sm-6"></div>
-							<div class="col-sm-6"></div>
-						</div>
-						<div class="row">
-							<div class="col-sm-12">
-								<table id="example2" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
-									<thead>
-									<tr role="row">
-										<th class="sorting_desc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Rendering engine: activate to sort column ascending" aria-sort="descending">Escola</th>
-										<th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Endereço</th>
-										<th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Cidade</th>
-										<th style="width: 70px">Ação</th>
-									</tr>
-									</thead>
-								<tbody>
-									{{#data}}
-										<tr role="row">
-											<td class="sorting_1">{{name}}</td>
-											<td class="">{{address}}</td>
-											<td class="">{{city}}</td>
-											<td>
-												<a href="/art/view/34126" title="Exibir" aria-label="Exibir" data-pjax="0"><span class="glyphicon glyphicon-eye-open"></span></a>
-												<a href="" title="Alterar" aria-label="Alterar" data-pjax="0"><span class="glyphicon glyphicon-pencil"></span></a>
-												<a href="" title="Excluir" aria-label="Excluir" data-pjax="0" data-confirm="Deseja realmente excluir este item?" data-method="post"><span class="glyphicon glyphicon-trash"></span></a>
-											</td>
-										</tr>
-									{{/data}}
-								</tbody>
-								</table>
-							</div>
-						</div>
-						
-						<div class="row">
-							<div class="col-md-12">
-								<div class="dataTables_info" id="example2_info" role="status" aria-live="polite">Showing 1 to 10 of 57 entries</div>
-							</div>
-							<div class="col-md-12">
-								<div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
-									<ul class="pagination">
-										<li class="paginate_button previous disabled" id="example2_previous"><a href="#" aria-controls="example2" data-dt-idx="0" tabindex="0">Previous</a></li>
-										<li class="paginate_button active"><a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0">1</a></li>
-										<li class="paginate_button "><a href="#" aria-controls="example2" data-dt-idx="2" tabindex="0">2</a></li>
-										<li class="paginate_button "><a href="#" aria-controls="example2" data-dt-idx="3" tabindex="0">3</a></li>
-										<li class="paginate_button "><a href="#" aria-controls="example2" data-dt-idx="4" tabindex="0">4</a></li>
-										<li class="paginate_button "><a href="#" aria-controls="example2" data-dt-idx="5" tabindex="0">5</a></li>
-										<li class="paginate_button "><a href="#" aria-controls="example2" data-dt-idx="6" tabindex="0">6</a></li>
-										<li class="paginate_button next" id="example2_next"><a href="#" aria-controls="example2" data-dt-idx="7" tabindex="0">Next</a></li>
-									</ul>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			<!-- /.box-body -->
-			</div>
-		<!-- /.box -->
-
-		<!-- /.box -->
-		</div>
-	<!-- /.col -->
-	</div>
-<!-- /.row -->
-</section>
-
-<!-- MODAL ADICIONA DADOS -->
-<div class="modal fade bd-example-modal-lg" id="addDados" tabindex="-1" role="dialog" aria-labelledby="addDados">
-  <div class="modal-dialog modal-lg" role="document">
-	<div class="modal-content">
-	  <div class="modal-header">
-		<h5 class="modal-title">Adicionar dados</h5>
-		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		  <i class="fa fa-times-circle" aria-hidden="true"></i>
-		</button>
-	  </div>
-	  <div class="modal-body row">
-
-		<div class="col-xs-12 col-sm-12 col-md-12">
-		  <div class="form-group">
-			<label for="nm_nivel_ensino" class="control-label">Nome do campo</label>
-			<input type="text" class="form-control" id="nmCampo" placeholder="Preencha este campo">
-		  </div>
-		</div>
-
-	  </div>
-	  <div class="modal-footer">
-		<button type="button" class="btn btn-success" title="Reprovar todos os itens"><i class="fa fa-check" aria-hidden="true"></i> Salvar</button>
-		<button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Cancelar</button>
-	  </div>
-	</div>
-  </div>
-</div>
