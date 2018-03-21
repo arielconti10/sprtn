@@ -38,8 +38,8 @@ export default class Schools extends Component {
                                 </header>
                                 <div>
                                     <div className="widget-body no-padding">
-                                        <SchoolsParams />
-
+                                    
+                                        
                                         <SchoolsList />
 
                                     </div>

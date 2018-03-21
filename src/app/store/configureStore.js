@@ -56,5 +56,4 @@ if(config.voice_command_auto){
   store.dispatch(voiceControlOn());
 }
 
-
 export default store;

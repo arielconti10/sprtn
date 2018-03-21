@@ -1,14 +1,16 @@
 import './SchoolsStyle.css'
 
 import React, { Component } from 'react'
-import { reduxForm, Field, formValueSelector } from 'redux-form'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import IonSlider from '../../../../components/forms/inputs/IonSlider'
+import { nameSearch, stateSearch, citySearch, studentsSearch } from './SchoolsActions'
 
-export default class SchoolsParams extends Component {
-
+class SchoolsParams extends Component {
+    componentWillMount() {
+       // this.props.getList()
+    }
     render() {
         return (
             <div id="content">
@@ -16,12 +18,12 @@ export default class SchoolsParams extends Component {
                     <div className="row">
                         <section className="col col-9 input-school-search">
                             <label className="input"> <i className="icon-append fa fa-search" />
-                                <input type="text" name="schoolSearch" placeholder="Busca..." />
+                                <input type="text" name="schoolSearch" placeholder="Escola" onChange={``} />
                             </label>
                         </section>
                         <section className="col col-3 input-school-state">
                             <label className="select">
-                                <select name="schoolState">
+                                <select name="schoolState" onChange={``}>
                                     <option value="">UF</option>
                                     <option value="AC">Acre</option>
                                     <option value="AL">Alagoas</option>
@@ -54,7 +56,7 @@ export default class SchoolsParams extends Component {
                         </section>
                         <section className="col col-4 input-school-city">
                             <label className="input">
-                                <input type="text" name="schoolCity" placeholder="Cidade" />
+                                <input type="text" name="schoolCity" placeholder="Cidade" onChange={``} />
                             </label>
                         </section>
                         <section className="col col-8">
@@ -62,7 +64,7 @@ export default class SchoolsParams extends Component {
                                 <IonSlider type="text" data-min="1" data-max="999999"
                                     data-type="double" data-step="10" data-postfix=""
                                     data-from="1" data-to="999999"
-                                    data-hasgrid="true" />
+                                    data-hasgrid="true" onChange={``} />
                             </div>
                         </section>
                     </div>
@@ -71,3 +73,6 @@ export default class SchoolsParams extends Component {
         )
     }
 }
+
+const mapDispatchToProps = dispatch => bindActionCreators({ nameSearch, stateSearch, citySearch, studentsSearch }, dispatch)
+export default connect(null, mapDispatchToProps)(SchoolsParams)
