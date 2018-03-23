@@ -3,7 +3,7 @@ import { reset as resetForm, initialize } from 'redux-form'
 
 import States from './SchoolsStates'
 
-const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjJkNTIyYzk1NmJjZTRiMGJmODk0YWExZWE1ZDZiODViZWRmODkyOGFlYzZmYzg5YWJjMGJiYTA0OTBkZDNlN2NhYWI3MGIwOTI3Y2EwMDRlIn0.eyJhdWQiOiIyIiwianRpIjoiMmQ1MjJjOTU2YmNlNGIwYmY4OTRhYTFlYTVkNmI4NWJlZGY4OTI4YWVjNmZjODlhYmMwYmJhMDQ5MGRkM2U3Y2FhYjcwYjA5MjdjYTAwNGUiLCJpYXQiOjE1MjE2NjI5NTAsIm5iZiI6MTUyMTY2Mjk1MCwiZXhwIjoxNTIxNzQ5MzUwLCJzdWIiOiIxMzM4Iiwic2NvcGVzIjpbXX0.JqjGXx9mDPJFZHhFZnWPmSjmr9Ja9Dhv5fz1LTV0smdXKULnIhV7NKJxq7RFHfko2suYIkfRgG7PYhn9vs4-YE8XReh4inGPw4xeGtCKCz0dluPNm7xheqJMhCwJNtMJJbR1uSbYcpglwzfQ1SyCXz6HUn2zhAehP1fp0hTof08kn9EQkv2rRvmmcRDtPyRq7bj9tx2js_Iw6TbonjBSnoZ9jtnX3TBxkP-MlYKRqusEBWzKcZBnGfDrF-Lfw_YtnP6b2YyHkyp734WBJDwAau52-OjaRIXut7wOz0VK6UlgNSNspWGhsaEDvKYlJUEEtBXVezLNc86Bp3pWZDsyL_dX1W2PSUtkkxt0nVGojFVjQoow5brGzGVIW7JW4zPyJgsDgk4BXyC_0A81Jr5aDDNHALTmkO55D9vj8IpCk_cRETU7Isx1OKtRVyjMcqwUCN5cd2ebMFsyuS5rwKAf9ZfvzIrrkjBzjFvA5K8d1cuepn6mxjzzbyqWA9I_-QYNDkIhxo233fa8TrudKe-j6MEu8vNUBEftM4IWj6LLYLHvZ5WHh83RQ9u_KHNtp8YK3IQvTn51LXeHeSNrqxBWciNz8b3MQsZO8qTmYvBKUWxxgq63QKwdlobCj1tuB5bQ5cWCLrcYoE-wH0icbtMadpHRBo4GNbo_2JqGNvZcC_c'
+const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImFjN2U0NGY1YjdkZTZmMzEyODJlYmQyOGZjODYxMjQ4ZGMyNDdjN2NmNzY3ZGMzNjI1NTBjNTQ4MzlmNjYyYWEyMjYzMjNjYWMwNzEwOTdhIn0.eyJhdWQiOiIyIiwianRpIjoiYWM3ZTQ0ZjViN2RlNmYzMTI4MmViZDI4ZmM4NjEyNDhkYzI0N2M3Y2Y3NjdkYzM2MjU1MGM1NDgzOWY2NjJhYTIyNjMyM2NhYzA3MTA5N2EiLCJpYXQiOjE1MjE4MDIyMzMsIm5iZiI6MTUyMTgwMjIzMywiZXhwIjoxNTIxODg4NjMzLCJzdWIiOiIxMzM4Iiwic2NvcGVzIjpbXX0.MxxKiHgB9kURudINfRXF60Hlj2dYUgbw9eoQENBpVAXe6uI9jXrAX9d-nnKotBvBrRPg70X1wqs8G4F6YUrM_V9GSqWIlhodI3sPw4cQkNMb439oEguw_h-k3s9mFqMC_gjReIrStTQY-KeBWyWUdPLjz0g_pyFMkLJqAZfiRzfAXtTzUdhVS-U_aldEF0GT6eMipVC_Q6rkuEO5lygLPylUrCK1LTGyQL6etTEIAd_tD7RH1iXT9TJ8BkbdU8QqrXZbDPhT97GCaf8eBm3zqaRennoo9vCm9fnyIPNZg-rOGfiGAqHzxktdlrd2BOFzUos0kkmv8vmFjGBdO5d5Lpbk7gTkrk12EdtrqVo5KYzbwpviIkzIfIai49Xs_1hEVDe-_V0CqlpC8YQlK56GhLP3ABDLZpw2-JB-8a-y8udKqABwSsuZpoVzGLSP1Sk5J0CYfxZhqP8ULHqLHzOXnx_ZypgPMw6tnpP0cE0wzGMGDXwVJS1KvlCfHZpAoEyfIYkl9OEvZtYGf628GeB7g93Z2Zq2uyLON8G9wJyV5i0KCvC0eDJaiRLsjPXvmyYd15lh-hfvZgBHh4PiW2o8UNEsd6yEM8pRoWOlwYPiGQsdezoQfyzz1bXEfLVci41k7nvCreXhn_zK5B9aUYEtlvOs9tzC_1HaufI1bqgqcFw'
 
 const URL = 'http://hapi.spartan.ftd.com.br/api/school'
 
@@ -11,13 +11,12 @@ export const getSchoolsList = (paginate) => {
     return (dispatch, getState) => {
         const schoolType = 'Particular'
         //const page = paginate ? paginate : '1'
-        console.log(getState())
         const page = paginate || getState().schoolsList.page
 
         console.log(`${URL}?school_type.name=${schoolType}&page=${page}`)
 
         axios.get(`${URL}?school_type.name=${schoolType}&page=${page}`, { headers: { Authorization: `Bearer ${token}` }})
-            .then(resp => {console.log('resp', resp)
+            .then(resp => {console.log('getSchoolsList - resp', resp)
                           dispatch({ type: States.SCHOOLS_LIST_FETCHED,
                                      payload: resp.data })})
     }
@@ -39,7 +38,9 @@ export const studentsSearch = () => {
 
 export const getInitial = (page) => {
     const schoolType = 'Particular'
-    const response = axios.get(`${URL}?school_type.name=${schoolType}&page=${page}`, { headers: { Authorization: `Bearer ${token}` }})
+    const response = setTimeout(function() {
+        axios.get(`${URL}?school_type.name=${schoolType}&page=${page}`, { headers: { Authorization: `Bearer ${token}` }}).then(resp => {console.log('getInitial - resp', resp); return resp.data})
+     }, 1000)
 
     return response
 }

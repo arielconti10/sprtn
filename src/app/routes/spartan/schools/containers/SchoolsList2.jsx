@@ -9,12 +9,11 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 
-import { getSchoolsList } from './SchoolsActions'
+import { getSchoolsList, getInitial } from './SchoolsActions'
 
 class SchoolsList extends Component {
     constructor(props) {
         super(props);
-        console.log('################## props', props)
         this.state = {
             page: props.page,
             data: props.list,
@@ -28,53 +27,55 @@ class SchoolsList extends Component {
         this.props.getSchoolsList(1)
     }
 
-    options = {
-        paginationSize: 4,
-        pageStartIndex: 1,
-        // alwaysShowAllBtns: true, // Always show next and previous button
-        // withFirstAndLast: false, // Hide the going to First and Last page button
-        hideSizePerPage: true, // Hide the sizePerPage dropdown always
-        // hidePageListOnlyOnePage: true, // Hide the pagination list when only one page
-        firstPageText: 'Primeira',
-        prePageText: 'Voltar',
-        nextPageText: 'Próxima',
-        lastPageText: 'Ultima',
-        nextPageTitle: 'Primeira página',
-        prePageTitle: 'Página anterior',
-        firstPageTitle: 'Próxima página',
-        lastPageTitle: 'Ultima página',
-        totalSize: this.props.totalSize,
-        onPageChange: (page, sizePerPage) => {
-            console.log('this.state', this.state)
-
-            if (this.state.pages.indexOf(page) == -1) {
-
-                this.props.getSchoolsList(page)
-
-                const dados = this.state.data
-                const list = this.props.list
-
-                const pages = this.state.pages
-                pages.push(page)
-
-                list.map(item => (
-                    dados.push(item)
-                ))
-
-                this.setState(() => ({
-                    page,
-                    data: dados,
-                    pages
-                }))
-
-                console.log('this.state:', this.state)
-            }
-        }
+    componentDidMount() {
+        this.props.getSchoolsList(1)
     }
 
     render() {
+        const options = {
+            paginationSize: 4,
+            pageStartIndex: 1,
+            // alwaysShowAllBtns: true, // Always show next and previous button
+            // withFirstAndLast: false, // Hide the going to First and Last page button
+            hideSizePerPage: true, // Hide the sizePerPage dropdown always
+            // hidePageListOnlyOnePage: true, // Hide the pagination list when only one page
+            firstPageText: 'Primeira',
+            prePageText: 'Voltar',
+            nextPageText: 'Próxima',
+            lastPageText: 'Ultima',
+            nextPageTitle: 'Primeira página',
+            prePageTitle: 'Página anterior',
+            firstPageTitle: 'Próxima página',
+            lastPageTitle: 'Ultima página',
+            totalSize: this.props.totalSize,
+            onPageChange: (page, sizePerPage) => {
+                console.log('onPageChange - before - this.state', this.state)
 
-        console.log('************* this.state', this.state)
+                if (this.state.pages.indexOf(page) == -1) {
+                    this.props.getSchoolsList(page)
+
+                    const dados = this.state.data
+                    const list = this.props.list
+
+                    const pages = this.state.pages
+                    pages.push(page)
+
+                    list.map(item => (
+                        dados.push(item)
+
+                    ))
+
+                    this.setState(() => ({
+                        page,
+                        data: dados,
+                        pages
+                    }))
+
+                    console.log('onPageChange - after - this.state:', this.state)
+                }
+            }
+        }
+        
         const columns = [
             { text: 'Filial', dataField: "state_id", sort: true },
             { text: 'TOTVS', dataField: "school_code_totvs", sort: true },
@@ -87,8 +88,6 @@ class SchoolsList extends Component {
             { text: 'Estado', dataField: "state.abbrev", sort: true }
         ]
 
-
-
         const selectRow = {
             mode: 'checkbox',
             onSelect: (row, isSelect, rowIndex) => {
@@ -98,7 +97,10 @@ class SchoolsList extends Component {
             }
         }
 
-        console.log('options', this.options)
+        console.log('options', options)
+        console.log('************* this.state', this.state)
+
+        this.setState({data: this.props.list})
 
         return (
             <div>
@@ -106,7 +108,8 @@ class SchoolsList extends Component {
                     data={this.state.data}
                     columns={columns}
                     selectRow={selectRow}
-                    pagination={paginationFactory(this.options)} />
+                    pagination={paginationFactory(options)} />
+                
             </div>
         )
     }
