@@ -19,7 +19,7 @@ import axios from 'axios'
 
 import Form from 'react-validation/build/form';
 import Input from 'react-validation/build/input';
-import { SubmissionError } from 'redux-form'
+import PropTypes from 'prop-types'; 
 
 class LoginError extends Component {
     render() {
@@ -32,9 +32,8 @@ class LoginError extends Component {
 }
   
 class LoginForm extends Component {
-    
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             login: '',
             password : '',
@@ -59,8 +58,6 @@ class LoginForm extends Component {
             this.setState({'valid_login' : true});
             window.location.href = "/#/spartan/schools";
         } else {
-            this.setState({'login' : ''});
-            this.setState({'password' : ''});
             this.setState({'valid_login' : false});
         }
 
@@ -98,7 +95,8 @@ class LoginForm extends Component {
 
                         <InputCustomize type="password" id="password" name="password" className="form-control" placeholder="Sua Senha" 
                             helperText="Você deve informar as suas credenciais de rede" cols="col-lg-12 col-md-12 col-sm-12"
-                            value={this.state.password} onChange={this.changeField.bind(this)}/>
+                            value={this.state.password} onChange={this.changeField.bind(this)}
+                            />
                     </div>
 
                     <button type="submit" className="btn btn-primary btn-block">Acessar</button>
@@ -108,7 +106,7 @@ class LoginForm extends Component {
     }
 }
 
-export default class Login extends Component {
+class Login extends Component {
     componentWillMount() {
         if (sessionStorage.getItem("access_token") !== null) {
             window.location.href = "#/spartan/schools";
@@ -122,3 +120,10 @@ export default class Login extends Component {
         )
     }
 }
+
+LoginForm.propTypes = {
+    login: PropTypes.string.isRequired,
+    password: PropTypes.string.isRequired
+};
+
+export default Login;
