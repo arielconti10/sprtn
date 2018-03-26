@@ -6,8 +6,6 @@ import {Router, hashHistory} from 'react-router'
 
 import store from './store/configureStore'
 
-import 'react-table/react-table.css'
-
 const history = syncHistoryWithStore(hashHistory, store);
 
 const routes = {
