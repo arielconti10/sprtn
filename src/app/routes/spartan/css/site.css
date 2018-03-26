@@ -1,0 +1,29 @@
+/*
+arquivo que irá registrar todos os estilos CSS
+*/
+
+body {
+    background: url('/assets/img/background.jpg') #fff !important;
+}
+
+.login-form {
+    width: 290px;
+    height: 242px;
+    top: 50%;
+    left: 50%;
+    margin-top: -121px;
+    margin-left: -145px;
+    position: absolute;
+}
+
+.center-help {
+    text-align: center;
+    padding-top: 0.5em;
+    display: block;
+}
+
+.main-logo {
+    width: 89%;
+    display: inline-block;
+    text-align: center;
+}

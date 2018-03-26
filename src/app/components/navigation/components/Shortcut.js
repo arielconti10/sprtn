@@ -25,13 +25,10 @@ export default function Shortcut() {
             className="fa fa-book fa-4x"/> <span>Invoice <span
             className="label pull-right bg-color-darken">99</span></span> </span> </Link>
         </li>
+
         <li>
-          <Link to="/views/gallery" className="jarvismetro-tile big-cubes bg-color-greenLight"> <span className="iconbox"> <i
-            className="fa fa-picture-o fa-4x"/> <span>Gallery </span> </span> </Link>
-        </li>
-        <li>
-          <Link to="/views/profile" className="jarvismetro-tile big-cubes selected bg-color-pinkDark"> <span
-            className="iconbox"> <i className="fa fa-user fa-4x"/> <span>My Profile </span> </span> </Link>
+          <Link to="/spartan/logout" className="jarvismetro-tile big-cubes selected bg-color-pinkDark"> <span
+            className="iconbox"> <i className="fa fa-user fa-4x"/> <span>Logout</span> </span> </Link>
         </li>
       </ul>
     </div>

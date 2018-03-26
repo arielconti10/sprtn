@@ -16,6 +16,11 @@ import { Stats, BigBreadcrumbs, WidgetGrid, JarvisWidget } from '../../../../com
 import SchoolsList from './SchoolsList'
 
 export default class Schools extends Component {
+    componentWillMount() {
+        if (sessionStorage.getItem("access_token") == null) {
+            window.location.href = "#/spartan/login";
+        }
+    }
     render() {
         return ( 
             <div id="content">
