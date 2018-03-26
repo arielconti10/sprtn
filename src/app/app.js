@@ -4,7 +4,7 @@ import {Provider} from 'react-redux'
 import {syncHistoryWithStore} from 'react-router-redux'
 import {Router, hashHistory} from 'react-router'
 
-import store from './store/configureStore'
+import store from './template/store/configureStore'
 
 const history = syncHistoryWithStore(hashHistory, store);
 
@@ -13,10 +13,10 @@ const routes = {
   path: '/',
   indexRoute: { onEnter: (nextState, replace) => replace('/spartan/login') },
   childRoutes: [
-    require('./routes/spartan/login').default,
-    require('./routes/spartan/logout').default,
-    require('./routes/home').default,
-    require('./routes/spartan/schools').default,
+    require('./spartan/login').default,
+    require('./spartan/logout').default,
+    require('./spartan/home').default,
+    require('./spartan/schools').default,
 
     // require('./routes/dashboard').default,
     // require('./routes/smartadmin-intel').default,

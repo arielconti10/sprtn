@@ -5,16 +5,16 @@ import '../../css/site.css';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import ContentHeader from '../../../../components/content/contentHeader'
-import Content from '../../../../components/content/content'
-import Row from '../../../../components/common/row'
-import Grid from '../../../../components/common/grid'
+import ContentHeader from '../../../template/components/content/contentHeader'
+import Content from '../../../template/components/content/content'
+import Row from '../../../template/components/common/row'
+import Grid from '../../../template/components/common/grid'
 
-import content from '../../../../components/content/content';
-import InputCustomize from '../../../../components/content/InputCustomize';
+import content from '../../../template/components/content/content';
+import InputCustomize from '../../../template/components/content/InputCustomize';
 
-import Datatable from '../../../../components/tables/Datatable';
-import { Stats, BigBreadcrumbs, WidgetGrid, JarvisWidget } from '../../../../components';
+import Datatable from '../../../template/components/tables/Datatable';
+import { Stats, BigBreadcrumbs, WidgetGrid, JarvisWidget } from '../../../template/components';
 import axios from 'axios'
 
 export default class Logout extends Component {

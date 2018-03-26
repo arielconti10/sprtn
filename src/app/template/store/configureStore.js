@@ -20,7 +20,7 @@ import outlookReducer from '../routes/outlook/outlookReducer'
 import {voiceReducer, VoiceMiddleware} from '../components/voice-control'
 import {voiceControlOn} from "../components/voice-control/VoiceActions";
 
-import schoolsReducer from '../routes/spartan/schools/containers/SchoolsReducer'
+import schoolsReducer from '../../spartan/schools/containers/SchoolsReducer'
 
 export const rootReducer = combineReducers(
   {

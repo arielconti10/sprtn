@@ -1,6 +1,6 @@
 export default {
   path: 'spartan',
-  component: require('../../../components/common/Layout').default,
+  component: require('../../template/components/common/Layout').default,
   childRoutes: [
     {
       path: 'schools',

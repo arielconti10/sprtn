@@ -2,16 +2,16 @@ import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import ContentHeader from '../../../../components/content/contentHeader'
-import Content from '../../../../components/content/content'
-import Row from '../../../../components/common/row'
-import Grid from '../../../../components/common/grid'
+import ContentHeader from '../../../template/components/content/contentHeader'
+import Content from '../../../template/components/content/content'
+import Row from '../../../template/components/common/row'
+import Grid from '../../../template/components/common/grid'
 
 import SchoolsParams from './SchoolsParams'
-import content from '../../../../components/content/content';
+import content from '../../../template/components/content/content';
 
-import Datatable from '../../../../components/tables/Datatable'
-import { Stats, BigBreadcrumbs, WidgetGrid, JarvisWidget } from '../../../../components'
+import Datatable from '../../../template/components/tables/Datatable'
+import { Stats, BigBreadcrumbs, WidgetGrid, JarvisWidget } from '../../../template/components'
 
 import SchoolsList from './SchoolsList'
 

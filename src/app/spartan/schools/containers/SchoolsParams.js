@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import IonSlider from '../../../../components/forms/inputs/IonSlider'
+import IonSlider from '../../../template/components/forms/inputs/IonSlider'
 import { nameSearch, stateSearch, citySearch, studentsSearch } from './SchoolsActions'
 
 class SchoolsParams extends Component {
