@@ -81,7 +81,6 @@ export default class Datatable extends React.Component {
 
 	render() {
 		let { children, options, detailsFormat, paginationLength, ...props } = this.props;
-		console.log(props)
 		return (
 			<table {...props} ref="table">
 				{children}

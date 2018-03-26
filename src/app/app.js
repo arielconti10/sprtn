@@ -6,15 +6,15 @@ import {Router, hashHistory} from 'react-router'
 
 import store from './store/configureStore'
 
-import 'react-table/react-table.css'
-
 const history = syncHistoryWithStore(hashHistory, store);
 
 const routes = {
 
   path: '/',
-  indexRoute: { onEnter: (nextState, replace) => replace('/home') },
+  indexRoute: { onEnter: (nextState, replace) => replace('/spartan/login') },
   childRoutes: [
+    require('./routes/spartan/login').default,
+    require('./routes/spartan/logout').default,
     require('./routes/home').default,
     require('./routes/spartan/schools').default,
 
