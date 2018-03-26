@@ -11,12 +11,13 @@ const history = syncHistoryWithStore(hashHistory, store);
 const routes = {
 
   path: '/',
-  indexRoute: { onEnter: (nextState, replace) => replace('/spartan/login') },
+  indexRoute: { onEnter: (nextState, replace) => replace('/login') },
   childRoutes: [
     require('./spartan/login').default,
     require('./spartan/logout').default,
     require('./spartan/home').default,
     require('./spartan/schools').default,
+    require('./spartan/jobTitles').default,
 
     // require('./routes/dashboard').default,
     // require('./routes/smartadmin-intel').default,

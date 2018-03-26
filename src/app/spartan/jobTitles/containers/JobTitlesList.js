@@ -25,7 +25,7 @@ const selectOptions = {
 
 const apiName = 'school'
 
-export default class SchoolsList extends Component {
+export default class JobTitlesList extends Component {
     constructor(props) {
         super(props);
 

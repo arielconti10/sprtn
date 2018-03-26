@@ -20,8 +20,6 @@ import outlookReducer from '../routes/outlook/outlookReducer'
 import {voiceReducer, VoiceMiddleware} from '../components/voice-control'
 import {voiceControlOn} from "../components/voice-control/VoiceActions";
 
-import schoolsReducer from '../../spartan/schools/containers/SchoolsReducer'
-
 export const rootReducer = combineReducers(
   {
     routing: routerReducer,
@@ -31,9 +29,7 @@ export const rootReducer = combineReducers(
     user: userReducer,
     chat: chatReducer,
     events: eventsReducer,
-    voice: voiceReducer,
-
-    schoolsList: schoolsReducer 
+    voice: voiceReducer 
   }
 );
 
