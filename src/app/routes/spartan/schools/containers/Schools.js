@@ -13,7 +13,7 @@ import content from '../../../../components/content/content';
 import Datatable from '../../../../components/tables/Datatable'
 import { Stats, BigBreadcrumbs, WidgetGrid, JarvisWidget } from '../../../../components'
 
-import SchoolsList from './SchoolsList2'
+import SchoolsList from './SchoolsList'
 
 export default class Schools extends Component {
     render() {
