@@ -49,6 +49,8 @@ class LoginForm extends Component {
 
     saveStorage(res) {
         if (res.data.access_token !== undefined) {
+            window.location.reload()
+            
             sessionStorage.setItem('token_type', res.data.token_type);
             sessionStorage.setItem('access_token', res.data.access_token);
             sessionStorage.setItem('refresh_token', res.data.refresh_token);
@@ -107,7 +109,7 @@ class LoginForm extends Component {
 class Login extends Component {
     componentWillMount() {
         if (sessionStorage.getItem("access_token") !== null) {
-            window.location.href = "#/schools";
+            window.location.href = "#/schools";            
         }
     }
     render() {
