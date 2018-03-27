@@ -6,24 +6,11 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import filterFactory, { textFilter, Comparator, selectFilter } from 'react-bootstrap-table2-filter';
 
 import React, { Component } from 'react'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
+import { ToastContainer, toast } from 'react-toastify'
 
 import axios from '../../common/axiosSpartan'
 
-const selectOptions = {
-    'Federal': 'Federal',
-    'Estadual': 'Estadual',
-    'Municipal': 'Municipal',
-    'Particular': 'Particular',
-    'Particular Católica': 'Particular Católica',
-    'Secretaria De Ensino': 'Secretaria De Ensino',
-    'Delegacia De Ensino': 'Delegacia De Ensino',
-    'Prefeitura': 'Prefeitura',
-    'Marista': 'Marista'
-};
-
-const apiName = 'school'
+const apiName = 'job-title'
 
 export default class JobTitlesList extends Component {
     constructor(props) {
@@ -34,25 +21,67 @@ export default class JobTitlesList extends Component {
             data: [],
             sizePerPage: 10,
             totalSize: 0,
-            lastFilter : '',
-            lastOrder : '',
+            lastFilter: '',
+            lastOrder: '',
+            row: '',
             columns: [
                 { text: 'ID', dataField: 'id' },
-                { text: 'Tipo', dataField: 'school_type.name', sort: false, filter: selectFilter({ options: selectOptions }) },
-                { text: 'Filial', dataField: 'state_id', sort: true, filter: textFilter() },
-                { text: 'TOTVS', dataField: 'school_code_totvs', sort: true, filter: textFilter() },
-                { text: 'Perfil', dataField: 'profile.name', sort: true },
                 { text: 'Nome', dataField: 'name', sort: true, filter: textFilter() },
-                { text: 'Endereço', dataField: 'address', sort: true, filter: textFilter() },
-                { text: 'Bairro', dataField: 'neighborhood', sort: true, filter: textFilter() },
-                { text: 'Cidade', dataField: 'city', sort: true, filter: textFilter() },
-                { text: 'UF', dataField: 'state.abbrev', sort: true }
+                { text: 'Tipo', dataField: 'type.name' },
+                { text: '', dataField: 'button', formatter: this.cellButton.bind(this) }
             ]
-        };
+        }
+        this.notify = this.notify.bind(this)
+        this.refreshList = this.refreshList.bind(this)
     }
 
-    componentDidMount() {
-        axios.get(`${apiName}?page=1`)
+    notify = () => {
+        /*if(element){
+            toast.error(element, { position: toast.POSITION.TOP_CENTER })
+        } else {*/
+            toast("Default Notification !")
+            //toast.succes('Operação realizada com sucesso!', { position: toast.POSITION.TOP_CENTER })
+       // }
+    }
+
+    cellButton(cell, row, enumObject, rowIndex) {
+        return (
+            <div>
+                <button className='btn btn-warning' onClick={() => this.onClickJobTitleEdit(cell, row, rowIndex)}>
+                    <i className='fa fa-pencil'></i>
+                </button>
+                <button className='btn btn-danger' data-toggle="modal"
+                    data-target="#myModal">
+                    <i className='fa fa-trash-o'></i>
+                </button>
+            </div>
+        )
+    }
+
+    onClickJobTitleEdit(cell, row, rowIndex) {
+        console.log('Edit', cell, row, rowIndex)
+
+    }
+
+    onClickJobTitleDelete() {
+
+        console.log('Delete', this.state.row)
+        let values = this.state.row
+        axios.delete(`${apiName}/${values.id}`, values)
+            .then(resp => {
+                this.notify
+                this.refreshList()
+            })
+            .catch(e => {
+                e.response.data.errors.forEach(element => this.notify(element))
+            })
+
+        //this.refreshList()
+
+    }
+
+    refreshList() {
+        axios.get(`${apiName}?paginate=10&page=1`)
             .then(response => {
                 const dados = response.data.data
 
@@ -64,24 +93,31 @@ export default class JobTitlesList extends Component {
                 }))
             })
             .catch(err => console.log(err));
+
+        console.log('after-refresList()')
+    }
+
+    componentDidMount() {
+        this.refreshList()
     }
 
     handleTableChange = (type, { page, sizePerPage, filters, sortField, sortOrder, data }) => {
+
         let baseURL = `${apiName}?paginate=${sizePerPage}&page=${page}`
 
         let urlSort = sortField ? `&order[${sortField}]=${sortOrder}` : ''
 
         let filterId = Object.keys(filters).toString()
         let arrFilterId = filterId.split(',')
-        let urlFilter = '' 
+        let urlFilter = ''
 
-        if(filterId){
-            arrFilterId.map(function(item){
+        if (filterId) {
+            arrFilterId.map(function (item) {
                 urlFilter += `&filter[${item}]=${filters[`${item}`]['filterVal']}`
             })
-        }        
+        }
 
-        switch(type){
+        switch (type) {
             case 'filter':
                 baseURL += `${urlFilter}${this.state.lastOrder}`
                 break
@@ -101,27 +137,80 @@ export default class JobTitlesList extends Component {
                     data: dados,
                     sizePerPage: sizePerPage,
                     totalSize: response.data.meta.pagination.total,
-                    lastFilter : urlFilter,
-                    lastOrder : urlSort
+                    lastFilter: urlFilter,
+                    lastOrder: urlSort
                 }))
             })
             .catch(err => console.log(err));
-    }    
+    }
 
     render() {
         const { data, sizePerPage, page, totalSize, columns } = this.state;
 
+        const selectRow = {
+            mode: 'radio',
+            clickToSelect: true,
+            hideSelectColumn: true,
+            bgColor: '#eee'
+        }
+
+        const rowEvents = {
+            onClick: (e, row, rowIndex) => {
+                console.log('onClick', e, row, rowIndex)
+                this.setState({ row })
+            }
+        }
+
         return (
             <div>
                 <BootstrapTable
-                    remote={{ pagination: true, sort: true }}
+                    remote={{ pagination: true, sort: true, cellEdit: true }}
                     keyField="id"
                     data={data}
                     columns={columns}
+                    selectRow={selectRow}
+                    rowEvents={rowEvents}
                     filter={filterFactory()}
                     pagination={paginationFactory({ page, sizePerPage, totalSize })}
                     onTableChange={this.handleTableChange}
                 />
+
+                <button onClick={this.notify}>Notify</button>
+
+                <div className="modal fade" id="myModal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel"
+                    aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                                <h4 className="modal-title" id="myModalLabel">Excluir registro</h4>
+                            </div>
+                            <div className="modal-body">
+
+                                <div className="row">
+                                    <p>Deseja realmente excluir este registro?</p>
+                                </div>
+
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-default" data-dismiss="modal">
+                                    Cancelar
+                                </button>
+                                <button type="button" className="btn btn-primary"
+                                    onClick={() => this.onClickJobTitleDelete()}
+                                    data-dismiss="modal">
+                                    Sim
+                                </button>
+                            </div>
+                        </div>
+                        {/* /.modal-content */}
+                    </div>
+                    {/* /.modal-dialog */}
+                </div>
+                {/* /.modal */}
+
             </div>
         );
     }

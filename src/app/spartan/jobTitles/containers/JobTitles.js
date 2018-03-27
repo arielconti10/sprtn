@@ -36,12 +36,12 @@ export default class JobTitles extends Component {
                             <JarvisWidget editbutton={false} color="darken" deletebutton={false} colorbutton={false} >
                                 <header>
                                     <span className="widget-icon"> <i className="fa fa-table" /> </span> 
-                                    <h2>Escolas</h2>
+                                    <h2>Cargos</h2>
                                 </header>
                                 <div>
                                     <div className="widget-body no-padding">
                                     
-                                        
+                                        <a class="btn btn-success" href="#/schools"><i class="fa fa-plus-circle"></i> Novo</a>    
                                         <JobTitlesList />
 
                                     </div>
