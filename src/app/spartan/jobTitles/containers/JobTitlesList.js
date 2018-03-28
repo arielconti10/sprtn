@@ -31,17 +31,11 @@ export default class JobTitlesList extends Component {
                 { text: '', dataField: 'button', formatter: this.cellButton.bind(this) }
             ]
         }
-        this.notify = this.notify.bind(this)
         this.refreshList = this.refreshList.bind(this)
     }
 
     notify = () => {
-        /*if(element){
-            toast.error(element, { position: toast.POSITION.TOP_CENTER })
-        } else {*/
             toast("Default Notification !")
-            //toast.succes('Operação realizada com sucesso!', { position: toast.POSITION.TOP_CENTER })
-       // }
     }
 
     cellButton(cell, row, enumObject, rowIndex) {
@@ -75,9 +69,6 @@ export default class JobTitlesList extends Component {
             .catch(e => {
                 e.response.data.errors.forEach(element => this.notify(element))
             })
-
-        //this.refreshList()
-
     }
 
     refreshList() {
