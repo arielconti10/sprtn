@@ -1,3 +1,0 @@
-export default {
-    SCHOOLS_LIST_FETCHED: 'SCHOOLS_LIST_FETCHED'
-}

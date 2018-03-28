@@ -7,7 +7,6 @@ import Content from '../../../template/components/content/content'
 import Row from '../../../template/components/common/row'
 import Grid from '../../../template/components/common/grid'
 
-import SchoolsParams from './SchoolsParams'
 import content from '../../../template/components/content/content';
 
 import Datatable from '../../../template/components/tables/Datatable'
