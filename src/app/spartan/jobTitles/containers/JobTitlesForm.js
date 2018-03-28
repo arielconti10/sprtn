@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { Router } from 'react-router'
 
 import ContentHeader from '../../../template/components/content/contentHeader'
 import Content from '../../../template/components/content/content'
@@ -199,6 +200,7 @@ export default class JobTitlesForm extends Component {
                                         </div>
 
                                         <button className="btn btn-primary">Salvar</button>
+                                        <button className="btn btn-danger" onClick={() => Router.History.back()}>Cancelar</button>
                                     </FormWithConstraints>
                                 </div>
                             </JarvisWidget>  
