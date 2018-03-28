@@ -7,15 +7,15 @@ import Content from '../../../template/components/content/content'
 import Row from '../../../template/components/common/row'
 import Grid from '../../../template/components/common/grid'
 
-import SchoolsParams from './SchoolsParams'
 import content from '../../../template/components/content/content';
 
+import {Router, hashHistory,Link} from 'react-router'
 import Datatable from '../../../template/components/tables/Datatable'
 import { Stats, BigBreadcrumbs, WidgetGrid, JarvisWidget } from '../../../template/components'
 
-import SchoolsList from './SchoolsList'
+import JobTitlesList from './JobTitlesList'
 
-export default class Schools extends Component {
+export default class JobTitles extends Component {
     componentWillMount() {
         if (sessionStorage.getItem("access_token") == null) {
             window.location.href = "#/login";
@@ -25,7 +25,7 @@ export default class Schools extends Component {
         return ( 
             <div id="content">
                 <div className="row">
-                    <BigBreadcrumbs items={['Carteira', 'Escolas']} icon="fa fa-fw fa-suitcase"
+                    <BigBreadcrumbs items={['Cadastros', 'Cargos']} icon="fa fa-fw fa-suitcase"
                         className="col-xs-12 col-sm-7 col-md-7 col-lg-4" />
                 </div>
 
@@ -37,13 +37,13 @@ export default class Schools extends Component {
                             <JarvisWidget editbutton={false} color="darken" deletebutton={false} colorbutton={false} >
                                 <header>
                                     <span className="widget-icon"> <i className="fa fa-table" /> </span> 
-                                    <h2>Escolas</h2>
+                                    <h2>Cargos</h2>
                                 </header>
                                 <div>
                                     <div className="widget-body no-padding">
                                     
-                                        
-                                        <SchoolsList />
+                                        <Link class="btn btn-success" href="#/job-titles/create"><i class="fa fa-plus-circle"></i> Novo</Link>    
+                                        <JobTitlesList />
 
                                     </div>
                                 </div>

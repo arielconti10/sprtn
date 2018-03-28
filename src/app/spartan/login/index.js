@@ -1,5 +1,5 @@
 export default {
-  path: 'spartan',
+  path: '/',
   // component: require('../../../components/common/Layout').default,
   childRoutes: [
     {

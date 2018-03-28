@@ -49,14 +49,15 @@ class LoginForm extends Component {
 
     saveStorage(res) {
         if (res.data.access_token !== undefined) {
+            window.location.reload();
             sessionStorage.setItem('token_type', res.data.token_type);
             sessionStorage.setItem('access_token', res.data.access_token);
             sessionStorage.setItem('refresh_token', res.data.refresh_token);
             sessionStorage.setItem('expires_in', res.data.expires_in); 
             this.setState({'valid_login' : true});
-            window.location.href = "/#/spartan/schools";
+            window.location.href = "#/home";
         } else {
-            this.setState({'valid_login' : false});
+            this.setState({'valid_login' : false, password: ''});
         }
 
     }
@@ -107,7 +108,7 @@ class LoginForm extends Component {
 class Login extends Component {
     componentWillMount() {
         if (sessionStorage.getItem("access_token") !== null) {
-            window.location.href = "#/spartan/schools";
+            window.location.href = "#/home";
         }
     }
     render() {

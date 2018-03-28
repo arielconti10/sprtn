@@ -5,10 +5,15 @@
 import React from 'react'
 
 import WidgetGrid from '../../../template/components/widgets/WidgetGrid'
-import JarvisWidget  from '../../../template/components/widgets/JarvisWidget'
+import JarvisWidget from '../../../template/components/widgets/JarvisWidget'
 
 
 export default class Home extends React.Component {
+  componentWillMount() {
+    if (sessionStorage.getItem("access_token") == null) {
+      window.location.href = "#/login";
+    }
+  }
   render() {
     return (
       <div id="content">

@@ -6,7 +6,7 @@ export default function Shortcut() {
   return (
     <div id="shortcut">
       <ul>
-        <li>
+        {/*<li>
           <Link to="/outlook" title="Inbox" className="jarvismetro-tile big-cubes bg-color-blue">
             <span className="iconbox"> <i className="fa fa-envelope fa-4x"/> <span>Mail <span
               className="label pull-right bg-color-darken">14</span></span> </span>
@@ -24,10 +24,10 @@ export default function Shortcut() {
           <Link to="/misc/invoice" className="jarvismetro-tile big-cubes bg-color-blueDark"> <span className="iconbox"> <i
             className="fa fa-book fa-4x"/> <span>Invoice <span
             className="label pull-right bg-color-darken">99</span></span> </span> </Link>
-        </li>
+        </li>*/}
 
         <li>
-          <Link to="/spartan/logout" className="jarvismetro-tile big-cubes selected bg-color-pinkDark"> <span
+          <Link to="/logout" className="jarvismetro-tile big-cubes selected bg-color-pinkDark"> <span
             className="iconbox"> <i className="fa fa-user fa-4x"/> <span>Logout</span> </span> </Link>
         </li>
       </ul>

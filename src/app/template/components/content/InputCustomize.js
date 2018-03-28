@@ -5,7 +5,10 @@ export default class InputCustomize extends Component {
         return (
             <div className={this.props.cols} >
                 <div className="form-group">
-                    <input {...this.props} />
+                    {this.props.label != undefined &&
+                        <label for={this.props.id}>{this.props.label}</label>
+                    }
+                    <input {...this.props} ref={input => this.internal_code = input}/>
                     {this.props.helperText != "" && 
                         <small id="passwordHelp" className="form-text text-muted center-help">{this.props.helperText}</small>
                     }

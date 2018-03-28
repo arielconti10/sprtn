@@ -27,3 +27,11 @@ body {
     display: inline-block;
     text-align: center;
 }
+
+.form-control-feedback {
+    position: initial;
+    width: initial;
+    text-align: initial;
+    padding-top: 0.5em;
+    color: red;
+}

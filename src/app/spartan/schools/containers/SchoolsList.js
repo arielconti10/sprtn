@@ -6,11 +6,8 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import filterFactory, { textFilter, Comparator, selectFilter } from 'react-bootstrap-table2-filter';
 
 import React, { Component } from 'react'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
 
 import axios from '../../common/axiosSpartan'
-import { getSchoolsList } from './SchoolsActions'
 
 const selectOptions = {
     'Federal': 'Federal',
