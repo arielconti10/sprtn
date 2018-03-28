@@ -7,6 +7,8 @@ import filterFactory, { textFilter, Comparator, selectFilter } from 'react-boots
 
 import React, { Component } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
+import {Router, hashHistory,Link, browserHistory} from 'react-router'
+import { Route , withRouter} from 'react-router-dom';
 
 import axios from '../../common/axiosSpartan'
 
@@ -27,7 +29,7 @@ export default class JobTitlesList extends Component {
             columns: [
                 { text: 'ID', dataField: 'id' },
                 { text: 'Nome', dataField: 'name', sort: true, filter: textFilter() },
-                { text: 'Tipo', dataField: 'type.name' },
+                { text: 'Tipo', dataField: 'job_title_type.name' },
                 { text: '', dataField: 'button', formatter: this.cellButton.bind(this) }
             ]
         }
@@ -47,9 +49,10 @@ export default class JobTitlesList extends Component {
     cellButton(cell, row, enumObject, rowIndex) {
         return (
             <div>
-                <button className='btn btn-warning' onClick={() => this.onClickJobTitleEdit(cell, row, rowIndex)}>
+                {/*onClick={() => this.onClickJobTitleEdit(cell, row, rowIndex)}*/}
+                <Link to = {`/job-titles/update/${row.id}`} className='btn btn-warning' >
                     <i className='fa fa-pencil'></i>
-                </button>
+                </Link>
                 <button className='btn btn-danger' data-toggle="modal"
                     data-target="#myModal">
                     <i className='fa fa-trash-o'></i>
@@ -58,7 +61,11 @@ export default class JobTitlesList extends Component {
         )
     }
 
+
     onClickJobTitleEdit(cell, row, rowIndex) {
+        browserHistory.push('/#/job-titles/update');
+        // browserHistory.refresh();
+        console.log(row.id);
         console.log('Edit', cell, row, rowIndex)
 
     }

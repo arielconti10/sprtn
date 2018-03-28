@@ -9,6 +9,7 @@ import Grid from '../../../template/components/common/grid'
 
 import content from '../../../template/components/content/content';
 
+import {Router, hashHistory,Link} from 'react-router'
 import Datatable from '../../../template/components/tables/Datatable'
 import { Stats, BigBreadcrumbs, WidgetGrid, JarvisWidget } from '../../../template/components'
 
@@ -41,7 +42,7 @@ export default class JobTitles extends Component {
                                 <div>
                                     <div className="widget-body no-padding">
                                     
-                                        <a class="btn btn-success" href="#/schools"><i class="fa fa-plus-circle"></i> Novo</a>    
+                                        <Link class="btn btn-success" href="#/job-titles/create"><i class="fa fa-plus-circle"></i> Novo</Link>    
                                         <JobTitlesList />
 
                                     </div>

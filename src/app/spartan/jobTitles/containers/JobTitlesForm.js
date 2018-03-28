@@ -28,7 +28,6 @@ const apiPost = 'job-title';
 export default class JobTitlesForm extends Component {
     constructor(props) {
         super(props);
-        
         this.state = {
             job_types:[],
             internal_code: '',
@@ -46,6 +45,18 @@ export default class JobTitlesForm extends Component {
     componentWillMount() {
         if (sessionStorage.getItem("access_token") == null) {
             window.location.href = "#/spartan/login";
+        }
+
+        if (this.props.params.id !== undefined) {
+            axios.get(`${apiPost}/${this.props.params.id}`)
+            .then(response => {
+                const dados = response.data.data;
+                this.setState({internal_code: dados.code});
+                this.setState({internal_name: dados.name});
+                this.setState({job_title_type_id: dados.job_title_type_id});
+                console.log(this.state.job_title_type_id);
+            })
+            .catch(err => console.log(err));
         }
     }
 
@@ -81,6 +92,22 @@ export default class JobTitlesForm extends Component {
             window.location.href = "#/job-titles";
         }).catch(function (error) {
             let data_error = error.response.data.errors;
+            let filterId = Object.keys(data_error)[0].toString();
+            this.setState({back_error: data_error[filterId]});
+        }.bind(this));
+    }
+
+    updateForm(event) {
+        event.preventDefault();
+        var id = this.props.params.id;
+        axios.put(`${apiPost}/${id}`, {
+            'code': this.state.internal_code.toUpperCase(),
+            'name': this.state.internal_name,
+            'job_title_type_id': this.state.job_title_type_id
+        }).then(res => {
+            window.location.href = "#/job-titles";
+        }).catch(function (error) {
+            let data_error = error.response.data.errors;
             let filterId = Object.keys(data_error).toString();
             this.setState({back_error: data_error[filterId]});
         }.bind(this));
@@ -94,7 +121,11 @@ export default class JobTitlesForm extends Component {
         this.setState({ submitButtonDisabled: !this.form.isValid() });
     
         if (this.form.isValid()) {
-            this.submitForm(event);
+            if (this.props.params.id !== undefined) {
+                this.updateForm(event);
+            } else {
+                this.submitForm(event);
+            }
         }
     }
     
@@ -129,7 +160,7 @@ export default class JobTitlesForm extends Component {
                                                 <FormControlLabel htmlFor="internal_code">Código</FormControlLabel>
                                                 <FormControlInput type="text" id="internal_code" name="internal_code"
                                                                     value={this.state.internal_code} onChange={this.handleChange}
-                                                                    required minLength={3} />
+                                                                    required />
                                                 <FieldFeedbacks for="internal_code">
                                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
                                                 </FieldFeedbacks>
@@ -141,7 +172,7 @@ export default class JobTitlesForm extends Component {
                                                 <FormControlLabel htmlFor="internal_name">Nome</FormControlLabel>
                                                 <FormControlInput type="text" id="internal_name" name="internal_name"
                                                                     value={this.state.internal_name} onChange={this.handleChange}
-                                                                    required minLength={3} />
+                                                                    required  />
                                                 <FieldFeedbacks for="internal_name">
                                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
                                                 </FieldFeedbacks>
@@ -155,8 +186,11 @@ export default class JobTitlesForm extends Component {
                                                     id="job_title_type_id" name="job_title_type_id">
                                                 {
                                                     this.state.job_types.map(data => {
+                                                        const checked = data.id == this.state.job_title_type_id?"checked":"";
                                                         return (
-                                                            <option value={data.id}>{data.name}</option>
+                                                            <option value={data.id} selected={checked}>
+                                                                {data.name}
+                                                            </option>
                                                         ) 
                                                     })
                                                 }
