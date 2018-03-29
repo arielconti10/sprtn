@@ -22,6 +22,10 @@
         {
           "route": "/job-titles",
           "title": "Cargos"
+        },
+        {
+          "route": "/localization-types",
+          "title": "Tipos de Localizaçāo"
         }
       ]
     }

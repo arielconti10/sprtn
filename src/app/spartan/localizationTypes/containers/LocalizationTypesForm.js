@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import {Router, hashHistory,Link} from 'react-router';
+import { Router } from 'react-router'
 
 import ContentHeader from '../../../template/components/content/contentHeader'
 import Content from '../../../template/components/content/content'
@@ -13,7 +13,7 @@ import content from '../../../template/components/content/content';
 import Datatable from '../../../template/components/tables/Datatable'
 import { Stats, BigBreadcrumbs, WidgetGrid, JarvisWidget } from '../../../template/components'
 
-import JobTitlesList from './JobTitlesList'
+import LocalizationTypesList from './LocalizationTypesList'
 import InputCustomize from '../../../template/components/content/InputCustomize';
 import SelectCustomize from '../../../template/components/content/SelectCustomize';
 import axios from '../../common/axiosSpartan';
@@ -22,18 +22,14 @@ import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints'
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 import '../../css/site.css';
 
-const apiSelectBox = 'job-title-type';
-const apiPost = 'job-title';
+const apiSpartan = 'localization';
 
 
-export default class JobTitlesForm extends Component {
+export default class LocalizationTypesForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            job_types:[],
-            internal_code: '',
-            internal_name: '',
-            job_title_type_id: '',
+            name: '',
             back_error: '',
             submitButtonDisabled: false
         };
@@ -49,26 +45,13 @@ export default class JobTitlesForm extends Component {
         }
 
         if (this.props.params.id !== undefined) {
-            axios.get(`${apiPost}/${this.props.params.id}`)
+            axios.get(`${apiSpartan}/${this.props.params.id}`)
             .then(response => {
                 const dados = response.data.data;
-                this.setState({internal_code: dados.code});
-                this.setState({internal_name: dados.name});
-                this.setState({job_title_type_id: dados.job_title_type_id});
-                console.log(this.state.job_title_type_id);
+                this.setState({name: dados.name});
             })
             .catch(err => console.log(err));
         }
-    }
-
-    componentDidMount() {
-        axios.get(`${apiSelectBox}?page=1`)
-            .then(response => {
-                const dados = response.data.data;
-                this.setState({job_types:dados});
-                this.setState({job_title_type_id:dados[0].id});
-            })
-            .catch(err => console.log(err));
     }
 
     handleChange(e) {
@@ -85,12 +68,10 @@ export default class JobTitlesForm extends Component {
 
     submitForm(event) {
         event.preventDefault();
-        axios.post(`${apiPost}`, {
-            'code': this.state.internal_code.toUpperCase(),
-            'name': this.state.internal_name,
-            'job_title_type_id': this.state.job_title_type_id
+        axios.post(`${apiSpartan}`, {
+            'name': this.state.name,
         }).then(res => {
-            window.location.href = "#/job-titles";
+            window.location.href = "#/localization-types";
         }).catch(function (error) {
             let data_error = error.response.data.errors;
             let filterId = Object.keys(data_error)[0].toString();
@@ -101,12 +82,10 @@ export default class JobTitlesForm extends Component {
     updateForm(event) {
         event.preventDefault();
         var id = this.props.params.id;
-        axios.put(`${apiPost}/${id}`, {
-            'code': this.state.internal_code.toUpperCase(),
-            'name': this.state.internal_name,
-            'job_title_type_id': this.state.job_title_type_id
+        axios.put(`${apiSpartan}/${id}`, {
+            'name': this.state.name,
         }).then(res => {
-            window.location.href = "#/job-titles";
+            window.location.href = "#/localization-types";
         }).catch(function (error) {
             let data_error = error.response.data.errors;
             let filterId = Object.keys(data_error).toString();
@@ -134,7 +113,7 @@ export default class JobTitlesForm extends Component {
         return ( 
             <div id="content">
                 <div className="row">
-                    <BigBreadcrumbs items={['Cadastros', 'Cargos']} icon="fa fa-fw fa-suitcase"
+                    <BigBreadcrumbs items={['Cadastros', 'Tipos de Localizaçāo']} icon="fa fa-fw fa-suitcase"
                         className="col-xs-12 col-sm-7 col-md-7 col-lg-4" />
                 </div>
 
@@ -150,53 +129,22 @@ export default class JobTitlesForm extends Component {
                             <JarvisWidget editbutton={false} color="darken" deletebutton={false} colorbutton={false} >
                                 <header>
                                     <span className="widget-icon"> <i className="fa fa-table" /> </span> 
-                                    <h2>Cadastrar Cargo</h2>
+                                    <h2>Cadastrar Tipo de Localizaçāo</h2>
                                 </header>
                                 <div>
                                     <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
                                         onSubmit={this.handleSubmit} noValidate>
 
-                                        <div className="col-lg-4 col-md-4 col-sm-12">
-                                            <FormGroup for="internal_code">
-                                                <FormControlLabel htmlFor="internal_code">Código</FormControlLabel>
-                                                <FormControlInput type="text" id="internal_code" name="internal_code"
-                                                                    value={this.state.internal_code} onChange={this.handleChange}
+                                        <div className="col-lg-12 col-md-12 col-sm-12">
+                                            <FormGroup for="name">
+                                                <FormControlLabel htmlFor="name">Nome</FormControlLabel>
+                                                <FormControlInput type="text" id="name" name="name"
+                                                                    value={this.state.name} onChange={this.handleChange}
                                                                     required />
-                                                <FieldFeedbacks for="internal_code">
+                                                <FieldFeedbacks for="name">
                                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
                                                 </FieldFeedbacks>
                                             </FormGroup>
-                                        </div>
-
-                                        <div className="col-lg-4 col-md-4 col-sm-12">
-                                            <FormGroup for="internal_name">
-                                                <FormControlLabel htmlFor="internal_name">Nome</FormControlLabel>
-                                                <FormControlInput type="text" id="internal_name" name="internal_name"
-                                                                    value={this.state.internal_name} onChange={this.handleChange}
-                                                                    required  />
-                                                <FieldFeedbacks for="internal_name">
-                                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                                </FieldFeedbacks>
-                                            </FormGroup>
-                                        </div>
-
-                                        <div className="col-lg-4 col-md-4 col-sm-4">
-                                            <div className="form-group">
-                                                <label for="job_title_type_id">Tipo do Cargo</label>
-                                                <select className="form-control" onChange={this.handleChange} 
-                                                    id="job_title_type_id" name="job_title_type_id">
-                                                {
-                                                    this.state.job_types.map(data => {
-                                                        const checked = data.id == this.state.job_title_type_id?"checked":"";
-                                                        return (
-                                                            <option value={data.id} selected={checked}>
-                                                                {data.name}
-                                                            </option>
-                                                        ) 
-                                                    })
-                                                }
-                                                </select>
-                                            </div>
                                         </div>
 
                                         <button className="btn btn-primary">Salvar</button>
