@@ -19,6 +19,7 @@ const routes = {
     require('./spartan/schools').default,
     require('./spartan/jobTitles').default,
     require('./spartan/localizationTypes').default,
+    require('./spartan/subsidiaries').default,
 
     // require('./routes/dashboard').default,
     // require('./routes/smartadmin-intel').default,

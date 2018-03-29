@@ -26,6 +26,10 @@
         {
           "route": "/localization-types",
           "title": "Tipos de Localizaçāo"
+        },
+        {
+            "route": "/subsidiaries",
+            "title": "Filiais"
         }
       ]
     }
