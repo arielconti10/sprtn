@@ -16,24 +16,15 @@ class SchoolList extends Component {
             page: 1,
             data: [],
             pages: null,
-            sizePerPage: 10,
-            totalSize: 0,
-            lastFilter : '',
-            lastOrder : '',
+            // pageSize: 10,
+            // totalSize: 0,
+            // lastFilter : '',
+            // lastOrder : '',
             loading: true,
-            columns: [
-                { Header: 'ID', acessor: 'id' },
-                { Header: 'Tipo', acessor: 'school_type.name'},
-                { Header: 'Filial', acessor: 'state_id'},
-                { Header: 'TOTVS', acessor: 'school_code_totvs'},
-                { Header: 'Perfil', acessor: 'profile.name'},
-                { Header: 'Nome', acessor: 'name'},
-                { Header: 'Endereço', acessor: 'address'},
-                { Header: 'Bairro', acessor: 'neighborhood'},
-                { Header: 'Cidade', acessor: 'city'},
-                { Header: 'UF', acessor: 'state.abbrev'}
-            ]
+            
         };
+
+        //this.onFetchData = this.onFetchData.bind(this);
     }
 
     // componentDidMount() {
@@ -46,7 +37,7 @@ class SchoolList extends Component {
     //             this.setState(() => ({
     //                 page: 1,
     //                 data: dados,
-    //                 sizePerPage: 10,
+    //                 pageSize: 10,
     //                 totalSize: response.data.meta.pagination.total,
     //                 pages: response.data.meta.pagination.last_page,
     //                 loading: false
@@ -55,102 +46,118 @@ class SchoolList extends Component {
     //         .catch(err => console.log(err));
     // }
 
-    onFetchData = (type, { page, sizePerPage, filters, sortField, sortOrder, data }) => {
-        let baseURL = `/school?paginate=10&page=1`
+    // onFetchData = (state, { page, pageSize, filters, sortField, sortOrder, data, pages }) => {
+    // //onFetchData = (state, instance) => {
 
-        // let urlSort = sortField ? `&order[${sortField}]=${sortOrder}` : ''
+    //     console.log(state);
+    //     let baseURL = `/school?paginate=${state.pageSize}&page=${state.page+1}`
 
-        // let filterId = Object.keys(filters).toString()
-        // let arrFilterId = filterId.split(',')
-        // let urlFilter = '' 
+    //     // let urlSort = sortField ? `&order[${sortField}]=${sortOrder}` : ''
 
-        // if(filterId){
-        //     arrFilterId.map(function(item){
-        //         urlFilter += `&filter[${item}]=${filters[`${item}`]['filterVal']}`
-        //     })
-        // }        
+    //     // let filterId = Object.keys(filters).toString()
+    //     // let arrFilterId = filterId.split(',')
+    //     // let urlFilter = '' 
 
-        // switch(type){
-        //     case 'filter':
-        //         baseURL += `${urlFilter}${this.state.lastOrder}`
-        //         break
-        //     case 'sort':
-        //         baseURL += `${this.state.lastFilter}${urlSort}`
-        //         break
-        //     default:
-        //         baseURL += `${this.state.lastFilter}${this.state.lastOrder}`
-        // }
+    //     // if(filterId){
+    //     //     arrFilterId.map(function(item){
+    //     //         urlFilter += `&filter[${item}]=${filters[`${item}`]['filterVal']}`
+    //     //     })
+    //     // }        
 
-        axios.get(baseURL)
-            .then(response => {
-                const dados = response.data.data
+    //     // switch(type){
+    //     //     case 'filter':
+    //     //         baseURL += `${urlFilter}${this.state.lastOrder}`
+    //     //         break
+    //     //     case 'sort':
+    //     //         baseURL += `${this.state.lastFilter}${urlSort}`
+    //     //         break
+    //     //     default:
+    //     //         baseURL += `${this.state.lastFilter}${this.state.lastOrder}`
+    //     // }
 
-                this.setState(() => ({
-                    page: 1,
-                    data: dados,
-                    sizePerPage: 10,
-                    totalSize: response.data.meta.pagination.total,
-                    pages: response.data.meta.pagination.last_page,
-                    loading: false
-                    // lastFilter : urlFilter,
-                    // lastOrder : urlSort
-                }))
-            })
-            .catch(err => console.log(err));
-    }  
+    //     axios.get(baseURL)
+    //         .then((response) => {
+    //             const dados = response.data.data
+
+    //             this.setState({
+    //                 //page: state.page+1,
+    //                 data: dados,
+    //                 //pageSize: state.pageSize,
+    //                 totalSize: response.data.meta.pagination.total,
+    //                 pages: response.data.meta.pagination.last_page,
+    //                 loading: false
+    //                 // lastFilter : urlFilter,
+    //                 // lastOrder : urlSort
+    //             });
+
+    //             console.log(this.state);
+    //         })
+    //         .catch(err => console.log(err));
+    // }  
 
     render() {
-        // const data = [{
-        //     name: 'Tanner Linsley',
-        //     age: 26,
-        //     friend: {
-        //       name: 'Jason Maurer',
-        //       age: 23,
-        //     }
-        //   }]
         
-        //   const columns = [{
-        //     Header: 'Name',
-        //     accessor: 'name' // String-based value accessors!
-        //   }, {
-        //     Header: 'Age',
-        //     accessor: 'age',
-        //     Cell: props => <span className='number'>{props.value}</span> // Custom cell components!
-        //   }, {
-        //     id: 'friendName', // Required because our accessor is not a string
-        //     Header: 'Friend Name',
-        //     accessor: d => d.friend.name // Custom value accessors!
-        //   }, {
-        //     Header: props => <span>Friend Age</span>, // Custom header components!
-        //     accessor: 'friend.age'
-        //   }]
-        
-        const { data, sizePerPage, page, totalSize, loading, columns, pages } = this.state;
+        const { data, pageSize, page, loading, pages } = this.state;
+
+        const columns= [
+            { Header: 'ID', acessor: 'id' },
+            { Header: 'Tipo', acessor: 'name'},
+            { Header: 'Filial', acessor: 'state_id'},
+            { Header: 'TOTVS', acessor: 'school_code_totvs'},
+            { Header: 'Perfil', acessor: 'name'},
+            { Header: 'Nome', acessor: 'name'},
+            { Header: 'Endereço', acessor: 'address'},
+            { Header: 'Bairro', acessor: 'neighborhood'},
+            { Header: 'Cidade', acessor: 'city'},
+            { Header: 'UF', acessor: 'name'}
+        ]
           
         return (
-
-
-
             <Card>
                 <CardHeader>
                     <i className="fa fa-table"></i>Escolas
                 </CardHeader>
                 <CardBody>                            
-                <ReactTable
-                    data={data}
+                <ReactTable                    
                     columns={columns}
+                    data={data}
                     pages={pages}
                     loading={loading}
-                    defaultPageSize={sizePerPage}
-                    onFetchData={this.onFetchData}
+                    defaultPageSize={pageSize}
                     manual
+                    // onFetchData={this.onFetchData}
+                    onFetchData={(state, instance) => {
+                        let baseURL = `/school?paginate=${state.pageSize}&page=${state.page+1}`
+
+                        // show the loading overlay
+                        this.setState({loading: true})
+                        // fetch your data
+                        axios.get(baseURL)
+                            .then((response) => {
+                                const dados = response.data.data
+
+                                this.setState({
+                                    //page: state.page+1,
+                                    data: dados,
+                                    //pageSize: state.pageSize,
+                                    //totalSize: response.data.meta.pagination.total,
+                                    pages: response.data.meta.pagination.last_page,
+                                    loading: false
+                                    // lastFilter : urlFilter,
+                                    // lastOrder : urlSort
+                                });
+
+                                console.log(this.state);
+                            })
+                            .catch(err => console.log(err));
+                      }}
                     previousText='Anterior'
                     nextText='Próximo'
                     loadingText='Carregando...'
                     noDataText='Sem registros'
                     pageText='Página'
                     ofText='de'
-                    rowsText='registros'
+                    rowsText=''
                 />
                 </CardBody>
             </Card>
