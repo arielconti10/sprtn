@@ -26,20 +26,18 @@ class LoginForm extends Component {
         this.state = {
             login: '',
             password: '',
-            valid_login: true
+            valid_login: null,            
         };
-        this.submitForm = this.submitForm.bind(this);
-        this.saveStorage = this.saveStorage.bind(this);
     }
 
-    changeField(input) {
+    changeField = (input) => {
         var new_value = {};
         var input_name = input.target.id;
         new_value[input_name] = input.target.value;
         this.setState(new_value);
     }
 
-    saveStorage(res) {
+    saveStorage = (res) => {
         if (res.data.access_token !== undefined) {
             //window.location.reload();
             sessionStorage.setItem('token_type', res.data.token_type);
@@ -48,28 +46,13 @@ class LoginForm extends Component {
             sessionStorage.setItem('expires_in', res.data.expires_in);
             this.setState({ 'valid_login': true });
 
-            console.log(this.state);
-
-            window.location.href='#/dashboard';
-
-            console.log('after')
-            /*return (
-                <BrowserRouter >
-                    <Switch>
-                        <Route path="/" component={Full} />
-                        <Route exact path="/" render={() => (<Redirect to="/dashboard" />)} />
-                    </Switch>
-                </BrowserRouter>
-            );*/
-
-
         } else {
             this.setState({ 'valid_login': false, password: '' });
         }
 
     }
 
-    submitForm(event) {
+    submitForm = (event) => {
         event.preventDefault();
 
         axios.post('login', {
@@ -81,15 +64,21 @@ class LoginForm extends Component {
             //'scope: '' 
         }).then(res => {
             console.log(res)
-            this.saveStorage(res);
+            this.saveStorage(res);            
         })
     }
 
     render() {
+
+        if (this.state.valid_login) {
+            return (
+                <Redirect to="/" />
+            );
+        }
         return (
             <section className="login-form">
                 <h1>
-                    <img src="./src/app/containers/login/logo-spartan.png" // place your logo here
+                    <img src="./img/logo.png" // place your logo here
                         alt="Spartan" className="main-logo" />
                 </h1>
                 {this.state.valid_login == false && <LoginError />}
@@ -105,7 +94,7 @@ class LoginForm extends Component {
                         />
                     </div>
 
-                    <button type="submit" className="btn btn-primary btn-block">Acessar</button>
+                    <button onClick={() => this.submitForm()} className="btn btn-primary btn-block">Acessar</button>
                 </form>
             </section>
         )
