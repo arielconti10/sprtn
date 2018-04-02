@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Card, CardHeader, CardFooter, CardBody } from 'reactstrap';
-import { Router, hashHistory, Link, browserHistory } from 'react-router-dom'
+import { Router, hashHistory, Link, browserHistory, withRouter } from 'react-router-dom'
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
 
@@ -77,7 +76,7 @@ class GridApi extends Component {
                     !element.value.deleted_at ?
                         <div>
 
-                            <Link to={`/sectors/update/${element.value.id}`} className='btn btn-warning' >
+                            <Link to={`${this.props.match.url + "/form/"}${element.value.id}`} className='btn btn-warning' >
                                 <i className='fa fa-pencil'></i>
                             </Link>
                             <button className='btn btn-danger' data-toggle="modal"
@@ -135,44 +134,36 @@ class GridApi extends Component {
 
         return (
             <div>
-                <Card>
-                    <CardHeader>
-                        <i className="fa fa-table"></i>{this.props.cardHeader}
-                    </CardHeader>
-                    <CardBody>
-                        <ReactTable
-                            columns={columns}
-                            data={data}
-                            pages={pages}
-                            loading={loading}
-                            defaultPageSize={pageSize}
-                            manual
-                            onFetchData={this.onFetchData}
-                            /*SubComponent={(row, column) => {
-                                return (
-        
-                                    <div style={{ padding: "20px" }}>
-                                        Endereço:
-                                </div>
-                                );
-                            }}*/
-                            onExpandedChange={(expanded, index, event) => {
-                                event.persist();
-                            }}
-                            previousText='Anterior'
-                            nextText='Próximo'
-                            loadingText='Carregando...'
-                            noDataText='Sem registros'
-                            pageText='Página'
-                            ofText='de'
-                            rowsText=''
-                        />
-                    </CardBody>
-                </Card>
-
+                <ReactTable
+                    columns={columns}
+                    data={data}
+                    pages={pages}
+                    loading={loading}
+                    defaultPageSize={pageSize}
+                    manual
+                    onFetchData={this.onFetchData}
+                    /*SubComponent={(row, column) => {
+                        return (
+ 
+                            <div style={{ padding: "20px" }}>
+                                Endereço:
+                        </div>
+                        );
+                    }}*/
+                    onExpandedChange={(expanded, index, event) => {
+                        event.persist();
+                    }}
+                    previousText='Anterior'
+                    nextText='Próximo'
+                    loadingText='Carregando...'
+                    noDataText='Sem registros'
+                    pageText='Página'
+                    ofText='de'
+                    rowsText=''
+                />
             </div>
         )
     }
 }
 
-export default GridApi;
+export default withRouter(GridApi);

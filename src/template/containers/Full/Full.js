@@ -15,6 +15,14 @@ import JobTitles from '../../../app/containers/JobTitle/JobTitles'
 class Full extends Component {
 
     render() {
+        
+        const token = sessionStorage.getItem('access_token');
+        if (token == undefined) {
+            return (
+                <Redirect to="/login" />
+            );
+        }
+
 
         return (
             <div className="app">
@@ -25,11 +33,10 @@ class Full extends Component {
                         <Breadcrumb />
                         <Container fluid>
                             <Switch>
-                                <Route path="/login" name="Login" component={Login}/>
                                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
                                 <Route path="/carteira/escolas" name="Carteira" component={Schools}/>
                                 <Route path="/cadastro/cargos" name="Cargos" component={JobTitles}/>
-                                <Redirect from="/" to="/login"/>
+                                <Redirect from="/" to="/dashboard" />
                             </Switch>
                         </Container>
                     </main>

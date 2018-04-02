@@ -100,14 +100,6 @@ class JobTitleList extends Component {
     render() {
         const { data, sizePerPage, page, totalSize, columns } = this.state;
 
-        let teste = 2;
-
-        console.log(teste);
-
-        teste = 3;
-
-        console.log(teste);
-
         return (
             <Card>
                 <CardHeader>
