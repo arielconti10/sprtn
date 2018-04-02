@@ -7,6 +7,7 @@ import Breadcrumb from '../../components/Breadcrumb/';
 import Aside from '../../components/Aside/';
 import Footer from '../../components/Footer/';
 
+import Login from '../../../app/containers/login/Login'
 import Dashboard from '../../views/Dashboard/';
 import Schools from '../../../app/containers/School/Schools'
 import JobTitles from '../../../app/containers/JobTitle/JobTitles'
@@ -24,10 +25,11 @@ class Full extends Component {
                         <Breadcrumb />
                         <Container fluid>
                             <Switch>
+                                <Route path="/login" name="Login" component={Login}/>
                                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
                                 <Route path="/carteira/escolas" name="Carteira" component={Schools}/>
                                 <Route path="/cadastro/cargos" name="Cargos" component={JobTitles}/>
-                                <Redirect from="/" to="/dashboard"/>
+                                <Redirect from="/" to="/login"/>
                             </Switch>
                         </Container>
                     </main>

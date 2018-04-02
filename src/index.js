@@ -16,10 +16,12 @@ import '../scss/core/_dropdown-menu-right.scss'
 
 // Containers
 import Full from './template/containers/Full/'
+import Login from '../src/app/containers/login/Login'
 
 ReactDOM.render((
   <HashRouter>
     <Switch>
+      <Route path="/login" name="Login" component={Login}/>
       <Route path="/" name="Home" component={Full}/>
     </Switch>
   </HashRouter>
