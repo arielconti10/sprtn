@@ -56,11 +56,13 @@ class SchoolList extends Component {
     
         console.log(state.sorted)
 
-        let baseURL = `/school?paginate=${state.pageSize}&page=${state.page+1}`
+        //console.log(state.sorted.length);
+        let baseURL = `/school?paginate=${state.pageSize}&page=${state.page+1}`;
 
-        let urlSort = state.sorted.length ? `&order[${state.sorted[0].id}]=${state.sorted[0].desc ? 'desc' : 'asc'}` : ''
-
-        baseURL += `${urlSort}`
+        for (let i=0; i < state.sorted.length; i++) {
+            console.log(state.sorted[i]);
+            baseURL += "&order[" + state.sorted[i]['id'] + "]=" + (state.sorted[i]['desc'] == false ? 'asc' : 'desc');
+        }
 
         // let filterId = Object.keys(filters).toString()
         // let arrFilterId = filterId.split(',')
@@ -110,9 +112,9 @@ class SchoolList extends Component {
         const columns = [
             { Header: 'ID', accessor: 'id' },
             { Header: "Nome", accessor: "name"},
-            { Header: "Tipo", accessor: "school_type.name"},
-            { Header: 'Filial', accessor: 'subsidiary.name'},
-            { Header: 'TOTVS', accessor: 'school_code_totvs'},
+            { Header: "Tipo", accessor: "school_type.name", sortable: false},
+            { Header: 'Filial', accessor: 'subsidiary.name', sortable: false},
+            { Header: 'TOTVS', accessor: 'school_code_totvs', sortable: false},
             { Header: 'Perfil', accessor: 'profile.name'},
             // { Header: 'Nome', accessor: 'name'},
             // { Header: 'Endereço',accessor: 'address'},
