@@ -55,8 +55,15 @@ class SchoolList extends Component {
     onFetchData = (state, { page, pageSize, filters, sortField, sortOrder, data, pages }) => {
     //onFetchData = (state, instance) => {
 
-        console.log(state);
-        let baseURL = `/school?paginate=${state.pageSize}&page=${state.page+1}`
+        //console.log(state.sorted.length);
+        let baseURL = `/school?paginate=${state.pageSize}&page=${state.page+1}`;
+
+        for (let i=0; i < state.sorted.length; i++) {
+            console.log(state.sorted[i]);
+            baseURL += "&order[" + state.sorted[i]['id'] + "]=" + (state.sorted[i]['desc'] == false ? 'asc' : 'desc');
+        }
+
+        console.log(baseURL);
 
         // let urlSort = sortField ? `&order[${sortField}]=${sortOrder}` : ''
 
@@ -108,10 +115,10 @@ class SchoolList extends Component {
         const columns = [
             { Header: 'ID', accessor: 'id' },
             { Header: "Nome", accessor: "name"},
-            { Header: "Tipo", accessor: "school_type.name"},
-            { Header: 'Filial', accessor: 'subsidiary.name'},
-            { Header: 'TOTVS', accessor: 'school_code_totvs'},
-            { Header: 'Perfil', accessor: 'profile.name'},
+            { Header: "Tipo", accessor: "school_type.name", sortable: false},
+            { Header: 'Filial', accessor: 'subsidiary.name', sortable: false},
+            { Header: 'TOTVS', accessor: 'school_code_totvs', sortable: false},
+            { Header: 'Perfil', accessor: 'profile.name', sortable: false},
             // { Header: 'Nome', accessor: 'name'},
             // { Header: 'Endereço',accessor: 'address'},
             // { Header: 'Bairro', accessor: 'neighborhood'},
