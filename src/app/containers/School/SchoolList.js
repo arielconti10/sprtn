@@ -63,8 +63,6 @@ class SchoolList extends Component {
             baseURL += "&order[" + state.sorted[i]['id'] + "]=" + (state.sorted[i]['desc'] == false ? 'asc' : 'desc');
         }
 
-        console.log(baseURL);
-
         // let urlSort = sortField ? `&order[${sortField}]=${sortOrder}` : ''
 
         // let filterId = Object.keys(filters).toString()
@@ -118,7 +116,7 @@ class SchoolList extends Component {
             { Header: "Tipo", accessor: "school_type.name", sortable: false},
             { Header: 'Filial', accessor: 'subsidiary.name', sortable: false},
             { Header: 'TOTVS', accessor: 'school_code_totvs', sortable: false},
-            { Header: 'Perfil', accessor: 'profile.name', sortable: false},
+            { Header: 'Perfil', accessor: 'profile.name'},
             // { Header: 'Nome', accessor: 'name'},
             // { Header: 'Endereço',accessor: 'address'},
             // { Header: 'Bairro', accessor: 'neighborhood'},
