@@ -25,6 +25,7 @@
     "file-loader": "1.1.6",
     "html-loader": "0.5.5",
     "html-webpack-plugin": "2.30.1",
+    "namor": "^1.0.1",
     "node-sass": "4.7.2",
     "rimraf": "2.6.2",
     "sass-loader": "6.0.6",

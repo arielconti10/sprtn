@@ -20,7 +20,7 @@ class SchoolList extends Component {
             // totalSize: 0,
             // lastFilter : '',
             // lastOrder : '',
-            loading: true,
+            loading: false,
             
         };
 
@@ -30,87 +30,95 @@ class SchoolList extends Component {
     // componentDidMount() {
     //     axios.get(`/school?page=1`)
     //         .then(response => {
-    //             const dados = response.data.data
+    //             const dados = response.data.data;
+
+                
 
     //             console.log(dados);
 
-    //             this.setState(() => ({
-    //                 page: 1,
-    //                 data: dados,
-    //                 pageSize: 10,
-    //                 totalSize: response.data.meta.pagination.total,
-    //                 pages: response.data.meta.pagination.last_page,
-    //                 loading: false
-    //             }))
+    //             this.setState({
+    //                 data: dados
+    //             });
+
+    //             // this.setState(() => ({
+    //             //     page: 1,
+    //             //     data: dados,
+    //             //     pageSize: 10,
+    //             //     totalSize: response.data.meta.pagination.total,
+    //             //     pages: response.data.meta.pagination.last_page,
+    //             //     loading: false
+    //             // }))
     //         })
     //         .catch(err => console.log(err));
     // }
 
-    // onFetchData = (state, { page, pageSize, filters, sortField, sortOrder, data, pages }) => {
-    // //onFetchData = (state, instance) => {
+    onFetchData = (state, { page, pageSize, filters, sortField, sortOrder, data, pages }) => {
+    //onFetchData = (state, instance) => {
 
-    //     console.log(state);
-    //     let baseURL = `/school?paginate=${state.pageSize}&page=${state.page+1}`
+        console.log(state);
+        let baseURL = `/school?paginate=${state.pageSize}&page=${state.page+1}`
 
-    //     // let urlSort = sortField ? `&order[${sortField}]=${sortOrder}` : ''
+        // let urlSort = sortField ? `&order[${sortField}]=${sortOrder}` : ''
 
-    //     // let filterId = Object.keys(filters).toString()
-    //     // let arrFilterId = filterId.split(',')
-    //     // let urlFilter = '' 
+        // let filterId = Object.keys(filters).toString()
+        // let arrFilterId = filterId.split(',')
+        // let urlFilter = '' 
 
-    //     // if(filterId){
-    //     //     arrFilterId.map(function(item){
-    //     //         urlFilter += `&filter[${item}]=${filters[`${item}`]['filterVal']}`
-    //     //     })
-    //     // }        
+        // if(filterId){
+        //     arrFilterId.map(function(item){
+        //         urlFilter += `&filter[${item}]=${filters[`${item}`]['filterVal']}`
+        //     })
+        // }        
 
-    //     // switch(type){
-    //     //     case 'filter':
-    //     //         baseURL += `${urlFilter}${this.state.lastOrder}`
-    //     //         break
-    //     //     case 'sort':
-    //     //         baseURL += `${this.state.lastFilter}${urlSort}`
-    //     //         break
-    //     //     default:
-    //     //         baseURL += `${this.state.lastFilter}${this.state.lastOrder}`
-    //     // }
+        // switch(type){
+        //     case 'filter':
+        //         baseURL += `${urlFilter}${this.state.lastOrder}`
+        //         break
+        //     case 'sort':
+        //         baseURL += `${this.state.lastFilter}${urlSort}`
+        //         break
+        //     default:
+        //         baseURL += `${this.state.lastFilter}${this.state.lastOrder}`
+        // }
 
-    //     axios.get(baseURL)
-    //         .then((response) => {
-    //             const dados = response.data.data
+        axios.get(baseURL)
+            .then((response) => {
+                const dados = response.data.data
 
-    //             this.setState({
-    //                 //page: state.page+1,
-    //                 data: dados,
-    //                 //pageSize: state.pageSize,
-    //                 totalSize: response.data.meta.pagination.total,
-    //                 pages: response.data.meta.pagination.last_page,
-    //                 loading: false
-    //                 // lastFilter : urlFilter,
-    //                 // lastOrder : urlSort
-    //             });
+                this.setState({
+                    //page: state.page+1,
+                    data: dados,
+                    //pageSize: state.pageSize,
+                    totalSize: response.data.meta.pagination.total,
+                    pages: response.data.meta.pagination.last_page,
+                    loading: false
+                    // lastFilter : urlFilter,
+                    // lastOrder : urlSort
+                });
 
-    //             console.log(this.state);
-    //         })
-    //         .catch(err => console.log(err));
-    // }  
+                //console.log(this.state);
+            })
+            .catch(err => console.log(err));
+    }  
 
     render() {
-        
+        // console.log(this.state.data);
         const { data, pageSize, page, loading, pages } = this.state;
 
-        const columns= [
-            { Header: 'ID', acessor: 'id' },
-            { Header: 'Tipo', acessor: 'name'},
-            { Header: 'Filial', acessor: 'state_id'},
-            { Header: 'TOTVS', acessor: 'school_code_totvs'},
-            { Header: 'Perfil', acessor: 'name'},
-            { Header: 'Nome', acessor: 'name'},
-            { Header: 'Endereço', acessor: 'address'},
-            { Header: 'Bairro', acessor: 'neighborhood'},
-            { Header: 'Cidade', acessor: 'city'},
-            { Header: 'UF', acessor: 'name'}
-        ]
+        const columns = [
+            { Header: 'ID', accessor: 'id' },
+            { Header: "Nome", accessor: "name"},
+            { Header: "Tipo", accessor: "school_type.name"},
+            { Header: 'Filial', accessor: 'subsidiary.name'},
+            { Header: 'TOTVS', accessor: 'school_code_totvs'},
+            { Header: 'Perfil', accessor: 'profile.name'},
+            // { Header: 'Nome', accessor: 'name'},
+            // { Header: 'Endereço',accessor: 'address'},
+            // { Header: 'Bairro', accessor: 'neighborhood'},
+            // { Header: 'Cidade', accessor: 'city'},
+            // { Header: 'UF', accessor: 'name'}
+        ];            
+          
           
         return (
             <Card>
@@ -125,32 +133,22 @@ class SchoolList extends Component {
                     loading={loading}
                     defaultPageSize={pageSize}
                     manual
-                    // onFetchData={this.onFetchData}
-                    onFetchData={(state, instance) => {
-                        let baseURL = `/school?paginate=${state.pageSize}&page=${state.page+1}`
-
-                        // show the loading overlay
-                        this.setState({loading: true})
-                        // fetch your data
-                        axios.get(baseURL)
-                            .then((response) => {
-                                const dados = response.data.data
-
-                                this.setState({
-                                    //page: state.page+1,
-                                    data: dados,
-                                    //pageSize: state.pageSize,
-                                    //totalSize: response.data.meta.pagination.total,
-                                    pages: response.data.meta.pagination.last_page,
-                                    loading: false
-                                    // lastFilter : urlFilter,
-                                    // lastOrder : urlSort
-                                });
-
-                                console.log(this.state);
-                            })
-                            .catch(err => console.log(err));
-                      }}
+                    onFetchData={this.onFetchData}
+                    SubComponent={(row, column) => {
+                        //console.log(row, column);
+                        //console.log(row);
+                        return (
+                            
+                            <div style={{ padding: "20px" }}>
+                                Endereço: 
+                            </div>
+                        );
+                    }}
+                    onExpandedChange={(expanded, index, event) => {
+                        event.persist();
+                        //console.log('Inside of onExpandedChange...')
+                        //console.log(expanded, index, event)
+                    }}                    
                     previousText='Anterior'
                     nextText='Próximo'
                     loadingText='Carregando...'

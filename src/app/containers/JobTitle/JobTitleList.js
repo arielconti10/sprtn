@@ -11,6 +11,7 @@ import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.m
 
 import axios from '../../common/axios';
 
+<<<<<<< HEAD
 
 const teste = {abc: 123};
 
@@ -18,6 +19,8 @@ teste.abc = 456;
 
 //console.log(teste);
 
+=======
+>>>>>>> 89f891425425a3cd490c0560d65649c89a1adc9e
 class JobTitleList extends Component {
 
     constructor(props) {
