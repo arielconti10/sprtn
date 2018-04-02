@@ -52,13 +52,15 @@ class SchoolList extends Component {
     //         .catch(err => console.log(err));
     // }
 
-    onFetchData = (state, { page, pageSize, filters, sortField, sortOrder, data, pages }) => {
-    //onFetchData = (state, instance) => {
+    onFetchData = (state, instance) => {
+    
+        console.log(state.sorted)
 
-        console.log(state);
         let baseURL = `/school?paginate=${state.pageSize}&page=${state.page+1}`
 
-        // let urlSort = sortField ? `&order[${sortField}]=${sortOrder}` : ''
+        let urlSort = state.sorted.length ? `&order[${state.sorted[0].id}]=${state.sorted[0].desc ? 'desc' : 'asc'}` : ''
+
+        baseURL += `${urlSort}`
 
         // let filterId = Object.keys(filters).toString()
         // let arrFilterId = filterId.split(',')
