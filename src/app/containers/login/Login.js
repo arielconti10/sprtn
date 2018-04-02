@@ -55,7 +55,7 @@ class LoginForm extends Component {
     submitForm = (event) => {
         event.preventDefault();
 
-        axios.post('login', {
+        axios.post('/login', {
             'grant_type': 'password',
             'client_id': '2',
             'client_secret': 'X2zabNZ1I8xThjTgfXXIfMZfWm84pLD4ITrE70Yx',

@@ -16,11 +16,11 @@ class SchoolList extends Component {
             page: 1,
             data: [],
             pages: null,
-            // pageSize: 10,
+            pageSize: 10,
             // totalSize: 0,
             // lastFilter : '',
             // lastOrder : '',
-            loading: false,
+            loading: true,
             
         };
 
@@ -85,6 +85,10 @@ class SchoolList extends Component {
         //     default:
         //         baseURL += `${this.state.lastFilter}${this.state.lastOrder}`
         // }
+
+        this.setState({
+            loading: true
+        });
 
         axios.get(baseURL)
             .then((response) => {
