@@ -18,6 +18,8 @@ const routes = {
   '/cadastro/tipos-localizacao': 'Tipos de Localizaçāo',
   '/cadastro/tipos-localizacao/form': 'Tipos de Localizaçāo',
   '/cadastro/perfis': 'Perfis',
-  '/cadastro/perfis/form': 'Perfis'      
+  '/cadastro/perfis/form': 'Perfis',
+  '/cadastro/contatos': 'Contatos',
+  '/cadastro/contatos/form': 'Contatos'      
 };
 export default routes;

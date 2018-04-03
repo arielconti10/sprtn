@@ -17,6 +17,8 @@ import Sectors from '../../../app/containers/Sector/Sectors'
 import Disciplines from '../../../app/containers/Discipline/Disciplines'
 import LocalizationTypes from '../../../app/containers/LocalizationType/LocalizationTypes'
 import Profiles from '../../../app/containers/Profile/Profiles'
+import Contacts from '../../../app/containers/Contact/Contacts'
+
 
 class Full extends Component {
 
@@ -47,6 +49,7 @@ class Full extends Component {
                                 <Route path="/cadastro/disciplinas" name="Disciplinas" component={Disciplines}/>
                                 <Route path="/cadastro/tipos-localizacao" name="Tipos de Localizaçāo" component={LocalizationTypes}/>
                                 <Route path="/cadastro/perfis" name="Perfis" component={Profiles}/>
+                                <Route path="/cadastro/contatos" name="Contatos" component={Contacts}/>
                                 <Redirect from="/" to="/dashboard" />
                             </Switch>
                         </Container>
