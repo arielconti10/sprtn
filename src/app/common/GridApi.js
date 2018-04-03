@@ -76,7 +76,7 @@ class GridApi extends Component {
                     !element.value.deleted_at ?
                         <div>
 
-                            <Link to={`${this.props.match.url + "/form/"}${element.value.id}`} className='btn btn-warning' >
+                            <Link to={this.props.match.url + "/" + element.value.id} params={{id: element.value.id}} className='btn btn-warning' >
                                 <i className='fa fa-pencil'></i>
                             </Link>
                             <button className='btn btn-danger' data-toggle="modal"
