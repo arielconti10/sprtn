@@ -20,6 +20,8 @@ const routes = {
   '/cadastro/congregacoes': 'Congregações',
   '/cadastro/congregacoes/form': 'Congregações',
   '/cadastro/perfis': 'Perfis',
-  '/cadastro/perfis/form': 'Perfis'      
+  '/cadastro/perfis/form': 'Perfis',
+  '/cadastro/redes': 'Redes',
+  '/cadastro/redes/form': 'Redes'      
 };
 export default routes;

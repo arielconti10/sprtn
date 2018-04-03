@@ -7,17 +7,18 @@ import Breadcrumb from '../../components/Breadcrumb/';
 import Aside from '../../components/Aside/';
 import Footer from '../../components/Footer/';
 
-import Login from '../../../app/containers/login/Login'
-import Logout from '../../../app/containers/logout/Logout'
+import Login from '../../../app/containers/login/Login';
+import Logout from '../../../app/containers/logout/Logout';
 import Dashboard from '../../views/Dashboard/';
-import Schools from '../../../app/containers/School/Schools'
-import JobTitles from '../../../app/containers/JobTitle/JobTitles'
-import Subsidiaries from '../../../app/containers/Subsidiary/Subsidiaries'
-import Sectors from '../../../app/containers/Sector/Sectors'
-import Disciplines from '../../../app/containers/Discipline/Disciplines'
-import LocalizationTypes from '../../../app/containers/LocalizationType/LocalizationTypes'
-import Profiles from '../../../app/containers/Profile/Profiles'
-import Congregations from '../../../app/containers/Congregation/Congregations'
+import Schools from '../../../app/containers/School/Schools';
+import JobTitles from '../../../app/containers/JobTitle/JobTitles';
+import Subsidiaries from '../../../app/containers/Subsidiary/Subsidiaries';
+import Sectors from '../../../app/containers/Sector/Sectors';
+import Disciplines from '../../../app/containers/Discipline/Disciplines';
+import LocalizationTypes from '../../../app/containers/LocalizationType/LocalizationTypes';
+import Profiles from '../../../app/containers/Profile/Profiles';
+import Congregations from '../../../app/containers/Congregation/Congregations';
+import Chains from '../../../app/containers/Chain/Chains';
 
 class Full extends Component {
 
@@ -49,6 +50,7 @@ class Full extends Component {
                                 <Route path="/cadastro/tipos-localizacao" name="Tipos de Localizaçāo" component={LocalizationTypes}/>
                                 <Route path="/cadastro/perfis" name="Perfis" component={Profiles}/>
                                 <Route path="/cadastro/congregacoes" name="Congregações" component={Congregations}/>
+                                <Route path="/cadastro/redes" name="Redes" component={Chains}/>
                                 <Redirect from="/" to="/dashboard" />
                             </Switch>
                         </Container>

@@ -56,7 +56,12 @@ export default {
           name: 'Congregações',
           url: '/cadastro/congregacoes',
           icon: 'fa-table'
-        }            
+        },
+        {
+          name: 'Redes',
+          url: '/cadastro/redes',
+          icon: 'fa-table'
+        }
       ]
     }
   ]
