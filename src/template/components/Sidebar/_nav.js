@@ -31,7 +31,12 @@ export default {
           name: 'Filiais',
           url: '/cadastro/filiais',
           icon: 'fa-thable'
-        }
+        },
+        {
+            name: 'Tipos de Localizaçāo',
+            url: '/cadastro/tipos-localizacao',
+            icon: 'fa-thable'
+          }
       ]
     }
   ]

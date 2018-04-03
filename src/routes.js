@@ -1,6 +1,7 @@
 const routes = {
   '/': 'Home',
   '/login': 'Login',
+  '/logout': 'Logout',
   '/dashboard': 'Dashboard',
   '/carteira': 'Carteira',
   '/carteira/escolas': 'Escolas',

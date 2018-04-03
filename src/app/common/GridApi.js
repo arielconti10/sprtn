@@ -27,8 +27,8 @@ class GridApi extends Component {
         const { id, code, name } = element.value;
 
         axios.delete(`${this.props.apiSpartan}/${id}`, {
-            'code': code.toUpperCase(),
-            'name': name,
+            'code': code?code.toUpperCase():'',
+            'name': name?name:'',
             'active': false
         }).then(res => {
             this.onFetchData();
@@ -41,8 +41,8 @@ class GridApi extends Component {
         const { id, code, name } = element.value;
 
         axios.put(`${this.props.apiSpartan}/${id}`, {
-            'code': code.toUpperCase(),
-            'name': name,
+            'code': code?code.toUpperCase():'',
+            'name': name?name:'',
             'active': true
         }).then(res => {
             this.onFetchData();

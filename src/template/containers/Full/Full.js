@@ -8,10 +8,12 @@ import Aside from '../../components/Aside/';
 import Footer from '../../components/Footer/';
 
 import Login from '../../../app/containers/login/Login'
+import Logout from '../../../app/containers/logout/Logout'
 import Dashboard from '../../views/Dashboard/';
 import Schools from '../../../app/containers/School/Schools'
 import JobTitles from '../../../app/containers/JobTitle/JobTitles'
 import Subsidiaries from '../../../app/containers/Subsidiary/Subsidiaries'
+import LocalizationTypes from '../../../app/containers/LocalizationType/LocalizationTypes'
 
 class Full extends Component {
 
@@ -35,9 +37,11 @@ class Full extends Component {
                         <Container fluid>
                             <Switch>
                                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
+                                <Route path="/logout" name="Logout" component={Logout}/>
                                 <Route path="/carteira/escolas" name="Carteira" component={Schools}/>
                                 <Route path="/cadastro/cargos" name="Cargos" component={JobTitles}/>
                                 <Route path="/cadastro/filiais" name="Filiais" component={Subsidiaries}/>
+                                <Route path="/cadastro/tipos-localizacao" name="Tipos de Localizaçāo" component={LocalizationTypes}/>
                                 <Redirect from="/" to="/dashboard" />
                             </Switch>
                         </Container>
