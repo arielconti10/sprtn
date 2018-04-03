@@ -16,6 +16,8 @@ const routes = {
   '/cadastro/disciplinas': 'Disciplinas',
   '/cadastro/disciplinas/form': 'Disciplinas',
   '/cadastro/tipos-localizacao': 'Tipos de Localizaçāo',
-  '/cadastro/tipos-localizacao/form': 'Tipos de Localizaçāo'   
+  '/cadastro/tipos-localizacao/form': 'Tipos de Localizaçāo',
+  '/cadastro/perfis': 'Perfis',
+  '/cadastro/perfis/form': 'Perfis'      
 };
 export default routes;

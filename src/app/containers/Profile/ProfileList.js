@@ -19,7 +19,7 @@ class LocalizationTypeList extends Component {
         return (
             <Card>
                 <CardHeader>
-                    <i className="fa fa-table"></i>Filiais
+                    <i className="fa fa-table"></i>Perfis
                 </CardHeader>
                 <CardBody>  
                     <p>

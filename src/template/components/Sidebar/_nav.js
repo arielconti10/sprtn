@@ -46,7 +46,12 @@ export default {
           name: 'Disciplinas',
           url: '/cadastro/disciplinas',
           icon: 'fa-table'
-        }
+        },
+        {
+            name: 'Perfis',
+            url: '/cadastro/perfis',
+            icon: 'fa-table'
+          }
       ]
     }
   ]
