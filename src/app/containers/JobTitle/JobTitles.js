@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import {Row, Col, Card, CardHeader, CardFooter, CardBody, Button} from 'reactstrap';
 
-import JobTitleList from './JobTitleList.1';
+import JobTitleList from './JobTitleList';
 import JobTitleForm from './JobTitleForm';
 
 class JobTitles extends Component {

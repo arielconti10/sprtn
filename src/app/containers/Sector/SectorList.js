@@ -12,14 +12,14 @@ import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.m
 import axios from '../../common/axios';
 import GridApi from '../../common/GridApi';
 
-class JobTitleList extends Component {
+class SectorList extends Component {
 
     render() {
 
         return (
             <Card>
                 <CardHeader>
-                    <i className="fa fa-table"></i>Cargos
+                    <i className="fa fa-table"></i>Setores
                 </CardHeader>
                 <CardBody>  
                     <p>
@@ -27,7 +27,7 @@ class JobTitleList extends Component {
                     </p>
                     <div>
                     <GridApi
-                        apiSpartan="job-title"
+                        apiSpartan="sector"
                         columns={[
                             { Header: 'ID', accessor: 'id', filterable: true, width: 100, headerClassName: 'text-left' },
                             { Header: "Nome", accessor: "name", filterable: true, headerClassName: 'text-left' }
@@ -40,4 +40,4 @@ class JobTitleList extends Component {
     }
 }
 
-export default JobTitleList;
+export default SectorList;

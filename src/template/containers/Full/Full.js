@@ -7,10 +7,24 @@ import Breadcrumb from '../../components/Breadcrumb/';
 import Aside from '../../components/Aside/';
 import Footer from '../../components/Footer/';
 
-import Login from '../../../app/containers/login/Login'
+import Login from '../../../app/containers/login/Login';
+import Logout from '../../../app/containers/logout/Logout';
 import Dashboard from '../../views/Dashboard/';
 import Schools from '../../../app/containers/School/Schools'
 import JobTitles from '../../../app/containers/JobTitle/JobTitles'
+import Subsidiaries from '../../../app/containers/Subsidiary/Subsidiaries'
+import Sectors from '../../../app/containers/Sector/Sectors'
+import Disciplines from '../../../app/containers/Discipline/Disciplines'
+import LocalizationTypes from '../../../app/containers/LocalizationType/LocalizationTypes'
+import Profiles from '../../../app/containers/Profile/Profiles'
+import Contacts from '../../../app/containers/Contact/Contacts'
+import Actions from '../../../app/containers/Action/Actions'
+import Events from '../../../app/containers/Event/Events'
+import Shifts from '../../../app/containers/Shift/Shifts'
+import Congregations from '../../../app/containers/Congregation/Congregations';
+import Chains from '../../../app/containers/Chain/Chains';
+import SchoolTypes from '../../../app/containers/SchoolType/SchoolTypes';
+import States from '../../../app/containers/State/States';
 
 class Full extends Component {
 
@@ -23,7 +37,6 @@ class Full extends Component {
             );
         }
 
-
         return (
             <div className="app">
                 <Header />
@@ -34,8 +47,22 @@ class Full extends Component {
                         <Container fluid>
                             <Switch>
                                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
+                                <Route path="/logout" name="Logout" component={Logout}/>
                                 <Route path="/carteira/escolas" name="Carteira" component={Schools}/>
                                 <Route path="/cadastro/cargos" name="Cargos" component={JobTitles}/>
+                                <Route path="/cadastro/filiais" name="Filiais" component={Subsidiaries}/>
+                                <Route path="/cadastro/setores" name="Setores" component={Sectors}/>
+                                <Route path="/cadastro/disciplinas" name="Disciplinas" component={Disciplines}/>
+                                <Route path="/cadastro/tipos-localizacao" name="Tipos de Localizaçāo" component={LocalizationTypes}/>
+                                <Route path="/cadastro/perfis" name="Perfis" component={Profiles}/>
+                                <Route path="/cadastro/contatos" name="Contatos" component={Contacts}/>
+                                <Route path="/cadastro/acoes" name="Acoes" component={Actions}/>
+                                <Route path="/cadastro/eventos" name="Eventos" component={Events}/>
+                                <Route path="/cadastro/turnos" name="Turnos" component={Shifts}/>
+                                <Route path="/cadastro/congregacoes" name="Congregações" component={Congregations}/>
+                                <Route path="/cadastro/redes" name="Redes" component={Chains}/>
+                                <Route path="/cadastro/tipos-escola" name="Tipos de Escola" component={SchoolTypes}/>
+                                <Route path="/cadastro/estados" name="Estadosa" component={States}/>
                                 <Redirect from="/" to="/dashboard" />
                             </Switch>
                         </Container>

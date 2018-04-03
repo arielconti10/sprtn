@@ -6,14 +6,14 @@ import { Card, CardHeader, CardFooter, CardBody, Button} from 'reactstrap';
 import axios from '../../common/axios';
 import GridApi from '../../common/GridApi';
 
-class JobTitleList extends Component {
+class ChainList extends Component {
 
     render() {
 
         return (
             <Card>
                 <CardHeader>
-                    <i className="fa fa-table"></i>Cargos
+                    <i className="fa fa-table"></i>Redes
                 </CardHeader>
                 <CardBody>  
                     <p>
@@ -21,12 +21,11 @@ class JobTitleList extends Component {
                     </p>
                     <div>
                     <GridApi
-                        apiSpartan="job-title"
+                        apiSpartan="chain"
                         columns={[
-                            { Header: 'ID', accessor: 'id' },
-                            { Header: "Nome", accessor: "name" }
+                            { Header: 'ID', accessor: 'id', filterable: true, width: 100, headerClassName: 'text-left' },
+                            { Header: "Nome", accessor: "name", filterable: true, headerClassName: 'text-left' }
                         ]}
-                        cardHeader="Cargos"
                     />
                     </div>
                 </CardBody>
@@ -35,4 +34,4 @@ class JobTitleList extends Component {
     }
 }
 
-export default JobTitleList;
+export default ChainList;
