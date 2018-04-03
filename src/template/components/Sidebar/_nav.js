@@ -66,6 +66,11 @@ export default {
           name: 'Tipos de Escola',
           url: '/cadastro/tipos-escola',
           icon: 'fa-table'
+        },
+        {
+          name: 'Estados',
+          url: '/cadastro/estados',
+          icon: 'fa-table'
         }
       ]
     }

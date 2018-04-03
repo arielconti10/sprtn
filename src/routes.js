@@ -24,6 +24,8 @@ const routes = {
   '/cadastro/redes': 'Redes',
   '/cadastro/redes/form': 'Redes',
   '/cadastro/tipos-escola': 'Tipos de Escola',
-  '/cadastro/tipos-escola/form': 'Tipos de Escola'      
+  '/cadastro/tipos-escola/form': 'Tipos de Escola',
+  '/cadastro/estados': 'Estados',
+  '/cadastro/estados/form': 'Estados'     
 };
 export default routes;
