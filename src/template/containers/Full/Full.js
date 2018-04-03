@@ -19,6 +19,7 @@ import LocalizationTypes from '../../../app/containers/LocalizationType/Localiza
 import Profiles from '../../../app/containers/Profile/Profiles';
 import Congregations from '../../../app/containers/Congregation/Congregations';
 import Chains from '../../../app/containers/Chain/Chains';
+import SchoolTypes from '../../../app/containers/SchoolType/SchoolTypes';
 
 class Full extends Component {
 
@@ -51,6 +52,7 @@ class Full extends Component {
                                 <Route path="/cadastro/perfis" name="Perfis" component={Profiles}/>
                                 <Route path="/cadastro/congregacoes" name="Congregações" component={Congregations}/>
                                 <Route path="/cadastro/redes" name="Redes" component={Chains}/>
+                                <Route path="/cadastro/tipos-escola" name="Tipos de Escola" component={SchoolTypes}/>
                                 <Redirect from="/" to="/dashboard" />
                             </Switch>
                         </Container>
