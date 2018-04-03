@@ -19,8 +19,7 @@ class JobTitleForm extends Component {
             code: '',
             name: '',
             job_title_type_id: '0',  
-            active: true,          
-            formIsValid: false,
+            active: true,       
             back_error: '',
             submitButtonDisabled: false,
             saved: false
@@ -236,7 +235,7 @@ class JobTitleForm extends Component {
                         {statusField}     
 
                         <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
-                        <button className="btn btn-danger" onClick={() => Router.History.back()}>Cancelar</button>
+                        <button className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
                     </FormWithConstraints>
                     
                 </CardBody>
