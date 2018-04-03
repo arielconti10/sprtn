@@ -27,6 +27,11 @@ export default {
           url: '/cadastro/cargos',
           icon: 'fa-table'
         },
+        {
+          name: 'Filiais',
+          url: '/cadastro/filiais',
+          icon: 'fa-thable'
+        }
       ]
     }
   ]
