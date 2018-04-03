@@ -12,14 +12,14 @@ import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.m
 import axios from '../../common/axios';
 import GridApi from '../../common/GridApi';
 
-class LocalizationTypeList extends Component {
+class CongregationList extends Component {
 
     render() {
 
         return (
             <Card>
                 <CardHeader>
-                    <i className="fa fa-table"></i>Perfis
+                    <i className="fa fa-table"></i>Congregações
                 </CardHeader>
                 <CardBody>  
                     <p>
@@ -27,7 +27,7 @@ class LocalizationTypeList extends Component {
                     </p>
                     <div>
                     <GridApi
-                        apiSpartan="profile"
+                        apiSpartan="congregation"
                         columns={[
                             { Header: 'ID', accessor: 'id', filterable: true, width: 100, headerClassName: 'text-left' },
                             { Header: "Nome", accessor: "name", filterable: true, headerClassName: 'text-left' }
@@ -40,4 +40,4 @@ class LocalizationTypeList extends Component {
     }
 }
 
-export default LocalizationTypeList;
+export default CongregationList;
