@@ -56,7 +56,7 @@ export default {
           name: 'Congregações',
           url: '/cadastro/congregacoes',
           icon: 'fa-table'
-        }
+        }            
       ]
     }
   ]
