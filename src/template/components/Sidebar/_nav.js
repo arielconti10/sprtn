@@ -56,6 +56,11 @@ export default {
             name: 'Contatos',
             url: '/cadastro/contatos',
             icon: 'fa-table'
+        },
+        {
+            name: 'Ações',
+            url: '/cadastro/acoes',
+            icon: 'fa-table'
         }
       ]
     }

@@ -20,6 +20,8 @@ const routes = {
   '/cadastro/perfis': 'Perfis',
   '/cadastro/perfis/form': 'Perfis',
   '/cadastro/contatos': 'Contatos',
-  '/cadastro/contatos/form': 'Contatos'      
+  '/cadastro/contatos/form': 'Contatos',
+  '/cadastro/acoes': 'Ações',
+  '/cadastro/acoes/form': 'Ações'    
 };
 export default routes;
