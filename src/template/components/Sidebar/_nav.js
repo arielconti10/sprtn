@@ -66,6 +66,11 @@ export default {
             name: 'Eventos',
             url: '/cadastro/eventos',
             icon: 'fa-table'
+        },
+        {
+            name: 'Turnos',
+            url: '/cadastro/turnos',
+            icon: 'fa-table'
         }
       ]
     }

@@ -20,6 +20,7 @@ import Profiles from '../../../app/containers/Profile/Profiles'
 import Contacts from '../../../app/containers/Contact/Contacts'
 import Actions from '../../../app/containers/Action/Actions'
 import Events from '../../../app/containers/Event/Events'
+import Shifts from '../../../app/containers/Shift/Shifts'
 
 
 class Full extends Component {
@@ -54,6 +55,7 @@ class Full extends Component {
                                 <Route path="/cadastro/contatos" name="Contatos" component={Contacts}/>
                                 <Route path="/cadastro/acoes" name="Acoes" component={Actions}/>
                                 <Route path="/cadastro/eventos" name="Eventos" component={Events}/>
+                                <Route path="/cadastro/turnos" name="Turnos" component={Shifts}/>
                                 <Redirect from="/" to="/dashboard" />
                             </Switch>
                         </Container>

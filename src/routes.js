@@ -24,6 +24,8 @@ const routes = {
   '/cadastro/acoes': 'Ações',
   '/cadastro/acoes/form': 'Ações',
   '/cadastro/eventos': 'Eventos',
-  '/cadastro/eventos/form': 'Eventos'    
+  '/cadastro/eventos/form': 'Eventos',
+  '/cadastro/turnos': 'Turnos',
+  '/cadastro/turnos/form': 'Turnos'      
 };
 export default routes;
