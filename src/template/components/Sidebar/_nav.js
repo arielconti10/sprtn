@@ -30,7 +30,12 @@ export default {
         {
           name: 'Filiais',
           url: '/cadastro/filiais',
-          icon: 'fa-thable'
+          icon: 'fa-table'
+        },
+        {
+          name: 'Setores',
+          url: '/cadastro/setores',
+          icon: 'fa-table'
         }
       ]
     }

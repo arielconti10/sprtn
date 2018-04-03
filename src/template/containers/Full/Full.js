@@ -12,6 +12,7 @@ import Dashboard from '../../views/Dashboard/';
 import Schools from '../../../app/containers/School/Schools'
 import JobTitles from '../../../app/containers/JobTitle/JobTitles'
 import Subsidiaries from '../../../app/containers/Subsidiary/Subsidiaries'
+import Sectors from '../../../app/containers/Sector/Sectors'
 
 class Full extends Component {
 
@@ -38,6 +39,7 @@ class Full extends Component {
                                 <Route path="/carteira/escolas" name="Carteira" component={Schools}/>
                                 <Route path="/cadastro/cargos" name="Cargos" component={JobTitles}/>
                                 <Route path="/cadastro/filiais" name="Filiais" component={Subsidiaries}/>
+                                <Route path="/cadastro/setores" name="Setores" component={Sectors}/>
                                 <Redirect from="/" to="/dashboard" />
                             </Switch>
                         </Container>
