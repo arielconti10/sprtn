@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 
+console.log(window.width, window.heigth)
 import './Login.css';
 import InputCustomize from '../../common/InputCustomize';
 import axios from '../../common/axios';
@@ -109,7 +110,7 @@ class Login extends Component {
     }
     render() {
         return (
-            <div id="">
+            <div id="login-body">
                 <LoginForm />
             </div>
         )
