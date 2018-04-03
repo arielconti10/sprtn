@@ -1,151 +1,113 @@
-const path = require('path');
 const webpack = require('webpack');
-
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const path = require('path');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const extractCSS = new ExtractTextPlugin('[name].fonts.css');
+const extractSCSS = new ExtractTextPlugin('[name].styles.css');
 
-const srcRoot = path.resolve(__dirname, 'src');
-const appRoot = path.resolve(srcRoot, 'app');
+const BUILD_DIR = path.resolve(__dirname, 'build');
+const SRC_DIR = path.resolve(__dirname, 'src');
 
+console.log('BUILD_DIR', BUILD_DIR);
+console.log('SRC_DIR', SRC_DIR);
 
-
-module.exports = (env) => {
-
-  const isDev = env == 'development';
-
+module.exports = (env = {}) => {
   return {
-    context: path.resolve(__dirname),
     entry: {
-      main: './src/app/main.js',
-      vendor: [
-        'react', 'react-dom', 'jquery', 'moment',
-        //'jquery-ui', 'bootstrap',
-        'react-bootstrap', 'lodash'
-      ]
+      index: [SRC_DIR + '/index.js']
     },
     output: {
-      path: path.resolve(__dirname, './dist'),
-      filename: isDev ? 'js/[name].bundle.js' : 'js/[name].[hash].bundle.js',
-      sourceMapFilename: isDev ? 'js/[name].bundle.map' : 'js/[name].[chunkhash].bundle.map',
-      chunkFilename: isDev ? 'js/[id].chunk.js' : 'js/[id].[chunkhash].chunk.js',
-
-
-      publicPath: '/'
+      path: BUILD_DIR,
+      filename: '[name].bundle.js'
+    },
+    // watch: true,
+    devtool: env.prod ? 'source-map' : 'cheap-module-eval-source-map',
+    devServer: {
+      contentBase: BUILD_DIR,
+      port: 9001,
+      compress: true,
+      hot: true,
+      open: true
     },
     module: {
       rules: [
         {
-          test: /\.jsx?$/, // A regexp to test the require path. accepts either js or jsx
-
-          loader: 'babel-loader',
-
-          query:{
-            "presets": [
-              ["es2015", {"modules": false}],
-              //Webpack understands the native import syntax, and uses it for tree shaking
-
-              "stage-2",
-              //Specifies what level of language features to activate.
-              //State 2 is "draft", 4 is finished, 0 is strawman.
-              //See https://tc39.github.io/process-document/
-
-              "react"
-              //Transpile React components to JS
-            ],
-            "plugins": [
-              "react-hot-loader/babel"
-              //Enables React code to work with HMR.
-            ]
-          },
-
-          exclude: [
-            /node_modules/,
-          ],
-        },
-
-        {test: /\.css$/, loader: "style-loader!css-loader"},
-
-        {test: /\.json$/, loader: "json-loader"},
-
-        {
-          test: /\.(jpe?g|png|gif)$/,
-          loader: 'file-loader',
-          query:{
-            name: 'assets/img/[name].[ext]'
-          }
-        },
-      ]
-
-    },
-    resolve: {
-      extensions: [".js", ".jsx"],
-
-      modules: [
-        appRoot,
-        'node_modules'
-      ]
-    },
-    devServer: {
-
-      // historyApiFallback: true,
-      contentBase: path.join(__dirname, "dist"),
-      port: 2200,
-      // hot: true,
-      compress:true,
-      publicPath: '/',
-      stats: "minimal"
-
-    },
-    stats: "minimal",
-    performance: {
-      hints: false
-    },
-    devtool: isDev ? 'eval' : 'cheap-source-map', //false, //isDev ? 'eval' : 'cheap-source-map',
-
-    plugins: [
-      new CleanWebpackPlugin(['dist']),
-      new CopyWebpackPlugin([
-        {from: './src/index.html'},
-        {from: './src/assets', to: './assets'},
-
-      ]),
-      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-
-      new HtmlWebpackPlugin({
-        template: path.resolve(srcRoot, 'index.html'),
-        chunksSortMode: 'dependency'
-      }),
-
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'vendor',
-        filename: 'js/[hash].vendor.js',
-
-        minChunks: Infinity,
-      }),
-
-      new webpack.DefinePlugin({
-        process: {
-          env: {
-            NODE_ENV: isDev ? '"development"' : '"production"'
-          }
-        }
-      }),
-
-
-    ].concat(
-      !isDev
-        ? // production only plugins
-        [
-          new webpack.optimize.UglifyJsPlugin({
-            compress: {
-              warnings: false
+          test: /\.(js|jsx)$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+              presets: ['es2015', 'react', 'env'],
+              plugins: ['transform-class-properties', "syntax-dynamic-import"]
             }
-          }),
-        ]
-        :// dev only plugins
-        []
-    )
+          }
+        },
+        {
+          test: /\.html$/,
+          loader: 'html-loader'
+        },
+        {
+          test: /\.(scss)$/,
+          use: ['css-hot-loader'].concat(extractSCSS.extract({
+            fallback: 'style-loader',
+            use: [
+              {
+                loader: 'css-loader',
+                options: {alias: {'../img': '../public/img'}}
+              },
+              {
+                loader: 'sass-loader'
+              }
+            ]
+          }))
+        },
+        {
+          test: /\.css$/,
+          use: extractCSS.extract({
+            fallback: 'style-loader',
+            use: 'css-loader'
+          })
+        },
+        {
+          test: /\.(png|jpg|jpeg|gif|ico)$/,
+          use: [
+            {
+              // loader: 'url-loader'
+              loader: 'file-loader',
+              options: {
+                name: './img/[name].[hash].[ext]'
+              }
+            }
+          ]
+        },
+        {
+          test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+          loader: 'file-loader',
+          options: {
+            name: './fonts/[name].[hash].[ext]'
+          }
+        }]
+    },
+    plugins: [
+      new webpack.HotModuleReplacementPlugin(),
+      new webpack.optimize.UglifyJsPlugin({sourceMap: true}),
+      new webpack.NamedModulesPlugin(),
+      extractCSS,
+      extractSCSS,
+      new HtmlWebpackPlugin(
+        {
+          inject: true,
+          template: './public/index.html'
+        }
+      ),
+      new CopyWebpackPlugin([
+          {from: './public/img', to: 'img'}
+        ],
+        {copyUnmodified: false}
+      )
+    ]
   }
 };
