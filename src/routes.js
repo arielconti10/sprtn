@@ -11,6 +11,8 @@ const routes = {
   '/cadastro/filiais': 'Filiais',
   '/cadastro/filiais/form': 'Filiais',
   '/cadastro/setores': 'Setores',
-  '/cadastro/setores/form': 'Setores'    
+  '/cadastro/setores/form': 'Setores',
+  '/cadastro/disciplinas': 'Disciplinas',
+  '/cadastro/disciplinas/form': 'Disciplinas'    
 };
 export default routes;

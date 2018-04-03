@@ -36,6 +36,11 @@ export default {
           name: 'Setores',
           url: '/cadastro/setores',
           icon: 'fa-table'
+        },
+        {
+          name: 'Disciplinas',
+          url: '/cadastro/disciplinas',
+          icon: 'fa-table'
         }
       ]
     }
