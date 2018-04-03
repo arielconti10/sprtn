@@ -17,6 +17,8 @@ const routes = {
   '/cadastro/disciplinas/form': 'Disciplinas',
   '/cadastro/tipos-localizacao': 'Tipos de Localizaçāo',
   '/cadastro/tipos-localizacao/form': 'Tipos de Localizaçāo',
+  '/cadastro/congregacoes': 'Congregações',
+  '/cadastro/congregacoes/form': 'Congregações',
   '/cadastro/perfis': 'Perfis',
   '/cadastro/perfis/form': 'Perfis',
   '/cadastro/contatos': 'Contatos',
@@ -26,6 +28,12 @@ const routes = {
   '/cadastro/eventos': 'Eventos',
   '/cadastro/eventos/form': 'Eventos',
   '/cadastro/turnos': 'Turnos',
-  '/cadastro/turnos/form': 'Turnos'      
+  '/cadastro/turnos/form': 'Turnos',     
+  '/cadastro/redes': 'Redes',
+  '/cadastro/redes/form': 'Redes',
+  '/cadastro/tipos-escola': 'Tipos de Escola',
+  '/cadastro/tipos-escola/form': 'Tipos de Escola',
+  '/cadastro/estados': 'Estados',
+  '/cadastro/estados/form': 'Estados'     
 };
 export default routes;

@@ -7,8 +7,8 @@ import Breadcrumb from '../../components/Breadcrumb/';
 import Aside from '../../components/Aside/';
 import Footer from '../../components/Footer/';
 
-import Login from '../../../app/containers/login/Login'
-import Logout from '../../../app/containers/logout/Logout'
+import Login from '../../../app/containers/login/Login';
+import Logout from '../../../app/containers/logout/Logout';
 import Dashboard from '../../views/Dashboard/';
 import Schools from '../../../app/containers/School/Schools'
 import JobTitles from '../../../app/containers/JobTitle/JobTitles'
@@ -21,7 +21,10 @@ import Contacts from '../../../app/containers/Contact/Contacts'
 import Actions from '../../../app/containers/Action/Actions'
 import Events from '../../../app/containers/Event/Events'
 import Shifts from '../../../app/containers/Shift/Shifts'
-
+import Congregations from '../../../app/containers/Congregation/Congregations';
+import Chains from '../../../app/containers/Chain/Chains';
+import SchoolTypes from '../../../app/containers/SchoolType/SchoolTypes';
+import States from '../../../app/containers/State/States';
 
 class Full extends Component {
 
@@ -56,6 +59,10 @@ class Full extends Component {
                                 <Route path="/cadastro/acoes" name="Acoes" component={Actions}/>
                                 <Route path="/cadastro/eventos" name="Eventos" component={Events}/>
                                 <Route path="/cadastro/turnos" name="Turnos" component={Shifts}/>
+                                <Route path="/cadastro/congregacoes" name="Congregações" component={Congregations}/>
+                                <Route path="/cadastro/redes" name="Redes" component={Chains}/>
+                                <Route path="/cadastro/tipos-escola" name="Tipos de Escola" component={SchoolTypes}/>
+                                <Route path="/cadastro/estados" name="Estadosa" component={States}/>
                                 <Redirect from="/" to="/dashboard" />
                             </Switch>
                         </Container>

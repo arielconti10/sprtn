@@ -27,12 +27,12 @@ class GridApi extends Component {
         const { id, code, name } = element.value;
 
         axios.delete(`${this.props.apiSpartan}/${id}`, {
-            'code': code?code.toUpperCase():'',
-            'name': name?name:'',
+            'code': code ? code.toUpperCase() : '',
+            'name': name ? name : '',
             'active': false
         }).then(res => {
             this.onFetchData();
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.log(error)
         }.bind(this));
     }
@@ -41,12 +41,12 @@ class GridApi extends Component {
         const { id, code, name } = element.value;
 
         axios.put(`${this.props.apiSpartan}/${id}`, {
-            'code': code?code.toUpperCase():'',
-            'name': name?name:'',
+            'code': code ? code.toUpperCase() : '',
+            'name': name ? name : '',
             'active': true
         }).then(res => {
             this.onFetchData();
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.log(error)
         }.bind(this));
 
@@ -54,19 +54,20 @@ class GridApi extends Component {
 
     componentDidMount() {
         let col = this.state.columns
-        col.push(
-            {
-                Header: "Status",
-                accessor: "",
-                width: 100,
-                headerClassName: 'text-left',
-                sortable: false,
-                Cell: (element) => (
-                    !element.value.deleted_at ?
-                    <div><span>Ativo</span></div>
-                    :
-                    <div><span>Inativo</span></div>
-                )/*,                
+        if (!this.props.hideButtons) {
+            col.push(
+                {
+                    Header: "Status",
+                    accessor: "",
+                    width: 100,
+                    headerClassName: 'text-left',
+                    sortable: false,
+                    Cell: (element) => (
+                        !element.value.deleted_at ?
+                            <div><span>Ativo</span></div>
+                            :
+                            <div><span>Inativo</span></div>
+                    )/*,                
                 filterable: true, 
                 Filter: ({ filter, onChange }) => (
                    
@@ -79,35 +80,36 @@ class GridApi extends Component {
                         <option value="true">Inativo</option>
                     </select>
                 )*/
-            },
-            {
-                Header: "Ações", accessor: "", sortable: false, width: 100, headerClassName: 'text-left', Cell: (element) => (
-                    !element.value.deleted_at ?
-                        <div>
+                },
+                {
+                    Header: "Ações", accessor: "", sortable: false, width: 100, headerClassName: 'text-left', Cell: (element) => (
+                        !element.value.deleted_at ?
+                            <div>
 
-                            <Link to={`${this.props.match.url + "/form/"}${element.value.id}`} className='btn btn-primary btn-sm' >
-                                <i className='fa fa-pencil'></i>
-                            </Link>
-                            <button className='btn btn-danger btn-sm' onClick={() => this.onClickDelete(element)}>
-                                <i className='fa fa-ban'></i>
-                            </button>
-                        </div>
-                        :
-                        <div>
-                            <button className='btn btn-success btn-sm' onClick={() => this.onClickActive(element)}>
-                                <i className='fa fa-check-circle'></i>
-                            </button>
-                        </div>
+                                <Link to={`${this.props.match.url + "/form/"}${element.value.id}`} className='btn btn-primary btn-sm' >
+                                    <i className='fa fa-pencil'></i>
+                                </Link>
+                                <button className='btn btn-danger btn-sm' onClick={() => this.onClickDelete(element)}>
+                                    <i className='fa fa-ban'></i>
+                                </button>
+                            </div>
+                            :
+                            <div>
+                                <button className='btn btn-success btn-sm' onClick={() => this.onClickActive(element)}>
+                                    <i className='fa fa-check-circle'></i>
+                                </button>
+                            </div>
 
-                )
-            }
-        )
+                    )
+                }
+            )
+        }
         this.setState({ columns: col })
     }
 
     onFetchData = (state, instance, deleted_at) => {
         let apiSpartan = this.props.apiSpartan
-        
+
         let pageSize = state ? state.pageSize : this.state.pageSize;
         let page = state ? state.page + 1 : this.state.page;
 

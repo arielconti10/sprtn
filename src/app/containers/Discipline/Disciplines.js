@@ -8,7 +8,6 @@ import DisciplineForm from './DisciplineForm';
 class Disciplines extends Component {
 
     render() {
-        console.log('disciplines');
         return (
             <Row>
                 <Col xs="12" sm="12" md="12">                         

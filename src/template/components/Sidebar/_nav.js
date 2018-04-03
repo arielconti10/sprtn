@@ -71,6 +71,26 @@ export default {
             name: 'Turnos',
             url: '/cadastro/turnos',
             icon: 'fa-table'
+        },
+        {
+          name: 'Congregações',
+          url: '/cadastro/congregacoes',
+          icon: 'fa-table'
+        },
+        {
+          name: 'Redes',
+          url: '/cadastro/redes',
+          icon: 'fa-table'
+        },
+        {
+          name: 'Tipos de Escola',
+          url: '/cadastro/tipos-escola',
+          icon: 'fa-table'
+        },
+        {
+          name: 'Estados',
+          url: '/cadastro/estados',
+          icon: 'fa-table'
         }
       ]
     }
