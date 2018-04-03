@@ -10,6 +10,8 @@ const routes = {
   '/cadastro/cargos': 'Cargos',
   '/cadastro/cargos/form': 'Cargos',
   '/cadastro/filiais': 'Filiais',
-  '/cadastro/filiais/form': 'Filiais'  
+  '/cadastro/filiais/form': 'Filiais',
+  '/cadastro/setores': 'Setores',
+  '/cadastro/setores/form': 'Setores'    
 };
 export default routes;

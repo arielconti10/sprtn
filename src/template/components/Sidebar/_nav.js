@@ -36,7 +36,12 @@ export default {
             name: 'Tipos de Localizaçāo',
             url: '/cadastro/tipos-localizacao',
             icon: 'fa-thable'
-          }
+        },
+        {
+          name: 'Setores',
+          url: '/cadastro/setores',
+          icon: 'fa-table'
+        }
       ]
     }
   ]
