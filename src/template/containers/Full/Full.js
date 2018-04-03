@@ -14,6 +14,7 @@ import Schools from '../../../app/containers/School/Schools'
 import JobTitles from '../../../app/containers/JobTitle/JobTitles'
 import Subsidiaries from '../../../app/containers/Subsidiary/Subsidiaries'
 import LocalizationTypes from '../../../app/containers/LocalizationType/LocalizationTypes'
+import Profiles from '../../../app/containers/Profile/Profiles'
 
 class Full extends Component {
 
@@ -42,6 +43,7 @@ class Full extends Component {
                                 <Route path="/cadastro/cargos" name="Cargos" component={JobTitles}/>
                                 <Route path="/cadastro/filiais" name="Filiais" component={Subsidiaries}/>
                                 <Route path="/cadastro/tipos-localizacao" name="Tipos de Localizaçāo" component={LocalizationTypes}/>
+                                <Route path="/cadastro/perfis" name="Perfis" component={Profiles}/>
                                 <Redirect from="/" to="/dashboard" />
                             </Switch>
                         </Container>

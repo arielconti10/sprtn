@@ -30,12 +30,17 @@ export default {
         {
           name: 'Filiais',
           url: '/cadastro/filiais',
-          icon: 'fa-thable'
+          icon: 'fa-table'
+        },
+        {
+            name: 'Perfis',
+            url: '/cadastro/perfis',
+            icon: 'fa-table'
         },
         {
             name: 'Tipos de Localizaçāo',
             url: '/cadastro/tipos-localizacao',
-            icon: 'fa-thable'
+            icon: 'fa-table'
         },
         {
           name: 'Setores',
