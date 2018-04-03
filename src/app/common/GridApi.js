@@ -131,6 +131,8 @@ class GridApi extends Component {
             baseURL += "&order[" + sorted[i]['id'] + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
         }
 
+        this.setState({loading: true});
+
         axios.get(baseURL)
             .then((response) => {
                 const dados = response.data.data
