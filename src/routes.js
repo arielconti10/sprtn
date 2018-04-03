@@ -22,6 +22,8 @@ const routes = {
   '/cadastro/contatos': 'Contatos',
   '/cadastro/contatos/form': 'Contatos',
   '/cadastro/acoes': 'Ações',
-  '/cadastro/acoes/form': 'Ações'    
+  '/cadastro/acoes/form': 'Ações',
+  '/cadastro/eventos': 'Eventos',
+  '/cadastro/eventos/form': 'Eventos'    
 };
 export default routes;

@@ -61,6 +61,11 @@ export default {
             name: 'Ações',
             url: '/cadastro/acoes',
             icon: 'fa-table'
+        },
+        {
+            name: 'Eventos',
+            url: '/cadastro/eventos',
+            icon: 'fa-table'
         }
       ]
     }
