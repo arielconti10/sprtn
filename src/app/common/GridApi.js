@@ -3,6 +3,7 @@ import { Router, hashHistory, Link, browserHistory, withRouter } from 'react-rou
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
 
+import './GridApi.css'
 import axios from '../common/axios';
 
 class GridApi extends Component {
@@ -57,6 +58,8 @@ class GridApi extends Component {
             {
                 Header: "Status",
                 accessor: "",
+                width: 100,
+                headerClassName: 'text-left',
                 sortable: false,
                 Cell: (element) => (
                     !element.value.deleted_at ?
@@ -78,24 +81,20 @@ class GridApi extends Component {
                 )*/
             },
             {
-                Header: "Ações", accessor: "", sortable: false, Cell: (element) => (
+                Header: "Ações", accessor: "", sortable: false, width: 100, headerClassName: 'text-left', Cell: (element) => (
                     !element.value.deleted_at ?
                         <div>
 
-                            <Link to={`${this.props.match.url + "/form/"}${element.value.id}`} className='btn btn-warning' >
+                            <Link to={`${this.props.match.url + "/form/"}${element.value.id}`} className='btn btn-primary btn-sm' >
                                 <i className='fa fa-pencil'></i>
                             </Link>
-                            <button className='btn btn-danger' data-toggle="modal"
-                                data-target="#myModal"
-                                onClick={() => this.onClickDelete(element)}>
+                            <button className='btn btn-danger btn-sm' onClick={() => this.onClickDelete(element)}>
                                 <i className='fa fa-ban'></i>
                             </button>
                         </div>
                         :
                         <div>
-                            <button className='btn btn-success' data-toggle="modal"
-                                data-target="#myModal"
-                                onClick={() => this.onClickActive(element)}>
+                            <button className='btn btn-success btn-sm' onClick={() => this.onClickActive(element)}>
                                 <i className='fa fa-check-circle'></i>
                             </button>
                         </div>
@@ -180,7 +179,7 @@ class GridApi extends Component {
                     pageText='Página'
                     ofText='de'
                     rowsText=''
-                    className="-striped -highlight"
+                    className='-striped -highlight'
                 />
             </div>
         )

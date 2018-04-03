@@ -29,8 +29,8 @@ class JobTitleList extends Component {
                     <GridApi
                         apiSpartan="job-title"
                         columns={[
-                            { Header: 'ID', accessor: 'id', filterable: true },
-                            { Header: "Nome", accessor: "name", filterable: true }
+                            { Header: 'ID', accessor: 'id', filterable: true, width: 100, headerClassName: 'text-left' },
+                            { Header: "Nome", accessor: "name", filterable: true, headerClassName: 'text-left' }
                         ]}
                     />
                     </div>
