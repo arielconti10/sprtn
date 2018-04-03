@@ -1,6 +1,7 @@
 const routes = {
   '/': 'Home',
   '/login': 'Login',
+  '/logout': 'Logout',
   '/dashboard': 'Dashboard',
   '/carteira': 'Carteira',
   '/carteira/escolas': 'Escolas',
@@ -13,6 +14,8 @@ const routes = {
   '/cadastro/setores': 'Setores',
   '/cadastro/setores/form': 'Setores',
   '/cadastro/disciplinas': 'Disciplinas',
-  '/cadastro/disciplinas/form': 'Disciplinas'    
+  '/cadastro/disciplinas/form': 'Disciplinas',
+  '/cadastro/tipos-localizacao': 'Tipos de Localizaçāo',
+  '/cadastro/tipos-localizacao/form': 'Tipos de Localizaçāo'   
 };
 export default routes;

@@ -28,6 +28,11 @@ export default {
           icon: 'fa-table'
         },
         {
+          name: 'Tipos de Localizaçāo',
+          url: '/cadastro/tipos-localizacao',
+          icon: 'fa-table'
+        },
+        {
           name: 'Filiais',
           url: '/cadastro/filiais',
           icon: 'fa-table'
