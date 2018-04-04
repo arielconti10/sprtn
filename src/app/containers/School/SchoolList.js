@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Card, CardHeader, CardFooter, CardBody} from 'reactstrap';
+import { Router, hashHistory, Link, browserHistory, withRouter } from 'react-router-dom'
+import { Card, CardHeader, CardFooter, CardBody } from 'reactstrap';
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
 
@@ -10,161 +11,158 @@ class SchoolList extends Component {
     constructor(props) {
         super(props);
 
-        //console.log(props);
-
         this.state = {
             page: 1,
-            data: [],
-            pages: null,
             pageSize: 10,
-            // totalSize: 0,
-            // lastFilter : '',
-            // lastOrder : '',
-            loading: true,
-            
+            data: [],
+            filtered: [],
+            sorted: [],
+            pages: null,
+            loading: false,
+            columns: []
         };
-
-        //this.onFetchData = this.onFetchData.bind(this);
     }
 
-    // componentDidMount() {
-    //     axios.get(`/school?page=1`)
-    //         .then(response => {
-    //             const dados = response.data.data;
+    componentDidMount() {
+        let col = [
+            { Header: 'ID', accessor: 'id', sortable: true, filterable: true, width: 70, headerClassName: 'text-left' },
+            { Header: "Nome", accessor: "name", sortable: true, filterable: true, maxWidth: 500, headerClassName: 'text-left' },
+            { Header: "Tipo", accessor: "school_type.name", sortable: true, filterable: true, width: 100, headerClassName: 'text-left' },
+            { Header: 'Filial', accessor: 'subsidiary.name', sortable: true, filterable: true, width: 60, headerClassName: 'text-left' },
+            { Header: 'TOTVS', accessor: 'school_code_totvs', sortable: true, filterable: true, width: 80, headerClassName: 'text-left' },
+            { Header: 'Perfil', accessor: 'profile.name', sortable: true, filterable: true, width: 100, headerClassName: 'text-left' },
+            { Header: 'Endereço', accessor: 'address', headerClassName: 'd-none', className: 'd-none' },
+            { Header: 'Bairro', accessor: 'neighborhood', headerClassName: 'd-none', className: 'd-none' },
+            { Header: 'Cidade', accessor: 'city', headerClassName: 'd-none', className: 'd-none' },
+            { Header: 'UF', accessor: 'state.abbrev', headerClassName: 'd-none', className: 'd-none' },
+            { Header: 'CEP', accessor: 'zip_code', headerClassName: 'd-none', className: 'd-none' }
+        ];
 
-                
+        col.push(
+            {
+                Header: "Status",
+                accessor: "",
+                width: 60,
+                headerClassName: 'text-left',
+                sortable: false,
+                Cell: (element) => (
+                    !element.value.deleted_at ?
+                        <div><span>Ativo</span></div>
+                        :
+                        <div><span>Inativo</span></div>
+                )/*,                
+                    filterable: true, 
+                    Filter: ({ filter, onChange }) => (
+                    
+                        <select
+                            onChange={event => this.onFetchData(null, null, event.target.value, { filter, onChange })}
+                            style={{ width: "100%" }}
+                        >
+                            <option value="all">Todos</option>
+                            <option value="false">Ativo</option>
+                            <option value="true">Inativo</option>
+                        </select>
+                    )*/
+            }, {
+                Header: "Ações", accessor: "", sortable: false, width: 50, headerClassName: 'text-left', Cell: (element) => (
+                    <div>
+                        <Link to={this.props.match.url + "/" + element.value.id} params={{ id: element.value.id }} className='btn btn-primary btn-sm' >
+                            <i className='fa fa-eye'></i>
+                        </Link>
+                    </div>
+                )
+            }
+        )
 
-    //             console.log(dados);
+        this.setState({ columns: col })
+    }
 
-    //             this.setState({
-    //                 data: dados
-    //             });
+    onFetchData = (state, instance, deleted_at) => {
+        let apiSpartan = this.props.apiSpartan
 
-    //             // this.setState(() => ({
-    //             //     page: 1,
-    //             //     data: dados,
-    //             //     pageSize: 10,
-    //             //     totalSize: response.data.meta.pagination.total,
-    //             //     pages: response.data.meta.pagination.last_page,
-    //             //     loading: false
-    //             // }))
-    //         })
-    //         .catch(err => console.log(err));
-    // }
+        let pageSize = state ? state.pageSize : this.state.pageSize;
+        let page = state ? state.page + 1 : this.state.page;
 
-    onFetchData = (state, instance) => {
-    
-        console.log(state.sorted)
+        let sorted = state ? state.sorted : this.state.sorted
+        let filtered = state ? state.filtered : this.state.filtered
 
-        //console.log(state.sorted.length);
-        let baseURL = `/school?paginate=${state.pageSize}&page=${state.page+1}`;
+        let baseURL = `/school?paginate=${pageSize}&page=${page}`;
 
-        for (let i=0; i < state.sorted.length; i++) {
-            console.log(state.sorted[i]);
-            baseURL += "&order[" + state.sorted[i]['id'] + "]=" + (state.sorted[i]['desc'] == false ? 'asc' : 'desc');
+        //To do: make filter to deleted_at
+        /*console.log('onFetchData:', deleted_at);
+        if(deleted_at != 'all')
+            console.log("deleted_at != 'all'", deleted_at);*/
+
+        filtered.map(function (item) {
+            baseURL += `&filter[${item.id}]=${item.value}`;
+        })
+
+        for (let i = 0; i < sorted.length; i++) {
+            baseURL += "&order[" + sorted[i]['id'] + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
         }
 
-        // let filterId = Object.keys(filters).toString()
-        // let arrFilterId = filterId.split(',')
-        // let urlFilter = '' 
-
-        // if(filterId){
-        //     arrFilterId.map(function(item){
-        //         urlFilter += `&filter[${item}]=${filters[`${item}`]['filterVal']}`
-        //     })
-        // }        
-
-        // switch(type){
-        //     case 'filter':
-        //         baseURL += `${urlFilter}${this.state.lastOrder}`
-        //         break
-        //     case 'sort':
-        //         baseURL += `${this.state.lastFilter}${urlSort}`
-        //         break
-        //     default:
-        //         baseURL += `${this.state.lastFilter}${this.state.lastOrder}`
-        // }
-
-        this.setState({
-            loading: true
-        });
+        //this.setState({loading: true});
 
         axios.get(baseURL)
             .then((response) => {
                 const dados = response.data.data
 
                 this.setState({
-                    //page: state.page+1,
                     data: dados,
-                    //pageSize: state.pageSize,
                     totalSize: response.data.meta.pagination.total,
                     pages: response.data.meta.pagination.last_page,
+                    page: response.data.meta.pagination.current_page,
+                    pageSize: parseInt(response.data.meta.pagination.per_page),
+                    sorted: sorted,
+                    filtered: filtered,
                     loading: false
-                    // lastFilter : urlFilter,
-                    // lastOrder : urlSort
                 });
-
-                //console.log(this.state);
             })
             .catch(err => console.log(err));
-    }  
+    }
 
     render() {
-        // console.log(this.state.data);
-        const { data, pageSize, page, loading, pages } = this.state;
+        const { data, pageSize, page, loading, pages, columns } = this.state;
 
-        const columns = [
-            { Header: 'ID', accessor: 'id' },
-            { Header: "Nome", accessor: "name"},
-            { Header: "Tipo", accessor: "school_type.name", sortable: false},
-            { Header: 'Filial', accessor: 'subsidiary.name', sortable: false},
-            { Header: 'TOTVS', accessor: 'school_code_totvs', sortable: false},
-            { Header: 'Perfil', accessor: 'profile.name'},
-            // { Header: 'Nome', accessor: 'name'},
-            // { Header: 'Endereço',accessor: 'address'},
-            // { Header: 'Bairro', accessor: 'neighborhood'},
-            // { Header: 'Cidade', accessor: 'city'},
-            // { Header: 'UF', accessor: 'name'}
-        ];            
-          
-          
         return (
             <Card>
                 <CardHeader>
                     <i className="fa fa-table"></i>Escolas
                 </CardHeader>
-                <CardBody>                            
-                <ReactTable                    
-                    columns={columns}
-                    data={data}
-                    pages={pages}
-                    loading={loading}
-                    defaultPageSize={pageSize}
-                    manual
-                    onFetchData={this.onFetchData}
-                    SubComponent={(row, column) => {
-                        //console.log(row, column);
-                        //console.log(row);
-                        return (
-                            
-                            <div style={{ padding: "20px" }}>
-                                Endereço: 
-                            </div>
-                        );
-                    }}
-                    onExpandedChange={(expanded, index, event) => {
-                        event.persist();
-                        //console.log('Inside of onExpandedChange...')
-                        //console.log(expanded, index, event)
-                    }}                    
-                    previousText='Anterior'
-                    nextText='Próximo'
-                    loadingText='Carregando...'
-                    noDataText='Sem registros'
-                    pageText='Página'
-                    ofText='de'
-                    rowsText=''
-                />
+                <CardBody>
+                    <ReactTable
+                        columns={columns}
+                        data={data}
+                        pages={pages}
+                        loading={loading}
+                        defaultPageSize={pageSize}
+                        manual
+                        onFetchData={this.onFetchData}
+                        SubComponent={(row) => {
+                            let school = row.original;
+
+                            return (
+                                <div style={{ padding: "20px" }}>
+                                    <b>Endereço:</b> {school.address} <br />
+                                    <b>Bairro:</b> {school.neighborhood} <br />
+                                    <b>Cidade:</b> {school.city} <br />
+                                    <b>UF:</b> {school.state.abbrev} <br />
+                                    <b>CEP:</b> {school.zip_code}
+                                </div>
+                            );
+                        }}
+                        onExpandedChange={(expanded, index, event) => {
+                            event.persist();
+                        }}
+                        previousText='Anterior'
+                        nextText='Próximo'
+                        loadingText='Carregando...'
+                        noDataText='Sem registros'
+                        pageText='Página'
+                        ofText='de'
+                        rowsText=''
+                        className='-striped -highlight'
+                    />
                 </CardBody>
             </Card>
         )
