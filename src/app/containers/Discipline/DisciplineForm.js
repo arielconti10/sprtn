@@ -153,6 +153,18 @@ class DisciplineForm extends Component {
                         onSubmit={this.handleSubmit} noValidate>
                         
                         <div className="">
+                            <FormGroup for="code">
+                                <FormControlLabel htmlFor="code">Código</FormControlLabel>
+                                <FormControlInput type="text" id="code" name="code"
+                                    value={this.state.code} onChange={this.handleChange}
+                                    required />
+                                <FieldFeedbacks for="code">
+                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                </FieldFeedbacks>
+                            </FormGroup>
+                        </div>
+
+                        <div className="">
                             <FormGroup for="name">
                                 <FormControlLabel htmlFor="name">Nome</FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
@@ -162,19 +174,7 @@ class DisciplineForm extends Component {
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
                                 </FieldFeedbacks>
                             </FormGroup>
-                        </div>
-
-                        <div className="">
-                            <FormGroup for="code">
-                                <FormControlLabel htmlFor="code">Nome</FormControlLabel>
-                                <FormControlInput type="text" id="code" name="code"
-                                    value={this.state.code} onChange={this.handleChange}
-                                    required />
-                                <FieldFeedbacks for="code">
-                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
-                            </FormGroup>
-                        </div>
+                        </div>                       
                         
                         {statusField}     
 
