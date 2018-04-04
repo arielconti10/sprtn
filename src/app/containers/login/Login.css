@@ -1,0 +1,50 @@
+/*
+arquivo que irá registrar todos os estilos CSS
+*/
+
+#login-body {
+    background-image: url('./background.jpg');
+    background-size: auto auto;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #fff;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+body { background-color: #f9f9f9 !important; }
+
+.login-form {
+    width: 290px;
+    height: 242px;
+    top: 50%;
+    left: 50%;
+    margin-top: -121px;
+    margin-left: -145px;
+    position: absolute;
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"]  {border: 2px solid #2091e3; border-radius: 5px;}
+.login-form button {text-transform: uppercase;}
+
+.center-help {
+    text-align: center;
+    padding-top: 0.5em;
+    display: block;
+}
+
+.main-logo {
+    width: 96%;
+    display: inline-block;
+    text-align: center;
+}
+
+.form-control-feedback {
+    position: initial;
+    width: initial;
+    text-align: initial;
+    padding-top: 0.5em;
+    color: red;
+}
