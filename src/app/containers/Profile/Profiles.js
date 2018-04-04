@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 import {Row, Col, Card, CardHeader, CardFooter, CardBody, Button} from 'reactstrap';
 
 import ProfileList from './ProfileList';
@@ -10,9 +10,12 @@ class Profiles extends Component {
     render() {
         return (
             <Row>
-                <Col xs="12" sm="12" md="12">                         
+                <Col xs="12" sm="12" md="12">  
+                <Switch>                       
                     <Route path='/cadastro/perfis' exact component={ProfileList} />
-                    <Route path='/cadastro/perfis/form' component={ProfileForm} />                        
+                    <Route path='/cadastro/perfis/novo' exact component={ProfileForm} />
+                        <Route path='/cadastro/perfis/:id' component={ProfileForm} />
+                    </Switch>                        
                 </Col>
             </Row>
         )
