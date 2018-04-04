@@ -1,24 +1,23 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
-import { Card, CardHeader, CardFooter, CardBody, Button } from 'reactstrap';
+import axios from '../../../app/common/axios';
+
+import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 'reactstrap';
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
-
-const apiSelectBox = 'job-title-type';
-const apiPost = 'job-title';
+const apiPost = 'school-type';
 
 class SchoolTypeForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            job_types: [],
-            internal_code: '',
-            internal_name: '',
-            job_title_type_id: '',
+            name: '',
+            active: true,       
             back_error: '',
-            submitButtonDisabled: false
+            submitButtonDisabled: false,
+            saved: false
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -27,32 +26,19 @@ class SchoolTypeForm extends Component {
     }
 
     componentWillMount() {
-        /*if (sessionStorage.getItem("access_token") == null) {
-            window.location.href = "#/spartan/login";
-        }*/
-
-        console.log(this.props)
-        if (this.props.params.id !== undefined) {
-            axios.get(`${apiPost}/${this.props.params.id}`)
+        if (this.props.match.params.id !== undefined) {
+            axios.get(`${apiPost}/${this.props.match.params.id}`)
                 .then(response => {
                     const dados = response.data.data;
-                    this.setState({ internal_code: dados.code });
-                    this.setState({ internal_name: dados.name });
-                    this.setState({ job_title_type_id: dados.job_title_type_id });
-                    console.log(this.state.job_title_type_id);
+
+                    console.log(dados.deleted_at);
+                    this.setState({ 
+                        name: dados.name,
+                        active: dados.deleted_at === null ? true: false
+                    });
                 })
                 .catch(err => console.log(err));
         }
-    }
-
-    componentDidMount() {
-        axios.get(`${apiSelectBox}?page=1`)
-            .then(response => {
-                const dados = response.data.data;
-                this.setState({ job_types: dados });
-                this.setState({ job_title_type_id: dados[0].id });
-            })
-            .catch(err => console.log(err));
     }
 
     handleChange(e) {
@@ -61,20 +47,20 @@ class SchoolTypeForm extends Component {
         this.form.validateFields(target);
 
         this.setState({
-            [target.name]: target.value,
+            [target.name]: (target.type == 'checkbox') ? target.checked : target.value,
             submitButtonDisabled: !this.form.isValid()
         });
-
     }
 
     submitForm(event) {
-        //event.preventDefault();
+        event.preventDefault();
         axios.post(`${apiPost}`, {
-            'code': this.state.internal_code.toUpperCase(),
-            'name': this.state.internal_name,
-            'job_title_type_id': this.state.job_title_type_id
+            'name': this.state.name,
+            'active': this.state.active
         }).then(res => {
-            window.location.href = "#/job-titles";
+            this.setState({
+                saved: true                   
+            })
         }).catch(function (error) {
             let data_error = error.response.data.errors;
             let filterId = Object.keys(data_error)[0].toString();
@@ -83,30 +69,37 @@ class SchoolTypeForm extends Component {
     }
 
     updateForm(event) {
-        //event.preventDefault();
-        var id = this.props.params.id;
+        event.preventDefault();
+        var id = this.props.match.params.id;
+
+        let data = {
+            'name': this.state.name,
+            'active': this.state.active
+        }
+
         axios.put(`${apiPost}/${id}`, {
-            'code': this.state.internal_code.toUpperCase(),
-            'name': this.state.internal_name,
-            'job_title_type_id': this.state.job_title_type_id
+            'name': this.state.name,
+            'active': this.state.active
         }).then(res => {
-            window.location.href = "#/job-titles";
+            this.setState({
+                saved: true                   
+            })
         }).catch(function (error) {
             let data_error = error.response.data.errors;
             let filterId = Object.keys(data_error).toString();
             this.setState({ back_error: data_error[filterId] });
-        }.bind(this));
+        })
     }
 
     handleSubmit(e) {
-        //e.preventDefault();
+        e.preventDefault();
 
         this.form.validateFields();
-
+        
         this.setState({ submitButtonDisabled: !this.form.isValid() });
 
         if (this.form.isValid()) {
-            if (this.props.params.id !== undefined) {
+            if (this.props.match.params.id !== undefined) {
                 this.updateForm(event);
             } else {
                 this.submitForm(event);
@@ -115,81 +108,63 @@ class SchoolTypeForm extends Component {
     }
 
     render() {
-        console.log(this.props);
+        let redirect = null;
+        if (this.state.saved) {
+            redirect = <Redirect to="/cadastro/tipos-escola" />;
+        }
+
+        let statusField = null;
+        if (this.props.match.params.id != undefined) {
+            statusField =
+                <div className="">
+                    <div className="form-group form-inline">
+                        <label className="" style={{marginRight: "10px"}}>Status</label>
+                        <div className="">
+                            <Label className="switch switch-default switch-pill switch-primary">
+                                <Input type="checkbox" id='active' name="active" className="switch-input"  checked={this.state.active} onChange={this.handleChange}/>
+                                <span className="switch-label"></span>
+                                <span className="switch-handle"></span>
+                            </Label>
+                        </div>                                
+                    </div>
+                </div>            
+        }
+        
+
         return (
             <Card>
+                {redirect}
                 <CardHeader>
-                    <i className="fa fa-table"></i>Cargos
+                    <i className="fa fa-table"></i>Tipos de Escola
                 </CardHeader>
                 <CardBody>
-                    <Button color='primary' onClick={this.props.history.goBack}><i className="fa fa-arrow-circle-left"></i> Voltar</Button>
+                    <p>
+                        <Button color='primary' onClick={this.props.history.goBack}><i className="fa fa-arrow-circle-left"></i> Voltar</Button>
+                    </p>
                     {this.state.back_error !== '' &&
-                        <h4 class="alert alert-danger"> {this.state.back_error} </h4>
+                        <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                     }
+                    <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
+                        onSubmit={this.handleSubmit} noValidate>
+                        
+                        <div className="">
+                            <FormGroup for="name">
+                                <FormControlLabel htmlFor="name">Nome</FormControlLabel>
+                                <FormControlInput type="text" id="name" name="name"
+                                    value={this.state.name} onChange={this.handleChange}
+                                    required />
+                                <FieldFeedbacks for="name">
+                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                </FieldFeedbacks>
+                            </FormGroup>
+                        </div>
+                        
+                        {statusField}     
 
-                    <div className="row">
-                        <article className="col-sm-12">
-
-                            <JarvisWidget editbutton={false} color="darken" deletebutton={false} colorbutton={false} >
-                                <header>
-                                    <span className="widget-icon"> <i className="fa fa-table" /> </span>
-                                    <h2>Cadastrar Cargo</h2>
-                                </header>
-                                <div>
-                                    <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
-                                        onSubmit={this.handleSubmit} noValidate>
-
-                                        <div className="col-lg-4 col-md-4 col-sm-12">
-                                            <FormGroup for="internal_code">
-                                                <FormControlLabel htmlFor="internal_code">Código</FormControlLabel>
-                                                <FormControlInput type="text" id="internal_code" name="internal_code"
-                                                    value={this.state.internal_code} onChange={this.handleChange}
-                                                    required />
-                                                <FieldFeedbacks for="internal_code">
-                                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                                </FieldFeedbacks>
-                                            </FormGroup>
-                                        </div>
-
-                                        <div className="col-lg-4 col-md-4 col-sm-12">
-                                            <FormGroup for="internal_name">
-                                                <FormControlLabel htmlFor="internal_name">Nome</FormControlLabel>
-                                                <FormControlInput type="text" id="internal_name" name="internal_name"
-                                                    value={this.state.internal_name} onChange={this.handleChange}
-                                                    required />
-                                                <FieldFeedbacks for="internal_name">
-                                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                                </FieldFeedbacks>
-                                            </FormGroup>
-                                        </div>
-
-                                        <div className="col-lg-4 col-md-4 col-sm-4">
-                                            <div className="form-group">
-                                                <label for="job_title_type_id">Tipo do Cargo</label>
-                                                <select className="form-control" onChange={this.handleChange}
-                                                    id="job_title_type_id" name="job_title_type_id">
-                                                    {
-                                                        this.state.job_types.map(data => {
-                                                            const checked = data.id == this.state.job_title_type_id ? "checked" : "";
-                                                            return (
-                                                                <option value={data.id} selected={checked}>
-                                                                    {data.name}
-                                                                </option>
-                                                            )
-                                                        })
-                                                    }
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <button className="btn btn-primary">Salvar</button>
-                                        <button className="btn btn-danger" onClick={() => Router.History.back()}>Cancelar</button>
-                                    </FormWithConstraints>
-                                </div>
-                            </JarvisWidget>
-
-                        </article>
-                    </div>
+                        <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
+                        <button className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
+                    </FormWithConstraints>
+                    
                 </CardBody>
             </Card>
         )
