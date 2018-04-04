@@ -13,7 +13,7 @@ export default {
         {
           name: 'Escolas',
           url: '/carteira/escolas',
-          icon: 'fa fa-table'
+          icon: 'fa fa-list'
         },
       ]
     },
@@ -25,72 +25,72 @@ export default {
         {
             name: 'Ações',
             url: '/cadastro/acoes',
-            icon: 'fa-table'
+            icon: 'fa fa-caret-right'
         },
         {
           name: 'Cargos',
           url: '/cadastro/cargos',
-          icon: 'fa-table'
+          icon: 'fa fa-caret-right'
         },
         {
             name: 'Congregações',
             url: '/cadastro/congregacoes',
-            icon: 'fa-table'
+            icon: 'fa fa-caret-right'
         },
         {
             name: 'Contatos',
             url: '/cadastro/contatos',
-            icon: 'fa-table'
+            icon: 'fa fa-caret-right'
         },
         {
             name: 'Disciplinas',
             url: '/cadastro/disciplinas',
-            icon: 'fa-table'
+            icon: 'fa fa-caret-right'
         },
         {
             name: 'Estados',
             url: '/cadastro/estados',
-            icon: 'fa-table'
+            icon: 'fa fa-caret-right'
         },
         {
             name: 'Eventos',
             url: '/cadastro/eventos',
-            icon: 'fa-table'
+            icon: 'fa fa-caret-right'
         },
         {
             name: 'Filiais',
             url: '/cadastro/filiais',
-            icon: 'fa-table'
+            icon: 'fa fa-caret-right'
         },
         {
             name: 'Perfis',
             url: '/cadastro/perfis',
-            icon: 'fa-table'
+            icon: 'fa fa-caret-right'
         },
         {
             name: 'Redes',
             url: '/cadastro/redes',
-            icon: 'fa-table'
+            icon: 'fa fa-caret-right'
         },
         {
             name: 'Setores',
             url: '/cadastro/setores',
-            icon: 'fa-table'
+            icon: 'fa fa-caret-right'
         },
         {
             name: 'Tipos de Escola',
             url: '/cadastro/tipos-escola',
-            icon: 'fa-table'
+            icon: 'fa fa-caret-right'
         },
         {
           name: 'Tipos de Localizaçāo',
           url: '/cadastro/tipos-localizacao',
-          icon: 'fa-table'
+          icon: 'fa fa-caret-right'
         },
         {
             name: 'Turnos',
             url: '/cadastro/turnos',
-            icon: 'fa-table'
+            icon: 'fa fa-caret-right'
         }
       ]
     }

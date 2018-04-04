@@ -54,33 +54,35 @@ class GridApi extends Component {
 
     componentDidMount() {
         let col = this.state.columns
+
+        col.push(
+            {
+                Header: "Status",
+                accessor: "",
+                width: 100,
+                headerClassName: 'text-left',
+                sortable: false,
+                Cell: (element) => (
+                    !element.value.deleted_at ?
+                        <div><span>Ativo</span></div>
+                        :
+                        <div><span>Inativo</span></div>
+                )/*,                
+                    filterable: true, 
+                    Filter: ({ filter, onChange }) => (
+                    
+                        <select
+                            onChange={event => this.onFetchData(null, null, event.target.value, { filter, onChange })}
+                            style={{ width: "100%" }}
+                        >
+                            <option value="all">Todos</option>
+                            <option value="false">Ativo</option>
+                            <option value="true">Inativo</option>
+                        </select>
+                    )*/
+            })
         if (!this.props.hideButtons) {
             col.push(
-                {
-                    Header: "Status",
-                    accessor: "",
-                    width: 100,
-                    headerClassName: 'text-left',
-                    sortable: false,
-                    Cell: (element) => (
-                        !element.value.deleted_at ?
-                            <div><span>Ativo</span></div>
-                            :
-                            <div><span>Inativo</span></div>
-                    )/*,                
-                filterable: true, 
-                Filter: ({ filter, onChange }) => (
-                   
-                    <select
-                        onChange={event => this.onFetchData(null, null, event.target.value, { filter, onChange })}
-                        style={{ width: "100%" }}
-                    >
-                        <option value="all">Todos</option>
-                        <option value="false">Ativo</option>
-                        <option value="true">Inativo</option>
-                    </select>
-                )*/
-                },
                 {
                     Header: "Ações", accessor: "", sortable: false, width: 100, headerClassName: 'text-left', Cell: (element) => (
                         !element.value.deleted_at ?
