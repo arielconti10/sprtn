@@ -88,7 +88,7 @@ class GridApi extends Component {
                         !element.value.deleted_at ?
                             <div>
 
-                                <Link to={`${this.props.match.url + "/form/"}${element.value.id}`} className='btn btn-primary btn-sm' >
+                                <Link to={this.props.match.url + "/" + element.value.id} params={{id: element.value.id}} className='btn btn-primary btn-sm' >
                                     <i className='fa fa-pencil'></i>
                                 </Link>
                                 <button className='btn btn-danger btn-sm' onClick={() => this.onClickDelete(element)}>
@@ -132,6 +132,8 @@ class GridApi extends Component {
         for (let i = 0; i < sorted.length; i++) {
             baseURL += "&order[" + sorted[i]['id'] + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
         }
+
+        this.setState({loading: true});
 
         axios.get(baseURL)
             .then((response) => {
