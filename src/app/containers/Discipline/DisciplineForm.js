@@ -140,7 +140,7 @@ class DisciplineForm extends Component {
             <Card>
                 {redirect}
                 <CardHeader>
-                    <i className="fa fa-table"></i>Cargos
+                    <i className="fa fa-table"></i>Disciplinas
                 </CardHeader>
                 <CardBody>
                     <p>
