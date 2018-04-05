@@ -40,7 +40,7 @@ pipeline {
 }
 
 def runNpm() {
-    return 'npm start build'
+    return 'npm install'
 }
 
 def getEnvironment() {
