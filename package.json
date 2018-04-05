@@ -31,6 +31,8 @@
     "react-form-with-constraints-bootstrap4": "^0.7.1",
     "rimraf": "2.6.2",
     "sass-loader": "6.0.6",
+    "shipit-cli": "^4.0.2",
+    "shipit-deploy": "^4.0.2",
     "source-list-map": "2.0.0",
     "style-loader": "0.20.1",
     "uglify-js": "3.3.9",
@@ -56,6 +58,7 @@
     "react-table": "^6.8.0",
     "react-transition-group": "2.2.1",
     "reactstrap": "5.0.0-beta",
+    "shipit-npm": "^0.2.0",
     "simple-line-icons": "2.4.1"
   },
   "scripts": {
