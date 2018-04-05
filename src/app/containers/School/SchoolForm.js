@@ -9,14 +9,36 @@ import classnames from 'classnames';
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
+import SchoolRegister from './SchoolRegister'
+import SchoolStudents from './SchoolStudents'
+
 class SchoolForm extends Component {
     constructor(props) {
         super(props);
 
         this.toggle = this.toggle.bind(this);
         this.state = {
-            activeTab: '1'
+            schoolName: '',
+            schoolId: this.props.match.params.id,
+            total_students: '0',
+            activeTab: 'cadastro'
         };
+    }
+
+    componentWillMount() {
+
+        axios.get(`school/${this.state.schoolId}`)
+            .then(response => {
+                const dados = response.data.data;
+
+                this.setState({
+                    schoolName: dados.name, 
+                    total_students: dados.total_students || '0',                  
+                    active: dados.deleted_at === null ? true : false
+                });
+            })
+            .catch(err => console.log(err));
+
     }
 
     toggle(tab) {
@@ -29,98 +51,106 @@ class SchoolForm extends Component {
 
     render() {
         return (
-            <Card>
-                <CardHeader>
-                    <i className="fa fa-table"></i>CAC :: Cadastro de Escolas
-                </CardHeader>
-                <CardBody>
-                    <p>
-                        <Button color='primary' onClick={this.props.history.goBack}><i className="fa fa-arrow-circle-left"></i> Voltar</Button>
-                    </p>
+            <div>
+                <h1 className="school-header"><i className="fa fa-graduation-cap"></i> {this.state.schoolName} <SchoolStudents numStudents={this.state.total_students} /></h1>
+                <br />
+                <Nav tabs>
+                    <NavItem>
+                        <NavLink
+                            className={classnames({ active: this.state.activeTab === 'dashboard' })}
+                            onClick={() => { this.toggle('dashboard'); }}
+                        >
+                            Dashboard
+                            </NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink
+                            className={classnames({ active: this.state.activeTab === 'cadastro' })}
+                            onClick={() => { this.toggle('cadastro'); }}
+                        >
+                            Cadastro
+                            </NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink
+                            className={classnames({ active: this.state.activeTab === 'contatos' })}
+                            onClick={() => { this.toggle('contatos'); }}
+                        >
+                            Contatos
+                            </NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink
+                            className={classnames({ active: this.state.activeTab === 'alunos' })}
+                            onClick={() => { this.toggle('alunos'); }}
+                        >
+                            Alunos
+                            </NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink
+                            className={classnames({ active: this.state.activeTab === 'adocoes' })}
+                            onClick={() => { this.toggle('adocoes'); }}
+                        >
+                            Adoções
+                            </NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink
+                            className={classnames({ active: this.state.activeTab === 'agendas' })}
+                            onClick={() => { this.toggle('agendas'); }}
+                        >
+                            Agenda
+                            </NavLink>
+                    </NavItem>
+                </Nav>
+                <TabContent activeTab={this.state.activeTab}>
+                    <TabPane tabId="dashboard">
+                        <Row>
+                            <Col sm="12">
+                                <h2>Dashboard</h2>
+                            </Col>
+                        </Row>
+                    </TabPane>
+                    <TabPane tabId="cadastro">
+                        <Row>
+                            <Col sm="12">
+                                <SchoolRegister viewMode={true}  schoolId={this.state.schoolId} />
+                            </Col>
+                        </Row>
+                    </TabPane>
+                    <TabPane tabId="contatos">
+                        <Row>
+                            <Col sm="12">
+                                <h2>Contatos</h2>
+                            </Col>
+                        </Row>
+                    </TabPane>
+                    <TabPane tabId="alunos">
+                        <Row>
+                            <Col sm="12">
+                                <h2>Alunos</h2>
+                            </Col>
+                        </Row>
+                    </TabPane>
+                    <TabPane tabId="adocoes">
+                        <Row>
+                            <Col sm="12">
+                                <h2>Adoções</h2>
+                            </Col>
+                        </Row>
+                    </TabPane>
+                    <TabPane tabId="agendas">
+                        <Row>
+                            <Col sm="12">
+                                <h2>Agendas</h2>
+                            </Col>
+                        </Row>
+                    </TabPane>
 
-                    <Nav tabs>
-                        <NavItem>
-                            <NavLink
-                                className={classnames({ active: this.state.activeTab === '1' })}
-                                onClick={() => { this.toggle('1'); }}
-                            >
-                                Cadastro
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink
-                                className={classnames({ active: this.state.activeTab === '2' })}
-                                onClick={() => { this.toggle('2'); }}
-                            >
-                                Contatos
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink
-                                className={classnames({ active: this.state.activeTab === '3' })}
-                                onClick={() => { this.toggle('3'); }}
-                            >
-                                Alunos
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink
-                                className={classnames({ active: this.state.activeTab === '4' })}
-                                onClick={() => { this.toggle('4'); }}
-                            >
-                                Adoções
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink
-                                className={classnames({ active: this.state.activeTab === '5' })}
-                                onClick={() => { this.toggle('5'); }}
-                            >
-                                Agenda
-                            </NavLink>
-                        </NavItem>
-                    </Nav>
-                    <TabContent activeTab={this.state.activeTab}>
-                        <TabPane tabId="1">
-                            <Row>
-                                <Col sm="12">
-                                    <h1>Cadastro</h1>
-                                </Col>
-                            </Row>
-                        </TabPane>
-                        <TabPane tabId="2">
-                            <Row>
-                                <Col sm="12">
-                                    <h1>Contatos</h1>
-                                </Col>
-                            </Row>
-                        </TabPane>
-                        <TabPane tabId="3">
-                            <Row>
-                                <Col sm="12">
-                                    <h1>Alunos</h1>
-                                </Col>
-                            </Row>
-                        </TabPane>
-                        <TabPane tabId="4">
-                            <Row>
-                                <Col sm="12">
-                                    <h1>Adoções</h1>
-                                </Col>
-                            </Row>
-                        </TabPane>
-                        <TabPane tabId="5">
-                            <Row>
-                                <Col sm="12">
-                                    <h1>Agendas</h1>
-                                </Col>
-                            </Row>
-                        </TabPane>
+                </TabContent>
 
-                    </TabContent>
-
-                </CardBody>
-            </Card>
+            </div>
         )
     }
 }

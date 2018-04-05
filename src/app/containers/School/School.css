@@ -1,0 +1,16 @@
+.no-overflow-x { overflow-x: hidden !important; }
+
+.schoolInfo { font-size:1.2em; margin: 18px 30px 0 0; float: left; }
+
+.schoolTitle { font-weight: bold; color: #549e3b; }
+
+.tab-content { margin-top: -3px !important; background: #fff !important; border-width: 3px 0 0 0 !important; border-style: solid !important; border-color: #2c96e6 !important; }
+
+.nav-tabs .nav-link.active { border-bottom-width: 3px; border-color: #fff !important; border-bottom-color: #293960 !important; }
+
+.nav-tabs .nav-link:hover { border-bottom-width: 3px; border-bottom-color: #293960 !important; border-top-color: transparent !important; border-left-color: transparent !important; border-right-color: transparent !important; }
+
+.school-header { font-size: 20px  !important; padding:  10px 15px  !important; background: #f7f7f7  !important; border: 1px solid #ececec  !important; border-radius: 6px  !important; }
+.school-header i { font-size: 22px !important; }
+.school-header-students { font-size: 16px !important; padding: 3px 0  !important; color: #109800  !important; }
+.school-header-students i { font-size: 16px !important; }
