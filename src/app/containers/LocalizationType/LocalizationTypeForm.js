@@ -133,13 +133,7 @@ class LocalizationTypeForm extends Component {
         return (
             <Card>
                 {redirect}
-                <CardHeader>
-                    <i className="fa fa-table"></i>Tipos de Localização
-                </CardHeader>
                 <CardBody>
-                    <p>
-                        <Button color='primary' onClick={this.props.history.goBack}><i className="fa fa-arrow-circle-left"></i> Voltar</Button>
-                    </p>
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                     }
@@ -148,7 +142,7 @@ class LocalizationTypeForm extends Component {
                         
                         <div className="">
                             <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Nome</FormControlLabel>
+                                <FormControlLabel htmlFor="name">Nome do tipo de localização</FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
                                     required />
