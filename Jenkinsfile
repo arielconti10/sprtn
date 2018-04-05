@@ -12,7 +12,7 @@ pipeline {
     }
     stage('Deploy') {
       steps {
-        sh "node -v"
+        sh "shipit ${getEnvironment().toLowerCase()} deploy permissions"
       }
     }
   }
