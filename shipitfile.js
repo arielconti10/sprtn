@@ -7,7 +7,7 @@ module.exports = shipit => {
   shipit.initConfig({
     default: {
       deployTo: '/var/www/html/ftdspartanf',
-      repositoryUrl: 'https://git@bitbucket.org/editora-ftd/ftdspartanf.git',
+      repositoryUrl: 'git@bitbucket.org:editora-ftd/ftdspartanf.git',
     //   repositoryUrl: 'git@bitbucket.org:editora-ftd/ftdspartanf.git',
       branch: 'staging',
       keepReleases: 3
@@ -26,5 +26,7 @@ module.exports = shipit => {
   });
 
 }
+
+//set('repository', 'git@bitbucket.org:editora-ftd/ftdspartanb.git');
 
 //repositoryUrl: 'ssh://git@bitbucket.org:editora-ftd/ftdspartanf.git',
