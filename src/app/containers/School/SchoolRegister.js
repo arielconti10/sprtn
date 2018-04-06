@@ -4,6 +4,7 @@ import axios from '../../../app/common/axios';
 import { Card, CardHeader, CardFooter, CardBody, CardTitle, CardText, Row, Col, Button, Label, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
+import ToastrContainer, {Toast} from 'react-toastr-basic'
 
 import './School.css'
 
@@ -65,6 +66,7 @@ export default class SchoolRegister extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.submitForm = this.submitForm.bind(this);
+        //this.createNotification = this.createNotification.bind(this);
 
     }
 
@@ -79,37 +81,42 @@ export default class SchoolRegister extends Component {
         });
     }
 
+    showToast(){
+        Toast('toast message');
+     }
+
     componentWillMount() {
-        axios.get(`${apiPost}/${this.state.id}`)
-            .then(response => {
-                let dados = response.data.data;
+        if (this.state.id !== undefined) {
+            axios.get(`${apiPost}/${this.state.id}`)
+                .then(response => {
+                    let dados = response.data.data;
 
-                this.setState({
-                    school_type_id: dados.school_type_id,
-                    subsidiary_id: dados.subsidiary_id,
-                    sector_id: dados.sector_id,
-                    school_code_totvs: dados.school_code_totvs,
-                    profile_id: dados.profile_id,
-                    congregation_id: dados.congregation_id,
-                    name: dados.name,
-                    trading_name: dados.trading_name,
-                    cnpj: dados.cnpj,
-                    mec_inep_code: dados.mec_inep_code,
-                    zip_code: dados.zip_code,
-                    address: dados.address,
-                    number: dados.number,
-                    neighborhood: dados.neighborhood,
-                    city: dados.city,
-                    state_id: dados.state_id,
-                    phone: dados.phone,
-                    email: dados.email,
-                    chain_id: dados.chain_id,
-                    localization_type_id: dados.localization_type_id,
-                    maintainer: dados.maintainer
-                });
-            })
-            .catch(err => console.log(4, err));
-
+                    this.setState({
+                        school_type_id: dados.school_type_id || '0',
+                        subsidiary_id: dados.subsidiary_id || '0',
+                        sector_id: dados.sector_id || '0',
+                        school_code_totvs: dados.school_code_totvs || '',
+                        profile_id: dados.profile_id || '0',
+                        congregation_id: dados.congregation_id || '0',
+                        name: dados.name || '',
+                        trading_name: dados.trading_name || '',
+                        cnpj: dados.cnpj || '',
+                        mec_inep_code: dados.mec_inep_code || '',
+                        zip_code: dados.zip_code || '',
+                        address: dados.address || '',
+                        number: dados.number || '',
+                        neighborhood: dados.neighborhood || '',
+                        city: dados.city || '',
+                        state_id: dados.state_id || '0',
+                        phone: dados.phone || '',
+                        email: dados.email || '',
+                        chain_id: dados.chain_id || '0',
+                        localization_type_id: dados.localization_type_id || '0',
+                        maintainer: dados.maintainer || ''
+                    });
+                })
+                .catch(err => console.log(4, err));
+        }
     }
 
     handleChange(e) {
@@ -148,20 +155,30 @@ export default class SchoolRegister extends Component {
             'localization_type_id': this.state.localization_type_id,
             'maintainer': this.state.maintainer
         }).then(res => {
+            console.log('res', res);
             this.setState({
-                saved: true                   
-            })
+                saved: true
+            });
+            alert('Dados salvos com sucesso!');
+            //this.createNotification('success', 'Dados gravados com sucesso!');
         }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error)[0].toString();
-            this.setState({ back_error: data_error[filterId] });
+            console.log('submitForm', error);
+            //let data_error = error.response.data.errors;
+            //let filterId = Object.keys(data_error).toString();
+            //this.setState({ back_error: data_error[filterId] });
+
+            alert('Erro! ' + error);
+            this.setState({ back_error: error || '' });
+
+            //this.createNotification('error', this.state.back_error);
         }.bind(this));
     }
 
     updateForm(event) {
+
         event.preventDefault();
-        var id = this.props.match.params.id;
- 
+        var id = this.state.id;
+
         axios.put(`${apiPost}/${id}`, {
             'school_type_id': this.state.school_type_id,
             'subsidiary_id': this.state.subsidiary_id,
@@ -185,13 +202,22 @@ export default class SchoolRegister extends Component {
             'localization_type_id': this.state.localization_type_id,
             'maintainer': this.state.maintainer
         }).then(res => {
+            console.log(res, res.data.data);
             this.setState({
-                saved: true                   
-            })
+                saved: true
+            });
+            alert('Dados salvos com sucesso!');
+            this.showToast;
+            //this.createNotification('success', 'Dados gravados com sucesso!');
         }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error).toString();
-            this.setState({ back_error: data_error[filterId] });
+            console.log('updateForm', error);
+            //let data_error = error.response.data.errors;
+            //let filterId = Object.keys(data_error).toString();
+            //this.setState({ back_error: data_error[filterId] });
+            alert('Erro! ' + error);
+            this.setState({ back_error: error || '' });
+
+            //this.createNotification('error', this.state.back_error);
         })
     }
 
@@ -199,13 +225,11 @@ export default class SchoolRegister extends Component {
         e.preventDefault();
 
         this.form.validateFields();
-        
-        //console.log(this.form.isValid());
 
         this.setState({ submitButtonDisabled: !this.form.isValid() });
 
         if (this.form.isValid()) {
-            if (this.props.match.params.id !== undefined) {
+            if (this.state.id !== undefined) {
                 this.updateForm(event);
             } else {
                 this.submitForm(event);
@@ -223,7 +247,7 @@ export default class SchoolRegister extends Component {
                     <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                 }
                 <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
-                    onSubmit={this.handleSubmit} noValidate>                    
+                    onSubmit={this.handleSubmit} noValidate>
 
                     <Row>
                         <Col md="3">
