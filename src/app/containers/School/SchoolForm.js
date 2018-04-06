@@ -11,6 +11,7 @@ import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'r
 
 import SchoolRegister from './SchoolRegister'
 import SchoolStudents from './SchoolStudents'
+import SchoolConctactList from './SchoolContactList';
 
 class SchoolForm extends Component {
     constructor(props) {
@@ -125,6 +126,7 @@ class SchoolForm extends Component {
                         <Row>
                             <Col sm="12">
                                 <h2>Contatos</h2>
+                                <SchoolConctactList />
                             </Col>
                         </Row>
                     </TabPane>

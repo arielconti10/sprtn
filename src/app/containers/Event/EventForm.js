@@ -32,7 +32,7 @@ class SubsidiariesForm extends Component {
         }*/
 
         console.log(this.props)
-        if (this.props.params.id !== undefined) {
+        if (this.props.match.params.id !== undefined) {
             axios.get(`${apiPost}/${this.props.params.id}`)
                 .then(response => {
                     const dados = response.data.data;

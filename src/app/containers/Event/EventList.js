@@ -11,10 +11,6 @@ class EventList extends Component {
 
         return (
             <div>
-                <p>
-                    <NavLink to={this.props.match.url + "/novo"} exact><Button color='primary' ><i className="fa fa-plus-circle"></i> Adicionar</Button></NavLink>
-                </p>
-
                 <GridApi
                     apiSpartan="event"
                     columns={[
