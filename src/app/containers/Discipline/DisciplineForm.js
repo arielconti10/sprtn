@@ -139,13 +139,7 @@ class DisciplineForm extends Component {
         return (
             <Card>
                 {redirect}
-                <CardHeader>
-                    <i className="fa fa-table"></i>Disciplinas
-                </CardHeader>
                 <CardBody>
-                    <p>
-                        <Button color='primary' onClick={this.props.history.goBack}><i className="fa fa-arrow-circle-left"></i> Voltar</Button>
-                    </p>
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                     }
@@ -154,7 +148,7 @@ class DisciplineForm extends Component {
                         
                         <div className="">
                             <FormGroup for="code">
-                                <FormControlLabel htmlFor="code">Código</FormControlLabel>
+                                <FormControlLabel htmlFor="code">Código da disciplina</FormControlLabel>
                                 <FormControlInput type="text" id="code" name="code"
                                     value={this.state.code} onChange={this.handleChange}
                                     required />
@@ -166,7 +160,7 @@ class DisciplineForm extends Component {
 
                         <div className="">
                             <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Nome</FormControlLabel>
+                                <FormControlLabel htmlFor="name">Nome da disciplina</FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
                                     required />

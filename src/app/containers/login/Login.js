@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 
-console.log(window.width, window.heigth)
 import './Login.css';
 import InputCustomize from '../../common/InputCustomize';
 import axios from '../../common/axios';
@@ -64,7 +63,6 @@ class LoginForm extends Component {
             'password': this.state.password,
             //'scope: '' 
         }).then(res => {
-            console.log(res)
             this.saveStorage(res);            
         })
     }

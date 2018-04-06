@@ -172,13 +172,7 @@ class JobTitleForm extends Component {
         return (
             <Card>
                 {redirect}
-                <CardHeader>
-                    <i className="fa fa-table"></i>Cargos
-                </CardHeader>
                 <CardBody>
-                    <p>
-                        <Button color='primary' onClick={this.props.history.goBack}><i className="fa fa-arrow-circle-left"></i> Voltar</Button>
-                    </p>
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                     }
@@ -187,7 +181,7 @@ class JobTitleForm extends Component {
 
                         <div className="">
                             <FormGroup for="code">
-                                <FormControlLabel htmlFor="code">Código</FormControlLabel>
+                                <FormControlLabel htmlFor="code">Código do cargo</FormControlLabel>
                                 <FormControlInput type="text" id="code" name="code"
                                     value={this.state.code} onChange={this.handleChange}
                                     required />
@@ -199,7 +193,7 @@ class JobTitleForm extends Component {
 
                         <div className="">
                             <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Nome</FormControlLabel>
+                                <FormControlLabel htmlFor="name">Nome do cargo</FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
                                     required />
@@ -211,7 +205,7 @@ class JobTitleForm extends Component {
 
                         <div className="">
                             <FormGroup for="job_title_type_id">
-                                <label>Tipo do Cargo</label>
+                                <label>Tipo do cargo</label>
                                 <select className="form-control" onChange={this.handleChange}
                                     id="job_title_type_id" name="job_title_type_id" value={this.state.job_title_type_id}>
                                     <option key="0" value="0" >Selecione um valor</option>

@@ -14,7 +14,7 @@ class ActionForm extends Component {
         super(props);
         this.state = {
             name: '',
-            active: true,       
+            active: true,
             back_error: '',
             submitButtonDisabled: false,
             saved: false
@@ -32,9 +32,9 @@ class ActionForm extends Component {
                     const dados = response.data.data;
 
                     console.log(dados.deleted_at);
-                    this.setState({ 
+                    this.setState({
                         name: dados.name,
-                        active: dados.deleted_at === null ? true: false
+                        active: dados.deleted_at === null ? true : false
                     });
                 })
                 .catch(err => console.log(err));
@@ -59,7 +59,7 @@ class ActionForm extends Component {
             'active': this.state.active
         }).then(res => {
             this.setState({
-                saved: true                   
+                saved: true
             })
         }).catch(function (error) {
             let data_error = error.response.data.errors;
@@ -82,7 +82,7 @@ class ActionForm extends Component {
             'active': this.state.active
         }).then(res => {
             this.setState({
-                saved: true                   
+                saved: true
             })
         }).catch(function (error) {
             let data_error = error.response.data.errors;
@@ -95,7 +95,7 @@ class ActionForm extends Component {
         e.preventDefault();
 
         this.form.validateFields();
-        
+
         this.setState({ submitButtonDisabled: !this.form.isValid() });
 
         if (this.form.isValid()) {
@@ -118,38 +118,33 @@ class ActionForm extends Component {
             statusField =
                 <div className="">
                     <div className="form-group form-inline">
-                        <label className="" style={{marginRight: "10px"}}>Status</label>
+                        <label className="" style={{ marginRight: "10px" }}>Status</label>
                         <div className="">
                             <Label className="switch switch-default switch-pill switch-primary">
-                                <Input type="checkbox" id='active' name="active" className="switch-input"  checked={this.state.active} onChange={this.handleChange}/>
+                                <Input type="checkbox" id='active' name="active" className="switch-input" checked={this.state.active} onChange={this.handleChange} />
                                 <span className="switch-label"></span>
                                 <span className="switch-handle"></span>
                             </Label>
-                        </div>                                
+                        </div>
                     </div>
-                </div>            
+                </div>
         }
-        
+
 
         return (
             <Card>
                 {redirect}
-                <CardHeader>
-                    <i className="fa fa-table"></i>Cargos
-                </CardHeader>
+
                 <CardBody>
-                    <p>
-                        <Button color='primary' onClick={this.props.history.goBack}><i className="fa fa-arrow-circle-left"></i> Voltar</Button>
-                    </p>
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                     }
                     <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
                         onSubmit={this.handleSubmit} noValidate>
-                        
+
                         <div className="">
                             <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Nome</FormControlLabel>
+                                <FormControlLabel htmlFor="name">Nome da ação</FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
                                     required />
@@ -158,13 +153,13 @@ class ActionForm extends Component {
                                 </FieldFeedbacks>
                             </FormGroup>
                         </div>
-                        
-                        {statusField}     
+
+                        {statusField}
 
                         <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
                         <button className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
                     </FormWithConstraints>
-                    
+
                 </CardBody>
             </Card>
         )

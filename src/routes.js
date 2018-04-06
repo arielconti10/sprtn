@@ -12,7 +12,7 @@ const routes = {
   '/cadastro/filiais': 'Filiais',
   '/cadastro/filiais/form': 'Filiais',
   '/cadastro/setores': 'Setores',
-  '/cadastro/setores/form': 'Setores',
+  '/cadastro/setores/novo': 'Setores',
   '/cadastro/disciplinas': 'Disciplinas',
   '/cadastro/disciplinas/form': 'Disciplinas',
   '/cadastro/tipos-localizacao': 'Tipos de Localizaçāo',
