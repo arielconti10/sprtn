@@ -15,7 +15,7 @@ module.exports = shipit => {
     staging: {
        servers: 'ftdiw@mtz-webh02',
     //    key: '/Users/tercmt-henrique/Desktop/deploy.pem'
-    //    key: '/home/.ssh-deploy-keys/mtz-webh02/deploy.pem'
+       key: '/home/.ssh-deploy-keys/mtz-webh02/deploy.pem'
     },
   });
 
