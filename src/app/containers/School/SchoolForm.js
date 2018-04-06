@@ -20,6 +20,7 @@ class SchoolForm extends Component {
         this.state = {
             schoolName: '',
             schoolId: this.props.match.params.id,
+            students: [],
             total_students: '0',
             activeTab: 'cadastro'
         };
@@ -33,7 +34,8 @@ class SchoolForm extends Component {
 
                 this.setState({
                     schoolName: dados.name, 
-                    total_students: dados.total_students || '0',                  
+                    total_students: dados.total_students || '0',
+                    students: dados.students || [],                  
                     active: dados.deleted_at === null ? true : false
                 });
             })
@@ -115,7 +117,7 @@ class SchoolForm extends Component {
                     <TabPane tabId="cadastro">
                         <Row>
                             <Col sm="12">
-                                <SchoolRegister viewMode={true}  schoolId={this.state.schoolId} />
+                                <SchoolRegister viewMode={false}  schoolId={this.state.schoolId} />
                             </Col>
                         </Row>
                     </TabPane>

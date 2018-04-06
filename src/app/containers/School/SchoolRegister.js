@@ -7,6 +7,8 @@ import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'r
 
 import './School.css'
 
+const apiPost = 'school';
+
 const apis = [
     { stateArray: 'school_types', api: 'school-type' },
     { stateArray: 'subsidiaries', api: 'subsidiary' },
@@ -24,6 +26,10 @@ export default class SchoolRegister extends Component {
 
         this.state = {
             viewMode: this.props.viewMode,
+            back_error: '',
+            submitButtonDisabled: false,
+            saved: false,
+
             id: this.props.schoolId,
             school_types: [],
             school_type_id: '0',
@@ -57,6 +63,8 @@ export default class SchoolRegister extends Component {
         };
 
         this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.submitForm = this.submitForm.bind(this);
 
     }
 
@@ -72,7 +80,7 @@ export default class SchoolRegister extends Component {
     }
 
     componentWillMount() {
-        axios.get(`school/${this.state.id}`)
+        axios.get(`${apiPost}/${this.state.id}`)
             .then(response => {
                 let dados = response.data.data;
 
@@ -110,12 +118,99 @@ export default class SchoolRegister extends Component {
         this.form.validateFields(target);
 
         this.setState({
-            [target.name]: (target.type == 'checkbox') ? target.checked : target.value
+            [target.name]: (target.type == 'checkbox') ? target.checked : target.value,
+            submitButtonDisabled: !this.form.isValid()
         });
     }
 
-    handleSubmit() {
+    submitForm(event) {
+        event.preventDefault();
+        axios.post(`${apiPost}`, {
+            'school_type_id': this.state.school_type_id,
+            'subsidiary_id': this.state.subsidiary_id,
+            'sector_id': this.state.sector_id,
+            'school_code_totvs': this.state.school_code_totvs,
+            'profile_id': this.state.profile_id,
+            'congregation_id': this.state.congregation_id,
+            'name': this.state.name,
+            'trading_name': this.state.trading_name,
+            'cnpj': this.state.cnpj,
+            'mec_inep_code': this.state.mec_inep_code,
+            'zip_code': this.state.zip_code,
+            'address': this.state.address,
+            'number': this.state.number,
+            'neighborhood': this.state.neighborhood,
+            'city': this.state.city,
+            'state_id': this.state.state_id,
+            'phone': this.state.phone,
+            'email': this.state.email,
+            'chain_id': this.state.chain_id,
+            'localization_type_id': this.state.localization_type_id,
+            'maintainer': this.state.maintainer
+        }).then(res => {
+            this.setState({
+                saved: true                   
+            })
+        }).catch(function (error) {
+            let data_error = error.response.data.errors;
+            let filterId = Object.keys(data_error)[0].toString();
+            this.setState({ back_error: data_error[filterId] });
+        }.bind(this));
+    }
 
+    updateForm(event) {
+        event.preventDefault();
+        var id = this.props.match.params.id;
+ 
+        axios.put(`${apiPost}/${id}`, {
+            'school_type_id': this.state.school_type_id,
+            'subsidiary_id': this.state.subsidiary_id,
+            'sector_id': this.state.sector_id,
+            'school_code_totvs': this.state.school_code_totvs,
+            'profile_id': this.state.profile_id,
+            'congregation_id': this.state.congregation_id,
+            'name': this.state.name,
+            'trading_name': this.state.trading_name,
+            'cnpj': this.state.cnpj,
+            'mec_inep_code': this.state.mec_inep_code,
+            'zip_code': this.state.zip_code,
+            'address': this.state.address,
+            'number': this.state.number,
+            'neighborhood': this.state.neighborhood,
+            'city': this.state.city,
+            'state_id': this.state.state_id,
+            'phone': this.state.phone,
+            'email': this.state.email,
+            'chain_id': this.state.chain_id,
+            'localization_type_id': this.state.localization_type_id,
+            'maintainer': this.state.maintainer
+        }).then(res => {
+            this.setState({
+                saved: true                   
+            })
+        }).catch(function (error) {
+            let data_error = error.response.data.errors;
+            let filterId = Object.keys(data_error).toString();
+            this.setState({ back_error: data_error[filterId] });
+        })
+    }
+
+    handleSubmit(e) {
+        e.preventDefault();
+
+        this.form.validateFields();
+        
+        //console.log(this.form.isValid());
+
+        this.setState({ submitButtonDisabled: !this.form.isValid() });
+
+        if (this.form.isValid()) {
+            if (this.props.match.params.id !== undefined) {
+                this.updateForm(event);
+            } else {
+                this.submitForm(event);
+            }
+        }
     }
 
     render() {
@@ -124,9 +219,11 @@ export default class SchoolRegister extends Component {
 
         return (
             <div>
-
+                {this.state.back_error !== '' &&
+                    <h4 className="alert alert-danger"> {this.state.back_error} </h4>
+                }
                 <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
-                    onSubmit={this.handleSubmit} noValidate>
+                    onSubmit={this.handleSubmit} noValidate>                    
 
                     <Row>
                         <Col md="3">
@@ -417,8 +514,8 @@ export default class SchoolRegister extends Component {
                                     <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
                                 </FieldFeedbacks>
                             </FormGroup>
-                        </Col>                        
-                    
+                        </Col>
+
                         <Col md="3">
                             <FormGroup for="chain_id">
                                 <label>Tipo de rede</label>
@@ -475,6 +572,12 @@ export default class SchoolRegister extends Component {
                                     <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
                                 </FieldFeedbacks>
                             </FormGroup>
+                        </Col>
+                    </Row>
+
+                    <Row>
+                        <Col md="12" className="pull-right">
+                            <button className="btn btn-primary pull-right" disabled={this.state.submitButtonDisabled}>Salvar</button>
                         </Col>
                     </Row>
 
