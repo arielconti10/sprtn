@@ -13,7 +13,7 @@ arquivo que irá registrar todos os estilos CSS
     height: 100%;
 }
 
-body { background-color: #f9f9f9 !important; }
+body { background-color: #fff !important; }
 
 .login-form {
     width: 290px;

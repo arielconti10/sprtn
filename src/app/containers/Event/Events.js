@@ -12,7 +12,7 @@ class Events extends Component {
             <Row>
                 <Col xs="12" sm="12" md="12">                         
                     <Route path='/cadastro/eventos' exact component={EventList} />
-                    <Route path='/cadastro/eventos/form' component={EventForm} />                        
+                    <Route path='/cadastro/eventos/novo' component={EventForm} />                        
                 </Col>
             </Row>
         )

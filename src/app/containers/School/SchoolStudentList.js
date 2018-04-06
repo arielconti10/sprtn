@@ -25,8 +25,10 @@ class SchoolList extends Component {
 
     componentDidMount() {
         let col = [
-            { Header: "Nome", accessor: "name", sortable: true, filterable: true, maxWidth: 600, headerClassName: 'text-left' },
+            { Header: 'ID', accessor: 'id', sortable: true, filterable: true, width: 70, headerClassName: 'text-left' },
+            { Header: "Nome", accessor: "name", sortable: true, filterable: true, maxWidth: 500, headerClassName: 'text-left' },
             { Header: "Tipo", accessor: "school_type.name", sortable: true, filterable: true, width: 100, headerClassName: 'text-left' },
+            { Header: 'Alunos', accessor: 'total_students', sortable: true, filterable: true, width: 60, headerClassName: 'text-left' },
             { Header: 'Filial', accessor: 'subsidiary.name', sortable: true, filterable: true, width: 60, headerClassName: 'text-left' },
             { Header: 'TOTVS', accessor: 'school_code_totvs', sortable: true, filterable: true, width: 80, headerClassName: 'text-left' },
             { Header: 'Perfil', accessor: 'profile.name', sortable: true, filterable: true, width: 100, headerClassName: 'text-left' }

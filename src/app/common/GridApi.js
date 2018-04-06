@@ -167,14 +167,6 @@ class GridApi extends Component {
                     defaultPageSize={pageSize}
                     manual
                     onFetchData={this.onFetchData}
-                    /*SubComponent={(row, column) => {
-                        return (
- 
-                            <div style={{ padding: "20px" }}>
-                                Endereço:
-                        </div>
-                        );
-                    }}*/
                     onExpandedChange={(expanded, index, event) => {
                         event.persist();
                     }}
