@@ -13,7 +13,7 @@ module.exports = shipit => {
     },
     staging: {
        servers: 'ftdiw@mtz-webh02',
-       key: '/home/ftdiw/.ssh/deployer_rsa'
+       key: 'home/.ssh-deploy-keys/mtz-webh02/deploy.pem'
     },
   });
 
