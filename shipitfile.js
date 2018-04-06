@@ -7,13 +7,15 @@ module.exports = shipit => {
   shipit.initConfig({
     default: {
       deployTo: '/var/www/html/ftdspartanf',
-      repositoryUrl: 'git@bitbucket.org:editora-ftd/ftdspartanf.git',
+      repositoryUrl: 'https://git@bitbucket.org/editora-ftd/ftdspartanf.git',
+    //   repositoryUrl: 'git@bitbucket.org:editora-ftd/ftdspartanf.git',
       branch: 'staging',
       keepReleases: 3
     },
     staging: {
        servers: 'ftdiw@mtz-webh02',
-       key: '/home/.ssh-deploy-keys/mtz-webh02/deploy.pem'
+       key: '/Users/tercmt-henrique/Desktop/deploy.pem'
+    //    key: '/home/.ssh-deploy-keys/mtz-webh02/deploy.pem'
     },
   });
 
@@ -24,3 +26,5 @@ module.exports = shipit => {
   });
 
 }
+
+//repositoryUrl: 'ssh://git@bitbucket.org:editora-ftd/ftdspartanf.git',
