@@ -34,6 +34,9 @@ const routes = {
   '/cadastro/tipos-escola': 'Tipos de Escola',
   '/cadastro/tipos-escola/form': 'Tipos de Escola',
   '/cadastro/estados': 'Estados',
-  '/cadastro/estados/form': 'Estados'     
+  '/cadastro/estados/form': 'Estados',
+  '/config': "Configuração",
+  '/config/regras': "Regras",
+  '/config/permissoes': "Permissões",
 };
 export default routes;
