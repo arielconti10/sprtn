@@ -10,7 +10,8 @@ import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints'
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
 import SchoolRegister from './SchoolRegister'
-import SchoolStudents from './SchoolStudents'
+import SchoolStudentIcon from './SchoolStudentIcon'
+import SchoolStudentList from './SchoolStudentList'
 
 class SchoolForm extends Component {
     constructor(props) {
@@ -54,7 +55,7 @@ class SchoolForm extends Component {
     render() {
         return (
             <div>
-                <h1 className="school-header"><i className="fa fa-graduation-cap"></i> {this.state.schoolName} <SchoolStudents numStudents={this.state.total_students} /></h1>
+                <h1 className="school-header"><i className="fa fa-graduation-cap"></i> {this.state.schoolName} <SchoolStudentIcon numStudents={this.state.total_students} /></h1>
                 <br />
                 <Nav tabs>
                     <NavItem>
@@ -131,7 +132,7 @@ class SchoolForm extends Component {
                     <TabPane tabId="alunos">
                         <Row>
                             <Col sm="12">
-                                <h2>Alunos</h2>
+                                <SchoolStudentList viewMode={false}  schoolId={this.state.schoolId} url={this.props.match.url} />
                             </Col>
                         </Row>
                     </TabPane>

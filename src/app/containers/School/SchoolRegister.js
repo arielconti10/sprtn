@@ -167,7 +167,7 @@ export default class SchoolRegister extends Component {
             //let filterId = Object.keys(data_error).toString();
             //this.setState({ back_error: data_error[filterId] });
 
-            alert('Erro! ' + error);
+            alert(error);
             this.setState({ back_error: error || '' });
 
             //this.createNotification('error', this.state.back_error);
@@ -214,7 +214,7 @@ export default class SchoolRegister extends Component {
             //let data_error = error.response.data.errors;
             //let filterId = Object.keys(data_error).toString();
             //this.setState({ back_error: data_error[filterId] });
-            alert('Erro! ' + error);
+            alert(error);
             this.setState({ back_error: error || '' });
 
             //this.createNotification('error', this.state.back_error);
@@ -483,11 +483,7 @@ export default class SchoolRegister extends Component {
                             <FormGroup for="number">
                                 <FormControlLabel htmlFor="number">Número</FormControlLabel>
                                 <FormControlInput type="text" id="number" name="number" readOnly={this.state.viewMode}
-                                    value={this.state.number} onChange={this.handleChange}
-                                    required />
-                                <FieldFeedbacks for="number">
-                                    <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
+                                    value={this.state.number} onChange={this.handleChange} />
                             </FormGroup>
                         </Col>
 
@@ -590,11 +586,7 @@ export default class SchoolRegister extends Component {
                             <FormGroup for="maintainer">
                                 <FormControlLabel htmlFor="maintainer">Mantenedora</FormControlLabel>
                                 <FormControlInput type="text" id="maintainer" name="maintainer" readOnly={this.state.viewMode}
-                                    value={this.state.maintainer} onChange={this.handleChange}
-                                    required />
-                                <FieldFeedbacks for="maintainer">
-                                    <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
+                                    value={this.state.maintainer} onChange={this.handleChange} />
                             </FormGroup>
                         </Col>
                     </Row>

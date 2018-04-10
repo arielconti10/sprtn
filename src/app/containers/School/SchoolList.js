@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Router, hashHistory, Link, browserHistory, withRouter } from 'react-router-dom'
-import { Card, CardHeader, CardFooter, CardBody } from 'reactstrap';
+import { Router, hashHistory, Link, browserHistory, withRouter, NavLink } from 'react-router-dom'
+import { Card, CardHeader, CardFooter, CardBody, Button } from 'reactstrap';
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
 
@@ -119,41 +119,44 @@ class SchoolList extends Component {
         const { data, pageSize, page, loading, pages, columns } = this.state;
 
         return (
+            <div>
+                <p>
+                    <NavLink to={this.props.match.url + "/novo"} exact><Button color='primary' disabled={true}><i className="fa fa-plus-circle"></i> Adicionar</Button></NavLink>
+                </p>
+                <ReactTable
+                    columns={columns}
+                    data={data}
+                    pages={pages}
+                    loading={loading}
+                    defaultPageSize={pageSize}
+                    manual
+                    onFetchData={this.onFetchData}
+                    SubComponent={(row) => {
+                        let school = row.original;
 
-            <ReactTable
-                columns={columns}
-                data={data}
-                pages={pages}
-                loading={loading}
-                defaultPageSize={pageSize}
-                manual
-                onFetchData={this.onFetchData}
-                SubComponent={(row) => {
-                    let school = row.original;
-
-                    return (
-                        <div style={{ padding: "20px" }}>
-                            <b>Endereço:</b> {school.address} <br />
-                            <b>Bairro:</b> {school.neighborhood} <br />
-                            <b>Cidade:</b> {school.city} <br />
-                            <b>UF:</b> {school.state.abbrev} <br />
-                            <b>CEP:</b> {school.zip_code}
-                        </div>
-                    );
-                }}
-                onExpandedChange={(expanded, index, event) => {
-                    event.persist();
-                }}
-                previousText='Anterior'
-                nextText='Próximo'
-                loadingText='Carregando...'
-                noDataText='Sem registros'
-                pageText='Página'
-                ofText='de'
-                rowsText=''
-                className='-striped -highlight'
-            />
-
+                        return (
+                            <div style={{ padding: "20px" }}>
+                                <b>Endereço:</b> {school.address} <br />
+                                <b>Bairro:</b> {school.neighborhood} <br />
+                                <b>Cidade:</b> {school.city} <br />
+                                <b>UF:</b> {school.state.abbrev} <br />
+                                <b>CEP:</b> {school.zip_code}
+                            </div>
+                        );
+                    }}
+                    onExpandedChange={(expanded, index, event) => {
+                        event.persist();
+                    }}
+                    previousText='Anterior'
+                    nextText='Próximo'
+                    loadingText='Carregando...'
+                    noDataText='Sem registros'
+                    pageText='Página'
+                    ofText='de'
+                    rowsText=''
+                    className='-striped -highlight'
+                />
+            </div>
         )
     }
 }

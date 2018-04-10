@@ -13,6 +13,7 @@ class Schools extends Component {
                 <Col xs="12" sm="12" md="12">
                     <Switch>
                         <Route path='/carteira/escolas' exact component={SchoolList} />
+                        <Route path='/cadastro/escolas/novo' component={SchoolForm} /> 
                         <Route path='/carteira/escolas/:id' component={SchoolForm} />
                     </Switch>
                 </Col>
