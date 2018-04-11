@@ -117,8 +117,7 @@ class SchoolStudentList extends Component {
 
     onClickEdit(element) {
         const { id, level_id, shift_id, first_grade, second_grade, third_grade, forth_grade, fifth_grade } = element.value;
-        //const shift_id = element.value.shift.code;
-
+        
         console.log('onClickEdit', element.value);
 
         this.setState({
@@ -135,7 +134,6 @@ class SchoolStudentList extends Component {
             new: false
         });
 
-        console.log('onClickEdit', this.state);
         this.showGrade(level_id);
     }
 
@@ -174,7 +172,6 @@ class SchoolStudentList extends Component {
         }).catch(function (error) {
             console.log(error)
         }.bind(this));
-
     }
 
     showGrade(level) {
@@ -183,7 +180,6 @@ class SchoolStudentList extends Component {
         let display_thirth = '';
         let display_forth = '';
         let display_fifth = '';
-
 
         switch (level.toString()) {
             case '1':
@@ -204,7 +200,7 @@ class SchoolStudentList extends Component {
                 display_thirth = 'd-none';
                 display_forth = 'd-none';
                 display_fifth = 'd-none';
-        }
+        };
 
         this.setState({
             class_form_first_grade: display_first,
@@ -215,7 +211,6 @@ class SchoolStudentList extends Component {
         });
 
         this.changeLabelGrade(level);
-
     }
 
     changeLabelGrade(level) {
@@ -249,7 +244,7 @@ class SchoolStudentList extends Component {
                 label_first_grade = '1ª série';
                 label_second_grade = '2ª série';
                 label_third_grade = '3ª série';
-        }
+        };
 
         this.setState({
             label_first_grade,
@@ -257,8 +252,7 @@ class SchoolStudentList extends Component {
             label_third_grade,
             label_forth_grade,
             label_fifth_grade
-        })
-
+        });
     }
 
     handleChange(e) {
@@ -280,8 +274,6 @@ class SchoolStudentList extends Component {
         event.preventDefault();
 
         const { school_id, form_level_id, form_shift_id, form_first_grade, form_second_grade, form_third_grade, form_forth_grade, form_fifth_grade } = this.state;
-
-        console.log('submitForm', this.state);
 
         axios.post(`${apiSpartan}`, {
             'school_id': parseInt(school_id),
@@ -307,8 +299,6 @@ class SchoolStudentList extends Component {
         event.preventDefault();
         const { id, school_id, form_level_id, form_shift_id, form_first_grade, form_second_grade, form_third_grade, form_forth_grade, form_fifth_grade } = this.state;
 
-        console.log('updateForm', this.state);
-
         axios.put(`${apiSpartan}/${id}`, {
             'school_id': parseInt(school_id),
             'level_id': parseInt(form_level_id),
@@ -325,13 +315,10 @@ class SchoolStudentList extends Component {
         }).catch(function (error) {
             alert(error);
             this.setState({ back_error: error || '' });
-
-        })
+        });
     }
 
     handleSubmit() {
-        //e.preventDefault();
-
         this.form.validateFields();
 
         this.setState({ submit_button_disabled: !this.form.isValid() });
@@ -439,8 +426,6 @@ class SchoolStudentList extends Component {
         for (let i = 0; i < sorted.length; i++) {
             baseURL += "&order[" + sorted[i]['id'] + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
         }
-
-        //this.setState({loading: true});
 
         axios.get(baseURL)
             .then((response) => {
