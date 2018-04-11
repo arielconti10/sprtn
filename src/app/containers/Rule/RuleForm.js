@@ -119,7 +119,7 @@ class RuleForm extends Component {
             return data;
         })
 
-        console.log(roles_id);
+        //console.log(roles_id);
 
         // roles_id = [
 

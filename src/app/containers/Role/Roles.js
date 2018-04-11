@@ -5,6 +5,8 @@ import { Row, Col, Card, CardHeader, CardFooter, CardBody, Button } from 'reacts
 import RoleList from './RoleList';
 import RoleForm from './RoleForm';
 
+import RoleRules from './RoleRules'
+
 class Roles extends Component {
 
     render() {
@@ -14,6 +16,7 @@ class Roles extends Component {
                     <Switch>
                         <Route path='/config/regras' exact component={RoleList} />
                         <Route path='/config/regras/novo' exact component={RoleForm} />
+                        <Route path='/config/regras/:id/permissoes' exact component={RoleRules} />
                         <Route path='/config/regras/:id' component={RoleForm} />
                     </Switch>
                 </Col>

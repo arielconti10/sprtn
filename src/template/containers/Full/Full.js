@@ -66,7 +66,7 @@ class Full extends Component {
                                 <Route path="/cadastro/redes" name="Redes" component={Chains}/>
                                 <Route path="/cadastro/tipos-escola" name="Tipos de Escola" component={SchoolTypes}/>
                                 <Route path="/cadastro/estados" name="Estados" component={States}/>
-                                <Route path="/config/regras" name="Regras" component={Roles}/>
+                                <Route path="/config/regras" name="Regras" component={Roles}/>                                
                                 <Route path="/config/permissoes" name="Permissões" component={Rules}/>
                                 <Redirect from="/" to="/dashboard" />
                             </Switch>
