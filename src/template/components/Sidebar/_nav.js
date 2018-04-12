@@ -38,11 +38,6 @@ export default {
             icon: 'fa fa-caret-right'
         },
         {
-            name: 'Contatos',
-            url: '/cadastro/contatos',
-            icon: 'fa fa-caret-right'
-        },
-        {
             name: 'Disciplinas',
             url: '/cadastro/disciplinas',
             icon: 'fa fa-caret-right'
@@ -83,7 +78,7 @@ export default {
             icon: 'fa fa-caret-right'
         },
         {
-          name: 'Tipos de Localizaçāo',
+          name: 'Localizações',
           url: '/cadastro/tipos-localizacao',
           icon: 'fa fa-caret-right'
         },

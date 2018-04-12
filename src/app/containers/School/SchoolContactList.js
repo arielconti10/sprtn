@@ -1,74 +1,203 @@
-import React, { Component } from 'react';
-import { Router, hashHistory, Link, browserHistory, withRouter } from 'react-router-dom'
-import { Card, CardHeader, CardFooter, CardBody } from 'reactstrap';
+import React, { Component } from 'react'
+import axios from '../../../app/common/axios';
+import { Link } from 'react-router-dom';
+import { Collapse, Card, CardHeader, CardFooter, CardBody, CardTitle, CardText, Row, Col, Button, Label, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
+import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
+import ContactForm from '../Contact/ContactForm';
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
+import SchoolForm from './SchoolForm';
 
-import axios from '../../common/axios';
+const apiSpartan = 'contact';
 
 class SchoolConctactList extends Component {
 
     constructor(props) {
         super(props);
+        this.toggle = this.toggle.bind(this);
+        this.state = {             
+            page: 1,
+            pageSize: 10,
+            data: this.props.contacts,
+            filtered: [],
+            sorted: [],
+            pages: null,
+            loading: false,
+            columns: [],
+            contact_find: [],
 
-        this.state = {
+            collapse: false,
+            blockButton: false,
+            back_error: '',
+            submit_button_disabled: false,
+            new: true, 
+            school_id: this.props.schoolId
         };
     }
 
-    componentDidMount() {
+    toggle() {
+
+        this.setState({collapse: !this.state.collapse}, function () {
+            if (this.state.collapse == true) {
+                this.setState({blockButton:true});
+            } else {
+                this.setState({blockButton:false});
+            }
+        });
 
     }
 
-    onFetchData = (state, instance, deleted_at) => {
-        let apiSpartan = this.props.apiSpartan
+    componentWillMount() {
+        // console.log(this.props.contacts);
+    }
 
-        let pageSize = state ? state.pageSize : this.state.pageSize;
-        let page = state ? state.page + 1 : this.state.page;
+    componentWillReceiveProps() {
+        this.setState({data:this.props.contacts});
+    }
 
-        let sorted = state ? state.sorted : this.state.sorted
-        let filtered = state ? state.filtered : this.state.filtered
+    onClickEdit(element) {
+        const values = this.state;
+        values.contact_find = element.value;
+        this.setState({values});
+        this.toggle();
+    }
 
-        let baseURL = `/school?paginate=${pageSize}&page=${page}`;
+    onClickCancel() {
+        const values = this.state;
+        values.contact_find = [];
+        this.setState({values});
+        this.toggle();
+    }
 
-        //To do: make filter to deleted_at
-        /*console.log('onFetchData:', deleted_at);
-        if(deleted_at != 'all')
-            console.log("deleted_at != 'all'", deleted_at);*/
+    onClickDelete(element) {
+        const { id } = element.value;
 
-        filtered.map(function (item) {
-            baseURL += `&filter[${item.id}]=${item.value}`;
+        axios.delete(`${apiSpartan}/${id}`)
+        .then(res => {
+            this.updateTable();
+        }).catch(function (error) {
+            console.log(error)
+        }.bind(this));
+    }
+    
+
+    componentDidMount() {
+        let col = [
+            { Header: "Nome", accessor: "name", headerClassName: 'text-left' },
+            { Header: "E-mail", accessor: "email", headerClassName: 'text-left' },
+            { Header: "Cargo", accessor: "job_title.name", headerClassName: 'text-left' },
+            {
+                Header: "Telefone",
+                id: "phone",
+                width: 380,
+                accessor: d => {
+                    let phones = "";
+                    if (d.phones !== undefined) {
+                        d.phones.forEach(element => {
+                            let item_phone = `${element.phone_extension} ${element.phone_number} (${element.phone_type})`;
+                            phones = phones + item_phone + ", ";
+                        });
+                        phones = phones.trim();
+                        phones = phones.substring(0, phones.length - 1);
+                    }
+                    
+                    return phones;
+                }
+            }
+        ];
+
+        col.push(
+            {
+                Header: "Status",
+                accessor: "",
+                width: 60,
+                headerClassName: 'text-left',
+                sortable: false,
+                Cell: (element) => (
+                    !element.value.deleted_at ?
+                        <div><span>Ativo</span></div>
+                        :
+                        <div><span>Inativo</span></div>
+                )
+            }, {
+                Header: "Ações", accessor: "", sortable: false, width: 90, headerClassName: 'text-left', Cell: (element) => (
+                    !element.value.deleted_at ?
+                        <div>
+                            <button className='btn btn-primary btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickEdit(element)}>
+                                <i className='fa fa-pencil'></i>
+                            </button>
+
+                            <button className='btn btn-danger btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickDelete(element)}>
+                                <i className='fa fa-ban'></i>
+                            </button>
+                        </div>
+                        :
+                        <div>
+                            <button className='btn btn-success btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickActive(element)}>
+                                <i className='fa fa-check-circle'></i>
+                            </button>
+                        </div>
+
+                )
+            }
+        )
+
+        this.setState({ columns: col });
+        console.log(this.state.data);
+    }
+
+    updateTable() {
+        axios.get(`school/${this.props.schoolId}`)
+        .then(response => {
+            const dados = response.data.data;
+            this.setState({              
+                data: dados.contacts || []
+            });
         })
-
-        for (let i = 0; i < sorted.length; i++) {
-            baseURL += "&order[" + sorted[i]['id'] + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
-        }
-
-        //this.setState({loading: true});
-
-        axios.get(baseURL)
-            .then((response) => {
-                const dados = response.data.data
-
-                this.setState({
-                    data: dados,
-                    totalSize: response.data.meta.pagination.total,
-                    pages: response.data.meta.pagination.last_page,
-                    page: response.data.meta.pagination.current_page,
-                    pageSize: parseInt(response.data.meta.pagination.per_page),
-                    sorted: sorted,
-                    filtered: filtered,
-                    loading: false
-                });
-            })
-            .catch(err => console.log(err));
+        // this.toggle();
     }
 
     render() {
+        const { data, pageSize, page, loading, pages, columns } = this.state;
+
         return (
             <div>
-                <p>
-                    Conteudo ira aqui
-                </p>
+                    <Collapse isOpen={this.state.collapse}>
+                        <Card>
+                            <CardBody>
+                                <ContactForm schoolId={this.props.schoolId} contact_find={this.state.contact_find} 
+                                    updateTable={this.updateTable.bind(this)} toggle={this.toggle.bind(this)}
+                                    onClickCancel={this.onClickCancel.bind(this)} />
+                            </CardBody>
+                        </Card>
+                    </Collapse>
+
+                    <button className='btn btn-primary' disabled={this.state.blockButton} onClick={this.toggle}>
+                        Adicionar
+                    </button>
+
+                    <br/>
+                    <Row>
+                        <Col md="12">
+                            <ReactTable
+                                columns={columns}
+                                data={data}
+                                // pages={pages}
+                                loading={loading}
+                                defaultPageSize={pageSize}
+                                // manual
+                                // onFetchData={this.onFetchData}
+                                // previousText='Anterior'
+                                // nextText='Próximo'
+                                loadingText='Carregando...'
+                                noDataText='Sem registros'
+                                // pageText='Página'
+                                ofText='de'
+                                rowsText=''
+                                className='-striped -highlight'
+                            />
+                        </Col>
+                    </Row>
             </div>
         )
     }

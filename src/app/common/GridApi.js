@@ -43,7 +43,7 @@ class GridApi extends Component {
         }.bind(this));
     }
 
-    onClickActive(element) {
+    onClickActive(element, fields) {
         const { id, code, name } = element.value;
 
         const updateData = {};
@@ -201,6 +201,7 @@ class GridApi extends Component {
             
         }
         if (!this.props.hideButtons) {
+            let fields = ['id', 'code', 'name'];
             col.push(
                 {
                     Header: "Ações", accessor: "", sortable: false, width: 100, headerClassName: 'text-center', Cell: (element) => (
@@ -219,7 +220,7 @@ class GridApi extends Component {
                             </div>
                             :
                             <div>
-                                <button className='btn btn-success btn-sm' onClick={() => this.onClickActive(element)}>
+                                <button className='btn btn-success btn-sm' onClick={() => this.onClickActive(element, fields)}>
                                     <i className='fa fa-check-circle'></i>
                                 </button>
                             </div>
@@ -232,6 +233,7 @@ class GridApi extends Component {
     }
 
     onFetchData = (state, instance, deleted_at) => {
+
         let apiSpartan = this.props.apiSpartan
 
         let pageSize = state ? state.pageSize : this.state.pageSize;

@@ -11,6 +11,7 @@ import Login from '../../../app/containers/login/Login';
 import Logout from '../../../app/containers/logout/Logout';
 import Dashboard from '../../views/Dashboard/';
 import Schools from '../../../app/containers/School/Schools'
+import SchoolForm from '../../../app/containers/School/SchoolForm'
 import JobTitles from '../../../app/containers/JobTitle/JobTitles'
 import Subsidiaries from '../../../app/containers/Subsidiary/Subsidiaries'
 import Sectors from '../../../app/containers/Sector/Sectors'
@@ -53,6 +54,7 @@ class Full extends Component {
                                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
                                 <Route path="/logout" name="Logout" component={Logout}/>
                                 <Route path="/carteira/escolas" name="Carteira" component={Schools}/>
+                                {/*<Route path="/carteira/escolas/alunos" name="Carteira" component={SchoolForm}/>*/}
                                 <Route path="/cadastro/cargos" name="Cargos" component={JobTitles}/>
                                 <Route path="/cadastro/filiais" name="Filiais" component={Subsidiaries}/>
                                 <Route path="/cadastro/setores" name="Setores" component={Sectors}/>

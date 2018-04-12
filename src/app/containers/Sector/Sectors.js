@@ -10,14 +10,13 @@ class Sectors extends Component {
     render() {
         return (
             <Row>
-                
-                    <Col xs="12" sm="12" md="12">            
-                        <Switch>             
-                            <Route path='/cadastro/setores' exact component={SectorList} />
-                            <Route path='/cadastro/setores/novo' exact component={SectorForm} />           
-                            <Route path='/cadastro/setores/:id' component={SectorForm} />         
-                        </Switch>   
-                    </Col>
+                <Col xs="12" sm="12" md="12">
+                    <Switch>
+                        <Route path='/cadastro/setores' exact component={SectorList} />
+                        <Route path='/cadastro/setores/novo' component={SectorForm} />
+                        <Route path='/cadastro/setores/:id' component={SectorForm} />
+                    </Switch>
+                </Col>
             </Row>
         )
     }
