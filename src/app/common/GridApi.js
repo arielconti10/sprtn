@@ -37,14 +37,12 @@ class GridApi extends Component {
         }.bind(this));
     }
 
-    onClickActive(element) {
+    onClickActive(element, fields) {
         const { id, code, name } = element.value;
 
-        axios.put(`${this.props.apiSpartan}/${id}`, {
-            'code': code ? code.toUpperCase() : '',
-            'name': name ? name : '',
-            'active': true
-        }).then(res => {
+        element.value['active'] = 1;
+
+        axios.put(`${this.props.apiSpartan}/${id}`, element.value).then(res => {
             this.onFetchData();
         }).catch(function (error) {
             console.log(error)
@@ -82,6 +80,7 @@ class GridApi extends Component {
                     )*/
             })
         if (!this.props.hideButtons) {
+            let fields = ['id', 'code', 'name'];
             col.push(
                 {
                     Header: "Ações", accessor: "", sortable: false, width: 100, headerClassName: 'text-left', Cell: (element) => (
@@ -97,7 +96,7 @@ class GridApi extends Component {
                             </div>
                             :
                             <div>
-                                <button className='btn btn-success btn-sm' onClick={() => this.onClickActive(element)}>
+                                <button className='btn btn-success btn-sm' onClick={() => this.onClickActive(element, fields)}>
                                     <i className='fa fa-check-circle'></i>
                                 </button>
                             </div>
@@ -110,6 +109,7 @@ class GridApi extends Component {
     }
 
     onFetchData = (state, instance, deleted_at) => {
+
         let apiSpartan = this.props.apiSpartan
 
         let pageSize = state ? state.pageSize : this.state.pageSize;

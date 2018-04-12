@@ -16,10 +16,11 @@ import SchoolConctactList from './SchoolContactList';
 class SchoolForm extends Component {
     constructor(props) {
         super(props);
-
         this.toggle = this.toggle.bind(this);
+        this.contacts_global = [];
         this.state = {
             schoolName: '',
+            contacts: [],
             schoolId: this.props.match.params.id,
             students: [],
             total_students: '0',
@@ -32,27 +33,31 @@ class SchoolForm extends Component {
         axios.get(`school/${this.state.schoolId}`)
             .then(response => {
                 const dados = response.data.data;
-
                 this.setState({
                     schoolName: dados.name, 
                     total_students: dados.total_students || '0',
                     students: dados.students || [],                  
-                    active: dados.deleted_at === null ? true : false
+                    contacts: dados.contacts || [],
+                    active: !dados.deleted_at ? true : false
                 });
             })
             .catch(err => console.log(err));
-
     }
 
     toggle(tab) {
+        let contacts_tab = this.state.contacts;
+        this.contacts_global = contacts_tab;
+    
         if (this.state.activeTab !== tab) {
             this.setState({
-                activeTab: tab
+                activeTab: tab,
+                contacts: this.contacts_global
             });
         }
     }
 
     render() {
+        // console.log(this.state.contacts);
         return (
             <div>
                 <h1 className="school-header"><i className="fa fa-graduation-cap"></i> {this.state.schoolName} <SchoolStudents numStudents={this.state.total_students} /></h1>
@@ -77,7 +82,7 @@ class SchoolForm extends Component {
                     <NavItem>
                         <NavLink
                             className={classnames({ active: this.state.activeTab === 'contatos' })}
-                            onClick={() => { this.toggle('contatos'); }}
+                            onClick={() => { this.toggle('contatos');  }}
                         >
                             Contatos
                             </NavLink>
@@ -118,15 +123,15 @@ class SchoolForm extends Component {
                     <TabPane tabId="cadastro">
                         <Row>
                             <Col sm="12">
-                                <SchoolRegister viewMode={false}  schoolId={this.state.schoolId} />
+                                {/* <SchoolRegister viewMode={false} schoolId={this.state.schoolId} /> */}
                             </Col>
                         </Row>
                     </TabPane>
                     <TabPane tabId="contatos">
+                       
                         <Row>
                             <Col sm="12">
-                                <h2>Contatos</h2>
-                                <SchoolConctactList />
+                                <SchoolConctactList schoolId={this.state.schoolId} contacts={this.state.contacts}/>
                             </Col>
                         </Row>
                     </TabPane>
