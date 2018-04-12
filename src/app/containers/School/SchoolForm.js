@@ -10,7 +10,6 @@ import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints'
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
 import SchoolRegister from './SchoolRegister'
-import SchoolStudents from './SchoolStudents'
 import SchoolConctactList from './SchoolContactList';
 import SchoolStudentIcon from './SchoolStudentIcon'
 import SchoolStudentList from './SchoolStudentList'
@@ -132,7 +131,7 @@ class SchoolForm extends Component {
                     <TabPane tabId="cadastro">
                         <Row>
                             <Col sm="12">
-                                {/* <SchoolRegister viewMode={false} schoolId={this.state.schoolId} /> */}
+                                <SchoolRegister viewMode={false} schoolId={this.state.schoolId} />
                             </Col>
                         </Row>
                     </TabPane>
