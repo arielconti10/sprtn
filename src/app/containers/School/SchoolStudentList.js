@@ -4,6 +4,9 @@ import { Card, CardHeader, CardFooter, CardBody, Button, Collapse, Row, Col } fr
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 import ReactTable from 'react-table'
+import Select from 'react-select';
+
+import 'react-select/dist/react-select.css';
 import 'react-table/react-table.css'
 
 import axios from '../../common/axios';
@@ -29,6 +32,7 @@ class SchoolStudentList extends Component {
             columns: [],
 
             collapse: false,
+            selectedOption: '',
             blockButton: false,
             back_error: '',
             submit_button_disabled: false,
@@ -70,6 +74,20 @@ class SchoolStudentList extends Component {
         this.changeLabelGrade = this.changeLabelGrade.bind(this);
         this.clearForm = this.clearForm.bind(this);
         this.closeColapse = this.closeColapse.bind(this);
+        this.handleChangeLevel = this.handleChangeLevel.bind(this);
+        this.handleChangeShift = this.handleChangeShift.bind(this);
+    }
+
+    handleChangeLevel = (selectedOption) => {
+        const values = this.state;
+        values.form_level_id = selectedOption.value;
+        this.setState({ values });
+    }
+
+    handleChangeShift = (selectedOption) => {
+        const values = this.state;
+        values.form_shift_id = selectedOption.value;
+        this.setState({ values });
     }
 
     clearForm() {
@@ -117,8 +135,6 @@ class SchoolStudentList extends Component {
 
     onClickEdit(element) {
         const { id, level_id, shift_id, first_grade, second_grade, third_grade, forth_grade, fifth_grade } = element.value;
-        
-        console.log('onClickEdit', element.value);
 
         this.setState({
             id: id,
@@ -398,6 +414,10 @@ class SchoolStudentList extends Component {
             axios.get(`${item.api}`)
                 .then(response => {
                     let dados = response.data.data;
+                    dados.map(item => {
+                        item['value'] = item.id,
+                        item['label'] = item.name
+                    });
                     this.setState({ [item.stateArray]: dados });
                 })
                 .catch(err => console.log(err));
@@ -447,7 +467,7 @@ class SchoolStudentList extends Component {
 
     render() {
         const { data, pageSize, page, loading, pages, columns, levels, shifts, form_level_id, form_shift_id } = this.state;
-
+    
         return (
             <div>
                 <Collapse isOpen={this.state.collapse}>
@@ -464,20 +484,14 @@ class SchoolStudentList extends Component {
                                         <Col md="3">
                                             <FormGroup for="form_level_id">
                                                 <label>Nível</label>
-                                                <select className="form-control" onChange={this.handleChange} disabled={this.state.viewMode}
-                                                    id="form_level_id" name="form_level_id" value={this.state.form_level_id}>
-                                                    <option key="0" value="0" >Selecione um valor</option>
-                                                    {
-                                                        levels.map(item => {
-                                                            let checked = item.id == form_level_id ? "checked" : "";
-                                                            return (
-                                                                <option key={item.id} value={item.id}>
-                                                                    {item.name}
-                                                                </option>
-                                                            )
-                                                        })
-                                                    }
-                                                </select>
+                                                <Select
+                                                    name="form_level_id"
+                                                    id="form_level_id"
+                                                    disabled={this.state.viewMode}
+                                                    value={form_level_id}
+                                                    onChange={this.handleChangeLevel}
+                                                    options={levels}
+                                                />
                                                 <FieldFeedbacks for="form_level_id">
                                                     <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
                                                 </FieldFeedbacks>
@@ -487,20 +501,14 @@ class SchoolStudentList extends Component {
                                         <Col md="3">
                                             <FormGroup for="form_shift_id">
                                                 <label>Turno</label>
-                                                <select className="form-control" onChange={this.handleChange} disabled={this.state.viewMode}
-                                                    id="form_shift_id" name="form_shift_id" value={this.state.form_shift_id}>
-                                                    <option key="0" value="0" >Selecione um valor</option>
-                                                    {
-                                                        shifts.map(item => {
-                                                            let checked = item.id == form_shift_id ? "checked" : "";
-                                                            return (
-                                                                <option key={item.id} value={item.id}>
-                                                                    {item.name}
-                                                                </option>
-                                                            )
-                                                        })
-                                                    }
-                                                </select>
+                                                <Select
+                                                    name="form_shift_id"
+                                                    id="form_shift_id"
+                                                    disabled={this.state.viewMode}
+                                                    value={form_shift_id}
+                                                    onChange={this.handleChangeShift}
+                                                    options={shifts}
+                                                />
                                                 <FieldFeedbacks for="form_shift_id">
                                                     <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
                                                 </FieldFeedbacks>

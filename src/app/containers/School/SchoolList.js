@@ -60,7 +60,8 @@ class SchoolList extends Component {
             }, {
                 Header: "Ações", accessor: "", sortable: false, width: 50, headerClassName: 'text-left', Cell: (element) => (
                     <div>
-                        <Link to={this.props.match.url + "/" + element.value.id} params={{ id: element.value.id }} className='btn btn-primary btn-sm' >
+                        <Link to={this.props.match.url + "/" + element.value.id} 
+                                 params={{ id: element.value.id }} className='btn btn-primary btn-sm' >
                             <i className='fa fa-eye'></i>
                         </Link>
                     </div>

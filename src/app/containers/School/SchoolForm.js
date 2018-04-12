@@ -12,6 +12,7 @@ import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'r
 import SchoolRegister from './SchoolRegister'
 import SchoolStudentIcon from './SchoolStudentIcon'
 import SchoolStudentList from './SchoolStudentList'
+import SchoolAdoptionList from './SchoolAdoptionList'
 
 class SchoolForm extends Component {
     constructor(props) {
@@ -23,7 +24,10 @@ class SchoolForm extends Component {
             schoolId: this.props.match.params.id,
             students: [],
             total_students: '0',
-            activeTab: 'cadastro'
+            activeTab: 'cadastro',
+            schoolCodeTotvs: '0',
+            subsidiaryId: '0',
+            sectorId: '0'
         };
     }
 
@@ -37,7 +41,10 @@ class SchoolForm extends Component {
                     schoolName: dados.name, 
                     total_students: dados.total_students || '0',
                     students: dados.students || [],                  
-                    active: dados.deleted_at === null ? true : false
+                    active: dados.deleted_at === null ? true : false,
+                    schoolCodeTotvs: dados.school_code_totvs,
+                    subsidiaryId: dados.subsidiary_id,
+                    sectorId: dados.sector_id
                 });
             })
             .catch(err => console.log(err));
@@ -139,7 +146,7 @@ class SchoolForm extends Component {
                     <TabPane tabId="adocoes">
                         <Row>
                             <Col sm="12">
-                                <h2>Adoções</h2>
+                                <SchoolAdoptionList schoolId={this.state.schoolId} schoolCodeTotvs={this.state.schoolCodeTotvs} subsidiaryId={this.state.subsidiaryId} sectorId={this.state.sectorId} />
                             </Col>
                         </Row>
                     </TabPane>
