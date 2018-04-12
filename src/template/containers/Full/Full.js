@@ -28,6 +28,7 @@ import States from '../../../app/containers/State/States';
 
 import Roles from '../../../app/containers/Role/Roles';
 import Rules from '../../../app/containers/Rule/Rules';
+import Users from '../../../app/containers/User/Users';
 
 class Full extends Component {
 
@@ -68,6 +69,7 @@ class Full extends Component {
                                 <Route path="/cadastro/estados" name="Estados" component={States}/>
                                 <Route path="/config/regras" name="Regras" component={Roles}/>                                
                                 <Route path="/config/permissoes" name="Permissões" component={Rules}/>
+                                <Route path="/config/usuarios" name="Usuários" component={Users}/>
                                 <Redirect from="/" to="/dashboard" />
                             </Switch>
                         </Container>

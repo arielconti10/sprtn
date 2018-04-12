@@ -109,6 +109,11 @@ export default {
                 url: '/config/permissoes',
                 icon: 'fa fa-caret-right'
             },
+            {
+                name: 'Usuários',
+                url: '/config/usuarios',
+                icon: 'fa fa-caret-right'
+            },
         ]
     }
   ]

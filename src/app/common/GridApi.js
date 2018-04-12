@@ -46,11 +46,18 @@ class GridApi extends Component {
     onClickActive(element) {
         const { id, code, name } = element.value;
 
-        axios.put(`${this.props.apiSpartan}/${id}`, {
-            'code': code ? code.toUpperCase() : '',
-            'name': name ? name : '',
-            'active': true
-        }).then(res => {
+        const updateData = {};
+        for (var val in element.value) {
+            //console.log(value);
+
+            if (val != 'created_at' && val != 'updated_at' && val != 'deleted_at') {
+                updateData[val] = element.value[val];
+            }
+        }
+
+        updateData.active = true;
+
+        axios.put(`${this.props.apiSpartan}/${id}`, updateData).then(res => {
             this.onFetchData();
         }).catch(function (error) {
             console.log(error)
@@ -154,7 +161,7 @@ class GridApi extends Component {
 
                                             let id = 0;
                                             for (var value in element.row['']) {
-                                                console.log(value);
+                                                //console.log(value);
 
                                                 if (value == 'id') {
                                                     id = element.row[''][value]

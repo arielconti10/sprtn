@@ -38,5 +38,6 @@ const routes = {
   '/config': "Configuração",
   '/config/regras': "Regras",
   '/config/permissoes': "Permissões",
+  '/config/usuarios': "Usuários",
 };
 export default routes;
