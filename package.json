@@ -51,6 +51,7 @@
     "flag-icon-css": "2.9.0",
     "font-awesome": "4.7.0",
     "history": "4.7.2",
+    "moment": "^2.22.0",
     "npm": "^5.8.0",
     "react": "16.2.0",
     "react-chartjs-2": "2.7.0",

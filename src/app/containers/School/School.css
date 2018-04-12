@@ -14,3 +14,5 @@
 .school-header i { font-size: 22px !important; }
 .school-header-students { font-size: 16px !important; padding: 3px 0  !important; color: #109800  !important; }
 .school-header-students i { font-size: 16px !important; }
+
+input, button, textarea, .btn { border-radius: 5px !important; }

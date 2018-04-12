@@ -12,6 +12,9 @@ import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'r
 import SchoolRegister from './SchoolRegister'
 import SchoolStudents from './SchoolStudents'
 import SchoolConctactList from './SchoolContactList';
+import SchoolStudentIcon from './SchoolStudentIcon'
+import SchoolStudentList from './SchoolStudentList'
+import SchoolAdoptionList from './SchoolAdoptionList'
 
 class SchoolForm extends Component {
     constructor(props) {
@@ -24,7 +27,10 @@ class SchoolForm extends Component {
             schoolId: this.props.match.params.id,
             students: [],
             total_students: '0',
-            activeTab: 'cadastro'
+            activeTab: 'cadastro',
+            schoolCodeTotvs: '0',
+            subsidiaryId: '0',
+            sectorId: '0'
         };
     }
 
@@ -38,7 +44,10 @@ class SchoolForm extends Component {
                     total_students: dados.total_students || '0',
                     students: dados.students || [],                  
                     contacts: dados.contacts || [],
-                    active: !dados.deleted_at ? true : false
+                    active: dados.deleted_at === null ? true : false,
+                    schoolCodeTotvs: dados.school_code_totvs,
+                    subsidiaryId: dados.subsidiary_id,
+                    sectorId: dados.sector_id
                 });
             })
             .catch(err => console.log(err));
@@ -60,7 +69,7 @@ class SchoolForm extends Component {
         // console.log(this.state.contacts);
         return (
             <div>
-                <h1 className="school-header"><i className="fa fa-graduation-cap"></i> {this.state.schoolName} <SchoolStudents numStudents={this.state.total_students} /></h1>
+                <h1 className="school-header"><i className="fa fa-graduation-cap"></i> {this.state.schoolName} <SchoolStudentIcon numStudents={this.state.total_students} /></h1>
                 <br />
                 <Nav tabs>
                     <NavItem>
@@ -138,14 +147,14 @@ class SchoolForm extends Component {
                     <TabPane tabId="alunos">
                         <Row>
                             <Col sm="12">
-                                <h2>Alunos</h2>
+                                <SchoolStudentList viewMode={false}  schoolId={this.state.schoolId} url={this.props.match.url} />
                             </Col>
                         </Row>
                     </TabPane>
                     <TabPane tabId="adocoes">
                         <Row>
                             <Col sm="12">
-                                <h2>Adoções</h2>
+                                <SchoolAdoptionList schoolId={this.state.schoolId} schoolCodeTotvs={this.state.schoolCodeTotvs} subsidiaryId={this.state.subsidiaryId} sectorId={this.state.sectorId} />
                             </Col>
                         </Row>
                     </TabPane>
