@@ -26,6 +26,10 @@ import Chains from '../../../app/containers/Chain/Chains';
 import SchoolTypes from '../../../app/containers/SchoolType/SchoolTypes';
 import States from '../../../app/containers/State/States';
 
+import Roles from '../../../app/containers/Role/Roles';
+import Rules from '../../../app/containers/Rule/Rules';
+import Users from '../../../app/containers/User/Users';
+
 class Full extends Component {
 
     render() {
@@ -62,7 +66,10 @@ class Full extends Component {
                                 <Route path="/cadastro/congregacoes" name="Congregações" component={Congregations}/>
                                 <Route path="/cadastro/redes" name="Redes" component={Chains}/>
                                 <Route path="/cadastro/tipos-escola" name="Tipos de Escola" component={SchoolTypes}/>
-                                <Route path="/cadastro/estados" name="Estadosa" component={States}/>
+                                <Route path="/cadastro/estados" name="Estados" component={States}/>
+                                <Route path="/config/regras" name="Regras" component={Roles}/>                                
+                                <Route path="/config/permissoes" name="Permissões" component={Rules}/>
+                                <Route path="/config/usuarios" name="Usuários" component={Users}/>
                                 <Redirect from="/" to="/dashboard" />
                             </Switch>
                         </Container>
