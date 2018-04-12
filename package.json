@@ -47,6 +47,7 @@
     "bootstrap": "4.0.0",
     "chart.js": "2.7.1",
     "classnames": "^2.2.5",
+    "dotenv-webpack": "^1.5.5",
     "flag-icon-css": "2.9.0",
     "font-awesome": "4.7.0",
     "history": "4.7.2",
@@ -67,6 +68,7 @@
   "scripts": {
     "dev": "webpack -d --progress --watch --profile --json > compilation-stats.json --env.dev",
     "start": "webpack-dev-server --progress --color --inline --env.dev",
+    "staging": "webpack-dev-server --progress --color --inline --env.staging",
     "build": "webpack -p --progress --env.prod",
     "clean": "rimraf ./build"
   },

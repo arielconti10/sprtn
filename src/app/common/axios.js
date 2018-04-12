@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'http://hapi.spartan.ftd.com.br/api'
+    baseURL: process.env.API_URL
 });
 
 instance.interceptors.request.use(request => {

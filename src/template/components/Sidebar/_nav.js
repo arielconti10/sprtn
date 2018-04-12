@@ -93,6 +93,28 @@ export default {
             icon: 'fa fa-caret-right'
         }
       ]
+    },
+    {
+        name: 'Configuração',
+        url: '/config',
+        icon: 'fa fa-book',
+        children: [
+            {
+                name: 'Regras',
+                url: '/config/regras',
+                icon: 'fa fa-caret-right'
+            },
+            {
+                name: 'Permissões',
+                url: '/config/permissoes',
+                icon: 'fa fa-caret-right'
+            },
+            {
+                name: 'Usuários',
+                url: '/config/usuarios',
+                icon: 'fa fa-caret-right'
+            },
+        ]
     }
   ]
 };
