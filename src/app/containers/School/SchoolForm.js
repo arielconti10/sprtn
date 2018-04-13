@@ -14,6 +14,7 @@ import SchoolConctactList from './SchoolContactList';
 import SchoolStudentIcon from './SchoolStudentIcon'
 import SchoolStudentList from './SchoolStudentList'
 import SchoolAdoptionList from './SchoolAdoptionList'
+import SchoolEventList from './SchoolEventList'
 
 class SchoolForm extends Component {
     constructor(props) {
@@ -161,7 +162,7 @@ class SchoolForm extends Component {
                     <TabPane tabId="agendas">
                         <Row>
                             <Col sm="12">
-                                <h2>Agendas</h2>
+                                <SchoolEventList schoolId={this.state.schoolId} />
                             </Col>
                         </Row>
                     </TabPane>
