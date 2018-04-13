@@ -72,12 +72,21 @@ class SchoolConctactList extends Component {
     onClickDelete(element) {
         const { id } = element.value;
 
-        axios.delete(`${apiSpartan}/${id}`)
-        .then(res => {
-            this.updateTable();
-        }).catch(function (error) {
-            console.log(error)
-        }.bind(this));
+        let resp = confirm("Deseja realmente excluir este registro?");
+        if (resp == true) {
+            axios.delete(`${apiSpartan}/${id}`)
+            .then(res => {
+                this.updateTable();
+            }).catch(function (error) {
+                console.log(error)
+            }.bind(this));
+        }
+    }
+
+    addNew() {
+        this.setState({contact_find:[]});
+        this.setState({contact_id: ''});
+        this.toggle();
     }
     
 
@@ -94,7 +103,8 @@ class SchoolConctactList extends Component {
                     let phones = "";
                     if (d.phones !== undefined) {
                         d.phones.forEach(element => {
-                            let item_phone = `${element.phone_extension} ${element.phone_number} (${element.phone_type})`;
+                            let type_text = element.phone_type == "mobile"?"celular":"trabalho";
+                            let item_phone = `${element.phone_number} (${type_text})`;
                             phones = phones + item_phone + ", ";
                         });
                         phones = phones.trim();
@@ -162,6 +172,7 @@ class SchoolConctactList extends Component {
 
         return (
             <div>
+                <div>
                     <Collapse isOpen={this.state.collapse}>
                         <Card>
                             <CardBody>
@@ -172,10 +183,11 @@ class SchoolConctactList extends Component {
                         </Card>
                     </Collapse>
 
-                    <button className='btn btn-primary' disabled={this.state.blockButton} onClick={this.toggle}>
+                    <button className='btn btn-primary' disabled={this.state.blockButton} onClick={this.addNew.bind(this)}>
                         Adicionar
                     </button>
-
+                </div>
+                <div>
                     <br/>
                     <Row>
                         <Col md="12">
@@ -198,6 +210,7 @@ class SchoolConctactList extends Component {
                             />
                         </Col>
                     </Row>
+                </div>
             </div>
         )
     }

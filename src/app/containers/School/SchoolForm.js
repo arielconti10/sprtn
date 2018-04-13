@@ -14,6 +14,7 @@ import SchoolConctactList from './SchoolContactList';
 import SchoolStudentIcon from './SchoolStudentIcon'
 import SchoolStudentList from './SchoolStudentList'
 import SchoolAdoptionList from './SchoolAdoptionList'
+import SchoolEventList from './SchoolEventList'
 
 class SchoolForm extends Component {
     constructor(props) {
@@ -38,6 +39,7 @@ class SchoolForm extends Component {
         axios.get(`school/${this.state.schoolId}`)
             .then(response => {
                 const dados = response.data.data;
+                console.log(dados);
                 this.setState({
                     schoolName: dados.name, 
                     total_students: dados.total_students || '0',
@@ -160,7 +162,7 @@ class SchoolForm extends Component {
                     <TabPane tabId="agendas">
                         <Row>
                             <Col sm="12">
-                                <h2>Agendas</h2>
+                                <SchoolEventList schoolId={this.state.schoolId} />
                             </Col>
                         </Row>
                     </TabPane>
