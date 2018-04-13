@@ -21,7 +21,7 @@ module.exports = shipit => {
 
   shipit.task('permissions', () => {
     shipit.remote('chmod -R 755 /var/www/html/ftdspartanf/releases').then(function(){
-        shipit.remote('cd /var/www/html/ftdspartanf/current && npm run build');
+        shipit.remote('cd /var/www/html/ftdspartanf/current && npm run build staging');
       });
   });
 

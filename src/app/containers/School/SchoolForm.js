@@ -38,6 +38,7 @@ class SchoolForm extends Component {
         axios.get(`school/${this.state.schoolId}`)
             .then(response => {
                 const dados = response.data.data;
+                console.log(dados);
                 this.setState({
                     schoolName: dados.name, 
                     total_students: dados.total_students || '0',
