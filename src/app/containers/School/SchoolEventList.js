@@ -5,13 +5,10 @@ import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints'
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput, FormControl } from 'react-form-with-constraints-bootstrap4';
 import ReactTable from 'react-table'
 import Select from 'react-select';
-import DatePicker from 'react-datepicker';
 import moment from 'moment';
-import TimePicker from 'react-time-picker'
 import Flatpickr from 'react-flatpickr'
 
 import 'flatpickr/dist/themes/material_blue.css'
-import 'react-datepicker/dist/react-datepicker.css';
 import 'react-select/dist/react-select.css';
 import 'react-table/react-table.css'
 
@@ -19,7 +16,7 @@ import axios from '../../common/axios';
 const apiSpartan = 'event';
 
 const apis = [
-    //{ stateArray: 'visit_types', api: 'visit-type' },
+    { stateArray: 'visit_types', api: 'visit-type' },
     { stateArray: 'actions', api: 'action' }
 ];
 
@@ -47,59 +44,61 @@ class SchoolEventList extends Component {
             submit_button_disabled: false,
             new: true,
 
-            visit_types: [
-                { value: '1', label: 'Tipo 1' },
-                { value: '2', label: 'Tipo 2' },
-                { value: '3', label: 'Tipo 3' }
-            ],
+            visit_types: [],
             actions: [],
 
             id: null,
             form_name: '',
             form_start_date: '',
             form_start_time: '',
-            form_duration: '',
+            form_duration: '00:00:00',
             form_visit_type_id: 0,
-            form_user_id: 0,
             form_action_id: 0,
             form_school_id: this.props.schoolId,
             form_observations: ''
         };
 
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
         this.submitForm = this.submitForm.bind(this);
         this.clearForm = this.clearForm.bind(this);
         this.closeColapse = this.closeColapse.bind(this);
+        this.showButtonAction = this.showButtonAction.bind(this);
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChangeVisitType = this.handleChangeVisitType.bind(this);
         this.handleChangeAction = this.handleChangeAction.bind(this);
         this.handleChangeStartDate = this.handleChangeStartDate.bind(this);
         this.handleChangeStartTime = this.handleChangeStartTime.bind(this);
-        this.handleChangeDuration = this.handleChangeDuration.bind(this);
+        this.handleOpenStartTime = this.handleOpenStartTime.bind(this);
+
+        this.formatedHour = this.formatedHour.bind(this);
+        this.convertDate = this.convertDate.bind(this);
     }
 
     handleChangeVisitType = (selectedOption) => {
         const values = this.state;
-        values.form_level_id = selectedOption.value;
+        values.form_visit_type_id = selectedOption.value;
         this.setState({ values });
     }
 
     handleChangeAction = (selectedOption) => {
         const values = this.state;
-        values.form_shift_id = selectedOption.value;
+        values.form_action_id = selectedOption.value;
         this.setState({ values });
     }
 
-    handleChangeStartDate(date) {
-        this.setState({ form_start_date: date });
+    handleChangeStartDate(selectedDates, dateStr, instance) {
+        this.setState({ form_start_date: dateStr });
     }
 
-    handleChangeStartTime(time) {
-        this.setState({ form_start_time: time });
+    handleChangeStartTime(selectedDates, dateStr, instance) {
+        this.setState({ form_start_time: dateStr + ':00' });
     }
 
-    handleChangeDuration(time) {
-        this.setState({ form_duration: time });
+    handleOpenStartTime(selectedDates, dateStr, instance) {
+        if (this.state.new) {
+            this.setState({ form_start_time: this.formatedHour(new Date()) });
+        }
     }
 
     clearForm() {
@@ -107,11 +106,8 @@ class SchoolEventList extends Component {
             form_name: '',
             form_start_date: '',
             form_start_time: '',
-            form_duration: '',
             form_visit_type_id: 0,
-            form_user_id: 0,
             form_action_id: 0,
-            form_school_id: 0,
             form_observations: ''
         });
     }
@@ -136,25 +132,22 @@ class SchoolEventList extends Component {
     }
 
     onClickEdit(element) {
-        const { id, name, start_date, start_time, duration, visit_type_id, user_id, action_id, school_id, observations } = element.value;
+        const { id, name, start_date, start_time, duration, visit_type_id, action_id, observations } = element.value;
+        const values = this.state;
 
-        this.setState({
-            id: id,
-            form_name: name,
-            form_start_date: start_date,
-            form_start_time: start_time,
-            form_duration: duration,
-            form_visit_type_id: visit_type_id,
-            form_user_id: user_id,
-            form_action_id: action_id,
-            form_school_id: school_id,
-            form_observations: observations,
-            blockButton: true,
-            collapse: true,
-            new: false
-        });
+        values.id = id;
+        values.form_name = name;
+        values.form_start_date = start_date;
+        values.form_start_time = start_time;
+        values.form_visit_type_id = visit_type_id;
+        values.form_action_id = action_id;
+        values.form_observations = observations;
+        values.blockButton = true;
+        values.collapse = true;
+        values.new = false;
 
-        this.showGrade(level_id);
+        this.setState({ values });
+
     }
 
     onClickAdd() {
@@ -163,7 +156,6 @@ class SchoolEventList extends Component {
             collapse: true,
             new: true
         });
-
     }
 
     onClickSave() {
@@ -175,7 +167,8 @@ class SchoolEventList extends Component {
     }
 
     onClickActive(element) {
-        const { id, name, start_date, start_time, duration, visit_type_id, user_id, action_id, school_id, observations } = element.value;
+        const { id, name, start_date, start_time, duration, visit_type_id, user_id, action_id, observations } = element.value;
+        let school_id = element.value.school[0]['id'];
 
         axios.put(`${apiSpartan}/${id}`, {
             'name': name,
@@ -196,7 +189,6 @@ class SchoolEventList extends Component {
     }
 
     handleChange(e) {
-        console.log('handleChange', e)
         const target = e.currentTarget;
 
         this.form.validateFields(target);
@@ -210,7 +202,7 @@ class SchoolEventList extends Component {
     submitForm(event) {
         event.preventDefault();
 
-        const { form_name, form_start_date, form_start_time, form_duration, form_visit_type_id, form_user_id, form_action_id, form_school_id, form_observations } = this.state;
+        const { form_name, form_start_date, form_start_time, form_duration, form_visit_type_id, form_action_id, form_school_id, form_observations } = this.state;
 
         axios.post(`${apiSpartan}`, {
             'name': form_name,
@@ -218,7 +210,6 @@ class SchoolEventList extends Component {
             'start_time': form_start_time,
             'duration': form_duration,
             'visit_type_id': form_visit_type_id,
-            'user_id': form_user_id,
             'action_id': form_action_id,
             'school_id': form_school_id,
             'observations': form_observations,
@@ -235,7 +226,7 @@ class SchoolEventList extends Component {
     updateForm(event) {
 
         event.preventDefault();
-        const { id, form_name, form_start_date, form_start_time, form_duration, form_visit_type_id, form_user_id, form_action_id, form_school_id, form_observations } = this.state;
+        const { id, form_name, form_start_date, form_start_time, form_duration, form_visit_type_id, form_action_id, form_school_id, form_observations } = this.state;
 
         axios.put(`${apiSpartan}/${id}`, {
             'name': form_name,
@@ -243,7 +234,6 @@ class SchoolEventList extends Component {
             'start_time': form_start_time,
             'duration': form_duration,
             'visit_type_id': form_visit_type_id,
-            'user_id': form_user_id,
             'action_id': form_action_id,
             'school_id': form_school_id,
             'observations': form_observations,
@@ -273,13 +263,12 @@ class SchoolEventList extends Component {
 
     componentDidMount() {
         let col = [
-            { Header: "Nome", accessor: "name", headerClassName: 'text-left' },
-            { Header: "Data início", accessor: "start_date", headerClassName: 'text-left' },
+            { Header: "Evento", accessor: "name", headerClassName: 'text-left' },
+            { Header: "Data início", accessor: "start_date", headerClassName: 'text-left', Cell: (element) => (<span>{this.convertDate(element)}</span>) },
             { Header: "Hora início", accessor: "start_time", headerClassName: 'text-left' },
-            { Header: "Duração", accessor: "duration", headerClassName: 'text-left' },
-            { Header: "Tipo visita", accessor: "visit_type_id", headerClassName: 'text-left' },
-            { Header: "Usuário", accessor: "user_id", headerClassName: 'text-left' },
-            { Header: "Ação", accessor: "action_id", headerClassName: 'text-left' },
+            { Header: "Tipo visita", accessor: "visit_type.name", headerClassName: 'text-left' },
+            { Header: "Usuário", accessor: "user.name", headerClassName: 'text-left' },
+            { Header: "Ação", accessor: "action.name", headerClassName: 'text-left' },
             { Header: "Observação", accessor: "observations", headerClassName: 'text-left' }
         ];
 
@@ -309,25 +298,25 @@ class SchoolEventList extends Component {
                         </select>
                     )*/
             }, {
-                Header: "Ações", accessor: "", sortable: false, width: 90, headerClassName: 'text-left', Cell: (element) => (
-                    !element.value.deleted_at ?
-                        <div>
-                            <button className='btn btn-primary btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickEdit(element)}>
-                                <i className='fa fa-pencil'></i>
-                            </button>
+                Header: "Ações", accessor: "", sortable: false, width: 90, headerClassName: 'text-left', Cell: (element) =>
+                    (
+                        !element.value.deleted_at ?
+                            <div className={this.showButtonAction(element)}>
+                                <button className='btn btn-primary btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickEdit(element)}>
+                                    <i className='fa fa-pencil'></i>
+                                </button>
 
-                            <button className='btn btn-danger btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickDelete(element)}>
-                                <i className='fa fa-ban'></i>
-                            </button>
-                        </div>
-                        :
-                        <div>
-                            <button className='btn btn-success btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickActive(element)}>
-                                <i className='fa fa-check-circle'></i>
-                            </button>
-                        </div>
-
-                )
+                                <button className='btn btn-danger btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickDelete(element)}>
+                                    <i className='fa fa-ban'></i>
+                                </button>
+                            </div>
+                            :
+                            <div className={this.showButtonAction(element)}>
+                                <button className='btn btn-success btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickActive(element)}>
+                                    <i className='fa fa-check-circle'></i>
+                                </button>
+                            </div>
+                    )
             }
         )
 
@@ -347,49 +336,47 @@ class SchoolEventList extends Component {
         });
     }
 
+    convertDate(element) {
+        let row = element.original;
+
+        let arr = row.start_date.split('-');
+        return `${arr[2]}/${arr[1]}/${arr[0]}`;
+    }
+
+    showButtonAction(element) {
+        let row = element.original;
+
+        let paramDate = parseInt(new Date(`${row.start_date} ${row.start_time}`).getTime());
+        let nowDate = parseInt(new Date().getTime());
+
+        let divClass = (nowDate < paramDate) ? '' : 'd-none';
+
+        return divClass;
+    }
+
+    formatedHour(hour) {
+        let h = new Date(hour);
+        function pad(h) { return h < 10 ? '0' + h : h }
+        return pad(h.getHours()) + ':'
+            + pad(h.getMinutes()) + ':00';
+    }
+
     onFetchData = (state, instance, deleted_at) => {
-
-        let pageSize = state ? state.pageSize : this.state.pageSize;
-        let page = state ? state.page + 1 : this.state.page;
-
-        let sorted = state ? state.sorted : this.state.sorted
-        let filtered = state ? state.filtered : this.state.filtered
-
-        let baseURL = `/${apiSpartan}?paginate=${pageSize}&page=${page}&filter[school_id]=${this.state.form_school_id}`;
-
-        //To do: make filter to deleted_at
-        /*console.log('onFetchData:', deleted_at);
-        if(deleted_at != 'all')
-            console.log("deleted_at != 'all'", deleted_at);*/
-
-        filtered.map(function (item) {
-            baseURL += `&filter[${item.id}]=${item.value}`;
-        })
-
-        for (let i = 0; i < sorted.length; i++) {
-            baseURL += "&order[" + sorted[i]['id'] + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
-        }
+        let baseURL = `/school/${this.state.form_school_id}`;
 
         axios.get(baseURL)
             .then((response) => {
-                const dados = response.data.data
+                const dados = response.data.data.events
 
                 this.setState({
-                    data: dados,
-                    totalSize: response.data.meta.pagination.total,
-                    pages: response.data.meta.pagination.last_page,
-                    page: response.data.meta.pagination.current_page,
-                    pageSize: parseInt(response.data.meta.pagination.per_page),
-                    sorted: sorted,
-                    filtered: filtered,
-                    loading: false
+                    data: dados
                 });
             })
             .catch(err => console.log(err));
     }
 
     render() {
-        const { data, pageSize, page, loading, pages, columns, actions, visit_types, form_name, form_start_date, form_start_time, form_duration, form_visit_type_id, form_user_id, form_action_id, form_school_id, form_observations } = this.state;
+        const { data, pageSize, page, loading, pages, columns, actions, visit_types, form_name, form_start_date, form_start_time, form_duration, form_visit_type_id, form_action_id, form_school_id, form_observations } = this.state;
 
         return (
             <div>
@@ -406,56 +393,57 @@ class SchoolEventList extends Component {
                                     <Row>
                                         <Col md="6">
                                             <FormGroup for="form_name">
-                                                <FormControlLabel htmlFor="form_name">Nome</FormControlLabel>
-                                                <FormControlInput type="text" id="form_name" name="form_name" readOnly={false}
-                                                    value={this.state.form_name} onChange={this.handleChange}
-                                                    required />
+                                                <FormControlLabel htmlFor="form_name">Evento</FormControlLabel>
+                                                <FormControlInput
+                                                    type="text"
+                                                    id="form_name"
+                                                    name="form_name"
+                                                    readOnly={false}
+                                                    value={this.state.form_name}
+                                                    onChange={this.handleChange}
+                                                    required
+                                                />
                                                 <FieldFeedbacks for="form_name">
                                                     <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
                                                 </FieldFeedbacks>
                                             </FormGroup>
                                         </Col>
 
-                                        <Col md="2">
+                                        <Col md="3">
                                             <FormGroup for="form_start_date">
                                                 <FormControlLabel htmlFor="form_start_date">Data início</FormControlLabel>
-                                                <Flatpickr className="form-control"
+                                                <Flatpickr
+                                                    className="form-control"
+                                                    options={{ minDate: 'today' }}
                                                     value={form_start_date}
-                                                    onChange={this.handleChangeStartDate} />
+                                                    onChange={this.handleChangeStartDate}
+                                                    required={true}
+                                                />
                                                 <FieldFeedbacks for="form_start_date">
                                                     <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
                                                 </FieldFeedbacks>
                                             </FormGroup>
                                         </Col>
 
-                                        <Col md="2">
+                                        <Col md="3">
                                             <FormGroup for="form_start_time">
                                                 <FormControlLabel htmlFor="form_start_time">Hora início</FormControlLabel>
-                                                <Flatpickr className="form-control"
+                                                <Flatpickr
+                                                    className="form-control"
                                                     data-enable-time
                                                     options={{ noCalendar: true, time_24hr: true }}
                                                     value={form_start_time}
-                                                    onChange={this.handleChangeStartTime} />
+                                                    onChange={this.handleChangeStartTime}
+                                                    onOpen={this.handleOpenStartTime}
+                                                    required={true}
+                                                />
                                                 <FieldFeedbacks for="form_start_time">
                                                     <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
                                                 </FieldFeedbacks>
                                             </FormGroup>
                                         </Col>
-
-                                        <Col md="2">
-                                            <FormGroup for="form_duration">
-                                                <FormControlLabel htmlFor="form_duration">Duração</FormControlLabel>
-                                                <Flatpickr className="form-control"
-                                                    data-enable-time
-                                                    options={{ noCalendar: true, time_24hr: true }}
-                                                    value={form_duration}
-                                                    onChange={this.handleChangeDuration} />
-                                                <FieldFeedbacks for="form_duration">
-                                                    <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                                </FieldFeedbacks>
-                                            </FormGroup>
-                                        </Col>
                                     </Row>
+
                                     <Row>
                                         <Col md="4">
                                             <FormGroup for="form_visit_type_id">
@@ -467,10 +455,15 @@ class SchoolEventList extends Component {
                                                     value={form_visit_type_id}
                                                     onChange={this.handleChangeVisitType}
                                                     options={visit_types}
+                                                    placeholder="Selecione..."
+                                                    // errorText={touched && error}
                                                 />
-                                                <FieldFeedbacks for="form_visit_type_id">
+                                                {/* <div>{(touched && error) &&
+                                                    <div style={{ 'fontSize': '12px', 'color': 'rgb(244, 67, 54)' }}>Este campo é de preenchimento obrigatório</div>}
+                                                </div> */}
+                                                {/* <FieldFeedbacks for="form_visit_type_id">
                                                     <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                                </FieldFeedbacks>
+                                                </FieldFeedbacks> */}
                                             </FormGroup>
                                         </Col>
 
@@ -484,20 +477,33 @@ class SchoolEventList extends Component {
                                                     value={form_action_id}
                                                     onChange={this.handleChangeAction}
                                                     options={actions}
+                                                    placeholder="Selecione..."
+                                                    // errorText={touched && error}
                                                 />
-                                                <FieldFeedbacks for="form_action_id">
+                                                {/* <div>{(touched && error) &&
+                                                    <div style={{ 'fontSize': '12px', 'color': 'rgb(244, 67, 54)' }}>Este campo é de preenchimento obrigatório</div>}
+                                                </div> */}
+                                                {/* <FieldFeedbacks for="form_action_id">
                                                     <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                                </FieldFeedbacks>
+                                                </FieldFeedbacks> */}
                                             </FormGroup>
                                         </Col>
                                     </Row>
+
                                     <Row>
                                         <Col md="12">
                                             <FormGroup for="form_observations">
                                                 <FormControlLabel htmlFor="form_observations">Observações</FormControlLabel>
-                                                <FormControlInput type="textarea" rows="5" id="form_observations" name="form_observations" readOnly={false}
-                                                    value={this.state.form_observations} onChange={this.handleChange}
-                                                    required />
+                                                <FormControlInput
+                                                    type="textarea"
+                                                    rows="5"
+                                                    id="form_observations"
+                                                    name="form_observations"
+                                                    readOnly={false}
+                                                    value={this.state.form_observations}
+                                                    onChange={this.handleChange}
+                                                    required
+                                                />
                                                 <FieldFeedbacks for="form_observations">
                                                     <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
                                                 </FieldFeedbacks>
@@ -506,6 +512,7 @@ class SchoolEventList extends Component {
                                     </Row>
                                 </FormWithConstraints>
                             </div>
+
                             <div>
                                 <Row>
                                     <Col md="1">
@@ -533,10 +540,7 @@ class SchoolEventList extends Component {
                             <ReactTable
                                 columns={columns}
                                 data={data}
-                                pages={pages}
-                                loading={loading}
                                 defaultPageSize={pageSize}
-                                manual
                                 onFetchData={this.onFetchData}
                                 previousText='Anterior'
                                 nextText='Próximo'
