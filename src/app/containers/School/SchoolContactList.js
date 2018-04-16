@@ -153,7 +153,6 @@ class SchoolConctactList extends Component {
         )
 
         this.setState({ columns: col });
-        console.log(this.state.data);
     }
 
     updateTable() {

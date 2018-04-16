@@ -23,6 +23,7 @@ const apis = [
 ];
 const apiPost = 'contact';
 const apiCep = 'cep';
+const apiStates = 'state';
 
 class ContactForm extends Component {
     constructor(props) {
@@ -62,7 +63,6 @@ class ContactForm extends Component {
             submitButtonDisabled: false,
             saved: false
         };
-        console.log(this.state.rows_table);
         this.handleChange = this.handleChange.bind(this);
         this.searchCep = this.searchCep.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -119,23 +119,8 @@ class ContactForm extends Component {
                     item.stateArray = item.stateArray.replace("-","_");
                     dados.map(item => {
                         item['value'] = item.id,
-                        item['label'] = item.name
-                    });
-                    this.setState({ [item.stateArray]: dados });
-                })
-                .catch(err => console.log(err));
-        });
-    }
-
-    populateStatesUf() {
-        apis.map(item => {
-            axios.get(`${item.api}`)
-                .then(response => {
-                    let dados = response.data.data;
-                    item.stateArray = item.stateArray.replace("-","_");
-                    dados.map(item => {
-                        item['value'] = item.id,
-                        item['label'] = item.name
+                        item['label'] = item.name,
+                        item['abbrev'] = item.abbrev
                     });
                     this.setState({ [item.stateArray]: dados });
                 })
@@ -217,7 +202,6 @@ class ContactForm extends Component {
 
     componentWillReceiveProps(nextProps) {
         this.populateSelectbox();
-        console.log(this.props);
         if (nextProps.contact_find !== this.props.contact_find) {
             this.setState({
                 previous_phone: nextProps.contact_find.phones,
@@ -292,19 +276,27 @@ class ContactForm extends Component {
         this.setState({city:''});
     }
 
+    searchStateWithCep(state_uf) {
+        this.state.state.map(item => {
+            if (item.abbrev == state_uf) {
+                this.setState({state_id:item.id});
+            }
+        });
+    }
+
     searchCep() {
         axios.get(`${apiCep}/${this.state.zip_code}`)
         .then(response => {
             let dados = response.data.data;
-            console.log(dados);
-            this.setState({address:dados.logradouro});
-            this.setState({neighborhood:dados.bairro});
-            this.setState({city:dados.localidade});
 
             if (dados.erro !== undefined) {
                 this.setState({ back_error: "CEP nāo encontrado. Verifique!" });
                 this.clearAddress();
             } else {
+                this.setState({address:dados.logradouro});
+                this.setState({neighborhood:dados.bairro});
+                this.setState({city:dados.localidade});
+                this.searchStateWithCep(dados.uf);
                 this.setState({back_error:''});
             }
             
