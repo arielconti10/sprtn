@@ -88,13 +88,13 @@ class SchoolConctactList extends Component {
         this.setState({contact_id: ''});
         this.toggle();
     }
-    
 
     componentDidMount() {
+
         let col = [
             { Header: "Nome", accessor: "name", headerClassName: 'text-left' },
-            { Header: "E-mail", accessor: "email", headerClassName: 'text-left' },
             { Header: "Cargo", accessor: "job_title.name", headerClassName: 'text-left' },
+            { Header: "E-mail", accessor: "email", headerClassName: 'text-left' },
             {
                 Header: "Telefone",
                 id: "phone",
@@ -103,7 +103,16 @@ class SchoolConctactList extends Component {
                     let phones = "";
                     if (d.phones !== undefined) {
                         d.phones.forEach(element => {
-                            let type_text = element.phone_type == "mobile"?"celular":"trabalho";
+                            let type_text = "";
+                            if (element.phone_type == "work") {
+                                type_text = "Trabalho";
+                            } else if (element.phone_type == "home") {
+                                type_text = "Casa";
+                            } else if (element.phone_type == "mobile") {
+                                type_text = "Celular";
+                            } else {
+                                type_text = "Fax";
+                            }
                             let item_phone = `${element.phone_number} (${type_text})`;
                             phones = phones + item_phone + ", ";
                         });
@@ -153,7 +162,6 @@ class SchoolConctactList extends Component {
         )
 
         this.setState({ columns: col });
-        console.log(this.state.data);
     }
 
     updateTable() {

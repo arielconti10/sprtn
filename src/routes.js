@@ -36,6 +36,8 @@ const routes = {
   '/cadastro/tipos-escola/form': 'Tipos de Escola',
   '/cadastro/estados': 'Estados',
   '/cadastro/estados/form': 'Estados',
+  '/cadastro/niveis': 'Níveis',
+  '/cadastro/niveis/form': 'Níveis',
   '/config': "Configuração",
   '/config/regras': "Regras",
   '/config/permissoes': "Permissões",
