@@ -28,7 +28,7 @@ class HeaderDropdown extends Component {
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
         <DropdownToggle nav>
-          <img src={'img/spartan.ico'} className="img-avatar" alt="Spartan"/>
+          <img src={'img/avatar-user.ico'} className="img-avatar" alt="Avatar"/>
         </DropdownToggle>
         <DropdownMenu right>
           <DropdownItem header tag="div" className="text-center"><strong>Minha Conta</strong></DropdownItem>

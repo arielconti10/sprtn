@@ -78,9 +78,9 @@ class GridApi extends Component {
                 sortable: false,
                 Cell: (element) => (
                     !element.value.deleted_at ?
-                        <div><span>Ativo</span></div>
-                        :
-                        <div><span>Inativo</span></div>
+                        <div><span className="alert-success grid-record-status">Ativo</span></div>
+                    :
+                        <div><span className="alert-danger grid-record-status">Inativo</span></div>
                 )/*,                
                     filterable: true, 
                     Filter: ({ filter, onChange }) => (
