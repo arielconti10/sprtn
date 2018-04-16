@@ -60,6 +60,8 @@ class ContactForm extends Component {
             active: true,       
             back_error: '',
             authorize_email: '0',
+            valid_select: '1',
+            favorite: '0',
             submitButtonDisabled: false,
             saved: false
         };
@@ -99,16 +101,22 @@ class ContactForm extends Component {
             phone_type: this.state.phone_type,
             phone_extension: this.state.phone_extension
         };
-        var phone_array = this.state.phones;
+
+        if (phone_object.phone_extension == "") {
+            delete phone_object.phone_extension;
+        }
+
+        let phone_array = this.state.phones !== undefined?this.state.phones:[];
         
-        if (phone_object.phone_number != "" && phone_object.phone_type != "" && phone_object.phone_extension != "") {
+        if (phone_object.phone_number != "" && phone_object.phone_type != "") {
             phone_object.phone_number = phone_object.phone_number.replace("_","");
             phone_array.push(phone_object);    
+            this.setState({phones:phone_array});
+            this.updateWithPhone(phone_array);
         } else {
             this.setState({back_error: 'Preencha os campos para adicionar um telefone'});
         }
-
-        this.updateWithPhone(phone_array);
+        
     }
 
     populateSelectbox() {
@@ -149,19 +157,23 @@ class ContactForm extends Component {
                 Header: "Tipo",
                 id: "phone",
                 width: 380,
-                accessor: d => {
-                    let phone_type = "";
-                    if (d.phone_type == "mobile") {
-                        phone_type = "Celular";
+                accessor: element => {
+                    let type_text = "";
+                    if (element.phone_type == "work") {
+                        type_text = "Trabalho";
+                    } else if (element.phone_type == "home") {
+                        type_text = "Casa";
+                    } else if (element.phone_type == "mobile") {
+                        type_text = "Celular";
                     } else {
-                        phone_type = "Trabalho";
+                        type_text = "Fax";
                     }
                     
-                    return phone_type;
+                    return type_text;
                 }
             },
-            { Header: "Extensāo", accessor: "phone_extension", headerClassName: 'text-left' },
-            { Header: "Número", accessor: "phone_number", headerClassName: 'text-left' },
+            { Header: "Telefone", accessor: "phone_number", headerClassName: 'text-left' },
+            { Header: "Observaçāo", accessor: "phone_extension", headerClassName: 'text-left' }
         ];
 
         col.push(
@@ -220,7 +232,8 @@ class ContactForm extends Component {
                 birthday: formatDateToBrazilian(nextProps.contact_find.birthday),
                 authorize_email: nextProps.contact_find.authorize_email,
                 job_title_id: nextProps.contact_find.job_title_id,       
-                authorize_email: nextProps.contact_find.authorize_email
+                authorize_email: nextProps.contact_find.authorize_email,
+                favorite: nextProps.contact_find.favorite
             });
 
             if (nextProps.contact_find.length == 0) {
@@ -265,6 +278,7 @@ class ContactForm extends Component {
             active: true,       
             back_error: '',
             authorize_email: '0',
+            favorite: '0',
             submitButtonDisabled: false,
             saved: false
         });
@@ -349,6 +363,7 @@ class ContactForm extends Component {
         event.preventDefault();
 
         axios.post(`${apiPost}`, {
+            'phones': this.state.phones,
             'school_id': this.props.schoolId,
             'name': this.state.name,
             'email': this.state.email,
@@ -363,7 +378,8 @@ class ContactForm extends Component {
             'city': this.state.city,
             'state_id': this.state.state_id,
             'active': this.state.active,
-            'authorize_email': this.state.authorize_email
+            'authorize_email': this.state.authorize_email,
+            'favorite': this.state.favorite
         }).then(res => {
             this.setState({
                 saved: true                   
@@ -382,6 +398,13 @@ class ContactForm extends Component {
         event.preventDefault();
         var id = this.state.contact_id;
 
+        //caso a extensāo do telefone esteja vazia, excluir, evitando erros na API
+        this.state.phones.map(item => {
+            if (item.phone_extension == "") {
+                delete item.phone_extension;
+            }
+        });
+
         axios.put(`${apiPost}/${id}`, {
             'phones': this.state.phones,
             'school_id': this.props.schoolId,
@@ -398,7 +421,8 @@ class ContactForm extends Component {
             'city': this.state.city,
             'state_id': this.state.state_id,
             'active': this.state.active,
-            'authorize_email': this.state.authorize_email
+            'authorize_email': this.state.authorize_email,
+            'favorite': this.state.favorite
         }).then(res => {
             this.setState({
                 saved: true                   
@@ -420,7 +444,13 @@ class ContactForm extends Component {
         
         this.setState({ submitButtonDisabled: !this.form.isValid() });
 
-        if (this.form.isValid()) {
+        if (this.state.job_title_id === undefined) {
+            this.setState({valid_select:0});
+        } else {
+            this.setState({valid_select:1});
+        }
+
+        if (this.form.isValid() && this.state.job_title_id !== undefined) {
             if (this.state.contact_id !== undefined) {
                 this.updateForm(event);
             } else {
@@ -444,6 +474,8 @@ class ContactForm extends Component {
                 columns: this.state.columns
             }, () => this.setState({ phones_data: contacts, phones: contacts }));
         }
+
+        this.clearFormPhone();
 
         this.props.toggle();
     }
@@ -471,10 +503,13 @@ class ContactForm extends Component {
                     <div className="row">
                         <div className="col-md-6">
                             <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Nome do contato</FormControlLabel>
+                                <FormControlLabel htmlFor="name">
+                                    Nome do contato
+                                    <span className="text-danger">*</span>
+                                </FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
-                                    required />
+                                    required/>
                                 <FieldFeedbacks for="name">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
                                 </FieldFeedbacks>
@@ -482,19 +517,35 @@ class ContactForm extends Component {
                         </div>
 
                         <div className="col-md-6">
-                            <FormGroup for="email">
-                                <FormControlLabel htmlFor="email">E-mail</FormControlLabel>
-                                <FormControlInput type="text" id="email" name="email"
-                                    value={this.state.email} onChange={this.handleChange}
-                                    required />
-                                <FieldFeedbacks for="email">
-                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
+                            <FormGroup for="job_title_id">
+                                <label>Cargo</label>
+                                <span className="text-danger">*</span>
+                                <Select
+                                    name="job_title_id"
+                                    value={value}
+                                    onChange={this.handleChangeSelect}
+                                    options={this.state.job_title}
+                                />
+                                {this.state.valid_select == 0 &&
+                                    <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
+                                }
                             </FormGroup>
                         </div>
                     </div>
 
                      <div className="row">
+
+                        <div className="col-md-4">
+                            <FormGroup for="email">
+                                <FormControlLabel htmlFor="email">E-mail</FormControlLabel>
+                                <FormControlInput type="text" id="email" name="email"
+                                    value={this.state.email} onChange={this.handleChange}
+                                    />
+                                <FieldFeedbacks for="email">
+                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                </FieldFeedbacks>
+                            </FormGroup>
+                        </div>
 
                         <div className="col-md-4">
                             <FormGroup for="cpf">
@@ -503,7 +554,7 @@ class ContactForm extends Component {
                                     name="cpf" id="cpf" onChange={this.handleChange}
                                     value = {this.state.cpf}
                                     className="form-control" 
-                                    required/>
+                                    />
                                 <FieldFeedbacks for="cpf">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
                                 </FieldFeedbacks>
@@ -517,24 +568,9 @@ class ContactForm extends Component {
                                     name="birthday" id="birthday" onChange={this.handleChange}
                                     value={this.state.birthday}
                                     className="form-control" 
-                                    required/>
+                                    />
                                 <FieldFeedbacks for="birthday">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
-                            </FormGroup>
-                        </div>
-
-                        <div className="col-md-4">
-                            <FormGroup for="job_title_id">
-                                <label>Cargo</label>
-                                <Select
-                                    name="job_title_id"
-                                    value={value}
-                                    onChange={this.handleChangeSelect}
-                                    options={this.state.job_title}
-                                />
-                                <FieldFeedbacks for="job_title_id">
-                                    <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
                                 </FieldFeedbacks>
                             </FormGroup>
                         </div>
@@ -548,7 +584,7 @@ class ContactForm extends Component {
                                 <MaskedInput mask="11111-111"
                                     name="zip_code" id="zip_code" onChange={this.handleChange}
                                     value = {this.state.zip_code}
-                                    className="form-control" required onBlur={this.searchCep}/>
+                                    className="form-control" onBlur={this.searchCep}/>
                                 <FieldFeedbacks for="zip_code">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
                                 </FieldFeedbacks>
@@ -626,7 +662,6 @@ class ContactForm extends Component {
                                     value={value_state}
                                     onChange={this.handleChangeState}
                                     options={this.state.state}
-                                    required
                                 />
                                 <FieldFeedbacks for="state_id">
                                     <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -636,7 +671,7 @@ class ContactForm extends Component {
                     </div>
 
                     <div className="row">
-                        <div className="col-md-12">
+                        <div className="col-md-6">
                             <div className="form-group form-inline">
                                 <label className="" style={{marginRight: "10px"}}>Autoriza E-mail</label>
                                 <div className="">
@@ -649,10 +684,24 @@ class ContactForm extends Component {
                                 </div>                                
                             </div>
                         </div>    
+
+                        <div className="col-md-6">
+                            <div className="form-group form-inline">
+                                <label className="" style={{marginRight: "10px"}}>Contato Decisor</label>
+                                <div className="">
+                                    <Label className="switch switch-default switch-pill switch-primary">
+                                        <Input type="checkbox" id='favorite' name="favorite" className="switch-input" onChange={this.handleChange}
+                                        checked={this.state.favorite == 1?'checked':''} />
+                                        <span className="switch-label"></span>
+                                        <span className="switch-handle"></span>
+                                    </Label>
+                                </div>                                
+                            </div>
+                        </div>  
+                         
                         {statusField}     
                     </div>
 
-                    {this.state.contact_id != undefined &&
                     <fieldset>
                          <legend>Telefones</legend>
                          <div className="row">
@@ -664,7 +713,9 @@ class ContactForm extends Component {
                                         value={value_phone}
                                         onChange={this.handleChangePhone}
                                         options={[
+                                            {label: 'Casa', value: 'home'},
                                             {label: 'Celular', value: 'mobile'},
+                                            {label: 'Fax', value: 'fax'},
                                             {label: 'Trabalho', value: 'work'}
                                         ]}
                                     />
@@ -675,29 +726,29 @@ class ContactForm extends Component {
                                 </FormGroup>
                             </div>
 
-                                <div className="col-md-4">
-                                    <FormGroup for="phone_extension">
-                                        <FormControlLabel htmlFor="phone_extension">Extensāo</FormControlLabel>
-                                        <FormControlInput type="text" id="phone_extension" name="phone_extension"
-                                            value={this.state.phone_extension} onChange={this.handleChange}
-                                            />
-                                        <FieldFeedbacks for="phone_extension">
-                                            <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                        </FieldFeedbacks>
-                                    </FormGroup>
-                                </div>
+                            <div className="col-md-4">
+                                <FormGroup for="phone_number">
+                                    <FormControlLabel htmlFor="phone_number">Telefone</FormControlLabel>
+                                    <MaskedInput className="form-control" mask="(11) 1111-11111" type="text" id="phone_number" name="phone_number" 
+                                        value={this.state.phone_number} onChange={this.handleChange}
+                                    />
+                                    <FieldFeedbacks for="phone_number">
+                                        <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                    </FieldFeedbacks>
+                                </FormGroup>
+                            </div>
 
-                                <div className="col-md-4">
-                                    <FormGroup for="phone_number">
-                                        <FormControlLabel htmlFor="phone_number">Telefone</FormControlLabel>
-                                        <MaskedInput className="form-control" mask="(11) 1111-11111" type="text" id="phone_number" name="phone_number" 
-                                            value={this.state.phone_number} onChange={this.handleChange}
+                            <div className="col-md-4">
+                                <FormGroup for="phone_extension">
+                                    <FormControlLabel htmlFor="phone_extension">Observaçāo</FormControlLabel>
+                                    <FormControlInput type="text" id="phone_extension" name="phone_extension"
+                                        value={this.state.phone_extension} onChange={this.handleChange}
                                         />
-                                        <FieldFeedbacks for="phone_number">
-                                            <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                        </FieldFeedbacks>
-                                    </FormGroup>
-                                </div>
+                                    <FieldFeedbacks for="phone_extension">
+                                        <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                    </FieldFeedbacks>
+                                </FormGroup>
+                            </div>
                                 
                             </div>
 
@@ -723,7 +774,6 @@ class ContactForm extends Component {
                                 </Col>
                             </Row>
                      </fieldset>
-                    }
 
                         <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
                         <button type="button" className='btn btn-danger' onClick={() => this.onClickCancel()}>
