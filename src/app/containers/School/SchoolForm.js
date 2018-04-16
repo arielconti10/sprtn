@@ -28,7 +28,8 @@ class SchoolForm extends Component {
             activeTab: 'cadastro',
             schoolCodeTotvs: '0',
             subsidiaryId: '0',
-            sectorId: '0'
+            sectorId: '0',
+            school_type_identify: ''
         };
     }
 
@@ -45,7 +46,8 @@ class SchoolForm extends Component {
                     active: dados.deleted_at === null ? true : false,
                     schoolCodeTotvs: dados.school_code_totvs,
                     subsidiaryId: dados.subsidiary_id,
-                    sectorId: dados.sector_id
+                    sectorId: dados.sector_id,
+                    school_type_identify: dados.school_type.identify.toLowerCase()
                 });
             })
             .catch(err => console.log(err));
@@ -63,9 +65,9 @@ class SchoolForm extends Component {
     render() {
         return (
             <div>
-                <h1 className="school-header"><i className="fa fa-graduation-cap"></i> {this.state.schoolName} <SchoolStudentIcon numStudents={this.state.total_students} /></h1>
+                <h1 className="school-header"><i className="fa fa-building-o"></i> {this.state.schoolName} <SchoolStudentIcon numStudents={this.state.total_students} /></h1>
                 <br />
-                <Nav tabs>
+                <Nav tabs className={`tab-${this.state.school_type_identify}`}>
                     <NavItem>
                         <NavLink
                             className={classnames({ active: this.state.activeTab === 'dashboard' })}
@@ -115,7 +117,7 @@ class SchoolForm extends Component {
                             </NavLink>
                     </NavItem>
                 </Nav>
-                <TabContent activeTab={this.state.activeTab}>
+                <TabContent activeTab={this.state.activeTab} className={`cont-${this.state.school_type_identify}`}>
                     <TabPane tabId="dashboard">
                         <Row>
                             <Col sm="12">

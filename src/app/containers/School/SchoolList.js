@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Router, hashHistory, Link, browserHistory, withRouter, NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardFooter, CardBody, Button } from 'reactstrap';
-import ReactTable from 'react-table'
+import ReactTable from 'react-table';
+
 import 'react-table/react-table.css'
 
 import axios from '../../common/axios';
@@ -24,11 +25,15 @@ class SchoolList extends Component {
     }
 
     componentDidMount() {
+
         let col = [
+            { Header: 'Filial', accessor: 'subsidiary.name', filterable: true, width: 60, headerClassName: 'text-left' },
             { Header: "Nome", accessor: "name", sortable: true, filterable: true, maxWidth: 600, headerClassName: 'text-left' },
-            { Header: "Tipo", accessor: "school_type.name", sortable: true, filterable: true, width: 100, headerClassName: 'text-left' },
-            { Header: 'Filial', accessor: 'subsidiary.name', sortable: true, filterable: true, width: 60, headerClassName: 'text-left' },
-            { Header: 'TOTVS', accessor: 'school_code_totvs', sortable: true, filterable: true, width: 80, headerClassName: 'text-left' },
+            { Header: "CEP", accessor: "zip_code", filterable: true, width: 100, headerClassName: 'text-left' },
+            {
+                Header: "Tipo", accessor: "school_type", filterable: true, width: 100, headerClassName: 'text-left',
+                Cell: props => <span className={`escola-${props.value.identify.toLowerCase()}`}>{props.value.name}</span>
+            },
             { Header: 'Perfil', accessor: 'profile.name', sortable: true, filterable: true, width: 100, headerClassName: 'text-left' }
         ];
 
@@ -41,9 +46,9 @@ class SchoolList extends Component {
                 sortable: false,
                 Cell: (element) => (
                     !element.value.deleted_at ?
-                        <div><span>Ativo</span></div>
+                        <div><span className="alert-success grid-record-status">Ativo</span></div>
                         :
-                        <div><span>Inativo</span></div>
+                        <div><span className="alert-danger grid-record-status">Inativo</span></div>
                 )/*,                
                     filterable: true, 
                     Filter: ({ filter, onChange }) => (
@@ -60,8 +65,8 @@ class SchoolList extends Component {
             }, {
                 Header: "Ações", accessor: "", sortable: false, width: 50, headerClassName: 'text-left', Cell: (element) => (
                     <div>
-                        <Link to={this.props.match.url + "/" + element.value.id} 
-                                 params={{ id: element.value.id }} className='btn btn-primary btn-sm' >
+                        <Link to={this.props.match.url + "/" + element.value.id}
+                            params={{ id: element.value.id }} className='btn btn-primary btn-sm' >
                             <i className='fa fa-eye'></i>
                         </Link>
                     </div>
@@ -120,7 +125,7 @@ class SchoolList extends Component {
         const { data, pageSize, page, loading, pages, columns } = this.state;
 
         return (
-            <div>
+            <div>                
                 <p>
                     <NavLink to={this.props.match.url + "/novo"} exact><Button color='primary' disabled={true}><i className="fa fa-plus-circle"></i> Adicionar</Button></NavLink>
                 </p>
@@ -137,11 +142,13 @@ class SchoolList extends Component {
 
                         return (
                             <div style={{ padding: "20px" }}>
-                                <b>Endereço:</b> {school.address} <br />
-                                <b>Bairro:</b> {school.neighborhood} <br />
-                                <b>Cidade:</b> {school.city} <br />
-                                <b>UF:</b> {school.state.abbrev} <br />
-                                <b>CEP:</b> {school.zip_code}
+                                <b style={{ marginLeft: '20px' }}>Endereço:</b> {school.address}
+                                <b style={{ marginLeft: '20px' }}>Bairro:</b> {school.neighborhood}
+                                <b style={{ marginLeft: '20px' }}>Cidade:</b> {school.city}
+                                <b style={{ marginLeft: '20px' }}>UF:</b> {school.state.abbrev}
+                                <b style={{ marginLeft: '20px' }}>CEP:</b> {school.zip_code}
+                                <b style={{ marginLeft: '20px' }}>TOTVS:</b> {school.school_code_totvs}
+
                             </div>
                         );
                     }}
