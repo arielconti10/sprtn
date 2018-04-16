@@ -417,7 +417,7 @@ class SchoolEventList extends Component {
                                                     options={{ minDate: 'today' }}
                                                     value={form_start_date}
                                                     onChange={this.handleChangeStartDate}
-                                                    required={true}
+                                                    required
                                                 />
                                                 <FieldFeedbacks for="form_start_date">
                                                     <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -435,7 +435,7 @@ class SchoolEventList extends Component {
                                                     value={form_start_time}
                                                     onChange={this.handleChangeStartTime}
                                                     onOpen={this.handleOpenStartTime}
-                                                    required={true}
+                                                    required
                                                 />
                                                 <FieldFeedbacks for="form_start_time">
                                                     <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -447,7 +447,7 @@ class SchoolEventList extends Component {
                                     <Row>
                                         <Col md="4">
                                             <FormGroup for="form_visit_type_id">
-                                                <label>Tipo de visita</label>
+                                                <FormControlLabel htmlFor="form_visit_type_id">Tipo de visita</FormControlLabel>
                                                 <Select
                                                     name="form_visit_type_id"
                                                     id="form_visit_type_id"
@@ -456,20 +456,17 @@ class SchoolEventList extends Component {
                                                     onChange={this.handleChangeVisitType}
                                                     options={visit_types}
                                                     placeholder="Selecione..."
-                                                    // errorText={touched && error}
+                                                    required
                                                 />
-                                                {/* <div>{(touched && error) &&
-                                                    <div style={{ 'fontSize': '12px', 'color': 'rgb(244, 67, 54)' }}>Este campo é de preenchimento obrigatório</div>}
-                                                </div> */}
-                                                {/* <FieldFeedbacks for="form_visit_type_id">
+                                                <FieldFeedbacks for="form_visit_type_id">
                                                     <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                                </FieldFeedbacks> */}
+                                                </FieldFeedbacks>
                                             </FormGroup>
                                         </Col>
 
                                         <Col md="4">
                                             <FormGroup for="form_action_id">
-                                                <label>Ação</label>
+                                                <FormControlLabel htmlFor="form_action_id">Ação</FormControlLabel>
                                                 <Select
                                                     name="form_action_id"
                                                     id="form_action_id"
@@ -478,14 +475,11 @@ class SchoolEventList extends Component {
                                                     onChange={this.handleChangeAction}
                                                     options={actions}
                                                     placeholder="Selecione..."
-                                                    // errorText={touched && error}
+                                                    required
                                                 />
-                                                {/* <div>{(touched && error) &&
-                                                    <div style={{ 'fontSize': '12px', 'color': 'rgb(244, 67, 54)' }}>Este campo é de preenchimento obrigatório</div>}
-                                                </div> */}
-                                                {/* <FieldFeedbacks for="form_action_id">
+                                                <FieldFeedbacks for="form_action_id">
                                                     <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                                </FieldFeedbacks> */}
+                                                </FieldFeedbacks>
                                             </FormGroup>
                                         </Col>
                                     </Row>
@@ -494,8 +488,8 @@ class SchoolEventList extends Component {
                                         <Col md="12">
                                             <FormGroup for="form_observations">
                                                 <FormControlLabel htmlFor="form_observations">Observações</FormControlLabel>
-                                                <FormControlInput
-                                                    type="textarea"
+                                                <textarea
+                                                    className="form-control"
                                                     rows="5"
                                                     id="form_observations"
                                                     name="form_observations"

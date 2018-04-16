@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import axios from '../../../app/common/axios';
 
+import { RingLoader } from 'react-spinners';
+
 import { Card, CardHeader, CardFooter, CardBody, CardTitle, CardText, Row, Col, Button, Label, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
@@ -34,6 +36,7 @@ export default class SchoolRegister extends Component {
             submitButtonDisabled: false,
             saved: false,
             selectedOption: '',
+            ringLoad: false,
 
             id: this.props.schoolId,
             school_types: [],
@@ -88,7 +91,7 @@ export default class SchoolRegister extends Component {
                     let dados = response.data.data;
                     dados.map(item => {
                         item['value'] = item.id,
-                            item['label'] = item.name
+                        item['label'] = item.name
                     });
                     this.setState({ [item.stateArray]: dados });
                 })
@@ -101,6 +104,7 @@ export default class SchoolRegister extends Component {
     }
 
     componentWillMount() {
+        this.setState({ ringLoad: true });
         if (this.state.id !== undefined) {
             axios.get(`${apiPost}/${this.state.id}`)
                 .then(response => {
@@ -127,7 +131,9 @@ export default class SchoolRegister extends Component {
                         email: dados.email || '',
                         chain_id: dados.chain_id || '0',
                         localization_type_id: dados.localization_type_id || '0',
-                        maintainer: dados.maintainer || ''
+                        maintainer: dados.maintainer || '',
+
+                        ringLoad: false
                     });
                 })
                 .catch(err => console.log(4, err));
@@ -303,6 +309,12 @@ export default class SchoolRegister extends Component {
 
         return (
             <div>
+                
+                <RingLoader
+                    color={'#123abc'}
+                    loading={this.state.ringLoad}
+                />
+                
                 {this.state.back_error !== '' &&
                     <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                 }
