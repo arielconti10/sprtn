@@ -21,7 +21,8 @@ export const formatDateToAmerican=(date_brazilian)=>{
  */
 export const formatDateToBrazilian=(date_american)=>{
     let date_brazilian = "";
-    if (date_american !== undefined && date_american.indexOf("-") !== -1) {
+    
+    if (date_american !== undefined && date_american !== null && date_american.indexOf("-") !== -1) {
         let date_explode = date_american.split("-");
         date_brazilian = `${date_explode[2]}/${date_explode[1]}/${date_explode[0]}`;
     }

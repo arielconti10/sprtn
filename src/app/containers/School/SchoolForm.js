@@ -39,7 +39,6 @@ class SchoolForm extends Component {
         axios.get(`school/${this.state.schoolId}`)
             .then(response => {
                 const dados = response.data.data;
-                console.log(dados);
                 this.setState({
                     schoolName: dados.name, 
                     total_students: dados.total_students || '0',
@@ -54,14 +53,44 @@ class SchoolForm extends Component {
             .catch(err => console.log(err));
     }
 
-    toggle(tab) {
-        let contacts_tab = this.state.contacts;
-        this.contacts_global = contacts_tab;
-    
+    componentWillUpdate(nextProps, nextState) {
+        // axios.get(`school/${this.state.schoolId}`)
+        //     .then(response => {
+        //         const dados = response.data.data;
+        //         this.setState({
+        //             schoolName: dados.name, 
+        //             total_students: dados.total_students || '0',
+        //             students: dados.students || [],                  
+        //             contacts: dados.contacts || [],
+        //             active: dados.deleted_at === null ? true : false,
+        //             schoolCodeTotvs: dados.school_code_totvs,
+        //             subsidiaryId: dados.subsidiary_id,
+        //             sectorId: dados.sector_id
+        //         });
+        //     })
+        //     .catch(err => console.log(err));
+    }
+
+    toggle(tab) {    
         if (this.state.activeTab !== tab) {
+            axios.get(`school/${this.state.schoolId}`)
+            .then(response => {
+                const dados = response.data.data;
+                this.setState({
+                    schoolName: dados.name, 
+                    total_students: dados.total_students || '0',
+                    students: dados.students || [],                  
+                    contacts: dados.contacts || [],
+                    active: dados.deleted_at === null ? true : false,
+                    schoolCodeTotvs: dados.school_code_totvs,
+                    subsidiaryId: dados.subsidiary_id,
+                    sectorId: dados.sector_id
+                });
+            })
+            .catch(err => console.log(err));
+            
             this.setState({
                 activeTab: tab,
-                contacts: this.contacts_global
             });
         }
     }

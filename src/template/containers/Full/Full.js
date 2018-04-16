@@ -26,6 +26,7 @@ import Congregations from '../../../app/containers/Congregation/Congregations';
 import Chains from '../../../app/containers/Chain/Chains';
 import SchoolTypes from '../../../app/containers/SchoolType/SchoolTypes';
 import States from '../../../app/containers/State/States';
+import Levels from '../../../app/containers/Level/Levels';
 
 import Roles from '../../../app/containers/Role/Roles';
 import Rules from '../../../app/containers/Rule/Rules';
@@ -61,9 +62,11 @@ class Full extends Component {
                                 <Route path="/cadastro/disciplinas" name="Disciplinas" component={Disciplines}/>
                                 <Route path="/cadastro/tipos-localizacao" name="Tipos de Localizaçāo" component={LocalizationTypes}/>
                                 <Route path="/cadastro/perfis" name="Perfis" component={Profiles}/>
+                                <Route path="/cadastro/perfis" name="Níveis" component={Levels}/>
                                 <Route path="/cadastro/contatos" name="Contatos" component={Contacts}/>
                                 <Route path="/cadastro/acoes" name="Acoes" component={Actions}/>
                                 <Route path="/cadastro/eventos" name="Eventos" component={Events}/>
+                                <Route path="/cadastro/niveis" name="Níveis" component={Levels}/>
                                 <Route path="/cadastro/turnos" name="Turnos" component={Shifts}/>
                                 <Route path="/cadastro/congregacoes" name="Congregações" component={Congregations}/>
                                 <Route path="/cadastro/redes" name="Redes" component={Chains}/>

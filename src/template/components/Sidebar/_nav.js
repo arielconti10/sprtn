@@ -58,6 +58,11 @@ export default {
             icon: 'fa fa-caret-right'
         },
         {
+            name: 'Níveis',
+            url: '/cadastro/niveis',
+            icon: 'fa fa-caret-right'
+        },
+        {
             name: 'Perfis',
             url: '/cadastro/perfis',
             icon: 'fa fa-caret-right'
