@@ -313,6 +313,7 @@ export default class SchoolRegister extends Component {
                 <RingLoader
                     color={'#123abc'}
                     loading={this.state.ringLoad}
+                    margin='50px'
                 />
                 
                 {this.state.back_error !== '' &&

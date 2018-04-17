@@ -81,7 +81,10 @@ class SchoolStudentList extends Component {
     handleChangeLevel = (selectedOption) => {
         const values = this.state;
         values.form_level_id = selectedOption.value;
+        
         this.setState({ values });
+        
+        this.showGrade(selectedOption.value);
     }
 
     handleChangeShift = (selectedOption) => {
@@ -149,7 +152,7 @@ class SchoolStudentList extends Component {
             collapse: true,
             new: false
         });
-
+        
         this.showGrade(level_id);
     }
 
@@ -289,12 +292,16 @@ class SchoolStudentList extends Component {
     submitForm(event) {
         event.preventDefault();
 
+        // const { school_id, form_level_id, form_first_grade, form_second_grade, form_third_grade, form_forth_grade, form_fifth_grade } = this.state;
         const { school_id, form_level_id, form_shift_id, form_first_grade, form_second_grade, form_third_grade, form_forth_grade, form_fifth_grade } = this.state;
+        
+        // let form_shift_id = (this.state.form_shift_id && this.state.form_shift_id > 0) ? parseInt(this.state.form_shift_id) : null;
 
+        console.log('form_shift_id', form_shift_id)
         axios.post(`${apiSpartan}`, {
             'school_id': parseInt(school_id),
             'level_id': parseInt(form_level_id),
-            'shift_id': parseInt(form_shift_id),
+            'shift_id': form_shift_id,
             'first_grade': parseInt(form_first_grade),
             'second_grade': parseInt(form_second_grade),
             'third_grade': parseInt(form_third_grade),
@@ -315,10 +322,11 @@ class SchoolStudentList extends Component {
         event.preventDefault();
         const { id, school_id, form_level_id, form_shift_id, form_first_grade, form_second_grade, form_third_grade, form_forth_grade, form_fifth_grade } = this.state;
 
+        console.log('form_shift_id', form_shift_id)
         axios.put(`${apiSpartan}/${id}`, {
             'school_id': parseInt(school_id),
             'level_id': parseInt(form_level_id),
-            'shift_id': parseInt(form_shift_id),
+            'shift_id': parseInt(form_shift_id) || 0,
             'first_grade': parseInt(form_first_grade),
             'second_grade': parseInt(form_second_grade),
             'third_grade': parseInt(form_third_grade),

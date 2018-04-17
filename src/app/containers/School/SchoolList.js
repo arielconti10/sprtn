@@ -31,8 +31,8 @@ class SchoolList extends Component {
             { Header: "Nome", accessor: "name", sortable: true, filterable: true, maxWidth: 600, headerClassName: 'text-left' },
             { Header: "CEP", accessor: "zip_code", filterable: true, width: 100, headerClassName: 'text-left' },
             {
-                Header: "Tipo", accessor: "school_type", filterable: true, width: 100, headerClassName: 'text-left',
-                Cell: props => <span className={`escola-${props.value.identify.toLowerCase()}`}>{props.value.name}</span>
+                Header: "Identificação", accessor: "school_type", filterable: true, width: 120, headerClassName: 'text-left',
+                Cell: props => <span className={`escola-${props.value.identify.toLowerCase()}`}>{props.value.identify}</span>
             },
             { Header: 'Perfil', accessor: 'profile.name', sortable: true, filterable: true, width: 100, headerClassName: 'text-left' }
         ];
@@ -94,7 +94,10 @@ class SchoolList extends Component {
             console.log("deleted_at != 'all'", deleted_at);*/
 
         filtered.map(function (item) {
-            baseURL += `&filter[${item.id}]=${item.value}`;
+            console.log('item', item);
+            let id = item.id == 'school_type' ? `${item.id}.identify` : item.id;
+            let value = item.value;
+            baseURL += `&filter[${id}]=${value}`;
         })
 
         for (let i = 0; i < sorted.length; i++) {
@@ -148,7 +151,7 @@ class SchoolList extends Component {
                                 <b style={{ marginLeft: '20px' }}>UF:</b> {school.state.abbrev}
                                 <b style={{ marginLeft: '20px' }}>CEP:</b> {school.zip_code}
                                 <b style={{ marginLeft: '20px' }}>TOTVS:</b> {school.school_code_totvs}
-
+                                <b style={{ marginLeft: '20px' }}>Tipo:</b> {school.school_type.name}
                             </div>
                         );
                     }}
