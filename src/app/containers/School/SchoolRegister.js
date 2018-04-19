@@ -26,6 +26,14 @@ const apis = [
     { stateArray: 'localization_types', api: 'localization' }
 ];
 
+const selectsValidade = [
+    { name: 'school_type_id' },
+    { name: 'subsidiary_id' },
+    { name: 'sector_id'},
+    { name: 'state_id'},
+    { name: 'localization_type_id'}
+];
+
 export default class SchoolRegister extends Component {
     constructor(props) {
         super(props);
@@ -67,7 +75,13 @@ export default class SchoolRegister extends Component {
             chain_id: '0',
             localization_types: [],
             localization_type_id: '0',
-            maintainer: ''
+            maintainer: '',
+
+            valid_select_school_type_id: 1,
+            valid_select_subsidiary_id: 1,
+            valid_select_sector_id: 1,
+            valid_select_state_id: 1,
+            valid_select_localization_type_id: 1
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -97,10 +111,6 @@ export default class SchoolRegister extends Component {
                 })
                 .catch(err => console.log(err));
         });
-    }
-
-    showToast() {
-        Toast('toast message');
     }
 
     componentWillMount() {
@@ -183,9 +193,6 @@ export default class SchoolRegister extends Component {
             alert('Dados salvos com sucesso!');
         }).catch(function (error) {
             console.log('submitForm', error);
-            //let data_error = error.response.data.errors;
-            //let filterId = Object.keys(data_error).toString();
-            //this.setState({ back_error: data_error[filterId] });
 
             alert(error);
             this.setState({ back_error: error || '' });
@@ -202,8 +209,8 @@ export default class SchoolRegister extends Component {
             'subsidiary_id': this.state.subsidiary_id,
             'sector_id': this.state.sector_id,
             'school_code_totvs': this.state.school_code_totvs,
-            'profile_id': this.state.profile_id,
-            'congregation_id': this.state.congregation_id,
+            'profile_id': this.state.profile_id < 1 ? null : this.state.profile_id,
+            'congregation_id': this.state.congregation_id < 1 ? null : this.state.congregation_id,
             'name': this.state.name,
             'trading_name': this.state.trading_name,
             'cnpj': this.state.cnpj,
@@ -216,26 +223,19 @@ export default class SchoolRegister extends Component {
             'state_id': this.state.state_id,
             'phone': this.state.phone,
             'email': this.state.email,
-            'chain_id': this.state.chain_id,
+            'chain_id': this.state.chain_id < 1 ? null : this.state.chain_id,
             'localization_type_id': this.state.localization_type_id,
-            'maintainer': this.state.maintainer
+            'maintainer': !this.state.maintainer ? ' ' : this.state.maintainer
         }).then(res => {
-            console.log(res, res.data.data);
             this.setState({
                 saved: true
             });
             alert('Dados salvos com sucesso!');
-            this.showToast;
-            //this.createNotification('success', 'Dados gravados com sucesso!');
         }).catch(function (error) {
             console.log('updateForm', error);
-            //let data_error = error.response.data.errors;
-            //let filterId = Object.keys(data_error).toString();
-            //this.setState({ back_error: data_error[filterId] });
+            
             alert(error);
             this.setState({ back_error: error || '' });
-
-            //this.createNotification('error', this.state.back_error);
         })
     }
 
@@ -245,6 +245,24 @@ export default class SchoolRegister extends Component {
         this.form.validateFields();
 
         this.setState({ submitButtonDisabled: !this.form.isValid() });
+
+        // Validate selects
+        let stopSubmit = false;
+        selectsValidade.map(select => {
+            let objState = `valid_select_${select.name}`;
+            let objSelect = this.state[select.name];
+            
+            if (objSelect === undefined || objSelect == 0) {
+                this.setState({ [objState]: 0, submit_button_disabled: true });
+                stopSubmit = true;
+            } else {
+                this.setState({ [objState]: 1 });
+            }
+        });
+
+        if(stopSubmit){
+            return;
+        }        
 
         if (this.form.isValid()) {
             if (this.state.id !== undefined) {
@@ -256,18 +274,24 @@ export default class SchoolRegister extends Component {
     }
 
     handleChangeType = (selectedOption) => {
+        this.setState({ valid_select_school_type_id: 1, submit_button_disabled: false });
+
         const values = this.state;
         values.school_type_id = selectedOption.value;
         this.setState({ values });
     }
 
     handleChangeSubsidiary = (selectedOption) => {
+        this.setState({ valid_select_subsidiary_id: 1, submit_button_disabled: false });
+
         const values = this.state;
         values.subsidiary_id = selectedOption.value;
         this.setState({ values });
     }
 
     handleChangeSector = (selectedOption) => {
+        this.setState({ valid_select_sector_id: 1, submit_button_disabled: false });
+        
         const values = this.state;
         values.sector_id = selectedOption.value;
         this.setState({ values });
@@ -286,6 +310,8 @@ export default class SchoolRegister extends Component {
     }
 
     handleChangeState = (selectedOption) => {
+        this.setState({ valid_select_state_id: 1, submit_button_disabled: false });
+
         const values = this.state;
         values.state_id = selectedOption.value;
         this.setState({ values });
@@ -298,6 +324,8 @@ export default class SchoolRegister extends Component {
     }
 
     handleChangeLocalization = (selectedOption) => {
+        this.setState({ valid_select_localization_type_id: 1, submit_button_disabled: false });
+
         const values = this.state;
         values.localization_type_id = selectedOption.value;
         this.setState({ values });
@@ -325,7 +353,7 @@ export default class SchoolRegister extends Component {
                     <Row>
                         <Col md="3">
                             <FormGroup for="school_type_id">
-                                <label>Tipo</label>
+                                <label>Tipo <span className="text-danger"><strong>*</strong></span></label>
                                 <Select
                                     name="school_type_id"
                                     id="school_type_id"
@@ -334,29 +362,15 @@ export default class SchoolRegister extends Component {
                                     onChange={this.handleChangeType}
                                     options={school_types}
                                 />
-                                {/* <select className="form-control" onChange={this.handleChange} disabled={this.state.viewMode}
-                                    id="school_type_id" name="school_type_id" value={this.state.school_type_id}>
-                                    <option key="0" value="0" >Selecione um valor</option>
-                                    {
-                                        school_types.map(item => {
-                                            let checked = item.id == school_type_id ? "checked" : "";
-                                            return (
-                                                <option key={item.id} value={item.id}>
-                                                    {item.name}
-                                                </option>
-                                            )
-                                        })
-                                    }
-                                </select> */}
-                                <FieldFeedbacks for="school_type_id">
-                                    <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
+                                {this.state.valid_select_school_type_id == 0 &&
+                                    <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
+                                }
                             </FormGroup>
                         </Col>
 
                         <Col md="2">
                             <FormGroup for="subsidiary_id">
-                                <label>Filial</label>
+                                <label>Filial <span className="text-danger"><strong>*</strong></span></label>
                                 <Select
                                     name="subsidiary_id"
                                     id="subsidiary_id"
@@ -365,29 +379,15 @@ export default class SchoolRegister extends Component {
                                     onChange={this.handleChangeSubsidiary}
                                     options={subsidiaries}
                                 />
-                                {/* <select className="form-control" onChange={this.handleChange} disabled={this.state.viewMode}
-                                    id="subsidiary_id" name="subsidiary_id" value={this.state.subsidiary_id}>
-                                    <option key="0" value="0" >Selecione um valor</option>
-                                    {
-                                        subsidiaries.map(item => {
-                                            let checked = item.id == subsidiary_id ? "checked" : "";
-                                            return (
-                                                <option key={item.id} value={item.id}>
-                                                    {item.name}
-                                                </option>
-                                            )
-                                        })
-                                    }
-                                </select> */}
-                                <FieldFeedbacks for="subsidiary_id">
-                                    <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
+                                {this.state.valid_select_subsidiary_id == 0 &&
+                                    <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
+                                }
                             </FormGroup>
                         </Col>
 
                         <Col md="2">
                             <FormGroup for="sector_id">
-                                <label>Setor</label>
+                                <label>Setor <span className="text-danger"><strong>*</strong></span></label>
                                 <Select
                                     name="sector_id"
                                     id="sector_id"
@@ -396,23 +396,9 @@ export default class SchoolRegister extends Component {
                                     onChange={this.handleChangeSector}
                                     options={sectors}
                                 />
-                                {/* <select className="form-control" onChange={this.handleChange} disabled={this.state.viewMode}
-                                    id="sector_id" name="sector_id" value={this.state.sector_id}>
-                                    <option key="0" value="0" >Selecione um valor</option>
-                                    {
-                                        sectors.map(item => {
-                                            let checked = item.id == sector_id ? "checked" : "";
-                                            return (
-                                                <option key={item.id} value={item.id}>
-                                                    {item.name}
-                                                </option>
-                                            )
-                                        })
-                                    }
-                                </select> */}
-                                <FieldFeedbacks for="sector_id">
-                                    <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
+                                {this.state.valid_select_sector_id == 0 &&
+                                    <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
+                                }
                             </FormGroup>
                         </Col>
 
@@ -420,11 +406,7 @@ export default class SchoolRegister extends Component {
                             <FormGroup for="school_code_totvs">
                                 <FormControlLabel htmlFor="school_code_totvs">Código escola</FormControlLabel>
                                 <FormControlInput type="text" id="school_code_totvs" name="school_code_totvs" readOnly={true}
-                                    value={this.state.school_code_totvs} onChange={this.handleChange}
-                                    required />
-                                <FieldFeedbacks for="school_code_totvs">
-                                    <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
+                                    value={this.state.school_code_totvs} />
                             </FormGroup>
                         </Col>
 
@@ -439,23 +421,6 @@ export default class SchoolRegister extends Component {
                                     onChange={this.handleChangeProfile}
                                     options={profiles}
                                 />
-                                {/*<select className="form-control" onChange={this.handleChange} disabled={this.state.viewMode}
-                                    id="profile_id" name="profile_id" value={this.state.profile_id}>
-                                    <option key="0" value="0" >Selecione um valor</option>
-                                    {
-                                        profiles.map(item => {
-                                            let checked = item.id == profile_id ? "checked" : "";
-                                            return (
-                                                <option key={item.id} value={item.id}>
-                                                    {item.name}
-                                                </option>
-                                            )
-                                        })
-                                    }
-                                </select>*/}
-                                <FieldFeedbacks for="profile_id">
-                                    <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
                             </FormGroup>
                         </Col>
                     </Row>
@@ -472,29 +437,12 @@ export default class SchoolRegister extends Component {
                                     onChange={this.handleChangeCongregation}
                                     options={congregations}
                                 />
-                                {/* <select className="form-control" onChange={this.handleChange} disabled={this.state.viewMode}
-                                    id="congregation_id" name="congregation_id" value={this.state.congregation_id}>
-                                    <option key="0" value="0" >Selecione um valor</option>
-                                    {
-                                        congregations.map(item => {
-                                            let checked = item.id == congregation_id ? "checked" : "";
-                                            return (
-                                                <option key={item.id} value={item.id}>
-                                                    {item.name}
-                                                </option>
-                                            )
-                                        })
-                                    }
-                                </select> */}
-                                <FieldFeedbacks for="congregation_id">
-                                    <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
                             </FormGroup>
                         </Col>
 
                         <Col md="5">
                             <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Instituição</FormControlLabel>
+                                <FormControlLabel htmlFor="name">Instituição <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name" readOnly={this.state.viewMode}
                                     value={this.state.name} onChange={this.handleChange}
                                     required />
@@ -506,7 +454,7 @@ export default class SchoolRegister extends Component {
 
                         <Col md="3">
                             <FormGroup for="trading_name">
-                                <FormControlLabel htmlFor="trading_name">Nome fantasia</FormControlLabel>
+                                <FormControlLabel htmlFor="trading_name">Nome fantasia <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                 <FormControlInput type="text" id="trading_name" name="trading_name" readOnly={this.state.viewMode}
                                     value={this.state.trading_name} onChange={this.handleChange}
                                     required />
@@ -520,7 +468,7 @@ export default class SchoolRegister extends Component {
                     <Row>
                         <Col md="3">
                             <FormGroup for="cnpj">
-                                <FormControlLabel htmlFor="cnpj">CNPJ</FormControlLabel>
+                                <FormControlLabel htmlFor="cnpj">CNPJ <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                 <MaskedInput className="form-control" mask="11.111.111/1111-11" type="text" id="cnpj" name="cnpj" readOnly={this.state.viewMode}
                                     value={this.state.cnpj} onChange={this.handleChange} required />
                                 <FieldFeedbacks for="cnpj">
@@ -531,7 +479,7 @@ export default class SchoolRegister extends Component {
 
                         <Col md="2">
                             <FormGroup for="mec_inep_code">
-                                <FormControlLabel htmlFor="mec_inep_code">Código MEC/INEP</FormControlLabel>
+                                <FormControlLabel htmlFor="mec_inep_code">Código MEC/INEP <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                 <MaskedInput className="form-control" mask="11111111" type="text" id="mec_inep_code" name="mec_inep_code" readOnly={this.state.viewMode}
                                     value={this.state.mec_inep_code} onChange={this.handleChange}
                                     required />
@@ -543,7 +491,7 @@ export default class SchoolRegister extends Component {
 
                         <Col md="2">
                             <FormGroup for="zip_code">
-                                <FormControlLabel htmlFor="zip_code">CEP</FormControlLabel>
+                                <FormControlLabel htmlFor="zip_code">CEP <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                 <MaskedInput className="form-control" mask="11111-111" type="text" id="zip_code" name="zip_code" readOnly={this.state.viewMode}
                                     value={this.state.zip_code} onChange={this.handleChange}
                                     required />
@@ -555,7 +503,7 @@ export default class SchoolRegister extends Component {
 
                         <Col md="2">
                             <FormGroup for="phone">
-                                <FormControlLabel htmlFor="phone">Telefone</FormControlLabel>
+                                <FormControlLabel htmlFor="phone">Telefone <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                 <MaskedInput className="form-control" mask="(11) 1111-11111" type="text" id="phone" name="phone" readOnly={this.state.viewMode}
                                     value={this.state.phone} onChange={this.handleChange}
                                     required />
@@ -569,11 +517,7 @@ export default class SchoolRegister extends Component {
                             <FormGroup for="email">
                                 <FormControlLabel htmlFor="email">E-mail</FormControlLabel>
                                 <FormControlInput type="text" id="email" name="email" readOnly={this.state.viewMode}
-                                    value={this.state.email} onChange={this.handleChange}
-                                    required />
-                                <FieldFeedbacks for="email">
-                                    <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
+                                    value={this.state.email} onChange={this.handleChange} />
                             </FormGroup>
                         </Col>
                     </Row>
@@ -581,7 +525,7 @@ export default class SchoolRegister extends Component {
                     <Row>
                         <Col md="4">
                             <FormGroup for="address">
-                                <FormControlLabel htmlFor="address">Endereço</FormControlLabel>
+                                <FormControlLabel htmlFor="address">Endereço <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                 <FormControlInput type="text" id="address" name="address" readOnly={this.state.viewMode}
                                     value={this.state.address} onChange={this.handleChange}
                                     required />
@@ -601,7 +545,7 @@ export default class SchoolRegister extends Component {
 
                         <Col md="3">
                             <FormGroup for="neighborhood">
-                                <FormControlLabel htmlFor="neighborhood">Bairro</FormControlLabel>
+                                <FormControlLabel htmlFor="neighborhood">Bairro <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                 <FormControlInput type="text" id="neighborhood" name="neighborhood" readOnly={this.state.viewMode}
                                     value={this.state.neighborhood} onChange={this.handleChange}
                                     required />
@@ -613,7 +557,7 @@ export default class SchoolRegister extends Component {
 
                         <Col md="4">
                             <FormGroup for="city">
-                                <FormControlLabel htmlFor="city">Cidade</FormControlLabel>
+                                <FormControlLabel htmlFor="city">Cidade <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                 <FormControlInput type="text" id="city" name="city" readOnly={this.state.viewMode}
                                     value={this.state.city} onChange={this.handleChange}
                                     required />
@@ -627,7 +571,7 @@ export default class SchoolRegister extends Component {
                     <Row>
                         <Col md="3">
                             <FormGroup for="state_id">
-                                <label>Estado</label>
+                                <label>Estado <span className="text-danger"><strong>*</strong></span></label>
                                 <Select
                                     name="state_id"
                                     id="state_id"
@@ -636,23 +580,9 @@ export default class SchoolRegister extends Component {
                                     onChange={this.handleChangeState}
                                     options={states}
                                 />
-                                {/* <select className="form-control" onChange={this.handleChange} disabled={this.state.viewMode}
-                                    id="state_id" name="state_id" value={this.state.state_id}>
-                                    <option key="0" value="0" >Selecione um valor</option>
-                                    {
-                                        states.map(item => {
-                                            let checked = item.id == state_id ? "checked" : "";
-                                            return (
-                                                <option key={item.id} value={item.id}>
-                                                    {item.name}
-                                                </option>
-                                            )
-                                        })
-                                    }
-                                </select> */}
-                                <FieldFeedbacks for="state_id">
-                                    <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
+                                {this.state.valid_select_state_id == 0 &&
+                                    <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
+                                }
                             </FormGroup>
                         </Col>
 
@@ -667,29 +597,12 @@ export default class SchoolRegister extends Component {
                                     onChange={this.handleChangeChain}
                                     options={chains}
                                 />
-                                {/* <select className="form-control" onChange={this.handleChange} disabled={this.state.viewMode}
-                                    id="chain_id" name="chain_id" value={this.state.chain_id}>
-                                    <option key="0" value="0" >Selecione um valor</option>
-                                    {
-                                        chains.map(item => {
-                                            let checked = item.id == chain_id ? "checked" : "";
-                                            return (
-                                                <option key={item.id} value={item.id}>
-                                                    {item.name}
-                                                </option>
-                                            )
-                                        })
-                                    }
-                                </select> */}
-                                <FieldFeedbacks for="chain_id">
-                                    <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
                             </FormGroup>
                         </Col>
 
                         <Col md="3">
                             <FormGroup for="localization_type_id">
-                                <label>Tipo de localização</label>
+                                <label>Tipo de localização <span className="text-danger"><strong>*</strong></span></label>
                                 <Select
                                     name="localization_type_id"
                                     id="localization_type_id"
@@ -698,23 +611,9 @@ export default class SchoolRegister extends Component {
                                     onChange={this.handleChangeLocalization}
                                     options={localization_types}
                                 />
-                                {/* <select className="form-control" onChange={this.handleChange} disabled={this.state.viewMode}
-                                    id="localization_type_id" name="localization_type_id" value={this.state.localization_type_id}>
-                                    <option key="0" value="0" >Selecione um valor</option>
-                                    {
-                                        localization_types.map(item => {
-                                            let checked = item.id == localization_type_id ? "checked" : "";
-                                            return (
-                                                <option key={item.id} value={item.id}>
-                                                    {item.name}
-                                                </option>
-                                            )
-                                        })
-                                    }
-                                </select> */}
-                                <FieldFeedbacks for="localization_type_id">
-                                    <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
+                                {this.state.valid_select_localization_type_id == 0 &&
+                                    <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
+                                }
                             </FormGroup>
                         </Col>
 
@@ -722,10 +621,7 @@ export default class SchoolRegister extends Component {
                             <FormGroup for="maintainer">
                                 <FormControlLabel htmlFor="maintainer">Mantenedora</FormControlLabel>
                                 <FormControlInput type="text" id="maintainer" name="maintainer" readOnly={this.state.viewMode}
-                                    value={this.state.maintainer} onChange={this.handleChange} required />
-                                <FieldFeedbacks for="maintainer">
-                                    <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
+                                    value={this.state.maintainer} onChange={this.handleChange} />
                             </FormGroup>
                         </Col>
                     </Row>

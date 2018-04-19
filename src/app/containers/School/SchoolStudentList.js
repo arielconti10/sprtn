@@ -369,78 +369,6 @@ class SchoolStudentList extends Component {
     }
 
     componentDidMount() {
-        // const { data } = this.state;
-        // console.log('data', data)
-        // let col = [
-        //     { Header: "Nível", accessor: "level.name", headerClassName: 'text-left', width: 180 },
-        //     { Header: "Turno", accessor: "shift.name", headerClassName: 'text-left' },
-        //     { Header: "1ª grade", accessor: "first_grade", headerClassName: 'text-left' },
-        //     { Header: "2ª grade", accessor: "second_grade", headerClassName: 'text-left' },
-        //     { Header: "3ª grade", accessor: "third_grade", headerClassName: 'text-left' },
-        //     { Header: "4ª grade", accessor: "forth_grade", headerClassName: 'text-left' },
-        //     { Header: "5ª grade", accessor: "fifth_grade", headerClassName: 'text-left' },
-        //     { Header: "Total", accessor: "total", headerClassName: 'text-left', 
-        //         Footer: (
-        //             <span>
-        //             <strong>TOTAL Geral:</strong>{" "}
-        //             {data.reduce( function( prevVal, elem ) {
-        //                 return prevVal + elem.total;
-        //             }, 0 )}
-        //             </span>
-        //         ) 
-        //     }
-        // ];
-
-        // col.push(
-        //     {
-        //         Header: "Status",
-        //         accessor: "",
-        //         width: 60,
-        //         headerClassName: 'text-left',
-        //         sortable: false,
-        //         Cell: (element) => (
-        //             !element.value.deleted_at ?
-        //                 <div><span>Ativo</span></div>
-        //                 :
-        //                 <div><span>Inativo</span></div>
-        //         )/*,                
-        //             filterable: true, 
-        //             Filter: ({ filter, onChange }) => (
-                    
-        //                 <select
-        //                     onChange={event => this.onFetchData(null, null, event.target.value, { filter, onChange })}
-        //                     style={{ width: "100%" }}
-        //                 >
-        //                     <option value="all">Todos</option>
-        //                     <option value="false">Ativo</option>
-        //                     <option value="true">Inativo</option>
-        //                 </select>
-        //             )*/
-        //     }, {
-        //         Header: "Ações", accessor: "", sortable: false, width: 90, headerClassName: 'text-left', Cell: (element) => (
-        //             !element.value.deleted_at ?
-        //                 <div>
-        //                     <button className='btn btn-primary btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickEdit(element)}>
-        //                         <i className='fa fa-pencil'></i>
-        //                     </button>
-
-        //                     <button className='btn btn-danger btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickDelete(element)}>
-        //                         <i className='fa fa-ban'></i>
-        //                     </button>
-        //                 </div>
-        //                 :
-        //                 <div>
-        //                     <button className='btn btn-success btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickActive(element)}>
-        //                         <i className='fa fa-check-circle'></i>
-        //                     </button>
-        //                 </div>
-
-        //         )
-        //     }
-        // )
-
-        // this.setState({ columns: col });
-
         apis.map(item => {
             axios.get(`${item.api}`)
                 .then(response => {
@@ -716,9 +644,9 @@ class SchoolStudentList extends Component {
                                         sortable: false,
                                         Cell: (element) => (
                                             !element.value.deleted_at ?
-                                            <div><span className="alert-success grid-record-status">Ativo</span></div>
-                                            :
-                                            <div><span className="alert-danger grid-record-status">Inativo</span></div>
+                                                <div><span className="alert-success grid-record-status">Ativo</span></div>
+                                                :
+                                                <div><span className="alert-danger grid-record-status">Inativo</span></div>
                                         )/*,                
                                             filterable: true, 
                                             Filter: ({ filter, onChange }) => (
@@ -744,13 +672,12 @@ class SchoolStudentList extends Component {
                                                         <i className='fa fa-ban'></i>
                                                     </button>
                                                 </div>
-                                                :
+                                            :
                                                 <div>
                                                     <button className='btn btn-success btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickActive(element)}>
                                                         <i className='fa fa-check-circle'></i>
                                                     </button>
-                                                </div>
-                        
+                                                </div>                                            
                                         )
                                     }
                                 ]}
