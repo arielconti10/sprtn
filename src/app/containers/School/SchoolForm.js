@@ -24,6 +24,7 @@ class SchoolForm extends Component {
         this.state = {
             schoolName: '',
             contacts: [],
+            contacts_initial: [],
             schoolId: this.props.match.params.id,
             students: [],
             total_students: '0',
@@ -45,12 +46,16 @@ class SchoolForm extends Component {
                     total_students: dados.total_students || '0',
                     students: dados.students || [],                  
                     contacts: dados.contacts || [],
+                    contacts_initial: dados.contacts || [],
                     active: dados.deleted_at === null ? true : false,
                     schoolCodeTotvs: dados.school_code_totvs,
                     subsidiaryId: dados.subsidiary_id,
                     sectorId: dados.sector_id,
                     school_type_identify: dados.school_type.identify.toLowerCase()
                 });
+
+                console.log("WILL MOUNT - INICIAL!");
+                console.log(this.state.contacts);
             })
             .catch(err => console.log(err));
     }
