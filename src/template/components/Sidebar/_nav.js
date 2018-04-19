@@ -38,11 +38,6 @@ export default {
             icon: 'fa fa-caret-right'
         },
         {
-            name: 'Contatos',
-            url: '/cadastro/contatos',
-            icon: 'fa fa-caret-right'
-        },
-        {
             name: 'Disciplinas',
             url: '/cadastro/disciplinas',
             icon: 'fa fa-caret-right'
@@ -60,6 +55,11 @@ export default {
         {
             name: 'Filiais',
             url: '/cadastro/filiais',
+            icon: 'fa fa-caret-right'
+        },
+        {
+            name: 'Níveis',
+            url: '/cadastro/niveis',
             icon: 'fa fa-caret-right'
         },
         {
@@ -83,7 +83,7 @@ export default {
             icon: 'fa fa-caret-right'
         },
         {
-          name: 'Tipos de Localizaçāo',
+          name: 'Localizações',
           url: '/cadastro/tipos-localizacao',
           icon: 'fa fa-caret-right'
         },
@@ -93,6 +93,28 @@ export default {
             icon: 'fa fa-caret-right'
         }
       ]
+    },
+    {
+        name: 'Configuração',
+        url: '/config',
+        icon: 'fa fa-book',
+        children: [
+            {
+                name: 'Regras',
+                url: '/config/regras',
+                icon: 'fa fa-caret-right'
+            },
+            {
+                name: 'Permissões',
+                url: '/config/permissoes',
+                icon: 'fa fa-caret-right'
+            },
+            {
+                name: 'Usuários',
+                url: '/config/usuarios',
+                icon: 'fa fa-caret-right'
+            },
+        ]
     }
   ]
 };

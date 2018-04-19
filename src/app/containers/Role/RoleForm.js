@@ -7,13 +7,14 @@ import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 're
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
-const apiPost = 'subsidiary';
+const apiPost = 'role';
 
-class SubsidiaryForm extends Component {
+class RoleForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
             name: '',
+            code: '',
             active: true,       
             back_error: '',
             submitButtonDisabled: false,
@@ -31,8 +32,10 @@ class SubsidiaryForm extends Component {
                 .then(response => {
                     const dados = response.data.data;
 
+                    console.log(dados.deleted_at);
                     this.setState({ 
                         name: dados.name,
+                        code: dados.code,
                         active: dados.deleted_at === null ? true: false
                     });
                 })
@@ -54,8 +57,8 @@ class SubsidiaryForm extends Component {
     submitForm(event) {
         event.preventDefault();
         axios.post(`${apiPost}`, {
-            'code': this.state.name,
             'name': this.state.name,
+            'code': this.state.code,
             'active': this.state.active
         }).then(res => {
             this.setState({
@@ -74,12 +77,13 @@ class SubsidiaryForm extends Component {
 
         let data = {
             'name': this.state.name,
+            'code': this.state.code,
             'active': this.state.active
         }
 
         axios.put(`${apiPost}/${id}`, {
-            'code': this.state.name,
             'name': this.state.name,
+            'code': this.state.code,
             'active': this.state.active
         }).then(res => {
             this.setState({
@@ -111,11 +115,11 @@ class SubsidiaryForm extends Component {
     render() {
         let redirect = null;
         if (this.state.saved) {
-            redirect = <Redirect to="/cadastro/filiais" />;
+            redirect = <Redirect to="/cadastro/disciplinas" />;
         }
 
         let statusField = null;
-        if (this.props.match.params.id !== undefined) {
+        if (this.props.match.params.id != undefined) {
             statusField =
                 <div className="">
                     <div className="form-group form-inline">
@@ -135,7 +139,6 @@ class SubsidiaryForm extends Component {
         return (
             <Card>
                 {redirect}
-
                 <CardBody>
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
@@ -144,8 +147,20 @@ class SubsidiaryForm extends Component {
                         onSubmit={this.handleSubmit} noValidate>
                         
                         <div className="">
+                            <FormGroup for="code">
+                                <FormControlLabel htmlFor="code">Código da disciplina</FormControlLabel>
+                                <FormControlInput type="text" id="code" name="code"
+                                    value={this.state.code} onChange={this.handleChange}
+                                    required />
+                                <FieldFeedbacks for="code">
+                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                </FieldFeedbacks>
+                            </FormGroup>
+                        </div>
+
+                        <div className="">
                             <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Nome da filial</FormControlLabel>
+                                <FormControlLabel htmlFor="name">Nome da disciplina</FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
                                     required />
@@ -153,7 +168,7 @@ class SubsidiaryForm extends Component {
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
                                 </FieldFeedbacks>
                             </FormGroup>
-                        </div>
+                        </div>                       
                         
                         {statusField}     
 
@@ -167,4 +182,4 @@ class SubsidiaryForm extends Component {
     }
 }
 
-export default SubsidiaryForm;
+export default RoleForm;

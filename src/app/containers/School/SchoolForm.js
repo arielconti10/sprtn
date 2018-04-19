@@ -10,6 +10,7 @@ import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints'
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
 import SchoolRegister from './SchoolRegister'
+import SchoolConctactList from './SchoolContactList';
 import SchoolStudentIcon from './SchoolStudentIcon'
 import SchoolStudentList from './SchoolStudentList'
 import SchoolAdoptionList from './SchoolAdoptionList'
@@ -18,10 +19,11 @@ import SchoolEventList from './SchoolEventList'
 class SchoolForm extends Component {
     constructor(props) {
         super(props);
-
         this.toggle = this.toggle.bind(this);
+        this.contacts_global = [];
         this.state = {
             schoolName: '',
+            contacts: [],
             schoolId: this.props.match.params.id,
             students: [],
             total_students: '0',
@@ -38,11 +40,11 @@ class SchoolForm extends Component {
         axios.get(`school/${this.state.schoolId}`)
             .then(response => {
                 const dados = response.data.data;
-
                 this.setState({
                     schoolName: dados.name, 
                     total_students: dados.total_students || '0',
                     students: dados.students || [],                  
+                    contacts: dados.contacts || [],
                     active: dados.deleted_at === null ? true : false,
                     schoolCodeTotvs: dados.school_code_totvs,
                     subsidiaryId: dados.subsidiary_id,
@@ -51,18 +53,52 @@ class SchoolForm extends Component {
                 });
             })
             .catch(err => console.log(err));
-
     }
 
-    toggle(tab) {
+    componentWillUpdate(nextProps, nextState) {
+        // axios.get(`school/${this.state.schoolId}`)
+        //     .then(response => {
+        //         const dados = response.data.data;
+        //         this.setState({
+        //             schoolName: dados.name, 
+        //             total_students: dados.total_students || '0',
+        //             students: dados.students || [],                  
+        //             contacts: dados.contacts || [],
+        //             active: dados.deleted_at === null ? true : false,
+        //             schoolCodeTotvs: dados.school_code_totvs,
+        //             subsidiaryId: dados.subsidiary_id,
+        //             sectorId: dados.sector_id
+        //         });
+        //     })
+        //     .catch(err => console.log(err));
+    }
+
+    toggle(tab) {    
         if (this.state.activeTab !== tab) {
+            axios.get(`school/${this.state.schoolId}`)
+            .then(response => {
+                const dados = response.data.data;
+                this.setState({
+                    schoolName: dados.name, 
+                    total_students: dados.total_students || '0',
+                    students: dados.students || [],                  
+                    contacts: dados.contacts || [],
+                    active: dados.deleted_at === null ? true : false,
+                    schoolCodeTotvs: dados.school_code_totvs,
+                    subsidiaryId: dados.subsidiary_id,
+                    sectorId: dados.sector_id
+                });
+            })
+            .catch(err => console.log(err));
+            
             this.setState({
-                activeTab: tab
+                activeTab: tab,
             });
         }
     }
 
     render() {
+        // console.log(this.state.contacts);
         return (
             <div>
                 <h1 className="school-header"><i className="fa fa-building-o"></i> {this.state.schoolName} <SchoolStudentIcon numStudents={this.state.total_students} /></h1>
@@ -87,7 +123,7 @@ class SchoolForm extends Component {
                     <NavItem>
                         <NavLink
                             className={classnames({ active: this.state.activeTab === 'contatos' })}
-                            onClick={() => { this.toggle('contatos'); }}
+                            onClick={() => { this.toggle('contatos');  }}
                         >
                             Contatos
                             </NavLink>
@@ -128,14 +164,15 @@ class SchoolForm extends Component {
                     <TabPane tabId="cadastro">
                         <Row>
                             <Col sm="12">
-                                <SchoolRegister viewMode={false}  schoolId={this.state.schoolId} />
+                                <SchoolRegister viewMode={false} schoolId={this.state.schoolId} />
                             </Col>
                         </Row>
                     </TabPane>
                     <TabPane tabId="contatos">
+                       
                         <Row>
                             <Col sm="12">
-                                <h2>Contatos</h2>
+                                <SchoolConctactList schoolId={this.state.schoolId} contacts={this.state.contacts}/>
                             </Col>
                         </Row>
                     </TabPane>

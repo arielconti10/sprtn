@@ -3,7 +3,7 @@
   "version": "1.0.10",
   "description": "Open Source Bootstrap Admin Template",
   "author": "Łukasz Holeczek",
-  "homepage": "http://coreui.io",
+  "homepage": "http://hspartan.ftd.com.br",
   "copyright": "Copyright 2018 creativeLabs Łukasz Holeczek",
   "license": "MIT",
   "private": true,
@@ -47,14 +47,12 @@
     "bootstrap": "4.0.0",
     "chart.js": "2.7.1",
     "classnames": "^2.2.5",
+    "dotenv-webpack": "^1.5.5",
     "flag-icon-css": "2.9.0",
     "flatpickr": "^4.4.4",
     "font-awesome": "4.7.0",
     "history": "4.7.2",
-<<<<<<< HEAD
-=======
     "moment": "^2.22.0",
->>>>>>> feature/school_cac
     "npm": "^5.8.0",
     "react": "16.2.0",
     "react-chartjs-2": "2.7.0",
@@ -75,6 +73,7 @@
   "scripts": {
     "dev": "webpack -d --progress --watch --profile --json > compilation-stats.json --env.dev",
     "start": "webpack-dev-server --progress --color --inline --env.dev",
+    "staging": "webpack-dev-server --progress --color --inline --env.staging",
     "build": "webpack -p --progress --env.prod",
     "clean": "rimraf ./build"
   },

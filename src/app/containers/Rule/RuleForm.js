@@ -7,17 +7,24 @@ import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 're
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
-const apiPost = 'subsidiary';
+import Select, { Async } from 'react-select';
+import 'react-select/dist/react-select.css';
 
-class SubsidiaryForm extends Component {
+const apiPost = 'rule';
+
+class RuleForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            roles: [],
             name: '',
+            code: '',
+            role_id: [],
             active: true,       
             back_error: '',
             submitButtonDisabled: false,
-            saved: false
+            saved: false,
+            roleSelect2Loading: true
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -31,13 +38,33 @@ class SubsidiaryForm extends Component {
                 .then(response => {
                     const dados = response.data.data;
 
+                    const role_id = dados.roles.map(function(item) {
+                        return item.id;
+                    });
+                    
+                    //console.log(dados);
                     this.setState({ 
                         name: dados.name,
-                        active: dados.deleted_at === null ? true: false
+                        code: dados.code,
+                        active: dados.deleted_at === null ? true: false,
+                        role_id: role_id
                     });
                 })
                 .catch(err => console.log(err));
         }
+    }
+
+    componentDidMount() {
+
+        //console.log(this.props)
+        axios.get(`role`)
+            .then(response => {
+                const dados = response.data.data;
+
+                this.setState({ roles: dados, roleSelect2Loading: false });
+                //this.setState({ job_title_type_id: dados[0].id });
+            })
+            .catch(err => console.log(err));
     }
 
     handleChange(e) {
@@ -51,12 +78,23 @@ class SubsidiaryForm extends Component {
         });
     }
 
+    handleSelectChange = (selectedOption) => {
+
+        const role_id = selectedOption.map(function(item) {
+            return item.id;
+        });
+
+        this.setState({ role_id: role_id });
+      }
+
     submitForm(event) {
+
         event.preventDefault();
         axios.post(`${apiPost}`, {
-            'code': this.state.name,
             'name': this.state.name,
-            'active': this.state.active
+            'code': this.state.code,
+            'active': this.state.active,
+            'roles': this.state.role_id
         }).then(res => {
             this.setState({
                 saved: true                   
@@ -72,15 +110,26 @@ class SubsidiaryForm extends Component {
         event.preventDefault();
         var id = this.props.match.params.id;
 
-        let data = {
-            'name': this.state.name,
-            'active': this.state.active
-        }
+        const roles_id = this.state.role_id.map(function(item) {
+
+            let data = [];
+
+            data['role_id'] = item;
+
+            return data;
+        })
+
+        //console.log(roles_id);
+
+        // roles_id = [
+
+        // ];        
 
         axios.put(`${apiPost}/${id}`, {
-            'code': this.state.name,
             'name': this.state.name,
-            'active': this.state.active
+            'code': this.state.code,
+            'active': this.state.active,
+            'roles': [{'role_id': 1}, {'role_id': 2}]
         }).then(res => {
             this.setState({
                 saved: true                   
@@ -111,11 +160,11 @@ class SubsidiaryForm extends Component {
     render() {
         let redirect = null;
         if (this.state.saved) {
-            redirect = <Redirect to="/cadastro/filiais" />;
+            redirect = <Redirect to="/cadastro/disciplinas" />;
         }
 
         let statusField = null;
-        if (this.props.match.params.id !== undefined) {
+        if (this.props.match.params.id != undefined) {
             statusField =
                 <div className="">
                     <div className="form-group form-inline">
@@ -135,7 +184,6 @@ class SubsidiaryForm extends Component {
         return (
             <Card>
                 {redirect}
-
                 <CardBody>
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
@@ -144,8 +192,20 @@ class SubsidiaryForm extends Component {
                         onSubmit={this.handleSubmit} noValidate>
                         
                         <div className="">
+                            <FormGroup for="code">
+                                <FormControlLabel htmlFor="code">Código</FormControlLabel>
+                                <FormControlInput type="text" id="code" name="code"
+                                    value={this.state.code} onChange={this.handleChange}
+                                    required />
+                                <FieldFeedbacks for="code">
+                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                </FieldFeedbacks>
+                            </FormGroup>
+                        </div>
+
+                        <div className="">
                             <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Nome da filial</FormControlLabel>
+                                <FormControlLabel htmlFor="name">Nome da permissão</FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
                                     required />
@@ -153,7 +213,28 @@ class SubsidiaryForm extends Component {
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
                                 </FieldFeedbacks>
                             </FormGroup>
-                        </div>
+                        </div>  
+
+                        <div className="">
+                            
+                            <FormGroup for="role_id">
+                                <FormControlLabel htmlFor="role_id">Regras</FormControlLabel>
+                                <Select
+                                    name="role_id"
+                                    onChange={this.handleSelectChange}
+                                    labelKey="name"
+                                    valueKey="id"
+                                    value={this.state.role_id}
+                                    multi={true}
+                                    joinValues={false}
+                                    isLoading={this.state.roleSelect2Loading}
+                                    options={this.state.roles}
+                                /> 
+                                <FieldFeedbacks for="role_id">
+                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                </FieldFeedbacks>
+                            </FormGroup>
+                        </div>                                       
                         
                         {statusField}     
 
@@ -167,4 +248,4 @@ class SubsidiaryForm extends Component {
     }
 }
 
-export default SubsidiaryForm;
+export default RuleForm;

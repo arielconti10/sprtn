@@ -6,32 +6,23 @@ module.exports = shipit => {
 
   shipit.initConfig({
     default: {
-      deployTo: '/home/ftdiw/spartan-teste/app',
-      repositoryUrl: 'https://bitbucket.org/editora-ftd/ftdspartanf',
+      deployTo: '/var/www/html/ftdspartanf',
+      repositoryUrl: 'https://pessolatohenrique@bitbucket.org/editora-ftd/ftdspartanf.git',
+    //   repositoryUrl: 'git@bitbucket.org:editora-ftd/ftdspartanf.git',
       branch: 'staging',
+      keepReleases: 3
     },
     staging: {
        servers: 'ftdiw@mtz-webh02',
-       key: 'deploy.pem'
-    //  servers: [{
-    //    host: 'mtz-webh02',
-    //    user: 'ftdiw',
-    //    password: 'a1s2d3'
-    //  }]
+       key: '/Users/tercmt-henrique/Desktop/deploy.pem'
+    //    key: '/home/jenkins/.ssh-deploy-keys/mtz-webh02/deploy.pem'
     },
   });
 
-//   shipit.task('update-server', function () {
-//     return shipit.remote('npm install');
-//   });
-
-//   shipit.task('build-server', function () {
-//     return shipit.remote('npm run build');
-//   });
-
-//   shipit.on('finish', function() {
-//     shipit.start('update-server');
-//     shipit.start('build-server');
-//   })
+  shipit.task('permissions', () => {
+    shipit.remote('chmod -R 755 /var/www/html/ftdspartanf/releases').then(function(){
+        shipit.remote('cd /var/www/html/ftdspartanf/current && npm run build staging');
+      });
+  });
 
 }

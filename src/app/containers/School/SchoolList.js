@@ -149,9 +149,15 @@ class SchoolList extends Component {
                                 <b style={{ marginLeft: '20px' }}>Bairro:</b> {school.neighborhood}
                                 <b style={{ marginLeft: '20px' }}>Cidade:</b> {school.city}
                                 <b style={{ marginLeft: '20px' }}>UF:</b> {school.state.abbrev}
-                                <b style={{ marginLeft: '20px' }}>CEP:</b> {school.zip_code}
+                                <b style={{ marginLeft: '20px' }}>CEP:</b> {school.zip_code} <br />
                                 <b style={{ marginLeft: '20px' }}>TOTVS:</b> {school.school_code_totvs}
                                 <b style={{ marginLeft: '20px' }}>Tipo:</b> {school.school_type.name}
+                                {/* To Do: carregar localization_type.name quando a API schools estiver preparada para carregar os registros de localization_type */}
+                                <b style={{ marginLeft: '20px' }}>Localização:</b> {school.localization_type_id || ''}                                
+                                <b style={{ marginLeft: '20px' }}>Alunos:</b> {school.total_students || 0}
+                                <b style={{ marginLeft: '20px' }}>Contatos:</b> {school.contacts.length}    
+                                <b style={{ marginLeft: '20px' }}>Telefone:</b> {school.phone}  
+                                <b style={{ marginLeft: '20px' }}>E-mail:</b> {school.email}                              
                             </div>
                         );
                     }}

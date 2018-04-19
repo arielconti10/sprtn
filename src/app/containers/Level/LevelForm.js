@@ -7,14 +7,15 @@ import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 're
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
-const apiPost = 'subsidiary';
+const apiPost = 'level';
 
-class SubsidiaryForm extends Component {
+class LevelForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            code: '',
             name: '',
-            active: true,       
+            active: true,
             back_error: '',
             submitButtonDisabled: false,
             saved: false
@@ -30,10 +31,10 @@ class SubsidiaryForm extends Component {
             axios.get(`${apiPost}/${this.props.match.params.id}`)
                 .then(response => {
                     const dados = response.data.data;
-
-                    this.setState({ 
+                    this.setState({
+                        code: dados.code,
                         name: dados.name,
-                        active: dados.deleted_at === null ? true: false
+                        active: dados.deleted_at === null ? true : false
                     });
                 })
                 .catch(err => console.log(err));
@@ -54,12 +55,12 @@ class SubsidiaryForm extends Component {
     submitForm(event) {
         event.preventDefault();
         axios.post(`${apiPost}`, {
-            'code': this.state.name,
+            'code': this.state.code,
             'name': this.state.name,
             'active': this.state.active
         }).then(res => {
             this.setState({
-                saved: true                   
+                saved: true
             })
         }).catch(function (error) {
             let data_error = error.response.data.errors;
@@ -73,17 +74,18 @@ class SubsidiaryForm extends Component {
         var id = this.props.match.params.id;
 
         let data = {
+            'code': this.state.code,
             'name': this.state.name,
             'active': this.state.active
         }
 
         axios.put(`${apiPost}/${id}`, {
-            'code': this.state.name,
+            'code': this.state.code,
             'name': this.state.name,
             'active': this.state.active
         }).then(res => {
             this.setState({
-                saved: true                   
+                saved: true
             })
         }).catch(function (error) {
             let data_error = error.response.data.errors;
@@ -96,7 +98,7 @@ class SubsidiaryForm extends Component {
         e.preventDefault();
 
         this.form.validateFields();
-        
+
         this.setState({ submitButtonDisabled: !this.form.isValid() });
 
         if (this.form.isValid()) {
@@ -111,26 +113,26 @@ class SubsidiaryForm extends Component {
     render() {
         let redirect = null;
         if (this.state.saved) {
-            redirect = <Redirect to="/cadastro/filiais" />;
+            redirect = <Redirect to="/cadastro/niveis" />;
         }
 
         let statusField = null;
-        if (this.props.match.params.id !== undefined) {
+        if (this.props.match.params.id != undefined) {
             statusField =
                 <div className="">
                     <div className="form-group form-inline">
-                        <label className="" style={{marginRight: "10px"}}>Status</label>
+                        <label className="" style={{ marginRight: "10px" }}>Status</label>
                         <div className="">
                             <Label className="switch switch-default switch-pill switch-primary">
-                                <Input type="checkbox" id='active' name="active" className="switch-input"  checked={this.state.active} onChange={this.handleChange}/>
+                                <Input type="checkbox" id='active' name="active" className="switch-input" checked={this.state.active} onChange={this.handleChange} />
                                 <span className="switch-label"></span>
                                 <span className="switch-handle"></span>
                             </Label>
-                        </div>                                
+                        </div>
                     </div>
-                </div>            
+                </div>
         }
-        
+
 
         return (
             <Card>
@@ -142,10 +144,22 @@ class SubsidiaryForm extends Component {
                     }
                     <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
                         onSubmit={this.handleSubmit} noValidate>
-                        
+
+                        <div className="">
+                            <FormGroup for="code">
+                                <FormControlLabel htmlFor="code">Código do nível</FormControlLabel>
+                                <FormControlInput type="text" id="code" name="code"
+                                    value={this.state.code} onChange={this.handleChange}
+                                    required />
+                                <FieldFeedbacks for="code">
+                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                </FieldFeedbacks>
+                            </FormGroup>
+                        </div>
+
                         <div className="">
                             <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Nome da filial</FormControlLabel>
+                                <FormControlLabel htmlFor="name">Nome do nível</FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
                                     required />
@@ -154,17 +168,17 @@ class SubsidiaryForm extends Component {
                                 </FieldFeedbacks>
                             </FormGroup>
                         </div>
-                        
-                        {statusField}     
+
+                        {statusField}
 
                         <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
                         <button className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
                     </FormWithConstraints>
-                    
+
                 </CardBody>
             </Card>
         )
     }
 }
 
-export default SubsidiaryForm;
+export default LevelForm;

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
-import { Row, Col, Card, CardHeader, CardFooter, CardBody, Button } from 'reactstrap';
+import {Row, Col, Card, CardHeader, CardFooter, CardBody, Button} from 'reactstrap';
 
 import SectorList from './SectorList';
 import SectorForm from './SectorForm';
