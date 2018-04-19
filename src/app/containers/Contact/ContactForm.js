@@ -16,6 +16,8 @@ import '../../custom.css';
 import MaskedInput from 'react-maskedinput';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
+import Editable from 'react-x-editable';
+
 
 const apis = [
     { stateArray: 'job-title', api: 'job-title' },
@@ -35,9 +37,11 @@ class ContactForm extends Component {
             page: 1,
             pageSize: 5,
 
+            phones_editable: [],
             selectedOption: '',
             previous_phone: [],
             phones_data: [],
+            phones_editable: [],
             phone_type: '',
             phone_extension: '',
             phone_number: '',
@@ -71,6 +75,8 @@ class ContactForm extends Component {
         this.submitForm = this.submitForm.bind(this);
         this.submitPhone = this.submitPhone.bind(this);
         this.clearFormPhone = this.clearFormPhone.bind(this);
+        this.renderEditable = this.renderEditable.bind(this);
+        this.renderEditableSelect = this.renderEditableSelect.bind(this);
     }
 
     clearFormPhone() {
@@ -130,6 +136,15 @@ class ContactForm extends Component {
                         item['label'] = item.name,
                         item['abbrev'] = item.abbrev
                     });
+
+                    dados.sort(function(a, b) {
+                        if (a.name === b.name) {
+                            return 0;
+                        }
+                        else {
+                            return (a.name < b.name) ? -1 : 1;
+                        }
+                    });
                     this.setState({ [item.stateArray]: dados });
                 })
                 .catch(err => console.log(err));
@@ -151,45 +166,81 @@ class ContactForm extends Component {
         }
     }
 
-    componentDidMount() {
+    renderEditable(cellInfo) {
+        try {
+            let index = cellInfo.index;
+            let column_id = cellInfo.column.id;
+            return (
+              <div
+                // style={{ backgroundColor: "#fafafa" }}
+                contentEditable
+                suppressContentEditableWarning
+                onBlur={e => {
+                  const data = this.state.phones_data;
+                  data[index][column_id] = e.target.innerHTML;
+                  this.setState({ phones_editable : data });
+                }}
+                dangerouslySetInnerHTML={{
+                  __html: this.state.phones_data[index][column_id]
+                }}
+              />
+            );
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    renderEditableSelect(cellInfo) {
+        try {
+            let index = this.state.phones_data.findIndex(function(item){
+                return cellInfo.target.id == item.id;
+            });
+            let column_id = cellInfo.target.name;
+            let data = this.state.phones_data;
+
+            data[index][column_id] = cellInfo.target.value;
+
+            this.setState({phones_data:data});
+            this.setState({phones:data});
+
+            this.createPhoneTable();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    createPhoneTable() {
         let col = [
             {
                 Header: "Tipo",
-                id: "phone",
+                id: "phone_type",
                 width: 380,
-                accessor: element => {
-                    let type_text = "";
-                    if (element.phone_type == "work") {
-                        type_text = "Trabalho";
-                    } else if (element.phone_type == "home") {
-                        type_text = "Casa";
-                    } else if (element.phone_type == "mobile") {
-                        type_text = "Celular";
-                    } else {
-                        type_text = "Fax";
-                    }
-                    
-                    return type_text;
+                accessor: (element) => {
+                    return (<select name="phone_type" className="form-control" id={element.id} value={element.phone_type} onChange={this.renderEditableSelect}>
+                        <option value="home">Casa</option>
+                        <option value="mobile">Celular</option>
+                        <option value="fax">Fax</option>
+                        <option value="work">Trabalho</option>
+                    </select>)
                 }
             },
-            { Header: "Telefone", accessor: "phone_number", headerClassName: 'text-left' },
-            { Header: "Observaçāo", accessor: "phone_extension", headerClassName: 'text-left' }
+            { 
+                Header: "Telefone", 
+                id: "phone_number",
+                headerClassName: 'text-left',
+                accessor: "phone_number",
+                Cell: this.renderEditable 
+            },
+            { 
+                Header: "Observaçāo", 
+                id: 'phone_extension',
+                accessor: "phone_extension", 
+                headerClassName: 'text-left',
+                Cell: this.renderEditable 
+            },
         ];
 
         col.push(
-            {
-                Header: "Status",
-                accessor: "",
-                width: 60,
-                headerClassName: 'text-left',
-                sortable: false,
-                Cell: (element) => (
-                    !element.value.deleted_at ?
-                        <div><span>Ativo</span></div>
-                        :
-                        <div><span>Inativo</span></div>
-                )
-            }, 
             {
                 Header: "Ações", accessor: "", sortable: false, width: 90, headerClassName: 'text-left', Cell: (element) => (
                     !element.value.deleted_at ?
@@ -212,9 +263,15 @@ class ContactForm extends Component {
         this.setState({ columns: col });
     }
 
+    componentDidMount() {
+        // this.createPhoneTable();
+    }
+
     componentWillReceiveProps(nextProps) {
         this.populateSelectbox();
+
         if (nextProps.contact_find !== this.props.contact_find) {
+            
             this.setState({
                 previous_phone: nextProps.contact_find.phones,
                 phones_data :nextProps.contact_find.phones,
@@ -222,11 +279,11 @@ class ContactForm extends Component {
                 contact_id: nextProps.contact_find.id,
                 name: nextProps.contact_find.name,
                 cpf: nextProps.contact_find.cpf,
-                email: nextProps.contact_find.email,
-                address: nextProps.contact_find.address,
-                number: nextProps.contact_find.number,
+                email: nextProps.contact_find.email !== null?nextProps.contact_find.email:'',
+                address: nextProps.contact_find.address !== null?nextProps.contact_find.address:'',
+                number: nextProps.contact_find.number !== null?nextProps.contact_find.number:'',
                 neighborhood: nextProps.contact_find.neighborhood,
-                city: nextProps.contact_find.city,
+                city: nextProps.contact_find.address !== null?nextProps.contact_find.city:'',
                 state_id: nextProps.contact_find.state_id,
                 zip_code: nextProps.contact_find.zip_code,
                 birthday: formatDateToBrazilian(nextProps.contact_find.birthday),
@@ -234,6 +291,8 @@ class ContactForm extends Component {
                 job_title_id: nextProps.contact_find.job_title_id,       
                 authorize_email: nextProps.contact_find.authorize_email,
                 favorite: nextProps.contact_find.favorite
+            }, function() {
+                this.createPhoneTable();
             });
 
             if (nextProps.contact_find.length == 0) {
@@ -475,6 +534,7 @@ class ContactForm extends Component {
             }, () => this.setState({ phones_data: contacts, phones: contacts }));
         }
 
+        // this.clearForm();
         this.clearFormPhone();
 
         this.props.toggle();
@@ -482,8 +542,7 @@ class ContactForm extends Component {
 
     render() {
         const { phones_data, pageSize, page, loading, pages, columns } = this.state;
-        // this.setState({name:this.props.contact_find.name});
-        // console.log(this.props.contact_find);
+
         const { selectedOption } = this.state;
         const value = this.state.job_title_id;
         const value_state = this.state.state_id;
@@ -505,7 +564,7 @@ class ContactForm extends Component {
                             <FormGroup for="name">
                                 <FormControlLabel htmlFor="name">
                                     Nome do contato
-                                    <span className="text-danger">*</span>
+                                    <span className="text-danger"><strong>*</strong></span>
                                 </FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
@@ -757,16 +816,10 @@ class ContactForm extends Component {
                                     <ReactTable
                                         columns={columns}
                                         data={phones_data}
-                                        // pages={pages}
                                         loading={loading}
                                         defaultPageSize={pageSize}
-                                        // manual
-                                        // onFetchData={this.onFetchData}
-                                        // previousText='Anterior'
-                                        // nextText='Próximo'
                                         loadingText='Carregando...'
                                         noDataText='Sem registros'
-                                        // pageText='Página'
                                         ofText='de'
                                         rowsText=''
                                         className='-striped -highlight'
