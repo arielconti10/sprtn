@@ -20,9 +20,17 @@ module.exports = shipit => {
   });
 
   shipit.task('permissions', () => {
-    shipit.remote('chmod -R 755 /var/www/html/ftdspartanf/releases').then(function(){
-        shipit.remote('cd /var/www/html/ftdspartanf/current && npm run build staging');
-      });
+    let hostname = shipit.remote('hostname').then(function(hostname){
+        if (hostname[0].stdout.trim() === "mtz-webh02") {
+            shipit.remote('chmod -R 755 /var/www/html/ftdspartanf/releases').then(function(){
+                shipit.remote('cd /var/www/html/ftdspartanf/current && npm run build_staging');
+            });
+        } else {
+            shipit.remote('chmod -R 755 /var/www/html/ftdspartanf/releases').then(function(){
+                shipit.remote('cd /var/www/html/ftdspartanf/current && npm run build');
+            });
+        }
+    })
   });
 
 }
