@@ -64,7 +64,9 @@ class SchoolStudentList extends Component {
             id: null,
             school_id: this.props.schoolId,
             level_id: 0,
-            shift_id: 0
+            shift_id: 0,
+
+            valid_select: 1
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -76,12 +78,18 @@ class SchoolStudentList extends Component {
         this.closeColapse = this.closeColapse.bind(this);
         this.handleChangeLevel = this.handleChangeLevel.bind(this);
         this.handleChangeShift = this.handleChangeShift.bind(this);
+        this.footerData = this.footerData.bind(this);
     }
 
     handleChangeLevel = (selectedOption) => {
+        this.setState({ valid_select: 1, submit_button_disabled: false });
+
         const values = this.state;
         values.form_level_id = selectedOption.value;
+        
         this.setState({ values });
+        
+        this.showGrade(selectedOption.value);
     }
 
     handleChangeShift = (selectedOption) => {
@@ -149,7 +157,7 @@ class SchoolStudentList extends Component {
             collapse: true,
             new: false
         });
-
+        
         this.showGrade(level_id);
     }
 
@@ -289,12 +297,16 @@ class SchoolStudentList extends Component {
     submitForm(event) {
         event.preventDefault();
 
+        // const { school_id, form_level_id, form_first_grade, form_second_grade, form_third_grade, form_forth_grade, form_fifth_grade } = this.state;
         const { school_id, form_level_id, form_shift_id, form_first_grade, form_second_grade, form_third_grade, form_forth_grade, form_fifth_grade } = this.state;
+        
+        // let form_shift_id = (this.state.form_shift_id && this.state.form_shift_id > 0) ? parseInt(this.state.form_shift_id) : null;
 
+        console.log('form_shift_id', form_shift_id)
         axios.post(`${apiSpartan}`, {
             'school_id': parseInt(school_id),
             'level_id': parseInt(form_level_id),
-            'shift_id': parseInt(form_shift_id),
+            'shift_id': form_shift_id,
             'first_grade': parseInt(form_first_grade),
             'second_grade': parseInt(form_second_grade),
             'third_grade': parseInt(form_third_grade),
@@ -315,10 +327,11 @@ class SchoolStudentList extends Component {
         event.preventDefault();
         const { id, school_id, form_level_id, form_shift_id, form_first_grade, form_second_grade, form_third_grade, form_forth_grade, form_fifth_grade } = this.state;
 
+        console.log('form_shift_id', form_shift_id)
         axios.put(`${apiSpartan}/${id}`, {
             'school_id': parseInt(school_id),
             'level_id': parseInt(form_level_id),
-            'shift_id': parseInt(form_shift_id),
+            'shift_id': parseInt(form_shift_id) || 0,
             'first_grade': parseInt(form_first_grade),
             'second_grade': parseInt(form_second_grade),
             'third_grade': parseInt(form_third_grade),
@@ -339,6 +352,13 @@ class SchoolStudentList extends Component {
 
         this.setState({ submit_button_disabled: !this.form.isValid() });
 
+        if (this.state.form_level_id === undefined || this.state.form_level_id == 0) {
+            this.setState({ valid_select: 0, submit_button_disabled: true });
+            return;
+        } else {
+            this.setState({ valid_select: 1 });
+        }
+
         if (this.form.isValid()) {
             if (!this.state.new) {
                 this.updateForm(event);
@@ -349,67 +369,6 @@ class SchoolStudentList extends Component {
     }
 
     componentDidMount() {
-        let col = [
-            { Header: "Nível", accessor: "level.name", headerClassName: 'text-left', width: 180 },
-            { Header: "Turno", accessor: "shift.name", headerClassName: 'text-left' },
-            { Header: "1ª grade", accessor: "first_grade", headerClassName: 'text-left' },
-            { Header: "2ª grade", accessor: "second_grade", headerClassName: 'text-left' },
-            { Header: "3ª grade", accessor: "third_grade", headerClassName: 'text-left' },
-            { Header: "4ª grade", accessor: "forth_grade", headerClassName: 'text-left' },
-            { Header: "5ª grade", accessor: "fifth_grade", headerClassName: 'text-left' },
-            { Header: "Total", accessor: "total", headerClassName: 'text-left' }
-        ];
-
-        col.push(
-            {
-                Header: "Status",
-                accessor: "",
-                width: 60,
-                headerClassName: 'text-left',
-                sortable: false,
-                Cell: (element) => (
-                    !element.value.deleted_at ?
-                        <div><span>Ativo</span></div>
-                        :
-                        <div><span>Inativo</span></div>
-                )/*,                
-                    filterable: true, 
-                    Filter: ({ filter, onChange }) => (
-                    
-                        <select
-                            onChange={event => this.onFetchData(null, null, event.target.value, { filter, onChange })}
-                            style={{ width: "100%" }}
-                        >
-                            <option value="all">Todos</option>
-                            <option value="false">Ativo</option>
-                            <option value="true">Inativo</option>
-                        </select>
-                    )*/
-            }, {
-                Header: "Ações", accessor: "", sortable: false, width: 90, headerClassName: 'text-left', Cell: (element) => (
-                    !element.value.deleted_at ?
-                        <div>
-                            <button className='btn btn-primary btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickEdit(element)}>
-                                <i className='fa fa-pencil'></i>
-                            </button>
-
-                            <button className='btn btn-danger btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickDelete(element)}>
-                                <i className='fa fa-ban'></i>
-                            </button>
-                        </div>
-                        :
-                        <div>
-                            <button className='btn btn-success btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickActive(element)}>
-                                <i className='fa fa-check-circle'></i>
-                            </button>
-                        </div>
-
-                )
-            }
-        )
-
-        this.setState({ columns: col });
-
         apis.map(item => {
             axios.get(`${item.api}`)
                 .then(response => {
@@ -465,6 +424,19 @@ class SchoolStudentList extends Component {
             .catch(err => console.log(err));
     }
 
+    footerData(data, column){
+        let result = data.reduce( ( total, element, index, array) => {
+            total += element[column];
+            if( !element.deleted_at ) { 
+                return total;
+            }else { 
+                return total - element[column];
+            } 
+        }, 0 );
+
+        return result;
+    }
+
     render() {
         const { data, pageSize, page, loading, pages, columns, levels, shifts, form_level_id, form_shift_id } = this.state;
     
@@ -483,7 +455,7 @@ class SchoolStudentList extends Component {
                                     <Row>
                                         <Col md="3">
                                             <FormGroup for="form_level_id">
-                                                <label>Nível</label>
+                                                <label>Nível <span className="text-danger"><strong>*</strong></span></label>
                                                 <Select
                                                     name="form_level_id"
                                                     id="form_level_id"
@@ -492,9 +464,9 @@ class SchoolStudentList extends Component {
                                                     onChange={this.handleChangeLevel}
                                                     options={levels}
                                                 />
-                                                <FieldFeedbacks for="form_level_id">
-                                                    <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                                </FieldFeedbacks>
+                                                {this.state.valid_select == 0 &&
+                                                    <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
+                                                }
                                             </FormGroup>
                                         </Col>
 
@@ -509,16 +481,13 @@ class SchoolStudentList extends Component {
                                                     onChange={this.handleChangeShift}
                                                     options={shifts}
                                                 />
-                                                <FieldFeedbacks for="form_shift_id">
-                                                    <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                                </FieldFeedbacks>
                                             </FormGroup>
                                         </Col>
                                     </Row>
                                     <Row>
                                         <Col md="2" className={this.state.class_form_first_grade}>
                                             <FormGroup for="form_first_grade">
-                                                <FormControlLabel htmlFor="form_first_grade">{this.state.label_first_grade}</FormControlLabel>
+                                                <FormControlLabel htmlFor="form_first_grade">{this.state.label_first_grade} <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                                 <FormControlInput type="number" id="form_first_grade" name="form_first_grade" readOnly={false}
                                                     value={this.state.form_first_grade} onChange={this.handleChange}
                                                     required />
@@ -531,7 +500,7 @@ class SchoolStudentList extends Component {
 
                                         <Col md="2" className={this.state.class_form_second_grade}>
                                             <FormGroup for="form_second_grade">
-                                                <FormControlLabel htmlFor="form_second_grade">{this.state.label_second_grade}</FormControlLabel>
+                                                <FormControlLabel htmlFor="form_second_grade">{this.state.label_second_grade} <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                                 <FormControlInput type="number" id="form_second_grade" name="form_second_grade" readOnly={false}
                                                     value={this.state.form_second_grade} onChange={this.handleChange}
                                                     required />
@@ -544,7 +513,7 @@ class SchoolStudentList extends Component {
 
                                         <Col md="2" className={this.state.class_form_thirth_grade}>
                                             <FormGroup for="form_third_grade">
-                                                <FormControlLabel htmlFor="form_third_grade">{this.state.label_third_grade}</FormControlLabel>
+                                                <FormControlLabel htmlFor="form_third_grade">{this.state.label_third_grade} <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                                 <FormControlInput type="number" id="form_third_grade" name="form_third_grade" readOnly={false}
                                                     value={this.state.form_third_grade} onChange={this.handleChange}
                                                     required />
@@ -557,7 +526,7 @@ class SchoolStudentList extends Component {
 
                                         <Col md="2" className={this.state.class_form_forth_grade}>
                                             <FormGroup for="form_forth_grade">
-                                                <FormControlLabel htmlFor="form_forth_grade">{this.state.label_forth_grade}</FormControlLabel>
+                                                <FormControlLabel htmlFor="form_forth_grade">{this.state.label_forth_grade} <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                                 <FormControlInput type="number" id="form_forth_grade" name="form_forth_grade" readOnly={false}
                                                     value={this.state.form_forth_grade} onChange={this.handleChange}
                                                     required />
@@ -570,7 +539,7 @@ class SchoolStudentList extends Component {
 
                                         <Col md="2" className={this.state.class_form_fifth_grade}>
                                             <FormGroup for="form_fifth_grade">
-                                                <FormControlLabel htmlFor="form_fifth_grade">{this.state.label_fifth_grade}</FormControlLabel>
+                                                <FormControlLabel htmlFor="form_fifth_grade">{this.state.label_fifth_grade} <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                                 <FormControlInput type="number" id="form_fifth_grade" name="form_fifth_grade" readOnly={false}
                                                     value={this.state.form_fifth_grade} onChange={this.handleChange}
                                                     required />
@@ -609,8 +578,109 @@ class SchoolStudentList extends Component {
                     <Row>
                         <Col md="12">
                             <ReactTable
-                                columns={columns}
                                 data={data}
+                                columns={[
+                                    { Header: "Nível", accessor: "level.name", headerClassName: 'text-left', filterable: true, width: 180, Footer: ( <span><strong>Total</strong></span> ) },
+                                    { Header: "Turno", accessor: "shift.name", headerClassName: 'text-left', filterable: true },
+                                    { Header: "1ª grade", accessor: "first_grade", headerClassName: 'text-left', 
+                                        Footer: (
+                                            <span>
+                                                <strong>
+                                                    {this.footerData(data, 'first_grade')}
+                                                </strong>
+                                            </span>
+                                        ) 
+                                    },
+                                    { Header: "2ª grade", accessor: "second_grade", headerClassName: 'text-left', 
+                                        Footer: (
+                                            <span>
+                                                <strong>
+                                                    {this.footerData(data, 'second_grade')}
+                                                </strong>
+                                            </span>
+                                        ) 
+                                    },
+                                    { Header: "3ª grade", accessor: "third_grade", headerClassName: 'text-left', 
+                                        Footer: (
+                                            <span>
+                                                <strong>
+                                                    {this.footerData(data, 'third_grade')}
+                                                </strong>
+                                            </span>
+                                        ) 
+                                    },
+                                    { Header: "4ª grade", accessor: "forth_grade", headerClassName: 'text-left', 
+                                        Footer: (
+                                            <span>
+                                                <strong>
+                                                    {this.footerData(data, 'forth_grade')}
+                                                </strong>
+                                            </span>
+                                        ) 
+                                    },
+                                    { Header: "5ª grade", accessor: "fifth_grade", headerClassName: 'text-left', 
+                                        Footer: (
+                                            <span>
+                                                <strong>
+                                                    {this.footerData(data, 'fifth_grade')}
+                                                </strong>
+                                            </span>
+                                        ) 
+                                    },
+                                    { Header: "Total Nível", accessor: "total", headerClassName: 'text-left', 
+                                        Footer: (
+                                            <span>
+                                                <strong>
+                                                    {this.footerData(data, 'total')}
+                                                </strong>
+                                            </span>
+                                        ) 
+                                    },
+                                    {
+                                        Header: "Status",
+                                        accessor: "",
+                                        width: 80,
+                                        headerClassName: 'text-left',
+                                        sortable: false,
+                                        Cell: (element) => (
+                                            !element.value.deleted_at ?
+                                                <div><span className="alert-success grid-record-status">Ativo</span></div>
+                                                :
+                                                <div><span className="alert-danger grid-record-status">Inativo</span></div>
+                                        )/*,                
+                                            filterable: true, 
+                                            Filter: ({ filter, onChange }) => (
+                                            
+                                                <select
+                                                    onChange={event => this.onFetchData(null, null, event.target.value, { filter, onChange })}
+                                                    style={{ width: "100%" }}
+                                                >
+                                                    <option value="all">Todos</option>
+                                                    <option value="false">Ativo</option>
+                                                    <option value="true">Inativo</option>
+                                                </select>
+                                            )*/
+                                    }, {
+                                        Header: "Ações", accessor: "", sortable: false, width: 90, headerClassName: 'text-left', Cell: (element) => (
+                                            !element.value.deleted_at ?
+                                                <div>
+                                                    <button className='btn btn-primary btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickEdit(element)}>
+                                                        <i className='fa fa-pencil'></i>
+                                                    </button>
+                        
+                                                    <button className='btn btn-danger btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickDelete(element)}>
+                                                        <i className='fa fa-ban'></i>
+                                                    </button>
+                                                </div>
+                                            :
+                                                <div>
+                                                    <button className='btn btn-success btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickActive(element)}>
+                                                        <i className='fa fa-check-circle'></i>
+                                                    </button>
+                                                </div>                                            
+                                        )
+                                    }
+                                ]}
                                 pages={pages}
                                 loading={loading}
                                 defaultPageSize={pageSize}
