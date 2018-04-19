@@ -41,7 +41,7 @@ module.exports = (env = {}) => {
             options: {
               cacheDirectory: true,
               presets: ['es2015', 'react', 'env'],
-              plugins: ['transform-class-properties', "syntax-dynamic-import"]
+              plugins: ['transform-class-properties', "syntax-dynamic-import", "emotion"]
             }
           }
         },
