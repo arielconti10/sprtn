@@ -22,47 +22,79 @@ class SchoolList extends Component {
             loading: false,
             columns: []
         };
+
+        this.onChangeFilter = this.onChangeFilter.bind(this);
+    }
+
+    onChangeFilter(target){
+        let oldFilters = this.state.filtered;
+
+        let newFilters = [];
+
+        //To do: fix search when value is ''
+
+        target.map(obj => {
+            newFilters = oldFilters.filter(( elem, index, arr ) => arr[index]['id'] != obj.id );
+
+            console.log('obj', 'obj.id:', obj.id, 'obj.value:', obj.value);
+            if(obj.value != ''){
+                newFilters.push({ id: obj.id, value: obj.value });
+            }
+        });
+
+        const values = this.state;
+        values.filtered = newFilters;
+        this.setState({ values });
+
+        this.onFetchData();
     }
 
     componentDidMount() {
 
         let col = [
-            { Header: 'Filial', accessor: 'subsidiary.name', filterable: true, width: 60, headerClassName: 'text-left' },
-            { Header: "Nome", accessor: "name", sortable: true, filterable: true, maxWidth: 600, headerClassName: 'text-left' },
-            { Header: "CEP", accessor: "zip_code", filterable: true, width: 100, headerClassName: 'text-left' },
+            { Header: "Nome", accessor: "name", sortable: true, filterable: true, minWidth: 250, maxWidth: 500, headerClassName: 'text-left' },
+            { Header: 'Tipo', accessor: 'school_type.name', sortable: true, filterable: true, width: 160, headerClassName: 'text-left' },
             {
                 Header: "Identificação", accessor: "school_type", filterable: true, width: 120, headerClassName: 'text-left',
-                Cell: props => <span className={`escola-${props.value.identify.toLowerCase()}`}>{props.value.identify}</span>
+                Cell: props => <span className={`escola-${props.value.identify.toLowerCase()}`}>{props.value.identify}</span>,
+                Filter: ({ filter, onChange }) => (                
+                    <select id="school_type" onChange={event => this.onChangeFilter([event.target])} style={{ width: "100%" }} >
+                        <option value="">Todos</option>
+                        <option value="particular">Particular</option>
+                        <option value="publico">Público</option>
+                        <option value="secretaria">Secretaria</option>
+                    </select>
+                )
             },
-            { Header: 'Perfil', accessor: 'profile.name', sortable: true, filterable: true, width: 100, headerClassName: 'text-left' }
-        ];
-
-        col.push(
+            { Header: 'Perfil', accessor: 'profile.name', sortable: true, filterable: true, width: 100, headerClassName: 'text-left' },
+            { Header: 'Filial', accessor: 'subsidiary.name', filterable: true, width: 60, headerClassName: 'text-left' },
+            { Header: 'Setor', accessor: 'sector.name', filterable: true, width: 60, headerClassName: 'text-left' },
+            { Header: "TOTVS", accessor: "school_code_totvs", filterable: true, width: 100, headerClassName: 'text-left' },
             {
                 Header: "Status",
                 accessor: "",
-                width: 60,
+                width: 100,
                 headerClassName: 'text-left',
-                sortable: false,
+                sortable: false,                
                 Cell: (element) => (
-                    !element.value.deleted_at ?
+                    element.value.active ?
                         <div><span className="alert-success grid-record-status">Ativo</span></div>
                         :
                         <div><span className="alert-danger grid-record-status">Inativo</span></div>
-                )/*,                
-                    filterable: true, 
-                    Filter: ({ filter, onChange }) => (
-                    
-                        <select
-                            onChange={event => this.onFetchData(null, null, event.target.value, { filter, onChange })}
-                            style={{ width: "100%" }}
-                        >
-                            <option value="all">Todos</option>
-                            <option value="false">Ativo</option>
-                            <option value="true">Inativo</option>
-                        </select>
-                    )*/
-            }, {
+                ), 
+                filterable: true,
+                Filter: ({ filter, onChange }) => (                
+                    <select id="active" onChange={event => this.onChangeFilter([event.target])} style={{ width: "100%" }} >
+                        <option value="">Todos</option>
+                        <option value="1">Ativo</option>
+                        <option value="0">Inativo</option>
+                    </select>
+                )
+            },
+            { Header: "CEP", accessor: "zip_code", filterable: true, width: 100, headerClassName: 'text-left' },
+            { Header: "Cidade", accessor: "city", filterable: true, width: 160, headerClassName: 'text-left' },
+            { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left' },   
+            {
                 Header: "Ações", accessor: "", sortable: false, width: 50, headerClassName: 'text-left', Cell: (element) => (
                     <div>
                         <Link to={this.props.match.url + "/" + element.value.id}
@@ -72,29 +104,31 @@ class SchoolList extends Component {
                     </div>
                 )
             }
-        )
+        ];
 
-        this.setState({ columns: col })
+        this.setState({ columns: col });       
+
     }
 
-    onFetchData = (state, instance, deleted_at) => {
+    onFetchData = (state, instance) => {
         let apiSpartan = this.props.apiSpartan
 
         let pageSize = state ? state.pageSize : this.state.pageSize;
         let page = state ? state.page + 1 : this.state.page;
 
-        let sorted = state ? state.sorted : this.state.sorted
-        let filtered = state ? state.filtered : this.state.filtered
+        let sorted = state ? state.sorted : this.state.sorted;
+
+        if(state && state.filtered.length > 0){
+            this.onChangeFilter(state.filtered);
+        }
+
+        let filtered = this.state.filtered
+        // let filtered = state ? state.filtered : this.state.filtered
 
         let baseURL = `/school?paginate=${pageSize}&page=${page}`;
 
-        //To do: make filter to deleted_at
-        /*console.log('onFetchData:', deleted_at);
-        if(deleted_at != 'all')
-            console.log("deleted_at != 'all'", deleted_at);*/
-
         filtered.map(function (item) {
-            console.log('item', item);
+            // console.log('filtered - item', item);
             let id = item.id == 'school_type' ? `${item.id}.identify` : item.id;
             let value = item.value;
             baseURL += `&filter[${id}]=${value}`;
@@ -153,7 +187,7 @@ class SchoolList extends Component {
                                 <b style={{ marginLeft: '20px' }}>TOTVS:</b> {school.school_code_totvs}
                                 <b style={{ marginLeft: '20px' }}>Tipo:</b> {school.school_type.name}
                                 {/* To Do: carregar localization_type.name quando a API schools estiver preparada para carregar os registros de localization_type */}
-                                <b style={{ marginLeft: '20px' }}>Localização:</b> {school.localization_type_id || ''}                                
+                                <b style={{ marginLeft: '20px' }}>Localização:</b> {school.localization_type ? school.localization_type.name : school.localization_type_id ? school.localization_type_id + ' Desativado' : 'Não há registro'}                                
                                 <b style={{ marginLeft: '20px' }}>Alunos:</b> {school.total_students || 0}
                                 <b style={{ marginLeft: '20px' }}>Contatos:</b> {school.contacts.length}    
                                 <b style={{ marginLeft: '20px' }}>Telefone:</b> {school.phone}  
