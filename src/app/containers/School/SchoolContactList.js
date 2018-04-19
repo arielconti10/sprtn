@@ -47,10 +47,6 @@ class SchoolConctactList extends Component {
 
     }
 
-    componentWillMount() {
-        // console.log(this.props.contacts);
-    }
-
     componentWillReceiveProps() {
         this.setState({data:this.props.contacts});
     }
@@ -89,10 +85,54 @@ class SchoolConctactList extends Component {
         this.toggle();
     }
 
+    onClickActive(element) {
+        const { id, name ,job_title_id, phones } = element.value;
+
+        element.value.phones.map(item => {
+            if (item.phone_extension == "") {
+                delete item.phone_extension;
+            }
+        });
+
+        axios.put(`${apiSpartan}/${id}`, {
+            'school_id': this.props.schoolId,
+            'name': name,
+            'job_title_id': job_title_id,
+            'phones': phones,
+            'active': true
+        }).then(res => {
+            this.updateTable();
+        }).catch(function (error) {
+            console.log(error)
+        }.bind(this));
+    }
+
+    renderEditable(cellInfo) {
+        try {
+            return (
+                <div
+                //   style={{ backgroundColor: "#fafafa" }}
+                  contentEditable
+                  suppressContentEditableWarning
+                  onBlur={e => {
+                    const data = [...this.state.data];
+                    data[cellInfo.index][cellInfo.column.id] = e.target.innerHTML;
+                    this.setState({ data });
+                  }}
+                  dangerouslySetInnerHTML={{
+                    __html: this.state.data[cellInfo.index][cellInfo.column.id]
+                  }}
+                />
+            )
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     componentDidMount() {
 
         let col = [
-            { Header: "Nome", accessor: "name", headerClassName: 'text-left' },
+            { Header: "Nome", accessor: "name", headerClassName: 'text-left'},
             { Header: "Cargo", accessor: "job_title.name", headerClassName: 'text-left' },
             { Header: "E-mail", accessor: "email", headerClassName: 'text-left' },
             {
@@ -129,14 +169,13 @@ class SchoolConctactList extends Component {
             {
                 Header: "Status",
                 accessor: "",
-                width: 60,
                 headerClassName: 'text-left',
                 sortable: false,
                 Cell: (element) => (
                     !element.value.deleted_at ?
-                        <div><span>Ativo</span></div>
-                        :
-                        <div><span>Inativo</span></div>
+                    <div><span className="alert-success grid-record-status">Ativo</span></div>
+                    :
+                    <div><span className="alert-danger grid-record-status">Inativo</span></div>
                 )
             }, {
                 Header: "Ações", accessor: "", sortable: false, width: 90, headerClassName: 'text-left', Cell: (element) => (
@@ -202,16 +241,10 @@ class SchoolConctactList extends Component {
                             <ReactTable
                                 columns={columns}
                                 data={data}
-                                // pages={pages}
                                 loading={loading}
                                 defaultPageSize={pageSize}
-                                // manual
-                                // onFetchData={this.onFetchData}
-                                // previousText='Anterior'
-                                // nextText='Próximo'
                                 loadingText='Carregando...'
                                 noDataText='Sem registros'
-                                // pageText='Página'
                                 ofText='de'
                                 rowsText=''
                                 className='-striped -highlight'
