@@ -177,7 +177,14 @@ class ContactForm extends Component {
                 suppressContentEditableWarning
                 onBlur={e => {
                   const data = this.state.phones_data;
+                  if (data[index][column_id] != "") {
+                     data[index]['old_value'] = data[index][column_id];
+                     data[index]['old_field'] = column_id;
+                  }
+                  
                   data[index][column_id] = e.target.innerHTML;
+                  data[index]['from_editable'] = 1;
+
                   this.setState({ phones_editable : data });
                 }}
                 dangerouslySetInnerHTML={{
@@ -527,6 +534,15 @@ class ContactForm extends Component {
             let contacts = this.props.contact_find.phones.filter(function(item){
                 return item.contact_id !== undefined 
             });
+
+            contacts.map(item => {
+                if(item.from_editable && item.from_editable == 1) {
+                    let old_field = item.old_field;
+                    item[old_field] = item.old_value;
+                }
+            });
+
+            console.log(contacts);
 
             this.setState({
                 phones_data: [],
