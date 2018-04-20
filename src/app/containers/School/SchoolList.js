@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { Router, hashHistory, Link, browserHistory, withRouter, NavLink } from 'react-router-dom'
+import { Router, hashHistory, Link, browserHistory, withRouter, NavLink, Redirect } from 'react-router-dom'
 import { Card, CardHeader, CardFooter, CardBody, Button } from 'reactstrap';
 import ReactTable from 'react-table';
 
 import 'react-table/react-table.css'
 
 import axios from '../../common/axios';
+import { verifyToken } from '../../common/AuthorizeHelper';
 
 class SchoolList extends Component {
 
@@ -16,6 +17,7 @@ class SchoolList extends Component {
             page: 1,
             pageSize: 10,
             data: [],
+            authorized: 1,
             filtered: [],
             sorted: [],
             pages: null,
@@ -155,11 +157,20 @@ class SchoolList extends Component {
                     loading: false
                 });
             })
-            .catch(err => console.log(err));
+            .catch(function (error) {
+                let authorized = verifyToken(error.response.status);
+                this.setState({authorized:authorized});
+            }.bind(this));
     }
 
     render() {
         const { data, pageSize, page, loading, pages, columns } = this.state;
+
+        if (this.state.authorized == 0) {
+            return (
+                <Redirect to="/login" />
+            );
+        }
 
         return (
             <div>                
