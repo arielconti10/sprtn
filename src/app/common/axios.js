@@ -7,6 +7,7 @@ const instance = axios.create({
 instance.interceptors.request.use(request => {
     const token = sessionStorage.getItem('access_token');
     request.headers.common.Authorization = `Bearer ${token}`;
+
     // Edit request config
     return request;
 }, error => {

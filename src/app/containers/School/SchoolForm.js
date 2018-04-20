@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 
 import axios from '../../../app/common/axios';
+import { verifyToken } from '../../../app/common/AuthorizeHelper';
 
 import { Card, CardHeader, CardFooter, CardBody, CardTitle, CardText, Row, Col, Button, Label, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import classnames from 'classnames';
@@ -24,6 +25,7 @@ class SchoolForm extends Component {
         this.state = {
             schoolName: '',
             contacts: [],
+            authorized: 1,
             contacts_initial: [],
             schoolId: this.props.match.params.id,
             students: [],
@@ -57,7 +59,10 @@ class SchoolForm extends Component {
                 console.log("WILL MOUNT - INICIAL!");
                 console.log(this.state.contacts);
             })
-            .catch(err => console.log(err));
+            .catch(function (error) {
+                let authorized = verifyToken(error.response.status);
+                this.setState({authorized:authorized});
+            }.bind(this));
     }
 
     toggle(tab) {    
@@ -76,7 +81,10 @@ class SchoolForm extends Component {
                     sectorId: dados.sector_id
                 });
             })
-            .catch(err => console.log(err));
+            .catch(function (error) {
+                let authorized = verifyToken(error.response.status);
+                this.setState({authorized:authorized});
+            }.bind(this));
             
             this.setState({
                 activeTab: tab,
@@ -85,6 +93,11 @@ class SchoolForm extends Component {
     }
 
     render() {
+        if (this.state.authorized == 0) {
+            return (
+                <Redirect to="/login" />
+            );
+        }
         // console.log(this.state.contacts);
         return (
             <div>

@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Router, hashHistory, Link, browserHistory, withRouter } from 'react-router-dom'
+import { Router, hashHistory, Link, browserHistory, withRouter, Redirect } from 'react-router-dom'
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
 
 import './GridApi.css'
 import axios from '../common/axios';
+import { verifyToken } from '../common/AuthorizeHelper';
 
 import Select, { Async } from 'react-select';
 import 'react-select/dist/react-select.css';
@@ -17,6 +18,7 @@ class GridApi extends Component {
         this.state = {
             page: 1,
             pageSize: 10,
+            authorized: 1,
             data: [],
             filtered: [],
             sorted: [],
@@ -27,6 +29,7 @@ class GridApi extends Component {
             dataAlt: [],
             dataAltSelected: []
         };
+
     }
 
     onClickDelete(element) {
@@ -275,12 +278,21 @@ class GridApi extends Component {
                 });
 
             })
-            .catch(err => console.log(err));
+            .catch(function (error) {
+                let authorized = verifyToken(error.response.status);
+                this.setState({authorized:authorized});
+            }.bind(this));
     }
 
     render() {
 
         const { data, pageSize, page, loading, pages, columns } = this.state;
+        
+        if (this.state.authorized == 0) {
+            return (
+                <Redirect to="/login" />
+            );
+        }
 
         return (
             <div>
