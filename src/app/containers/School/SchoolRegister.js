@@ -178,6 +178,7 @@ export default class SchoolRegister extends Component {
                 values.address = dados.logradouro;
                 values.neighborhood = dados.bairro;
                 values.city = dados.localidade;
+                values.number = '';
                 values.back_error = '';
 
                 this.setState({ values });
@@ -197,9 +198,14 @@ export default class SchoolRegister extends Component {
     }
 
     clearAddress() {
-        this.setState({ address: '' });
-        this.setState({ neighborhood: '' });
-        this.setState({ city: '' });
+        const values = this.state;
+
+        values.address = '';
+        values.neighborhood = '';
+        values.city = '';
+        values.number = '';
+
+        this.setState({ values });
     }
 
     handleChange(e) {
