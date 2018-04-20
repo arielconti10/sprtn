@@ -14,6 +14,7 @@ import 'react-select/dist/react-select.css';
 import './School.css'
 
 const apiPost = 'school';
+const apiCep = 'cep';
 
 const apis = [
     { stateArray: 'school_types', api: 'school-type' },
@@ -27,11 +28,11 @@ const apis = [
 ];
 
 const selectsValidade = [
-    { name: 'school_type_id' },
-    { name: 'subsidiary_id' },
-    { name: 'sector_id'},
-    { name: 'state_id'},
-    { name: 'localization_type_id'}
+    { name: 'school_type_id', stateArray: 'school_types' },
+    { name: 'subsidiary_id', stateArray: 'subsidiaries' },
+    { name: 'sector_id', stateArray: 'sectors'},
+    { name: 'state_id', stateArray: 'states'},
+    { name: 'localization_type_id', stateArray: 'localization_types'}
 ];
 
 export default class SchoolRegister extends Component {
@@ -95,12 +96,12 @@ export default class SchoolRegister extends Component {
         this.handleChangeState = this.handleChangeState.bind(this);
         this.handleChangeChain = this.handleChangeChain.bind(this);
         this.handleChangeLocalization = this.handleChangeLocalization.bind(this);
-
+        this.searchCep = this.searchCep.bind(this);
     }
 
     componentDidMount() {
         apis.map(item => {
-            axios.get(`${item.api}`)
+            axios.get(`${item.api}?order[name]=asc`)
                 .then(response => {
                     let dados = response.data.data;
                     dados.map(item => {
@@ -150,6 +151,63 @@ export default class SchoolRegister extends Component {
         }
     }
 
+    searchStateWithCep(state_uf) {
+        this.state.states.map(item => {
+            if (item.abbrev == state_uf) {
+                this.setState({ state_id: item.id });
+            }
+        });
+    }
+
+    searchCep() {
+        axios.get(`${apiCep}/${this.state.zip_code}`)
+        .then(response => {
+            let dados = response.data.data;
+
+            if (dados.erro) {
+                const values = this.state;
+
+                values.back_error = 'CEP nāo encontrado. Verifique!';
+
+                this.setState({ values });
+
+                this.clearAddress();
+            } else {
+                const values = this.state;
+
+                values.address = dados.logradouro;
+                values.neighborhood = dados.bairro;
+                values.city = dados.localidade;
+                values.number = '';
+                values.back_error = '';
+
+                this.setState({ values });
+
+                this.searchStateWithCep(dados.uf);
+            }
+            
+        })
+        .catch(err => {
+            const values = this.state;
+
+            values.back_error = err;
+
+            this.setState({ values });
+            this.clearAddress();
+        });
+    }
+
+    clearAddress() {
+        const values = this.state;
+
+        values.address = '';
+        values.neighborhood = '';
+        values.city = '';
+        values.number = '';
+
+        this.setState({ values });
+    }
+
     handleChange(e) {
         const target = e.currentTarget;
 
@@ -186,14 +244,11 @@ export default class SchoolRegister extends Component {
             'localization_type_id': this.state.localization_type_id,
             'maintainer': this.state.maintainer
         }).then(res => {
-            console.log('res', res);
             this.setState({
                 saved: true
             });
             alert('Dados salvos com sucesso!');
         }).catch(function (error) {
-            console.log('submitForm', error);
-
             alert(error);
             this.setState({ back_error: error || '' });
         }.bind(this));
@@ -232,8 +287,6 @@ export default class SchoolRegister extends Component {
             });
             alert('Dados salvos com sucesso!');
         }).catch(function (error) {
-            console.log('updateForm', error);
-            
             alert(error);
             this.setState({ back_error: error || '' });
         })
@@ -246,17 +299,31 @@ export default class SchoolRegister extends Component {
 
         this.setState({ submitButtonDisabled: !this.form.isValid() });
 
-        // Validate selects
+        // Validate selects 
         let stopSubmit = false;
         selectsValidade.map(select => {
             let objState = `valid_select_${select.name}`;
             let objSelect = this.state[select.name];
-            
+            let objArray = this.state[select.stateArray];            
+
             if (objSelect === undefined || objSelect == 0) {
                 this.setState({ [objState]: 0, submit_button_disabled: true });
-                stopSubmit = true;
-            } else {
-                this.setState({ [objState]: 1 });
+                stopSubmit = true;                
+            } else { 
+                let disabledValue = false
+
+                objArray.map( elem => { 
+                    if(elem['id'] === objSelect) {
+                        disabledValue = true;
+                    }
+                } );
+
+                if(!disabledValue) {
+                    this.setState({ [objState]: 0, submit_button_disabled: true });
+                    stopSubmit = true;
+                } else {
+                    this.setState({ [objState]: 1 });
+                }
             }
         });
 
@@ -493,7 +560,7 @@ export default class SchoolRegister extends Component {
                             <FormGroup for="zip_code">
                                 <FormControlLabel htmlFor="zip_code">CEP <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                 <MaskedInput className="form-control" mask="11111-111" type="text" id="zip_code" name="zip_code" readOnly={this.state.viewMode}
-                                    value={this.state.zip_code} onChange={this.handleChange}
+                                    value={this.state.zip_code} onChange={this.handleChange} onBlur={this.searchCep}
                                     required />
                                 <FieldFeedbacks for="zip_code">
                                     <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
