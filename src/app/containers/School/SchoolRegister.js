@@ -213,7 +213,7 @@ export default class SchoolRegister extends Component {
     validarCNPJ(cnpj) {
         cnpj = cnpj.replace(/[^\d]+/g, '');
 
-        if (cnpj == '') return false;
+        if (cnpj == '') return true;
 
         if (cnpj.length != 14){
             this.setState({ valid_cnpj: 0, submitButtonDisabled: true });
@@ -626,15 +626,15 @@ export default class SchoolRegister extends Component {
                     <Row>
                         <Col md="3">
                             <FormGroup for="cnpj">
-                                <FormControlLabel htmlFor="cnpj">CNPJ <span className="text-danger"><strong>*</strong></span></FormControlLabel>
+                                <FormControlLabel htmlFor="cnpj">CNPJ</FormControlLabel>
                                 <MaskedInput className="form-control" mask="11.111.111/1111-11" type="text" id="cnpj" name="cnpj" readOnly={this.state.viewMode}
                                     value={this.state.cnpj} onChange={this.handleChange} required />
                                 {this.state.valid_cnpj == 0 &&
                                     <div className="form-control-feedback"><div className="error">CNPJ inválido</div></div>
                                 }
-                                <FieldFeedbacks for="cnpj">
+                                {/* <FieldFeedbacks for="cnpj">
                                     <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>                                
+                                </FieldFeedbacks>                                 */}
                             </FormGroup>
                         </Col>
 
