@@ -83,7 +83,8 @@ export default class SchoolRegister extends Component {
             valid_select_sector_id: 1,
             valid_select_state_id: 1,
             valid_select_localization_type_id: 1,
-            valid_cnpj: 1
+            valid_cnpj: 1,
+            valid_email: 1
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -99,6 +100,7 @@ export default class SchoolRegister extends Component {
         this.handleChangeLocalization = this.handleChangeLocalization.bind(this);
         this.searchCep = this.searchCep.bind(this);
         this.validarCNPJ = this.validarCNPJ.bind(this);
+        this.validarEmail = this.validarEmail.bind(this);
     }
 
     componentDidMount() {
@@ -279,6 +281,20 @@ export default class SchoolRegister extends Component {
         }
 
         return true;
+    }    
+
+    validarEmail(email) {
+        let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        console.log('validarEmail(email)', email, re.test(String(email).toLowerCase()));
+        if(email == '') return true;
+
+        if(!re.test(String(email).toLowerCase())){
+            this.setState({ valid_email: 0, submitButtonDisabled: true });
+
+            return false;
+        }
+        
+        return true;
     }
 
     handleChange(e) {
@@ -298,6 +314,15 @@ export default class SchoolRegister extends Component {
 
             this.setState({ values });
             this.validarCNPJ(target.value);
+        }
+
+        if( target.name == 'email'){
+            const values = this.state;
+            values.valid_email = 1;
+            values.submitButtonDisabled = false;
+
+            this.setState({ values });
+            this.validarEmail(target.value);
         }
     }
 
@@ -410,6 +435,10 @@ export default class SchoolRegister extends Component {
         });
 
         if(!this.validarCNPJ(this.state.cnpj)){
+            stopSubmit = true;
+        }
+
+        if(!this.validarEmail(this.state.email)){
             stopSubmit = true;
         }
 
@@ -632,9 +661,6 @@ export default class SchoolRegister extends Component {
                                 {this.state.valid_cnpj == 0 &&
                                     <div className="form-control-feedback"><div className="error">CNPJ inválido</div></div>
                                 }
-                                {/* <FieldFeedbacks for="cnpj">
-                                    <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>                                 */}
                             </FormGroup>
                         </Col>
 
@@ -679,6 +705,9 @@ export default class SchoolRegister extends Component {
                                 <FormControlLabel htmlFor="email">E-mail</FormControlLabel>
                                 <FormControlInput type="text" id="email" name="email" readOnly={this.state.viewMode}
                                     value={this.state.email} onChange={this.handleChange} />
+                                {this.state.valid_email == 0 &&
+                                    <div className="form-control-feedback"><div className="error">E-mail inválido</div></div>
+                                }
                             </FormGroup>
                         </Col>
                     </Row>
