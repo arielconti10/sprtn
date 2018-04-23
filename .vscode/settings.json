@@ -6,5 +6,6 @@
     "workbench.colorCustomizations": {
         "sideBar.background": "#22323a",
         // "activityBar.foreground": "#00FFFF"
-    }
+    },
+    "git.ignoreLimitWarning": true
 }

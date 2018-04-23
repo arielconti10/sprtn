@@ -30,9 +30,9 @@ const apis = [
 const selectsValidade = [
     { name: 'school_type_id', stateArray: 'school_types' },
     { name: 'subsidiary_id', stateArray: 'subsidiaries' },
-    { name: 'sector_id', stateArray: 'sectors'},
-    { name: 'state_id', stateArray: 'states'},
-    { name: 'localization_type_id', stateArray: 'localization_types'}
+    { name: 'sector_id', stateArray: 'sectors' },
+    { name: 'state_id', stateArray: 'states' },
+    { name: 'localization_type_id', stateArray: 'localization_types' }
 ];
 
 export default class SchoolRegister extends Component {
@@ -82,7 +82,8 @@ export default class SchoolRegister extends Component {
             valid_select_subsidiary_id: 1,
             valid_select_sector_id: 1,
             valid_select_state_id: 1,
-            valid_select_localization_type_id: 1
+            valid_select_localization_type_id: 1,
+            valid_cnpj: 1
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -97,6 +98,7 @@ export default class SchoolRegister extends Component {
         this.handleChangeChain = this.handleChangeChain.bind(this);
         this.handleChangeLocalization = this.handleChangeLocalization.bind(this);
         this.searchCep = this.searchCep.bind(this);
+        this.validarCNPJ = this.validarCNPJ.bind(this);
     }
 
     componentDidMount() {
@@ -106,7 +108,7 @@ export default class SchoolRegister extends Component {
                     let dados = response.data.data;
                     dados.map(item => {
                         item['value'] = item.id,
-                        item['label'] = item.name
+                            item['label'] = item.name
                     });
                     this.setState({ [item.stateArray]: dados });
                 })
@@ -161,40 +163,40 @@ export default class SchoolRegister extends Component {
 
     searchCep() {
         axios.get(`${apiCep}/${this.state.zip_code}`)
-        .then(response => {
-            let dados = response.data.data;
+            .then(response => {
+                let dados = response.data.data;
 
-            if (dados.erro) {
+                if (dados.erro) {
+                    const values = this.state;
+
+                    values.back_error = 'CEP nāo encontrado. Verifique!';
+
+                    this.setState({ values });
+
+                    this.clearAddress();
+                } else {
+                    const values = this.state;
+
+                    values.address = dados.logradouro;
+                    values.neighborhood = dados.bairro;
+                    values.city = dados.localidade;
+                    values.number = '';
+                    values.back_error = '';
+
+                    this.setState({ values });
+
+                    this.searchStateWithCep(dados.uf);
+                }
+
+            })
+            .catch(err => {
                 const values = this.state;
 
-                values.back_error = 'CEP nāo encontrado. Verifique!';
+                values.back_error = err;
 
                 this.setState({ values });
-
                 this.clearAddress();
-            } else {
-                const values = this.state;
-
-                values.address = dados.logradouro;
-                values.neighborhood = dados.bairro;
-                values.city = dados.localidade;
-                values.number = '';
-                values.back_error = '';
-
-                this.setState({ values });
-
-                this.searchStateWithCep(dados.uf);
-            }
-            
-        })
-        .catch(err => {
-            const values = this.state;
-
-            values.back_error = err;
-
-            this.setState({ values });
-            this.clearAddress();
-        });
+            });
     }
 
     clearAddress() {
@@ -208,6 +210,77 @@ export default class SchoolRegister extends Component {
         this.setState({ values });
     }
 
+    validarCNPJ(cnpj) {
+        cnpj = cnpj.replace(/[^\d]+/g, '');
+
+        if (cnpj == '') return false;
+
+        if (cnpj.length != 14){
+            this.setState({ valid_cnpj: 0, submitButtonDisabled: true });
+
+            return false;
+        }
+
+        // Elimina CNPJs invalidos conhecidos
+        if (cnpj == "00000000000000" ||
+            cnpj == "11111111111111" ||
+            cnpj == "22222222222222" ||
+            cnpj == "33333333333333" ||
+            cnpj == "44444444444444" ||
+            cnpj == "55555555555555" ||
+            cnpj == "66666666666666" ||
+            cnpj == "77777777777777" ||
+            cnpj == "88888888888888" ||
+            cnpj == "99999999999999"){
+
+            this.setState({ valid_cnpj: 0, submitButtonDisabled: true });
+
+            return false;
+        }
+
+        // Valida DVs
+        let tamanho = cnpj.length - 2;
+        let numeros = cnpj.substring(0, tamanho);
+        let digitos = cnpj.substring(tamanho);
+        let soma = 0;
+        let pos = tamanho - 7;
+
+        for (let i = tamanho; i >= 1; i--) {
+            soma += numeros.charAt(tamanho - i) * pos--;
+            if (pos < 2)
+                pos = 9;
+        }
+
+        let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+
+        if (resultado != digitos.charAt(0)){
+            this.setState({ valid_cnpj: 0, submitButtonDisabled: true });
+
+            return false;
+        }
+
+        tamanho = tamanho + 1;
+        numeros = cnpj.substring(0, tamanho);
+        soma = 0;
+        pos = tamanho - 7;
+
+        for (let i = tamanho; i >= 1; i--) {
+            soma += numeros.charAt(tamanho - i) * pos--;
+            if (pos < 2)
+                pos = 9;
+        }
+
+        resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+
+        if (resultado != digitos.charAt(1)){
+            this.setState({ valid_cnpj: 0, submitButtonDisabled: true });
+
+            return false;
+        }
+
+        return true;
+    }
+
     handleChange(e) {
         const target = e.currentTarget;
 
@@ -217,6 +290,15 @@ export default class SchoolRegister extends Component {
             [target.name]: (target.type == 'checkbox') ? target.checked : target.value,
             submitButtonDisabled: !this.form.isValid()
         });
+
+        if( target.name == 'cnpj'){
+            const values = this.state;
+            values.valid_cnpj = 1;
+            values.submitButtonDisabled = false;
+
+            this.setState({ values });
+            this.validarCNPJ(target.value);
+        }
     }
 
     submitForm(event) {
@@ -304,22 +386,22 @@ export default class SchoolRegister extends Component {
         selectsValidade.map(select => {
             let objState = `valid_select_${select.name}`;
             let objSelect = this.state[select.name];
-            let objArray = this.state[select.stateArray];            
+            let objArray = this.state[select.stateArray];
 
             if (objSelect === undefined || objSelect == 0) {
-                this.setState({ [objState]: 0, submit_button_disabled: true });
-                stopSubmit = true;                
-            } else { 
+                this.setState({ [objState]: 0, submitButtonDisabled: true });
+                stopSubmit = true;
+            } else {
                 let disabledValue = false
 
-                objArray.map( elem => { 
-                    if(elem['id'] === objSelect) {
+                objArray.map(elem => {
+                    if (elem['id'] === objSelect) {
                         disabledValue = true;
                     }
-                } );
+                });
 
-                if(!disabledValue) {
-                    this.setState({ [objState]: 0, submit_button_disabled: true });
+                if (!disabledValue) {
+                    this.setState({ [objState]: 0, submitButtonDisabled: true });
                     stopSubmit = true;
                 } else {
                     this.setState({ [objState]: 1 });
@@ -327,9 +409,13 @@ export default class SchoolRegister extends Component {
             }
         });
 
-        if(stopSubmit){
+        if(!this.validarCNPJ(this.state.cnpj)){
+            stopSubmit = true;
+        }
+
+        if (stopSubmit) {
             return;
-        }        
+        }
 
         if (this.form.isValid()) {
             if (this.state.id !== undefined) {
@@ -341,7 +427,7 @@ export default class SchoolRegister extends Component {
     }
 
     handleChangeType = (selectedOption) => {
-        this.setState({ valid_select_school_type_id: 1, submit_button_disabled: false });
+        this.setState({ valid_select_school_type_id: 1, submitButtonDisabled: false });
 
         const values = this.state;
         values.school_type_id = selectedOption.value;
@@ -349,7 +435,7 @@ export default class SchoolRegister extends Component {
     }
 
     handleChangeSubsidiary = (selectedOption) => {
-        this.setState({ valid_select_subsidiary_id: 1, submit_button_disabled: false });
+        this.setState({ valid_select_subsidiary_id: 1, submitButtonDisabled: false });
 
         const values = this.state;
         values.subsidiary_id = selectedOption.value;
@@ -357,8 +443,8 @@ export default class SchoolRegister extends Component {
     }
 
     handleChangeSector = (selectedOption) => {
-        this.setState({ valid_select_sector_id: 1, submit_button_disabled: false });
-        
+        this.setState({ valid_select_sector_id: 1, submitButtonDisabled: false });
+
         const values = this.state;
         values.sector_id = selectedOption.value;
         this.setState({ values });
@@ -377,7 +463,7 @@ export default class SchoolRegister extends Component {
     }
 
     handleChangeState = (selectedOption) => {
-        this.setState({ valid_select_state_id: 1, submit_button_disabled: false });
+        this.setState({ valid_select_state_id: 1, submitButtonDisabled: false });
 
         const values = this.state;
         values.state_id = selectedOption.value;
@@ -391,7 +477,7 @@ export default class SchoolRegister extends Component {
     }
 
     handleChangeLocalization = (selectedOption) => {
-        this.setState({ valid_select_localization_type_id: 1, submit_button_disabled: false });
+        this.setState({ valid_select_localization_type_id: 1, submitButtonDisabled: false });
 
         const values = this.state;
         values.localization_type_id = selectedOption.value;
@@ -404,13 +490,13 @@ export default class SchoolRegister extends Component {
 
         return (
             <div>
-                
+
                 <RingLoader
                     color={'#123abc'}
                     loading={this.state.ringLoad}
                     margin='50px'
                 />
-                
+
                 {this.state.back_error !== '' &&
                     <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                 }
@@ -428,6 +514,7 @@ export default class SchoolRegister extends Component {
                                     value={this.state.school_type_id}
                                     onChange={this.handleChangeType}
                                     options={school_types}
+                                    placeholder="Selecione..."
                                 />
                                 {this.state.valid_select_school_type_id == 0 &&
                                     <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
@@ -445,6 +532,7 @@ export default class SchoolRegister extends Component {
                                     value={this.state.subsidiary_id}
                                     onChange={this.handleChangeSubsidiary}
                                     options={subsidiaries}
+                                    placeholder="Selecione..."
                                 />
                                 {this.state.valid_select_subsidiary_id == 0 &&
                                     <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
@@ -462,6 +550,7 @@ export default class SchoolRegister extends Component {
                                     value={this.state.sector_id}
                                     onChange={this.handleChangeSector}
                                     options={sectors}
+                                    placeholder="Selecione..."
                                 />
                                 {this.state.valid_select_sector_id == 0 &&
                                     <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
@@ -487,6 +576,7 @@ export default class SchoolRegister extends Component {
                                     value={this.state.profile_id}
                                     onChange={this.handleChangeProfile}
                                     options={profiles}
+                                    placeholder="Selecione..."
                                 />
                             </FormGroup>
                         </Col>
@@ -503,6 +593,7 @@ export default class SchoolRegister extends Component {
                                     value={this.state.congregation_id}
                                     onChange={this.handleChangeCongregation}
                                     options={congregations}
+                                    placeholder="Selecione..."
                                 />
                             </FormGroup>
                         </Col>
@@ -538,9 +629,12 @@ export default class SchoolRegister extends Component {
                                 <FormControlLabel htmlFor="cnpj">CNPJ <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                 <MaskedInput className="form-control" mask="11.111.111/1111-11" type="text" id="cnpj" name="cnpj" readOnly={this.state.viewMode}
                                     value={this.state.cnpj} onChange={this.handleChange} required />
+                                {this.state.valid_cnpj == 0 &&
+                                    <div className="form-control-feedback"><div className="error">CNPJ inválido</div></div>
+                                }
                                 <FieldFeedbacks for="cnpj">
                                     <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
+                                </FieldFeedbacks>                                
                             </FormGroup>
                         </Col>
 
@@ -646,6 +740,7 @@ export default class SchoolRegister extends Component {
                                     value={this.state.state_id}
                                     onChange={this.handleChangeState}
                                     options={states}
+                                    placeholder="Selecione..."
                                 />
                                 {this.state.valid_select_state_id == 0 &&
                                     <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
@@ -663,6 +758,7 @@ export default class SchoolRegister extends Component {
                                     value={this.state.chain_id}
                                     onChange={this.handleChangeChain}
                                     options={chains}
+                                    placeholder="Selecione..."
                                 />
                             </FormGroup>
                         </Col>
@@ -677,6 +773,7 @@ export default class SchoolRegister extends Component {
                                     value={this.state.localization_type_id}
                                     onChange={this.handleChangeLocalization}
                                     options={localization_types}
+                                    placeholder="Selecione..."
                                 />
                                 {this.state.valid_select_localization_type_id == 0 &&
                                     <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
