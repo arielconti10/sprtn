@@ -3,7 +3,19 @@ export default {
     {
       name: 'Dashboard',
       url: '/dashboard',
-      icon: 'icon-speedometer'
+      icon: 'icon-speedometer',
+      children: [
+        {
+            name: 'Market share',
+            url: '#',
+            icon: 'fa fa-caret-right'
+          },
+          {
+            name: 'Indicadores',
+            url: '#',
+            icon: 'fa fa-caret-right'
+          }
+      ]
     },
     {
       name: 'Carteira',
@@ -13,14 +25,24 @@ export default {
         {
           name: 'Escolas',
           url: '/carteira/escolas',
-          icon: 'fa fa-list'
+          icon: 'fa fa-caret-right'
         },
+        {
+          name: 'Distribuição',
+          url: '#',
+          icon: 'fa fa-caret-right'
+        },
+        {
+          name: 'Termo de aceite',
+          url: '#',
+          icon: 'fa fa-caret-right'
+        }
       ]
     },
     {
-      name: 'Cadastro',
+      name: 'Administração',
       url: '/cadastro',
-      icon: 'fa fa-book',
+      icon: 'fa fa-edit',
       children: [
         {
             name: 'Ações',
@@ -95,10 +117,27 @@ export default {
       ]
     },
     {
+      name: 'Relatórios',
+      url: '#',
+      icon: 'fa fa-files-o',
+      children: [
+        {
+            name: 'Escolas',
+            url: '#',
+            icon: 'fa fa-caret-right'
+        }
+      ]
+    },
+    {
         name: 'Configuração',
         url: '/config',
-        icon: 'fa fa-book',
+        icon: 'fa fa-cogs',
         children: [
+            {
+                name: 'Usuários',
+                url: '/config/usuarios',
+                icon: 'fa fa-caret-right'
+            },
             {
                 name: 'Regras',
                 url: '/config/regras',
@@ -108,12 +147,7 @@ export default {
                 name: 'Permissões',
                 url: '/config/permissoes',
                 icon: 'fa fa-caret-right'
-            },
-            {
-                name: 'Usuários',
-                url: '/config/usuarios',
-                icon: 'fa fa-caret-right'
-            },
+            }
         ]
     }
   ]
