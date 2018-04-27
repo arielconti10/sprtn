@@ -721,10 +721,10 @@ export default class SchoolRegister extends Component {
                             <FormGroup for="maintainer">
                                 <FormControlLabel htmlFor="maintainer">Mantenedora</FormControlLabel>
                                 <FormControlInput type="text" id="maintainer" name="maintainer" readOnly={this.state.viewMode}
-                                    value={this.state.maintainer} onChange={this.handleChange} required />
-                                <FieldFeedbacks for="maintainer">
+                                    value={this.state.maintainer} onChange={this.handleChange}  />
+                                {/* <FieldFeedbacks for="maintainer">
                                     <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
+                                </FieldFeedbacks> */}
                             </FormGroup>
                         </Col>
                     </Row>

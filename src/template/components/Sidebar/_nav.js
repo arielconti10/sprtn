@@ -15,6 +15,11 @@ export default {
           url: '/carteira/escolas',
           icon: 'fa fa-list'
         },
+        {
+            name: 'Distribuição',
+            url: '/carteira/distribuicao',
+            icon: 'fa fa-list'
+          },
       ]
     },
     {

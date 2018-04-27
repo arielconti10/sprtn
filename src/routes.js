@@ -7,6 +7,7 @@ const routes = {
   '/carteira/escolas': 'Escolas',
   '/carteira/escolas/form': 'Cadastro',
   '/carteira/escolas/alunos': 'Alunos',
+  '/carteira/distribuicao': 'Distribuição',
   '/cadastro': 'Cadastro',
   '/cadastro/cargos': 'Cargos',
   '/cadastro/cargos/form': 'Cargos',
