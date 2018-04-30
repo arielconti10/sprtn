@@ -24,7 +24,7 @@ const BOOTSTRAP_CLASSES = {
 
 const apis = [
     { stateArray: 'school_types', fieldLabel:'name', name: 'school_type_id', api: 'school-type' },
-    { stateArray: 'sectors', fieldLabel:'name', name: 'sector_id', api: 'sector' },
+    //{ stateArray: 'sectors', fieldLabel:'name', name: 'sector_id', api: 'sector' },
     { stateArray: 'subsidiaries', fieldLabel:'name', name: 'subsidiary_id', api: 'subsidiary' },
     { stateArray: 'users', fieldLabel:'full_name', name: 'user_id', api: 'hierarchy/childrens' }
 ];
@@ -65,6 +65,8 @@ class UserSchools extends Component {
         deselectedOptions.forEach(option => {
           selectedOptions.splice(selectedOptions.indexOf(option), 1)
         })
+
+        //console.log()
         this.setState({selectedOptions})
     }
 
@@ -73,7 +75,7 @@ class UserSchools extends Component {
         this.setState({selectedOptions})
     }
 
-    handleSelectChange = (field, value, func) => {
+    handleSelectChange = (field, value, func, obj) => {
 
         //console.log(typeof value);
 
@@ -89,16 +91,22 @@ class UserSchools extends Component {
         
         this.setState({ values });
 
-        func();
+        func(obj);
     }
 
+    getSectors = (obj) => {
+        console.log(obj.sectors);
+        this.setState({sectors: obj.sectors});
+    }
     getSchools = () => {
 
         console.log(this.state);
 
+        this.setState({schools: []});
+
         let filters = "";
         if (this.state.sector_id == 0 && this.state.school_type_id == 0) {
-            this.setState({schools: []});
+            //this.setState({schools: []});
             return false;
         }
 
@@ -112,8 +120,7 @@ class UserSchools extends Component {
 
         if (this.state.school_type_id != 0) {
 
-
-                filters += "&filter[school_type_id]=" + this.state.school_type_id.join("&filter[school_type_id]=");
+                filters += "&filter[school_type_id][]=" + this.state.school_type_id.join("&filter[school_type_id][]=");
         }
 
         axios.get('user-schools?' + filters)
@@ -162,12 +169,12 @@ class UserSchools extends Component {
                         </Col>
                         <Col xs="3" sm="3" md="3"> 
                             
-                            <FormGroup for="sector_id">
+                            <FormGroup for="subsidiary_id">
                                 <FormControlLabel htmlFor="subsidiary_id">Filial</FormControlLabel>
                                 <Select
                                     name="subsidiary_id"
-                                    onChange={(selectedOption) => {this.handleSelectChange('subsidiary_id', selectedOption.id, this.getSchools);}}
-                                    labelKey="name"
+                                    onChange={(selectedOption) => {this.handleSelectChange('subsidiary_id', selectedOption.id, this.getSectors, selectedOption);}}
+                                    labelKey="code_name"
                                     valueKey="id"
                                     value={this.state.subsidiary_id}
                                     multi={false}
