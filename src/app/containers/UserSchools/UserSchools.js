@@ -60,19 +60,50 @@ class UserSchools extends Component {
         });
     }
     
+    handleSelect = (selectedOptions) => {
+
+        console.log(selectedOptions);
+        if (this.state.user_id == 0) {
+            //validação de obrigatorio do campo de usuário
+            return false;
+        }
+        selectedOptions.sort((a, b) => a.id - b.id);
+
+        axios.post('user-school', {
+            'user_id': this.state.user_id,
+            'school_id': selectedOptions.map(item => item.id)
+        })
+        .then(response => {
+            this.setState({selectedOptions})
+        })
+        .catch(err => console.log(err));
+        
+
+        //console.log(this.state.user_id);
+    }
+
     handleDeselect = (deselectedOptions) => {
+
+        if (this.state.user_id == 0) {
+            //validação de obrigatoriedade do campo de usuário
+            return false;
+        }
+
         var selectedOptions = this.state.selectedOptions.slice()
         deselectedOptions.forEach(option => {
           selectedOptions.splice(selectedOptions.indexOf(option), 1)
         })
 
-        //console.log()
-        this.setState({selectedOptions})
-    }
+        axios.delete('user-school', {
+            params: {
+                'user_id': this.state.user_id,
+                'school_id': deselectedOptions.map(item => item.id)
+            }           
+        })
+        .then(response => {           
 
-    handleSelect = (selectedOptions) => {
-        selectedOptions.sort((a, b) => a.id - b.id)
-        this.setState({selectedOptions})
+            this.setState({selectedOptions})
+        })
     }
 
     handleSelectChange = (field, value, func, obj) => {
@@ -95,12 +126,37 @@ class UserSchools extends Component {
     }
 
     getSectors = (obj) => {
-        console.log(obj.sectors);
+        //console.log(obj.sectors);
         this.setState({sectors: obj.sectors});
     }
+
+    getUserSchool = (obj) => {
+
+        axios.get('user-school/' + obj.id)
+                .then(response => {
+                    let dados = response.data.data;
+
+                    console.log(dados);
+                    this.setState({selectedOptions: dados})
+                    //console.log(Object.keys(dados).length);
+                    // dados.map(data => (item) => {
+                    //     data['value'] = data.id,
+                    //     data['label'] = data[item.fieldName]
+                    // });
+                    //this.setState({ schools: dados });
+                })
+                .catch(err => console.log(err));
+
+        // const role_id = selectedOption.map(function(item) {
+        //     return item.id;
+        // });
+
+        // this.setState({ role_id: role_id });
+    }
+
     getSchools = () => {
 
-        console.log(this.state);
+        //console.log(this.state);
 
         this.setState({schools: []});
 
@@ -126,7 +182,7 @@ class UserSchools extends Component {
         axios.get('user-schools?' + filters)
                 .then(response => {
                     let dados = response.data.data;
-                    console.log(Object.keys(dados).length);
+                    //console.log(Object.keys(dados).length);
                     // dados.map(data => (item) => {
                     //     data['value'] = data.id,
                     //     data['label'] = data[item.fieldName]
@@ -157,7 +213,7 @@ class UserSchools extends Component {
                                 <FormControlLabel htmlFor="user_id">Consultor</FormControlLabel>
                                 <Select
                                     name="user_id"
-                                    onChange={(selectedOption) => this.setState({ user_id: selectedOption.id })}
+                                    onChange={(selectedOption) => {this.handleSelectChange('user_id', selectedOption.id, this.getUserSchool, selectedOption);}}
                                     labelKey="full_name"
                                     valueKey="id"
                                     value={this.state.user_id}
