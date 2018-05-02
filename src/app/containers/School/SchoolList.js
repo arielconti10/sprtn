@@ -89,6 +89,16 @@ class SchoolList extends Component {
     componentDidMount() {
 
         let col = [
+            {
+                Header: "Ações", accessor: "", sortable: false, width: 50, headerClassName: 'text-left', Cell: (element) => (
+                    <div>
+                        <Link to={this.props.match.url + "/" + element.value.id}
+                            params={{ id: element.value.id }} className='btn btn-primary btn-sm' >
+                            <i className='fa fa-eye'></i>
+                        </Link>
+                    </div>
+                )
+            },
             { Header: "Nome", accessor: "name", sortable: true, filterable: true, minWidth: 250, maxWidth: 500, headerClassName: 'text-left' },
             { Header: 'Tipo', accessor: 'school_type.name', sortable: true, filterable: true, width: 160, headerClassName: 'text-left' },
             {
@@ -130,17 +140,7 @@ class SchoolList extends Component {
             },
             { Header: "CEP", accessor: "zip_code", filterable: true, width: 100, headerClassName: 'text-left' },
             { Header: "Cidade", accessor: "city", filterable: true, width: 160, headerClassName: 'text-left' },
-            { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left' },
-            {
-                Header: "Ações", accessor: "", sortable: false, width: 50, headerClassName: 'text-left', Cell: (element) => (
-                    <div>
-                        <Link to={this.props.match.url + "/" + element.value.id}
-                            params={{ id: element.value.id }} className='btn btn-primary btn-sm' >
-                            <i className='fa fa-eye'></i>
-                        </Link>
-                    </div>
-                )
-            }
+            { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left' }            
         ];
 
         this.setState({ columns: col });
