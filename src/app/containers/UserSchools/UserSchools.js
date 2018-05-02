@@ -68,7 +68,8 @@ class UserSchools extends Component {
 
         axios.post('user-school', {
             'user_id': this.state.user_id,
-            'school_id': selectedOptions.map(item => item.id)
+            'school_id': selectedOptions.map(item => item.id),
+            'type': 'insert'
         })
         .then(response => {
             this.setState({selectedOptions})
@@ -91,11 +92,10 @@ class UserSchools extends Component {
           selectedOptions.splice(selectedOptions.indexOf(option), 1)
         })
 
-        axios.delete('user-school', {
-            params: {
-                'user_id': this.state.user_id,
-                'school_id': deselectedOptions.map(item => item.id)
-            }           
+        axios.post('user-school', {
+            'user_id': this.state.user_id,
+            'school_id': deselectedOptions.map(item => item.id),
+            'type': 'delete'       
         })
         .then(response => {           
 
