@@ -157,7 +157,7 @@ class UserSchools extends Component {
 
         this.setState({schools: []});
 
-        let filters = "";
+        let filters = "&filter[active]=0";
         if (this.state.sector_id == 0 && this.state.school_type_id == 0) {
             //this.setState({schools: []});
             return false;
