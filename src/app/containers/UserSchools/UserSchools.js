@@ -12,9 +12,6 @@ import FilteredMultiSelect from 'react-filtered-multiselect';
 
 import axios from '../../../app/common/axios';
 
-import UserSchoolsList from './UserSchoolsList';
-import UserSchoolsForm from './UserSchoolsList';
-
 const BOOTSTRAP_CLASSES = {
     filter: 'form-control',
     select: 'form-control',
