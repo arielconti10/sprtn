@@ -157,7 +157,7 @@ class UserSchools extends Component {
 
         this.setState({schools: []});
 
-        let filters = "&filter[active]=0";
+        let filters = "&filter[active]=1";
         if (this.state.sector_id == 0 && this.state.school_type_id == 0) {
             //this.setState({schools: []});
             return false;
@@ -172,8 +172,7 @@ class UserSchools extends Component {
         }
 
         if (this.state.school_type_id != 0) {
-
-                filters += "&filter[school_type_id][]=" + this.state.school_type_id.join("&filter[school_type_id][]=");
+            filters += "&filter[school_type_id][]=" + this.state.school_type_id.join("&filter[school_type_id][]=");
         }
 
         axios.get('user-schools?' + filters)
