@@ -85,7 +85,7 @@ class RuleForm extends Component {
         });
 
         this.setState({ role_id: role_id });
-      }
+    }
 
     submitForm(event) {
 

@@ -28,14 +28,14 @@ export default {
           icon: 'fa fa-caret-right'
         },
         {
-          name: 'Distribuição',
-          url: '#',
-          icon: 'fa fa-caret-right'
+            name: 'Distribuição',
+            url: '/carteira/distribuicao',
+            icon: 'fa fa-list'
         },
         {
-          name: 'Termo de aceite',
-          url: '#',
-          icon: 'fa fa-caret-right'
+            name: 'Termo de aceite',
+            url: '#',
+            icon: 'fa fa-caret-right'
         }
       ]
     },

@@ -32,6 +32,8 @@ import Roles from '../../../app/containers/Role/Roles';
 import Rules from '../../../app/containers/Rule/Rules';
 import Users from '../../../app/containers/User/Users';
 
+import UserSchools from '../../../app/containers/UserSchools/UserSchools';
+
 class Full extends Component {
 
     render() {
@@ -55,6 +57,7 @@ class Full extends Component {
                                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
                                 <Route path="/logout" name="Logout" component={Logout}/>
                                 <Route path="/carteira/escolas" name="Carteira" component={Schools}/>
+                                <Route path="/carteira/distribuicao" name="Distribuicao" component={UserSchools}/>
                                 {/*<Route path="/carteira/escolas/alunos" name="Carteira" component={SchoolForm}/>*/}
                                 <Route path="/cadastro/cargos" name="Cargos" component={JobTitles}/>
                                 <Route path="/cadastro/filiais" name="Filiais" component={Subsidiaries}/>
