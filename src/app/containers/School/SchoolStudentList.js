@@ -53,6 +53,7 @@ class SchoolStudentList extends Component {
             label_forth_grade: '',
             label_fifth_grade: '',
 
+            form_year: 0,
             form_level_id: 0,
             form_shift_id: 0,
             form_first_grade: 0,
@@ -112,6 +113,7 @@ class SchoolStudentList extends Component {
             label_forth_grade: '',
             label_fifth_grade: '',
 
+            form_year: 0,
             form_level_id: 0,
             form_shift_id: 0,
             form_first_grade: 0,
@@ -142,10 +144,11 @@ class SchoolStudentList extends Component {
     }
 
     onClickEdit(element) {
-        const { id, level_id, shift_id, first_grade, second_grade, third_grade, forth_grade, fifth_grade } = element.value;
+        const { id, year, level_id, shift_id, first_grade, second_grade, third_grade, forth_grade, fifth_grade } = element.value;
 
         this.setState({
             id: id,
+            form_year: year,
             form_level_id: level_id,
             form_shift_id: shift_id,
             form_first_grade: first_grade,
@@ -179,12 +182,13 @@ class SchoolStudentList extends Component {
     }
 
     onClickActive(element) {
-        const { id, level_id, school_id, shift_id, first_grade, second_grade, third_grade, forth_grade, fifth_grade, total } = element.value;
+        const { id, year, level_id, school_id, shift_id, first_grade, second_grade, third_grade, forth_grade, fifth_grade, total } = element.value;
 
         axios.put(`${apiSpartan}/${id}`, {
+            'year': year,
             'level_id': level_id,
             'school_id': school_id,
-            'shift_id': shift_id,
+            'shift_id': parseInt(form_shift_id) || 0,
             'first_grade': first_grade,
             'second_grade': second_grade,
             'third_grade': third_grade,
@@ -298,15 +302,16 @@ class SchoolStudentList extends Component {
         event.preventDefault();
 
         // const { school_id, form_level_id, form_first_grade, form_second_grade, form_third_grade, form_forth_grade, form_fifth_grade } = this.state;
-        const { school_id, form_level_id, form_shift_id, form_first_grade, form_second_grade, form_third_grade, form_forth_grade, form_fifth_grade } = this.state;
+        const { school_id, form_year, form_level_id, form_shift_id, form_first_grade, form_second_grade, form_third_grade, form_forth_grade, form_fifth_grade } = this.state;
         
         // let form_shift_id = (this.state.form_shift_id && this.state.form_shift_id > 0) ? parseInt(this.state.form_shift_id) : null;
 
         console.log('form_shift_id', form_shift_id)
         axios.post(`${apiSpartan}`, {
+            'year': parseInt(form_year),
             'school_id': parseInt(school_id),
             'level_id': parseInt(form_level_id),
-            'shift_id': form_shift_id,
+            'shift_id': parseInt(form_shift_id) || 0,
             'first_grade': parseInt(form_first_grade),
             'second_grade': parseInt(form_second_grade),
             'third_grade': parseInt(form_third_grade),
@@ -325,10 +330,11 @@ class SchoolStudentList extends Component {
     updateForm(event) {
 
         event.preventDefault();
-        const { id, school_id, form_level_id, form_shift_id, form_first_grade, form_second_grade, form_third_grade, form_forth_grade, form_fifth_grade } = this.state;
+        const { id, form_year, school_id, form_level_id, form_shift_id, form_first_grade, form_second_grade, form_third_grade, form_forth_grade, form_fifth_grade } = this.state;
 
         console.log('form_shift_id', form_shift_id)
         axios.put(`${apiSpartan}/${id}`, {
+            'year': parseInt(form_year),
             'school_id': parseInt(school_id),
             'level_id': parseInt(form_level_id),
             'shift_id': parseInt(form_shift_id) || 0,
@@ -438,7 +444,7 @@ class SchoolStudentList extends Component {
     }
 
     render() {
-        const { data, pageSize, page, loading, pages, columns, levels, shifts, form_level_id, form_shift_id } = this.state;
+        const { data, pageSize, page, loading, pages, columns, levels, shifts, form_year, form_level_id, form_shift_id } = this.state;
     
         return (
             <div>
@@ -453,6 +459,18 @@ class SchoolStudentList extends Component {
                                     onSubmit={this.handleSubmit} noValidate>
 
                                     <Row>
+                                        <Col md="2">
+                                            <FormGroup for="form_year">
+                                                <FormControlLabel htmlFor="form_year">Ano <span className="text-danger"><strong>*</strong></span></FormControlLabel>
+                                                <FormControlInput type="number" id="form_year" name="form_year" readOnly={false}
+                                                    value={this.state.form_year} onChange={this.handleChange}
+                                                    required />
+                                                <FieldFeedbacks for="form_year">
+                                                    <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                                    <FieldFeedback when={value => value.length !== 4}>Este campo possui um valor inválido</FieldFeedback>
+                                                </FieldFeedbacks>
+                                            </FormGroup>
+                                        </Col>
                                         <Col md="3">
                                             <FormGroup for="form_level_id">
                                                 <label>Nível <span className="text-danger"><strong>*</strong></span></label>
@@ -580,8 +598,8 @@ class SchoolStudentList extends Component {
                             <ReactTable
                                 data={data}
                                 columns={[
+                                    { Header: "Ano", accessor: "year", headerClassName: 'text-left', filterable: true },
                                     { Header: "Nível", accessor: "level.name", headerClassName: 'text-left', filterable: true, width: 180, Footer: ( <span><strong>Total</strong></span> ) },
-                                    { Header: "Turno", accessor: "shift.name", headerClassName: 'text-left', filterable: true },
                                     { Header: "1ª grade", accessor: "first_grade", headerClassName: 'text-left', 
                                         Footer: (
                                             <span>
