@@ -19,6 +19,10 @@
 .nav-tabs.tab-publico .nav-link.active { border-bottom-width: 3px; border-color: #fff !important; border-bottom-color: #8c7300 !important; }
 .nav-tabs.tab-publico .nav-link:hover { border-bottom-width: 3px; border-bottom-color: #8c7300 !important; border-top-color: transparent !important; border-left-color: transparent !important; border-right-color: transparent !important; }
 
+.cont-secretaria { border-color: #a3f79c !important; }
+.nav-tabs.tab-secretaria .nav-link.active { border-bottom-width: 3px; border-color: #fff !important; border-bottom-color: #1d6a17 !important; }
+.nav-tabs.tab-secretaria .nav-link:hover { border-bottom-width: 3px; border-bottom-color: #1d6a17 !important; border-top-color: transparent !important; border-left-color: transparent !important; border-right-color: transparent !important; }
+
 .school-header { font-size: 20px  !important; padding:  10px 15px  !important; background: #f7f7f7  !important; border: 1px solid #ececec  !important; border-radius: 6px  !important; }
 .school-header i { font-size: 22px !important; }
 .school-header-students { font-size: 16px !important; padding: 3px 0  !important; color: #109800  !important; }
