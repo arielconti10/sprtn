@@ -3,9 +3,12 @@ import { Link, Redirect } from 'react-router-dom';
 
 import axios from '../../../app/common/axios';
 
-import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, CardBody, Button, Label, Input, Table } from 'reactstrap';
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
+
+import Select, { Async } from 'react-select';
+import 'react-select/dist/react-select.css';
 
 const apiPost = 'action';
 
@@ -153,6 +156,66 @@ class ActionForm extends Component {
                                 </FieldFeedbacks>
                             </FormGroup>
                         </div>
+                        <Row>
+                            <Col xs="5" sm="5" md="5"> 
+                            
+                                <FormGroup for="user_id">
+                                    <FormControlLabel htmlFor="user_id">Tipo de Visita</FormControlLabel>
+                                    <Select
+                                        name="user_id"
+                                        //onChange={(selectedOption) => {this.handleSelectChange('user_id', selectedOption.id, this.getUserSchool, selectedOption);}}
+                                        labelKey="full_name"
+                                        valueKey="id"
+                                        //value={this.state.user_id}
+                                        placeholder="Selecione o consultor"
+                                        multi={false}
+                                        //options={this.state.users}
+                                    />
+                                </FormGroup>  
+                            </Col>
+                            <Col xs="5" sm="5" md="5"> 
+                                
+                                <FormGroup for="subsidiary_id">
+                                    <FormControlLabel htmlFor="subsidiary_id">Tipo de Escola</FormControlLabel>
+                                    <Select
+                                        name="subsidiary_id"
+                                        //onChange={(selectedOption) => {this.handleSelectChange('subsidiary_id', selectedOption.id, this.getSectors, selectedOption);}}
+                                        labelKey="code_name"
+                                        valueKey="id"
+                                        //value={this.state.subsidiary_id}
+                                        multi={false}
+                                        placeholder="Selecione a filial"
+                                        //options={this.state.subsidiaries}
+                                    />
+                                </FormGroup>  
+                            </Col>
+                            <Col xs="2" sm="2" md="2"> 
+                                
+                                <FormGroup for="sector_id">
+                                    <FormControlLabel htmlFor="sector_id"></FormControlLabel>
+                                    <Button>Adicionar</Button>
+                                </FormGroup>  
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="12" sm="12" md="12"> 
+                                <Table striped>
+                                    <thead>
+                                        <tr>
+                                            <th>Tipo de Visita</th>
+                                            <th>Tipo de Escola</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </Table>
+                            </Col>
+                        </Row>
 
                         {statusField}
 
