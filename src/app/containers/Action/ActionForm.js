@@ -6,26 +6,117 @@ import axios from '../../../app/common/axios';
 import { Row, Col, Card, CardHeader, CardFooter, CardBody, Button, Label, Input, Table } from 'reactstrap';
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
+import ReactTable from 'react-table'
 
 import Select, { Async } from 'react-select';
 import 'react-select/dist/react-select.css';
 
 const apiPost = 'action';
 
+const apis = [
+    { stateArray: 'school_types', api: 'school-type' },
+    { stateArray: 'visit_types', api: 'visit-type' }
+];
+
+const selectsValidade = [
+    { name: 'school_type_id', stateArray: 'school_types' },
+    { name: 'visit_type_id', stateArray: 'visit_types' }
+];
+
 class ActionForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            page: 1,
+            pageSize: 5,
+            columns: [],
+
             name: '',
             active: true,
+            visit_types: [],
+            school_types: [],
+            school_type_id: [],
+            visit_type_id: [],
+
+            valid_select_school_type_id: 1,
+            valid_select_visit_type_id: 1,
+
+            tableData: [],
+
             back_error: '',
             submitButtonDisabled: false,
             saved: false
         };
 
         this.handleChange = this.handleChange.bind(this);
+        this.handleChangeSchoolType = this.handleChangeSchoolType.bind(this);
+        this.handleChangeVisitType = this.handleChangeVisitType.bind(this);
+
+        this.clearSelects = this.clearSelects.bind(this);
+        this.saveData = this.saveData.bind(this);
+        this.validSelects = this.validSelects.bind(this);
+
         this.handleSubmit = this.handleSubmit.bind(this);
         this.submitForm = this.submitForm.bind(this);
+
+        this.getVisitType = this.getVisitType.bind(this);
+        this.getSchoolType = this.getSchoolType.bind(this);
+
+        this.onClickDelete = this.onClickDelete.bind(this);
+    }
+
+    componentDidMount() {
+        this.createTypeTable();
+
+        apis.map(item => {
+            axios.get(`${item.api}?order[name]=asc`)
+                .then(response => {
+                    let dados = response.data.data;
+                    dados.map(item => {
+                        item['value'] = item.id,
+                        item['label'] = item.name
+                    });
+                    this.setState({ [item.stateArray]: dados });
+                })
+                .catch(err => console.log(err));
+        });
+    }
+
+    getVisitType(element){
+        let visitType = this.state.visit_types.map(item => {
+            if(item.id === element.original.visit_type_id)
+                return item.name;
+        });
+
+        return visitType;
+    }
+
+    getSchoolType(element){
+        let schoolType = this.state.school_types.map(item => {
+             if(item.id === element.original.school_type_id){
+                return item.name;
+            }
+        });
+
+        return schoolType;
+    }
+
+    createTypeTable(){
+        let col = [            
+            {
+                Header: "Ações", accessor: "", sortable: false, width: 50, headerClassName: 'text-left', Cell: (element) =>
+                    (
+                        <button type="button" className='btn btn-danger btn-sm' onClick={() => this.onClickDelete(element)}>
+                            <i className='fa fa-ban'></i>
+                        </button>
+                            
+                    )
+            },
+            { Header: "Tipo de visita", accessor: "visit_type_id", headerClassName: 'text-left', Cell: (element) =>  (<span>{this.getVisitType(element)}</span>)},
+            { Header: "Tipo de escola", accessor: "school_type_id", headerClassName: 'text-left', Cell: (element) =>  (<span>{this.getSchoolType(element)}</span>)}
+        ];
+
+        this.setState({ columns: col });
     }
 
     componentWillMount() {
@@ -34,14 +125,157 @@ class ActionForm extends Component {
                 .then(response => {
                     const dados = response.data.data;
 
-                    console.log(dados.deleted_at);
+                    let visit_type_school_type = []
+
+                    if(dados.visit_type_school_type.length > 1){
+                        dados.visit_type_school_type.map(item => {
+                            let objectData = {};
+                            objectData['visit_type_id'] = parseInt(item.visit_type.id);
+                            objectData['school_type_id'] = parseInt(item.school_type.id);
+
+                            visit_type_school_type.push(objectData);
+                        });
+                    }
+
                     this.setState({
                         name: dados.name,
-                        active: dados.deleted_at === null ? true : false
+                        active: dados.deleted_at === null ? true : false,
+                        tableData: visit_type_school_type
                     });
                 })
                 .catch(err => console.log(err));
         }
+    }
+
+    clearSelects(){
+        this.setState({
+            school_type_id: [],
+            visit_type_id: [],
+            valid_select_school_type_id: 1,
+            valid_select_visit_type_id: 1
+        });
+    }
+
+    validSelects(){
+        // Validate selects 
+        let stopSubmit = false;
+        selectsValidade.map(select => {
+            let objState = `valid_select_${select.name}`;
+            let objSelect = this.state[select.name];
+            let objArray = this.state[select.stateArray];
+
+            if (objSelect === undefined || objSelect == 0 || objSelect.length < 1) {
+                this.setState({ [objState]: 0, submitButtonDisabled: true });
+                stopSubmit = true;
+            } else {
+                let disabledValue = false
+
+                objArray.map(elem => {
+                    objSelect.map(obj =>{
+                        if (elem['id'] === obj) {
+                            disabledValue = true;
+                        }
+                    })
+                });
+
+                if (!disabledValue) {
+                    this.setState({ [objState]: 0, submitButtonDisabled: true });
+                    stopSubmit = true;
+                } else {
+                    this.setState({ [objState]: 1 });
+                }
+            }
+        });
+
+        if (stopSubmit) {
+            return;
+        }
+
+        this.saveData();
+    }
+
+    pesquisa(visit, school){
+        let objectArray = this.state.tableData;
+
+        return objectArray.find(function (obj) { return obj.visit_type_id === visit &&  obj.school_type_id === school; });
+
+        
+    }
+
+    saveData(){
+        let objectArray = this.state.tableData;
+        let arrayVisitType = this.state.visit_type_id;
+        let arraySchoolType = this.state.school_type_id;
+
+        let newArray = [];
+
+        arrayVisitType.map(visit => {
+            arraySchoolType.map(school => {
+
+                if(!(this.pesquisa(visit, school))){
+                    let objectData = {};
+                    objectData['visit_type_id'] = parseInt(visit);
+                    objectData['school_type_id'] = parseInt(school);
+
+                    objectArray.push(objectData);
+                }
+
+                
+                // if(objectArray.length > 0){
+                //     objectArray.map(original => {
+                //         console.log('objectArray:', objectArray)
+                //         console.log('newArray:', newArray)
+
+                //         console.log('original.visit_type_id:', original.visit_type_id, 'visit:', visit)
+                //         console.log('original.school_type_id:', original.school_type_id, 'school:', school)
+                //         console.log(original.visit_type_id === visit && original.school_type_id === school)
+
+                //         if(original.visit_type_id === visit && original.school_type_id === school){
+                //             return;
+                //         }
+                //         let objectData = {};
+                //         objectData['visit_type_id'] = parseInt(visit);
+                //         objectData['school_type_id'] = parseInt(school);
+        
+                //         objectArray.push(objectData);
+                //         newArray.push(objectData);
+
+                //         console.log('objectArray:', objectArray)
+                //     });
+                // } else  {
+                //     console.log('else')
+                //     let objectData = {};
+                //     objectData['visit_type_id'] = parseInt(visit);
+                //     objectData['school_type_id'] = parseInt(school);
+    
+                //     objectArray.push(objectData);
+                // }
+            });
+        });
+
+        console.log('objectArray:', objectArray)
+        
+        
+        this.setState({ tableData: objectArray });
+
+        this.clearSelects();        
+        this.createTypeTable();
+    }
+
+    onClickDelete(element) {
+        const { visit_type_id, school_type_id } = element.original;
+
+        const arrayData = this.state.tableData;
+        let arrayNewData = [];
+
+        arrayData.map(item => {
+            if(!(item.visit_type_id === visit_type_id && item.school_type_id === school_type_id)){
+                arrayNewData.push(item);
+            }
+        });
+
+        this.setState({ tableData: arrayNewData });
+        this.createTypeTable();
     }
 
     handleChange(e) {
@@ -55,11 +289,36 @@ class ActionForm extends Component {
         });
     }
 
+    handleChangeSchoolType = (selectedOption) => {
+        this.setState({ valid_select_school_type_id: 1, submitButtonDisabled: false });
+
+        let schoolTypes = [];
+
+        selectedOption.map(item => schoolTypes.push(item.value));
+
+        const values = this.state;
+        values.school_type_id = schoolTypes;
+        this.setState({ values });
+    }
+
+    handleChangeVisitType = (selectedOption) => {
+        this.setState({ valid_select_visit_type_id: 1, submitButtonDisabled: false });
+
+        let visitTypes = [];
+
+        selectedOption.map(item => visitTypes.push(item.value));
+
+        const values = this.state;
+        values.visit_type_id = visitTypes;
+        this.setState({ values });
+    }
+
     submitForm(event) {
         event.preventDefault();
         axios.post(`${apiPost}`, {
             'name': this.state.name,
-            'active': this.state.active
+            'active': true,
+            'visit_type_school_type': this.state.tableData
         }).then(res => {
             this.setState({
                 saved: true
@@ -75,14 +334,10 @@ class ActionForm extends Component {
         event.preventDefault();
         var id = this.props.match.params.id;
 
-        let data = {
-            'name': this.state.name,
-            'active': this.state.active
-        }
-
         axios.put(`${apiPost}/${id}`, {
             'name': this.state.name,
-            'active': this.state.active
+            'active': this.state.active,
+            'visit_type_school_type': this.state.tableData
         }).then(res => {
             this.setState({
                 saved: true
@@ -99,7 +354,7 @@ class ActionForm extends Component {
 
         this.form.validateFields();
 
-        this.setState({ submitButtonDisabled: !this.form.isValid() });
+        this.setState({ submitButtonDisabled: !this.form.isValid() });        
 
         if (this.form.isValid()) {
             if (this.props.match.params.id !== undefined) {
@@ -133,7 +388,6 @@ class ActionForm extends Component {
                 </div>
         }
 
-
         return (
             <Card>
                 {redirect}
@@ -142,7 +396,7 @@ class ActionForm extends Component {
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                     }
-                    <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
+                    <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints} 
                         onSubmit={this.handleSubmit} noValidate>
 
                         <div className="">
@@ -160,60 +414,62 @@ class ActionForm extends Component {
                             <Col xs="5" sm="5" md="5"> 
                             
                                 <FormGroup for="user_id">
-                                    <FormControlLabel htmlFor="user_id">Tipo de Visita</FormControlLabel>
+                                    <FormControlLabel htmlFor="visit_type_id">Tipo de Visita</FormControlLabel>
                                     <Select
-                                        name="user_id"
-                                        //onChange={(selectedOption) => {this.handleSelectChange('user_id', selectedOption.id, this.getUserSchool, selectedOption);}}
-                                        labelKey="full_name"
-                                        valueKey="id"
-                                        //value={this.state.user_id}
-                                        placeholder="Selecione o consultor"
-                                        multi={false}
-                                        //options={this.state.users}
+                                        name="visit_type_id"
+                                        id="visit_type_id"
+                                        value={this.state.visit_type_id}
+                                        onChange={this.handleChangeVisitType}
+                                        options={this.state.visit_types}
+                                        placeholder="Selecione..."
+                                        multi={true}
                                     />
+                                    {this.state.valid_select_visit_type_id == 0 &&
+                                        <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
+                                    }
                                 </FormGroup>  
                             </Col>
                             <Col xs="5" sm="5" md="5"> 
                                 
                                 <FormGroup for="subsidiary_id">
-                                    <FormControlLabel htmlFor="subsidiary_id">Tipo de Escola</FormControlLabel>
+                                    <FormControlLabel htmlFor="school_type_id">Tipo de Escola</FormControlLabel>
                                     <Select
-                                        name="subsidiary_id"
-                                        //onChange={(selectedOption) => {this.handleSelectChange('subsidiary_id', selectedOption.id, this.getSectors, selectedOption);}}
-                                        labelKey="code_name"
-                                        valueKey="id"
-                                        //value={this.state.subsidiary_id}
-                                        multi={false}
-                                        placeholder="Selecione a filial"
-                                        //options={this.state.subsidiaries}
+                                        name="school_type_id"
+                                        id="school_type_id"
+                                        value={this.state.school_type_id}
+                                        onChange={this.handleChangeSchoolType}
+                                        options={this.state.school_types}
+                                        placeholder="Selecione..."
+                                        multi={true}
                                     />
+                                    {this.state.valid_select_school_type_id == 0 &&
+                                        <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
+                                    }
                                 </FormGroup>  
                             </Col>
                             <Col xs="2" sm="2" md="2"> 
                                 
                                 <FormGroup for="sector_id">
-                                    <FormControlLabel htmlFor="sector_id"></FormControlLabel>
-                                    <Button>Adicionar</Button>
+                                    <FormControlLabel htmlFor="sector_id"> </FormControlLabel>
+                                    <Button onClick={this.validSelects}>Adicionar</Button>
                                 </FormGroup>  
                             </Col>
                         </Row>
                         <Row>
                             <Col xs="12" sm="12" md="12"> 
-                                <Table striped>
-                                    <thead>
-                                        <tr>
-                                            <th>Tipo de Visita</th>
-                                            <th>Tipo de Escola</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
-                                        
-                                    </tbody>
-                                </Table>
+                                <ReactTable
+                                    columns={this.state.columns}
+                                    data={this.state.tableData}
+                                    defaultPageSize={this.state.pageSize}
+                                    previousText='Anterior'
+                                    nextText='Próximo'
+                                    loadingText='Carregando...'
+                                    noDataText='Sem registros'
+                                    pageText='Página'
+                                    ofText='de'
+                                    rowsText=''
+                                    className='-striped -highlight'
+                                />
                             </Col>
                         </Row>
 
