@@ -97,8 +97,7 @@ class UserSchools extends Component {
             'school_id': deselectedOptions.map(item => item.id),
             'type': 'delete'       
         })
-        .then(response => {           
-
+        .then(response => {
             this.setState({selectedOptions})
         })
     }
