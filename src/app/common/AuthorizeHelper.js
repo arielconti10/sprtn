@@ -11,7 +11,10 @@ export const verifyToken=(http_code)=>{
         sessionStorage.removeItem("access_token");
         sessionStorage.removeItem("refresh_token");
         sessionStorage.removeItem("expires_in");
+        window.location.href = "#/login";
     }
+
+    window.location.href = "#/login";
 
     return authorized;
 }
