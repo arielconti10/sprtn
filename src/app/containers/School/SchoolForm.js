@@ -10,12 +10,13 @@ import classnames from 'classnames';
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
-import SchoolRegister from './SchoolRegister'
+import SchoolDashboard from './SchoolDashboard';
+import SchoolRegister from './SchoolRegister';
 import SchoolConctactList from './SchoolContactList';
-import SchoolStudentIcon from './SchoolStudentIcon'
-import SchoolStudentList from './SchoolStudentList'
-import SchoolAdoptionList from './SchoolAdoptionList'
-import SchoolEventList from './SchoolEventList'
+import SchoolStudentIcon from './SchoolStudentIcon';
+import SchoolStudentList from './SchoolStudentList';
+import SchoolAdoptionList from './SchoolAdoptionList';
+import SchoolEventList from './SchoolEventList';
 
 class SchoolForm extends Component {
     constructor(props) {
@@ -34,7 +35,8 @@ class SchoolForm extends Component {
             schoolCodeTotvs: '0',
             subsidiaryId: '0',
             sectorId: '0',
-            school_type_identify: ''
+            school_type_identify: '',
+            marketshare: []
         };
     }
 
@@ -53,7 +55,8 @@ class SchoolForm extends Component {
                     schoolCodeTotvs: dados.school_code_totvs,
                     subsidiaryId: dados.subsidiary_id,
                     sectorId: dados.sector_id,
-                    school_type_identify: dados.school_type.identify.toLowerCase()
+                    school_type_identify: dados.school_type.identify.toLowerCase(),
+                    marketshare: dados.marketshare
                 });
 
                 console.log("WILL MOUNT - INICIAL!");
@@ -157,7 +160,7 @@ class SchoolForm extends Component {
                     <TabPane tabId="dashboard">
                         <Row>
                             <Col sm="12">
-                                <h2>Dashboard</h2>
+                                <SchoolDashboard marketshare={this.state.marketshare}/>
                             </Col>
                         </Row>
                     </TabPane>
