@@ -4,32 +4,79 @@ import ReactDOM from 'react-dom';
 import FusionCharts from 'fusioncharts';
 import Charts from 'fusioncharts/fusioncharts.charts';
 import ReactFC from 'react-fusioncharts';
-import { Card, CardBody } from 'reactstrap';
+import { Col, Row, Card, CardBody } from 'reactstrap';
+import Select from 'react-select';
+
+import 'react-select/dist/react-select.css';
 
 Charts(FusionCharts);
+
+const paletteColors = "#009de8,#FD0006,#1aaf5d,#f45b00,#8e0000,#000000,#7D7D7D,#00CB19,#8C0172,#F70060,#1B7474,#0a3b60,#f2c500,#BCF25B,#00DDCD";
 
 export default class SchoolDashboard extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {            
-            marketshare: this.props.marketshare,
-            publishers: [],
-            colections: []
+        this.state = {
+            year_param: 0,
+            years: [],
+            marketshare: this.props.marketshare
         };
+
+        this.handleChangeYear = this.handleChangeYear.bind(this);
     }
 
     componentWillReceiveProps() {
-        this.setState({ marketshare: this.props.marketshare });
+        let marketshare = this.props.marketshare;         
+        let selectedYear = parseInt(new Date().getFullYear());
+        let years = [];
+        let aux = 0;
+
+        if(marketshare.length > 0){
+            selectedYear = marketshare.reduce(function(prevVal, elem) {
+                return Math.max(elem.year);
+            });
+
+            marketshare.map(item => {
+                let year = {};
+    
+                if(aux !== item.year){
+                    year['value'] = item.year;
+                    year['label'] = item.year;
+                    
+                    years.push(year);
+                    aux = item.year;
+                }
+            });
+        }
+
+        this.setState({ 
+            marketshare: marketshare,
+            year_param: selectedYear,
+            years: years
+        });
+    }  
+
+    handleChangeYear = (selectedOption) => {
+        if(selectedOption){
+            const values = this.state;
+            values.year_param = selectedOption.value;
+            this.setState({ values });
+        }
     }
 
-    componentDidMount() {
-        let dashData = this.state.marketshare;
+    render() {
+        const { marketshare, years, year_param } = this.state;
 
         let publishers = [];
         let colections = [];
+        
+        let pubFTD = null;
+        
+        marketshare.map(item => {
+            if(item.year !== this.state.year_param)
+                return;
 
-        dashData.map(item => {
             let publish = {};
             let colection = {};
 
@@ -37,40 +84,35 @@ export default class SchoolDashboard extends Component {
             let key = register[0];
             let label = register[1];
 
-            if(key === 'EDITORAS') {
+            if (key === 'EDITORAS') {
                 publish['label'] = label;
                 publish['value'] = item.value;
 
-                publishers.push(publish);
+                if(label.search("FTD") !== -1){
+                    pubFTD = publish;
+                } else {
+                    publishers.push(publish);
+                }
             } else {
                 colection['label'] = label;
                 colection['value'] = item.value;
-                
-                colections.push(colection);
+
+                colections.push(colection);                
             }
         });
 
-        console.log('publishers:', publishers);
-        console.log('colections:', colections);
-
-        this.setState({ publishers, colections });
-
-        console.log('this.state:', this.state);
-
-    }
-
-    render(){
-        const { publishers, colections } = this.state;
+        if(pubFTD){        
+            publishers.unshift(pubFTD);
+        }
 
         const dataPublishers = {
             chart: {
                 caption: "Editoras",
-                subCaption: "2016",
-                paletteColors: "#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",
+                paletteColors: paletteColors,
                 bgColor: "#ffffff",
-                showBorder: "0",
-                use3DLighting: "0",
-                showShadow: "0",
+                showBorder: "1",
+                use3DLighting: "1",
+                showShadow: "1",
                 enableSmartLabels: "0",
                 startingAngle: "0",
                 showPercentValues: "1",
@@ -79,6 +121,7 @@ export default class SchoolDashboard extends Component {
                 captionFontSize: "14",
                 subcaptionFontSize: "14",
                 subcaptionFontBold: "0",
+                placeValuesInside: "0",
                 toolTipColor: "#ffffff",
                 toolTipBorderThickness: "0",
                 toolTipBgColor: "#000000",
@@ -92,30 +135,32 @@ export default class SchoolDashboard extends Component {
                 legendShadow: "0",
                 legendItemFontSize: "10",
                 legendItemFontColor: "#666666",
-                useDataPlotColorForLabels: "1"
+                useDataPlotColorForLabels: "1",
+                showValues: "1",
             },
             data: publishers
-          };
+        };
 
-          const dataColections = {
+        const dataColections = {
             chart: {
                 caption: "Coleções",
-                subCaption: "2016",
-                paletteColors: "#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",
-                valueFontColor: "#ffffff",
+                captionFontSize: "14",
+                subcaptionFontSize: "14",
+                subcaptionFontBold: "0",
+                yAxisName: 'Percentual (%)',
+                paletteColors: paletteColors,
+                valueFontColor: "#000",
+                valueFontSize: "13",
+                placeValuesInside: "0",
                 bgColor: "#ffffff",
-                showBorder: "0",
-                use3DLighting: "0",
-                showShadow: "0",
+                showBorder: "1",
+                use3DLighting: "1",
+                showShadow: "1",
                 enableSmartLabels: "0",
                 startingAngle: "0",
                 showPercentValues: "1",
                 showPercentInTooltip: "0",
-                decimals: "1",
-                captionFontSize: "14",
-                subcaptionFontSize: "14",
-                subcaptionFontBold: "0",
-                placeValuesInside: "1",
+                decimals: "1",               
                 divlineColor: "#999999",
                 divLineDashed: "1",
                 divlineThickness: "1",
@@ -136,36 +181,57 @@ export default class SchoolDashboard extends Component {
                 useDataPlotColorForLabels: "1"
             },
             data: colections
-          };
-          
-          const chartConfigsPie = {
+        };
+
+        const chartConfigsPie = {
             type: 'pie3d',
-            width: 1000,
+            width: '100%',
             height: 400,
             dataFormat: 'json',
             dataSource: dataPublishers,
-          };
+        };
 
-          const chartConfigsColumn = {
+        const chartConfigsColumn = {
             type: 'column3d',
-            width: 1000,
+            width: '100%',
             height: 400,
             dataFormat: 'json',
             dataSource: dataColections,
-          };
+        };
 
-        return(
+        return (
             <div>
-                <Card>
-                    <CardBody>
-                        <ReactFC {...chartConfigsPie} />
-                    </CardBody>
-                </Card>
-                <Card>
-                    <CardBody>
-                        <ReactFC {...chartConfigsColumn} />
-                    </CardBody>
-                </Card>
+                <Row>
+                    <Col md="2">
+                        <label>Ano</label>
+                        <Select
+                            name="year_param"
+                            id="year_param"
+                            disabled={!(years.length > 1)}
+                            clearable={false}
+                            value={year_param}
+                            onChange={this.handleChangeYear}
+                            options={years}
+                            placeholder="Não há registros"
+                        />
+                    </Col>
+                </Row>
+                <br />
+                <Row>
+                    <Col md="12">
+                        {/* <Card>
+                            <CardBody> */}
+                                <ReactFC {...chartConfigsPie} />
+                                <br />
+                            {/* </CardBody>
+                        </Card>
+                        <Card>
+                            <CardBody> */}
+                                <ReactFC {...chartConfigsColumn} />
+                            {/* </CardBody>
+                        </Card> */}
+                    </Col>
+                </Row>
             </div>
         )
     }

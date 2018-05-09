@@ -45,6 +45,7 @@ class SchoolForm extends Component {
         axios.get(`school/${this.state.schoolId}`)
             .then(response => {
                 const dados = response.data.data;
+
                 this.setState({
                     schoolName: dados.name, 
                     total_students: dados.total_students || '0',
@@ -59,8 +60,6 @@ class SchoolForm extends Component {
                     marketshare: dados.marketshare
                 });
 
-                console.log("WILL MOUNT - INICIAL!");
-                console.log(this.state.contacts);
             })
             .catch(function (error) {
                 let authorized = verifyToken(error.response.status);
@@ -81,7 +80,8 @@ class SchoolForm extends Component {
                     active: dados.deleted_at === null ? true : false,
                     schoolCodeTotvs: dados.school_code_totvs,
                     subsidiaryId: dados.subsidiary_id,
-                    sectorId: dados.sector_id
+                    sectorId: dados.sector_id,
+                    marketshare: dados.marketshare
                 });
             })
             .catch(function (error) {
@@ -101,7 +101,7 @@ class SchoolForm extends Component {
                 <Redirect to="/login" />
             );
         }
-        // console.log(this.state.contacts);
+
         return (
             <div>
                 <h1 className="school-header"><i className="fa fa-building-o"></i> {this.state.schoolName} <SchoolStudentIcon numStudents={this.state.total_students} /></h1>
