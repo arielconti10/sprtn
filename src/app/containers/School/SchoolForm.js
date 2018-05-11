@@ -31,7 +31,7 @@ class SchoolForm extends Component {
             schoolId: this.props.match.params.id,
             students: [],
             total_students: '0',
-            activeTab: 'cadastro',
+            activeTab: 'dashboard',
             schoolCodeTotvs: '0',
             subsidiaryId: '0',
             sectorId: '0',
@@ -160,7 +160,7 @@ class SchoolForm extends Component {
                     <TabPane tabId="dashboard">
                         <Row>
                             <Col sm="12">
-                                <SchoolDashboard marketshare={this.state.marketshare}/>
+                                <SchoolDashboard schoolId={this.state.schoolId} />
                             </Col>
                         </Row>
                     </TabPane>
