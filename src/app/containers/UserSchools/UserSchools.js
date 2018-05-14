@@ -212,7 +212,11 @@ class UserSchools extends Component {
             'type': 'insert'
         })
         .then(response => {
-            this.setState({selectedOptions, ringLoad: false, total_selected_wallet: 0});
+            
+            this.setState({selectedOptions, ringLoad: false, total_selected_wallet: 0}, function() {
+                const total_available = this.state.schools.length - this.state.selectedOptions.length;
+                this.setState({total_available});
+            });
         })
     }
 

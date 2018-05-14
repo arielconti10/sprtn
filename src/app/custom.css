@@ -16,6 +16,11 @@
     /* display: none; */
 }
 
+.FilteredMultiSelect select {
+    font-family: Tahoma, Verdana, Segoe, sans-serif;
+    font-size: 13.5px;
+}
+
 .label-carteira {
     font-size: 16px;
     color: #00445d;
