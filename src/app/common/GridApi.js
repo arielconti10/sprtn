@@ -71,20 +71,142 @@ class GridApi extends Component {
     componentDidMount() {
         let col = this.state.columns
 
-        col.push(
-            {
-                Header: "Status",
-                accessor: "",
-                width: 100,
-                headerClassName: 'text-left',
-                
-                sortable: false,
-                Cell: (element) => (
-                    !element.value.deleted_at ?
-                        <div><span className="alert-success grid-record-status">Ativo</span></div>
+        if (this.props.columnsAlt) {
+
+            this.props.columnsAlt.map(item => {
+
+                if (item.type == 'select' || item.type == 'selectMulti') {
+
+                    if (item.api) {
+                        axios.get(item.api)
+                            .then(response => {
+                                const dados = response.data.data;
+
+                                //console.log(dados);
+
+                                this.setState({ dataAlt: dados });
+                                //this.setState({ job_title_type_id: dados[0].id });
+                            })
+                            .catch(err => console.log(err));
+                    }
+
+                    const multi = item.type == 'selectMulti' ? true : false;
+                    col.push(
+                        {
+                            Header: item.Header,
+                            accessor: item.accessor,
+                            width: item.width,
+                            headerClassName: 'text-center',
+                            style: { overflow: 'visible' },
+                            sortable: false,
+                            Cell: (element) => {
+                                console.log('GridApi - element:', element)
+
+                                let search = 'element.value' + (item.sub ? `.${item.sub}` : '');
+                                console.log('search:', search)
+
+                                let column_value = [];
+
+                                if (item.sub) {
+                                    element.value.map(val => {
+                                        if (!column_value.find(function (obj) { return obj === val[item.sub]; })) {
+                                            column_value.push(val[item.sub])
+                                        }
+                                    });
+
+                                } else {
+                                    column_value = element.value.map(val => {
+                                        return val.id
+                                    });
+                                }
+
+                                console.log('column_value:', column_value)
+
+                                return (
+
+                                    <div>
+                                        <Select
+                                            name={item.name}
+                                            onChange={(selectedOption) => {
+                                                console.log(item.accessor)
+                                                const column_value_changed = selectedOption.map(function (cv) {
+                                                    //console.log(item.name);
+                                                    return cv.id;
+                                                });
+
+                                                this.setState({
+                                                    dataAltSelected: {
+                                                        [element.row[""].id]: column_value_changed
+                                                    }
+                                                });
+
+                                                const column_value_update = selectedOption.map(function (cv) {
+                                                    let value = {};
+                                                    value[item.name] = cv.id;
+                                                    return value;
+                                                }, {});
+
+                                                //console.log(column_value_update);
+
+                                                const updateData = {};
+
+                                                let id = 0;
+                                                for (var value in element.row['']) {
+                                                    //console.log(value);
+
+                                                    if (value == 'id') {
+                                                        id = element.row[''][value]
+                                                    }
+                                                    else if (value != 'created_at' && value != 'updated_at' && value != 'deleted_at' && value != item.accessor) {
+                                                        updateData[value] = element.row[''][value];
+                                                    }
+                                                    else if (value == item.accessor) {
+                                                        updateData[value] = column_value_update;
+                                                    }
+                                                }
+
+                                                updateData.active = true;
+
+                                                axios.put(`${this.props.apiSpartan}/${id}`, updateData).then(res => {
+                                                    this.onFetchData();
+                                                }).catch(function (error) {
+                                                    console.log(error)
+                                                }.bind(this));
+                                                //console.log(data_update_role);
+                                            }}
+                                            labelKey="name"
+                                            valueKey="id"
+                                            value={this.state.dataAltSelected[element.row[""].id] == undefined ? column_value : this.state.dataAltSelected[element.row[""].id]}
+                                            multi={multi}
+                                            joinValues={false}
+                                            // menuContainerStyle={{'zIndex': 99999}}
+                                            //isLoading={this.state.roleSelect2Loading}
+                                            placeholder="Selecione um valor"
+                                            options={this.state.dataAlt}
+                                            rtl={false}
+                                            // disabled
+                                        /> </div>
+                                )
+                            }
+                        })
+                }
+            })
+
+        }
+        
+        col.unshift({
+            Header: "Status",
+            accessor: "",
+            width: 100,
+            headerClassName: 'text-left',
+
+            sortable: false,
+            Cell: (element) => (
+                !element.value.deleted_at ?
+                    <div><span className="alert-success grid-record-status">Ativo</span></div>
                     :
-                        <div><span className="alert-danger grid-record-status">Inativo</span></div>
-                )/*,                
+                    <div><span className="alert-danger grid-record-status">Inativo</span></div>
+            )/*,                
                     filterable: true, 
                     Filter: ({ filter, onChange }) => (
                     
@@ -97,121 +219,17 @@ class GridApi extends Component {
                             <option value="true">Inativo</option>
                         </select>
                     )*/
-            })
+        })
 
-        if (this.props.columnsAlt) {
-
-            
-                        
-            this.props.columnsAlt.map(item => {
-
-                if (item.type == 'select' || item.type == 'selectMulti') {   
-                    
-                    if (item.api) {
-                        axios.get(item.api)
-                        .then(response => {
-                            const dados = response.data.data;
-        
-                            //console.log(dados);
-        
-                            this.setState({ dataAlt: dados});
-                            //this.setState({ job_title_type_id: dados[0].id });
-                        })
-                        .catch(err => console.log(err));
-                    }
-
-                    const multi = item.type == 'selectMulti' ? true : false;
-                    col.push(
-                        {
-                            Header: item.Header,
-                            accessor: item.accessor,
-                            width: item.width,
-                            headerClassName: 'text-center',
-                            style: {overflow: 'visible'},
-                            sortable: false,
-                            Cell: (element) => {
-                                //console.log(element)
-
-                                const column_value = element.value.map(val => {
-                                    return val.id
-                                });
-
-                                return (                                   
-                            
-                                    <div>
-                                        <Select
-                                        name={item.name}
-                                        onChange={(selectedOption) => {
-                                            console.log(item.accessor)
-                                            const column_value_changed = selectedOption.map(function(cv) {
-                                                //console.log(item.name);
-                                                return cv.id;
-                                            });
-
-                                            this.setState({ dataAltSelected: {
-                                                [element.row[""].id]: column_value_changed }
-                                            });
-
-                                            const column_value_update = selectedOption.map(function(cv) {
-                                                let value = {};
-                                                value[item.name] = cv.id;
-                                                return value;
-                                            }, {});
-
-                                            //console.log(column_value_update);
-
-                                            const updateData = {};
-
-                                            let id = 0;
-                                            for (var value in element.row['']) {
-                                                //console.log(value);
-
-                                                if (value == 'id') {
-                                                    id = element.row[''][value]
-                                                }
-                                                else if (value != 'created_at' && value != 'updated_at' && value != 'deleted_at' && value != item.accessor) {
-                                                    updateData[value] = element.row[''][value];
-                                                }
-                                                else if (value == item.accessor) {
-                                                    updateData[value] = column_value_update;
-                                                }
-                                            }
-
-                                            updateData.active = true;
-
-                                            axios.put(`${this.props.apiSpartan}/${id}`, updateData).then(res => {
-                                                this.onFetchData();
-                                            }).catch(function (error) {
-                                                console.log(error)
-                                            }.bind(this));
-                                            //console.log(data_update_role);
-                                        }}
-                                        labelKey="name"
-                                        valueKey="id"
-                                        value={this.state.dataAltSelected[element.row[""].id] == undefined ? column_value : this.state.dataAltSelected[element.row[""].id]}
-                                        multi={multi}
-                                        joinValues={false}
-                                        // menuContainerStyle={{'zIndex': 99999}}
-                                        //isLoading={this.state.roleSelect2Loading}
-                                        placeholder="Selecione um valor"
-                                        options={this.state.dataAlt}
-                                        rtl={false}
-                                    /> </div>
-                            )}
-                        })
-                    }
-            })
-            
-        }
         if (!this.props.hideButtons) {
             let fields = ['id', 'code', 'name'];
-            col.push(
+            col.unshift(
                 {
-                    Header: "Ações", accessor: "", sortable: false, width: 100, headerClassName: 'text-center', Cell: (element) => (
+                    Header: "Ações", accessor: "", sortable: false, width: 80, headerClassName: 'text-center', Cell: (element) => (
                         !element.value.deleted_at ?
                             <div>
 
-                                <Link to={this.props.match.url + "/" + element.value.id} params={{id: element.value.id}} className='btn btn-primary btn-sm' >
+                                <Link to={this.props.match.url + "/" + element.value.id} params={{ id: element.value.id }} className='btn btn-primary btn-sm' >
                                     <i className='fa fa-pencil'></i>
                                 </Link>
                                 <button className='btn btn-danger btn-sm' onClick={() => this.onClickDelete(element)}>
@@ -259,8 +277,8 @@ class GridApi extends Component {
         for (let i = 0; i < sorted.length; i++) {
             baseURL += "&order[" + sorted[i]['id'] + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
         }
-        
-        this.setState({loading: true});
+
+        this.setState({ loading: true });
 
         axios.get(baseURL)
             .then((response) => {
@@ -280,14 +298,14 @@ class GridApi extends Component {
             })
             .catch(function (error) {
                 let authorized = verifyToken(error.response.status);
-                this.setState({authorized:authorized});
+                this.setState({ authorized: authorized });
             }.bind(this));
     }
 
     render() {
 
         const { data, pageSize, page, loading, pages, columns } = this.state;
-        
+
         if (this.state.authorized == 0) {
             return (
                 <Redirect to="/login" />

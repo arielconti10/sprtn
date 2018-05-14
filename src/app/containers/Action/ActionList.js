@@ -17,9 +17,13 @@ class ActionList extends Component {
                 <GridApi
                     apiSpartan="action"
                     columns={[
-                        { Header: 'ID', accessor: 'id', filterable: true, width: 100, headerClassName: 'text-left' },
-                        { Header: "Nome", accessor: "name", filterable: true, headerClassName: 'text-left' }
+                        { Header: "Nome", accessor: "name", filterable: true, headerClassName: 'text-left' },
                     ]}
+                    columnsAlt={[
+                        { Header: "Tipo Escola", accessor: "visit_type_school_type", sub: 'school_type_id', width: 400, type: 'selectMulti', api: 'school-type', filterable: true, headerClassName: 'text-left' },
+                        { Header: "Tipo Visita", accessor: "visit_type_school_type", sub: 'visit_type_id', width: 400, type: 'selectMulti', api: 'visit-type', filterable: true, headerClassName: 'text-left' }
+                    ]}
+
                 />
             </div>
         )
