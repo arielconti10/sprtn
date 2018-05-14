@@ -7,7 +7,6 @@ module.exports = shipit => {
   shipit.initConfig({
     default: {
       deployTo: '/var/www/html/ftdspartanf',
-    //   repositoryUrl: 'https://pessolatohenrique@bitbucket.org/editora-ftd/ftdspartanf.git',
       repositoryUrl: 'git@bitbucket.org:editora-ftd/ftdspartanf.git',
       branch: 'staging',
       keepReleases: 3
@@ -18,7 +17,8 @@ module.exports = shipit => {
     },
     production: {
         servers: 'ftdiw@mtz-webp02',
-        key: '/home/jenkins/.ssh-deploy-keys/mtz-webp02/deploy.pem'
+        key: '/home/jenkins/.ssh-deploy-keys/mtz-webp02/deploy.pem',
+        port: '2223'
      },
   });
 
