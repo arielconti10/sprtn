@@ -141,7 +141,7 @@ class SchoolForm extends Component {
                     </NavItem>
                     <NavItem>
                         <NavLink
-                            className={classnames({ active: this.state.activeTab === 'adocoes' }) + 'd-none'}
+                            className={classnames({ active: this.state.activeTab === 'adocoes' })}
                             onClick={() => { this.toggle('adocoes'); }}
                         >
                             Adoções
