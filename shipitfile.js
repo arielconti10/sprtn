@@ -14,9 +14,12 @@ module.exports = shipit => {
     },
     staging: {
        servers: 'ftdiw@mtz-webh02',
-    //    key: '/Users/tercmt-henrique/Desktop/deploy.pem'
        key: '/home/jenkins/.ssh-deploy-keys/mtz-webh02/deploy.pem'
     },
+    production: {
+        servers: 'ftdiw@mtz-webp02',
+        key: '/home/jenkins/.ssh-deploy-keys/mtz-webp02/deploy.pem'
+     },
   });
 
   shipit.task('permissions', () => {
