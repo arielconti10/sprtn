@@ -1,0 +1,4 @@
+.btn { margin-right: 1px; }
+
+.ReactTable { margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.2); box-shadow: 0px 0px 10px #e6e6e6; }
+.rt-thead { box-shadow: 0 0 0 0 rgba(0,0,0,0),0 0 0 0 rgba(0,0,0,0) !important; border-bottom: 1px solid #f2f2f2; }
