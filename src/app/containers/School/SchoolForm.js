@@ -10,12 +10,13 @@ import classnames from 'classnames';
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
-import SchoolRegister from './SchoolRegister'
+import SchoolDashboard from './SchoolDashboard';
+import SchoolRegister from './SchoolRegister';
 import SchoolConctactList from './SchoolContactList';
-import SchoolStudentIcon from './SchoolStudentIcon'
-import SchoolStudentList from './SchoolStudentList'
-import SchoolAdoptionList from './SchoolAdoptionList'
-import SchoolEventList from './SchoolEventList'
+import SchoolStudentIcon from './SchoolStudentIcon';
+import SchoolStudentList from './SchoolStudentList';
+import SchoolAdoptionList from './SchoolAdoptionList';
+import SchoolEventList from './SchoolEventList';
 
 class SchoolForm extends Component {
     constructor(props) {
@@ -30,11 +31,12 @@ class SchoolForm extends Component {
             schoolId: this.props.match.params.id,
             students: [],
             total_students: '0',
-            activeTab: 'cadastro',
+            activeTab: 'dashboard',
             schoolCodeTotvs: '0',
             subsidiaryId: '0',
             sectorId: '0',
-            school_type_identify: ''
+            school_type_identify: '',
+            marketshare: []
         };
     }
 
@@ -43,6 +45,7 @@ class SchoolForm extends Component {
         axios.get(`school/${this.state.schoolId}`)
             .then(response => {
                 const dados = response.data.data;
+
                 this.setState({
                     schoolName: dados.name, 
                     total_students: dados.total_students || '0',
@@ -53,11 +56,10 @@ class SchoolForm extends Component {
                     schoolCodeTotvs: dados.school_code_totvs,
                     subsidiaryId: dados.subsidiary_id,
                     sectorId: dados.sector_id,
-                    school_type_identify: dados.school_type.identify.toLowerCase()
+                    school_type_identify: dados.school_type.identify.toLowerCase(),
+                    marketshare: dados.marketshare
                 });
 
-                console.log("WILL MOUNT - INICIAL!");
-                console.log(this.state.contacts);
             })
             .catch(function (error) {
                 let authorized = verifyToken(error.response.status);
@@ -78,7 +80,8 @@ class SchoolForm extends Component {
                     active: dados.deleted_at === null ? true : false,
                     schoolCodeTotvs: dados.school_code_totvs,
                     subsidiaryId: dados.subsidiary_id,
-                    sectorId: dados.sector_id
+                    sectorId: dados.sector_id,
+                    marketshare: dados.marketshare
                 });
             })
             .catch(function (error) {
@@ -98,7 +101,7 @@ class SchoolForm extends Component {
                 <Redirect to="/login" />
             );
         }
-        // console.log(this.state.contacts);
+
         return (
             <div>
                 <h1 className="school-header"><i className="fa fa-building-o"></i> {this.state.schoolName} <SchoolStudentIcon numStudents={this.state.total_students} /></h1>
@@ -157,7 +160,7 @@ class SchoolForm extends Component {
                     <TabPane tabId="dashboard">
                         <Row>
                             <Col sm="12">
-                                <h2>Dashboard</h2>
+                                <SchoolDashboard schoolId={this.state.schoolId} />
                             </Col>
                         </Row>
                     </TabPane>
