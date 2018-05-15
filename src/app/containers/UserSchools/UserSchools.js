@@ -46,7 +46,10 @@ class UserSchools extends Component {
             subsidiary_id: 0,
             users: [],
             user_id: 0,
-            schools: []
+            schools: [],
+            total_available: 0,
+            total_selected_available: 0,
+            total_selected_wallet: 0
         };
     }
 
@@ -106,8 +109,7 @@ class UserSchools extends Component {
     getTextSchool(list) {
         let new_list = list;
         new_list.map(item => {
-            //remover condicao após school_type ser totalmente implementado na API
-            if (item.school_type !== undefined) {
+            if (item.school_type !== undefined || item.school_type !== null) {
                 item.id = `${item.id} | ${item.school_type.name}`;
                 item.label = `${item.subsidiary.name} - ${item.sector.name} - ${item.school_type.name} - ${item.school_code_totvs} - ${item.name}`;
             } else {
@@ -141,10 +143,28 @@ class UserSchools extends Component {
     }
 
     componentDidMount() {
-        // this.setState({ringLoad:false});
         this.searchByApi();
     }
-    
+
+    /**
+     * com base na lista de escolas na carteira, retorna as escolas disponíveis
+     * ou seja, as escolas disponíveis nāo terá escolas que estāo nas carteiras
+     * @param {Array} selectedOptions opções selecionadas 
+     * @return {Array} filtered escolas que estāo apenas na aba de disponíveis
+     */
+    filterAvailableSchools(selectedOptions) {
+        let selected_ids = selectedOptions.map(a => a.school_code_totvs);
+
+        let filtered = this.state.schools.filter(function(value) {
+            let value_id = value.school_code_totvs;
+            return selected_ids.indexOf(value_id) == -1;
+        });   
+
+        let total_available = filtered.length;
+
+        this.setState({schools: filtered, total_available ,selectedOptions, ringLoad: false});
+    }
+
     handleSelect = (selectedOptions) => {
 
         this.setState({ringLoad: true});
@@ -163,8 +183,8 @@ class UserSchools extends Component {
             'type': 'insert'
         })
         .then(response => {
-            selectedOptions = this.getTextSchool(selectedOptions);      
-            this.setState({selectedOptions, ringLoad: false});
+            this.filterAvailableSchools(selectedOptions);
+            this.setState({total_selected_available:0});
         })
         .catch(err => console.log(err));
         
@@ -192,7 +212,11 @@ class UserSchools extends Component {
             'type': 'insert'
         })
         .then(response => {
-            this.setState({selectedOptions, ringLoad: false});
+            
+            this.setState({selectedOptions, ringLoad: false, total_selected_wallet: 0}, function() {
+                const total_available = this.state.schools.length - this.state.selectedOptions.length;
+                this.setState({total_available});
+            });
         })
     }
 
@@ -223,25 +247,61 @@ class UserSchools extends Component {
 
     getUserSchool = (obj) => {
         this.setState({ringLoad:true});
+
+        this.countTotalWallet();
+
         axios.get('user-school/' + obj.id)
                 .then(response => {
                     let dados = response.data.data;
                     dados = this.getTextSchool(dados);                    
                     this.setState({selectedOptions: dados, ringLoad: false});
                 })
-                .catch(err => console.log(err));
-        
+                .catch(err => console.log(err));   
+    }
+
+    /**
+     * a funçāo utiliza elementos de seleçāo javascript devido ao componente FilterSelectMultiple nāo fornecer
+     * evento de elementos selecionados (antes do click em 'Adicionar' ou 'Remover')
+     */
+    countTotalSelected() {
+        document.addEventListener('change', function(){
+            let options = document.querySelectorAll('.escolas-disponiveis option');
+            let total = 0;
+
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].selected) {
+                    total++;
+                }
+            }
+
+            this.setState({total_selected_available : total});
+        }.bind(this));
+    }
+
+    countTotalWallet() {
+
+        document.addEventListener('change', function(){
+            let options = document.querySelectorAll('.escolas-carteira option');
+            let total = 0;
+
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].selected) {
+                    total++;
+                }
+            }
+
+            this.setState({total_selected_wallet : total});
+        }.bind(this));
     }
 
     getSchools = () => {
-
-        //console.log(this.state);
+        //contagem de escolas selecionadas
+        // this.countTotalSelected();
 
         this.setState({schools: [], ringLoad: true});
 
         let filters = "&filter[active]=1";
         if (this.state.sector_id == 0 && this.state.school_type_id == 0) {
-            //this.setState({schools: []});
             return false;
         }
 
@@ -260,22 +320,23 @@ class UserSchools extends Component {
         axios.get('user-schools?' + filters)
                 .then(response => {
                     let dados = response.data.data;
-                    dados = this.getTextSchool(dados);    
-                    this.setState({ schools: dados, ringLoad: false });
+                    dados = this.getTextSchool(dados); 
+                    
+                    this.setState({ schools: dados, ringLoad: false, total_selected_available: 0}, function() {
+                        this.countTotalSelected();
+                        this.filterAvailableSchools(this.state.selectedOptions);
+                        // const total_available = this.state.schools.length - this.state.selectedOptions.length;
+                        // this.setState({total_available});
+                    });
                 })
                 .catch(err => console.log(err));
 
-        // const role_id = selectedOption.map(function(item) {
-        //     return item.id;
-        // });
-
-        // this.setState({ role_id: role_id });
     }
 
     render() {
 
-        var {selectedOptions} = this.state;
-
+        var { selectedOptions, total_available } = this.state;
+    
         return (
             
             <div>
@@ -370,44 +431,56 @@ class UserSchools extends Component {
                     </Row>
                     <Row>
                         <Col md="6">
+                                
+                            <div className="escolas-disponiveis"> 
+                                <FormGroup for="role_id">
+                                    <FormControlLabel htmlFor="role_id" className="label-carteira">
+                                        <i className="fa fa-building-o"></i> <strong>{total_available > 0?total_available:'0'}</strong> Escolas Disponíveis
+                                        {(this.state.total_selected_available > 0)  &&
+                                            <span>/ {this.state.total_selected_available} Selecionadas(s)</span> 
+                                        }
+                                    </FormControlLabel>
+                                        <FilteredMultiSelect
+                                            placeholder='digite para filtrar'
+                                            buttonText="Adicionar"
+                                            classNames={BOOTSTRAP_CLASSES}
+                                            onChange={this.handleSelect}
+                                            options={this.state.schools}
+                                            selectedOptions={selectedOptions}
+                                            textProp="label"
+                                            valueProp="id"
+                                            size={15}
+                                        />
+                                </FormGroup>
+                            </div>
+                        </Col>
+                       
+                        <Col md="6">
+                        <div className="escolas-carteira"> 
                             <FormGroup for="role_id">
                                 <FormControlLabel htmlFor="role_id" className="label-carteira">
-                                    <i className="fa fa-building-o"></i> <strong>{this.state.schools.length}</strong> Escolas Disponíveis
+                                    <i className="fa fa-suitcase"></i> <strong>{selectedOptions.length}</strong> Escolas na Carteira
+                                    {(this.state.total_selected_wallet > 0)  &&
+                                            <span>/ {this.state.total_selected_wallet} Selecionadas(s)</span> 
+                                    }
                                 </FormControlLabel>
                                     <FilteredMultiSelect
                                         placeholder='digite para filtrar'
-                                        buttonText="Adicionar"
-                                        classNames={BOOTSTRAP_CLASSES}
-                                        onChange={this.handleSelect}
-                                        options={this.state.schools}
-                                        selectedOptions={selectedOptions}
+                                        buttonText="Remover"
+                                        classNames={{
+                                            filter: 'form-control',
+                                            select: 'form-control',
+                                            button: 'btn btn btn-block btn-default',
+                                            buttonActive: 'btn btn btn-block btn-danger'
+                                        }}
+                                        onChange={this.handleDeselect}
+                                        options={selectedOptions}
                                         textProp="label"
                                         valueProp="id"
                                         size={15}
                                     />
                             </FormGroup>
-                        </Col>
-                        <Col md="6">
-                        <FormGroup for="role_id">
-                            <FormControlLabel htmlFor="role_id" className="label-carteira">
-                                <i className="fa fa-suitcase"></i> <strong>{selectedOptions.length}</strong> Escolas na Carteira
-                            </FormControlLabel>
-                                <FilteredMultiSelect
-                                    placeholder='digite para filtrar'
-                                    buttonText="Remover"
-                                    classNames={{
-                                        filter: 'form-control',
-                                        select: 'form-control',
-                                        button: 'btn btn btn-block btn-default',
-                                        buttonActive: 'btn btn btn-block btn-danger'
-                                    }}
-                                    onChange={this.handleDeselect}
-                                    options={selectedOptions}
-                                    textProp="label"
-                                    valueProp="id"
-                                    size={15}
-                                />
-                            </FormGroup>
+                        </div>
                         </Col>
                     </Row>
                 </FormWithConstraints>
