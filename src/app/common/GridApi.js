@@ -26,6 +26,7 @@ class GridApi extends Component {
             loading: false,
             columns: this.props.columns,
             columnsAlt: this.props.columnsAlt,
+            blockEdit: this.props.blockEdit,
             dataAlt: [],
             dataAltSelected: []
         };
@@ -51,8 +52,6 @@ class GridApi extends Component {
 
         const updateData = {};
         for (var val in element.value) {
-            //console.log(value);
-
             if (val != 'created_at' && val != 'updated_at' && val != 'deleted_at') {
                 updateData[val] = element.value[val];
             }
@@ -68,26 +67,68 @@ class GridApi extends Component {
 
     }
 
+    getSchoolAndVisitValues(sub, old_value, column_value_changed, val) {
+        let newArrayData = [];
+
+        column_value_changed.map(item => {
+            val.map(register => {
+                let values = {};
+                if (old_value.length > column_value_changed.length) {
+                    if (register[sub] === item) {
+                        values['school_type_id'] = register['school_type_id'];
+                        values['visit_type_id'] = register['visit_type_id'];
+
+                        newArrayData.push(values);
+                    }
+                }
+                else {
+                    if (sub === 'school_type_id') {
+                        values['school_type_id'] = item;
+                        values['visit_type_id'] = register['visit_type_id'];
+                    } else {
+                        values['school_type_id'] = register['school_type_id'];
+                        values['visit_type_id'] = item;
+                    }
+
+                    newArrayData.push(values);
+                }
+            });
+        });
+
+        newArrayData = newArrayData.filter((item, index, self) =>
+            index === self.findIndex((obj) => (
+                obj.school_type_id === item.school_type_id && obj.visit_type_id === item.visit_type_id
+            ))
+        )
+
+        return newArrayData;
+    }
+
     componentDidMount() {
         let col = this.state.columns
 
         if (this.props.columnsAlt) {
 
+            this.setState({ dataAlt: [] });
+
             this.props.columnsAlt.map(item => {
 
                 if (item.type == 'select' || item.type == 'selectMulti') {
-
                     if (item.api) {
                         axios.get(item.api)
                             .then(response => {
                                 const dados = response.data.data;
 
-                                //console.log(dados);
+                                let dataAltAux = this.state.dataAlt;
 
-                                this.setState({ dataAlt: dados });
-                                //this.setState({ job_title_type_id: dados[0].id });
+                                dataAltAux.splice(item.seq, 0,dados);
+
+                                this.setState({ dataAlt: dataAltAux });
+                                // this.setState({ dataAlt: {[item.seq]: dados} });
+                                console.log('this.state.dataAlt:', this.state.dataAlt)
                             })
                             .catch(err => console.log(err));
+
                     }
 
                     const multi = item.type == 'selectMulti' ? true : false;
@@ -100,11 +141,6 @@ class GridApi extends Component {
                             style: { overflow: 'visible' },
                             sortable: false,
                             Cell: (element) => {
-                                console.log('GridApi - element:', element)
-
-                                let search = 'element.value' + (item.sub ? `.${item.sub}` : '');
-                                console.log('search:', search)
-
                                 let column_value = [];
 
                                 if (item.sub) {
@@ -120,17 +156,17 @@ class GridApi extends Component {
                                     });
                                 }
 
-                                console.log('column_value:', column_value)
+                                let seq = item.seq || 0;
 
                                 return (
 
                                     <div>
+                                        {console.log('return - this.state.dataAlt:', this.state.dataAlt)}
                                         <Select
+                                            autosize={true}
                                             name={item.name}
                                             onChange={(selectedOption) => {
-                                                console.log(item.accessor)
                                                 const column_value_changed = selectedOption.map(function (cv) {
-                                                    //console.log(item.name);
                                                     return cv.id;
                                                 });
 
@@ -140,20 +176,24 @@ class GridApi extends Component {
                                                     }
                                                 });
 
-                                                const column_value_update = selectedOption.map(function (cv) {
-                                                    let value = {};
-                                                    value[item.name] = cv.id;
-                                                    return value;
-                                                }, {});
+                                                let column_value_update = [];
 
-                                                //console.log(column_value_update);
+                                                if (item.accessor == 'visit_type_school_type') {
+                                                    let val = this.state.dataAltSelected[element.row[""].id] == undefined ? column_value : this.state.dataAltSelected[element.row[""].id];
+                                                    column_value_update = this.getSchoolAndVisitValues(item.sub, val, column_value_changed, element.value);
+                                                } else {
+                                                    column_value_update = selectedOption.map(function (cv) {
+                                                        let value = {};
+                                                        value[item.name] = cv.id;
+                                                        return value;
+                                                    }, {});
+                                                }
 
                                                 const updateData = {};
 
                                                 let id = 0;
-                                                for (var value in element.row['']) {
-                                                    //console.log(value);
 
+                                                for (var value in element.row['']) {
                                                     if (value == 'id') {
                                                         id = element.row[''][value]
                                                     }
@@ -172,7 +212,6 @@ class GridApi extends Component {
                                                 }).catch(function (error) {
                                                     console.log(error)
                                                 }.bind(this));
-                                                //console.log(data_update_role);
                                             }}
                                             labelKey="name"
                                             valueKey="id"
@@ -182,9 +221,8 @@ class GridApi extends Component {
                                             // menuContainerStyle={{'zIndex': 99999}}
                                             //isLoading={this.state.roleSelect2Loading}
                                             placeholder="Selecione um valor"
-                                            options={this.state.dataAlt}
+                                            options={this.state.dataAlt[seq]}
                                             rtl={false}
-                                            // disabled
                                         /> </div>
                                 )
                             }
@@ -193,7 +231,7 @@ class GridApi extends Component {
             })
 
         }
-        
+
         col.unshift({
             Header: "Status",
             accessor: "",
@@ -229,7 +267,7 @@ class GridApi extends Component {
                         !element.value.deleted_at ?
                             <div>
 
-                                <Link to={this.props.match.url + "/" + element.value.id} params={{ id: element.value.id }} className='btn btn-primary btn-sm' >
+                                <Link to={this.props.match.url + "/" + element.value.id} params={{ id: element.value.id }} className={`btn btn-primary btn-sm ${this.state.blockEdit ? 'd-none' : ''}`} >
                                     <i className='fa fa-pencil'></i>
                                 </Link>
                                 <button className='btn btn-danger btn-sm' onClick={() => this.onClickDelete(element)}>
