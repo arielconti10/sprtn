@@ -322,10 +322,11 @@ class UserSchools extends Component {
                     let dados = response.data.data;
                     dados = this.getTextSchool(dados); 
                     
-                    this.setState({ schools: dados, ringLoad: false}, function() {
+                    this.setState({ schools: dados, ringLoad: false, total_selected_available: 0}, function() {
                         this.countTotalSelected();
-                        const total_available = this.state.schools.length - this.state.selectedOptions.length;
-                        this.setState({total_available});
+                        this.filterAvailableSchools(this.state.selectedOptions);
+                        // const total_available = this.state.schools.length - this.state.selectedOptions.length;
+                        // this.setState({total_available});
                     });
                 })
                 .catch(err => console.log(err));
