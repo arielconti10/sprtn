@@ -115,6 +115,7 @@ class SchoolForm extends Component {
                 <h1 className="school-header">
                     <i className="fa fa-building-o"></i> {this.state.schoolName} 
                     <SchoolStudentIcon 
+                        active={true}
                         eiStudents={this.state.total_students_ei} 
                         ef1Students={this.state.total_students_ef1}
                         ef2Students={this.state.total_students_ef2}
