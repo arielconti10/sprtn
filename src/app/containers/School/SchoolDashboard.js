@@ -7,8 +7,8 @@ import { RingLoader } from 'react-spinners';
 import { Chart } from 'react-google-charts';
 
 import 'react-select/dist/react-select.css';
-const apiPost = 'school';
 
+const apiPost = 'school';
 const paletteColors = ["#009de8", "#FD0006", "#1aaf5d", "#f45b00", "#8e0000", "#000000", "#7D7D7D", "#00CB19", "#8C0172", "#F70060", "#1B7474", "#0a3b60", "#f2c500", "#BCF25B", "#00DDCD"];
 
 export default class SchoolDashboard extends Component {
@@ -40,18 +40,23 @@ export default class SchoolDashboard extends Component {
         this.chargeChart = this.chargeChart.bind(this);
     }
 
+
     componentWillMount() {
         this.chargeChart();
     }
 
+
     chargeChart() {
+
         let initDataP = [['Editoras', '%']];
         let initDataC = [['Coleções', '%', { 'role': 'style' }],['',0,'']];
+
         this.setState({ ringLoad: true, data_publisher: initDataP, data_colection: initDataC });
 
         if (this.state.schoolId !== undefined) {
-            axios.get(`${apiPost}/${this.state.schoolId}`)
-                .then(response => {
+
+            axios.get(`${apiPost}/${this.state.schoolId}`).then(response => {
+
                     let marketshare = response.data.data.marketshare;
 
                     let selectedYear = parseInt(new Date().getFullYear());
@@ -132,9 +137,7 @@ export default class SchoolDashboard extends Component {
         const values = this.state;
         values.year_param = selectedOption.value;
         this.setState({ values });
-
         this.chargeChart();
-
     }
 
     render() {
