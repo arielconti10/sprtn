@@ -301,6 +301,7 @@ class UserSchools extends Component {
         this.setState({schools: [], ringLoad: true});
 
         let filters = "&filter[active]=1";
+        filters += "&filter[portfolio]=1";
         if (this.state.sector_id == 0 && this.state.school_type_id == 0) {
             return false;
         }
