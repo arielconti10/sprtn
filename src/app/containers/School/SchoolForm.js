@@ -30,6 +30,10 @@ class SchoolForm extends Component {
             contacts_initial: [],
             schoolId: this.props.match.params.id,
             students: [],
+            total_students_ei: '0',
+            total_students_ef1: '0',
+            total_students_ef2: '0',
+            total_students_em: '0',
             total_students: '0',
             activeTab: 'dashboard',
             schoolCodeTotvs: '0',
@@ -48,6 +52,10 @@ class SchoolForm extends Component {
 
                 this.setState({
                     schoolName: dados.name, 
+                    total_students_ei: dados.total_students_ei || '0',
+                    total_students_ef1: dados.total_students_ef1 || '0',
+                    total_students_ef2: dados.total_students_ef2 || '0',
+                    total_students_em: dados.total_students_em || '0',
                     total_students: dados.total_students || '0',
                     students: dados.students || [],                  
                     contacts: dados.contacts || [],
@@ -104,7 +112,16 @@ class SchoolForm extends Component {
 
         return (
             <div>
-                <h1 className="school-header"><i className="fa fa-building-o"></i> {this.state.schoolName} <SchoolStudentIcon numStudents={this.state.total_students} /></h1>
+                <h1 className="school-header">
+                    <i className="fa fa-building-o"></i> {this.state.schoolName} 
+                    <SchoolStudentIcon 
+                        eiStudents={this.state.total_students_ei} 
+                        ef1Students={this.state.total_students_ef1}
+                        ef2Students={this.state.total_students_ef2}
+                        emStudents={this.state.total_students_em} 
+                        numStudents={this.state.total_students} 
+                    />
+                </h1>
                 <br />
                 <Nav tabs className={`tab-${this.state.school_type_identify}`}>
                     <NavItem>
