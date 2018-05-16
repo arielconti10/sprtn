@@ -49,7 +49,8 @@ class UserSchools extends Component {
             schools: [],
             total_available: 0,
             total_selected_available: 0,
-            total_selected_wallet: 0
+            total_selected_wallet: 0,
+            back_error: ''
         };
     }
 
@@ -167,7 +168,7 @@ class UserSchools extends Component {
 
     handleSelect = (selectedOptions) => {
 
-        this.setState({ringLoad: true});
+        this.setState({ringLoad: true, back_error:''});
 
         if (this.state.user_id == 0) {
             this.setState({ringLoad:false});
@@ -186,8 +187,18 @@ class UserSchools extends Component {
             this.filterAvailableSchools(selectedOptions);
             this.setState({total_selected_available:0});
         })
-        .catch(err => console.log(err));
-        
+        .catch(function(error) {
+            /*
+            para todos os outros erros, é retornado mensagem de erro com código
+            para estouro de memória, retorna apenas a mensagem "Error: Network Error"
+            condicao para tratar a mensagem
+            */
+            let error_message = error.toString();
+            if (error == "Error: Network Error") {
+                error_message = "Error 500 - Allowed memory size exhausted";
+            }
+            this.setState({ringLoad: false, back_error: error_message, total_selected_available: 0});
+        }.bind(this));        
     }
 
     handleDeselect = (deselectedOptions) => {
@@ -218,6 +229,18 @@ class UserSchools extends Component {
                 this.setState({total_available});
             });
         })
+        .catch(function(error) {
+            /*
+            para todos os outros erros, é retornado mensagem de erro com código
+            para estouro de memória, retorna apenas a mensagem "Error: Network Error"
+            condicao para tratar a mensagem
+            */
+            let error_message = error.toString();
+            if (error == "Error: Network Error") {
+                error_message = "Error 500 - Allowed memory size exhausted";
+            }
+            this.setState({ringLoad: false, back_error: error_message, total_selected_wallet: 0});
+        }.bind(this)); 
     }
 
     handleSelectChange = (field, value, func, obj) => {
@@ -347,6 +370,10 @@ class UserSchools extends Component {
                             <div className="load"></div>
                         </div>
                     </div>
+                }
+
+                {this.state.back_error !== '' &&
+                    <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                 }
 
                 <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
