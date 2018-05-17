@@ -6,11 +6,10 @@ import { Chart } from 'react-google-charts';
 import axios from '../../../app/common/axios';
 
 const apiPost = 'school';
-
 const paletteColors = ["#009de8", "#FD0006", "#1aaf5d", "#f45b00", "#8e0000", "#000000", "#7D7D7D", "#00CB19", "#8C0172", "#F70060", "#1B7474", "#0a3b60", "#f2c500", "#BCF25B", "#00DDCD"];
 
-class Dashboard extends Component {
 
+class MarketShare extends Component {
     constructor(props) {
         super(props);
 
@@ -38,6 +37,7 @@ class Dashboard extends Component {
         //   this.handleChangeYear = this.handleChangeYear.bind(this);
         //    this.chargeChart = this.chargeChart.bind(this);
     }
+
 
     componentWillMount() {
         this.chargeChart();
@@ -135,39 +135,53 @@ class Dashboard extends Component {
 
         return (
             <div className="animated fadeIn">
-                <RingLoader
-                    color={'#123abc'}
-                    loading={ringLoad}
-                    margin='50px'
-                />
+            <RingLoader
+                color={'#123abc'}
+                loading={ringLoad}
+                margin='50px'
+            />
 
-              
-                <br />
-                <Row>
-                    <Col md="12">
-                        <Card>
-                            <CardHeader>
-                                <span><strong>TESTE </strong></span>
-                            </CardHeader>
-                            <CardBody>
-                                <Chart
-                                    chartType="BarChart"
-                                    data={data_publisher}
-                                    options={options_publisher}
-                                    graph_id="PieChart"
-                                    width="100%"
-                                    height="400px"
-                                    legend_toggle
-                                />
-                            </CardBody>
-                        </Card>
-                        <br />
-                       
-                    </Col>
-                </Row>
-            </div>
+            <Row>
+                <Col md="2">
+                    <label>Ano</label>
+                    <Select
+                        name="year_param"
+                        id="year_param"
+                        disabled={!(years.length > 1)}
+                        clearable={false}
+                        value={year_param}
+                        onChange={this.handleChangeYear}
+                        options={years}
+                        placeholder="Não há registros"
+                    />
+                </Col>
+            </Row>
+            <br />
+            <Row>
+                <Col md="12">
+                    <Card>
+                        <CardHeader>
+                            <span><strong>Indicadores </strong></span>
+                        </CardHeader>
+                        <CardBody>
+                            <Chart
+                                chartType="BarChart"
+                                data={data_publisher}
+                                options={options_publisher}
+                                graph_id="PieChart"
+                                width="100%"
+                                height="400px"
+                                legend_toggle
+                            />
+                        </CardBody>
+                    </Card>
+                    <br />
+                   
+                </Col>
+            </Row>
+        </div>
         )
     }
 }
 
-export default Dashboard;
+export default MarketShare;

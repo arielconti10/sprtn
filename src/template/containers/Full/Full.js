@@ -32,6 +32,10 @@ import Roles from '../../../app/containers/Role/Roles';
 import Rules from '../../../app/containers/Rule/Rules';
 import Users from '../../../app/containers/User/Users';
 
+import Marketshare from '../../../app/containers/MarketShare/MarketShare';
+
+import Indicadores from '../../../app/containers/Indicadores/Indicadores'
+
 import UserSchools from '../../../app/containers/UserSchools/UserSchools';
 import axios from '../../../app/common/axios';
 
@@ -73,12 +77,19 @@ class Full extends Component {
                     <Sidebar {...this.props}/>
                     <main className="main">
                         <Breadcrumb />
+
                         <Container fluid>
                             {
                                 this.showMessagePermission()
                             }
                             <Switch>
                                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
+
+                                <Route path="/marketshare" name="marketshare" component={Marketshare}/>
+                                
+                                <Route path="/indicadores" name="indicadores" component={Indicadores}/>
+
+
                                 <Route path="/logout" name="Logout" component={Logout}/>
                                 <Route path="/carteira/escolas" name="Carteira" component={Schools} />
                                 <Route path="/carteira/distribuicao" name="Distribuicao" component={UserSchools} />
@@ -102,7 +113,7 @@ class Full extends Component {
                                 <Route path="/config/regras" name="Regras" component={Roles}/>                                
                                 <Route path="/config/permissoes" name="Permissões" component={Rules}/>
                                 <Route path="/config/usuarios" name="Usuários" component={Users}/>
-                                <Redirect from="/" to="/dashboard" />
+                                <Redirect from="/" to="/marketshare" />
                             </Switch>
                         </Container>
                     </main>
