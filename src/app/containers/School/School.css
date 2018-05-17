@@ -32,9 +32,9 @@
 .globe.active { color: green; }
 .globe.inactive { color: red; }
 
-.circle { margin-right: 10px; }
-.circle.check { color: green; }
-.circle.exclamation { color: #ecc033; }
+.portfolio { margin-right: 10px; }
+.portfolio.suitcase { color: green; }
+.portfolio.exclamation { color: red; }
 
 input, button, textarea, .btn { border-radius: 5px !important; }
 
