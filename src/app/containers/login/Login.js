@@ -44,6 +44,7 @@ class LoginForm extends Component {
             sessionStorage.setItem('access_token', res.data.access_token);
             sessionStorage.setItem('refresh_token', res.data.refresh_token);
             sessionStorage.setItem('expires_in', res.data.expires_in);
+            sessionStorage.setItem('user_id', res.data.user.id);
             sessionStorage.setItem('user_name', res.data.user.name);
             sessionStorage.setItem('user_email', res.data.user.email);
             sessionStorage.setItem('user_userName', res.data.user.username);

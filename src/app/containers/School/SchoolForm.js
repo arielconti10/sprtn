@@ -26,6 +26,7 @@ class SchoolForm extends Component {
         this.contacts_global = [];
         this.state = {
             schoolName: '',
+            viewMode: false,
             contacts: [],
             authorized: 1,
             contacts_initial: [],
@@ -77,6 +78,7 @@ class SchoolForm extends Component {
                 let authorized = verifyToken(error.response.status);
                 this.setState({ authorized: authorized });
             }.bind(this));
+
     }
 
     toggle(tab) {
@@ -199,12 +201,11 @@ class SchoolForm extends Component {
                     <TabPane tabId="cadastro">
                         <Row>
                             <Col sm="12">
-                                <SchoolRegister viewMode={false} schoolId={this.state.schoolId} />
+                                <SchoolRegister viewMode={this.state.viewMode} schoolId={this.state.schoolId} />
                             </Col>
                         </Row>
                     </TabPane>
                     <TabPane tabId="contatos">
-
                         <Row>
                             <Col sm="12">
                                 <SchoolConctactList schoolId={this.state.schoolId} contacts={this.state.contacts} />
@@ -214,7 +215,7 @@ class SchoolForm extends Component {
                     <TabPane tabId="alunos">
                         <Row>
                             <Col sm="12">
-                                <SchoolStudentList viewMode={false} schoolId={this.state.schoolId} url={this.props.match.url} />
+                                <SchoolStudentList viewMode={this.state.viewMode} schoolId={this.state.schoolId} url={this.props.match.url} />
                             </Col>
                         </Row>
                     </TabPane>

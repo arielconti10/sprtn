@@ -6,10 +6,8 @@ import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'r
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
 
-import axios from 'axios';
-import axiosSpartan from '../../common/axios';
-const apiAdocoes = 'https://fluigapi.ftd.com.br/v1/adocoes';
-const apiSpartan = 'http://hapi.spartan.ftd.com.br/api'
+import axios from '../../common/axios';
+const apiSpartan = 'school';
 
 class SchoolDistributionList extends Component {
 
@@ -26,54 +24,26 @@ class SchoolDistributionList extends Component {
             loading: false,
             columns: [],
 
-            schoolId: this.props.schoolId,
-            school_code_totvs: this.props.schoolCodeTotvs,
-            subsidiary_id: this.props.subsidiaryId,
-            sector_id: this.props.sectorId
+            schoolId: this.props.schoolId
         };
     }
 
     componentWillMount() {
-        axiosSpartan.get(`${apiSpartan}/school/${this.state.schoolId}`)
-            .then((response) => {
-                const dados = response.data.data;
+        axios.get(`${apiSpartan}`)
+            .then(response => {
+                let data = response.data.data.users || [];
 
-                let school_code_totvs = dados.school_code_totvs;
-                let baseURL = `${apiAdocoes}?filter[cd_escola]=${school_code_totvs}`;
-
-                axios.get(baseURL)
-                    .then((response) => {
-                        const dados = response.data
-                        
-                        this.setState({ data: dados });
-                    })
-                    .catch(err => console.log(err));
-
+                this.setState({ data });
             })
             .catch(err => console.log(err));
+
     }
 
     componentDidMount() {
         let col = [
-            { Header: "cd_nivel", accessor: "cd_nivel", headerClassName: 'text-left' },
-            { Header: "cd_series", accessor: "cd_series", headerClassName: 'text-left' },
-            { Header: "qt_alunos", accessor: "qt_alunos", headerClassName: 'text-left' },
-            { Header: "cd_disci", accessor: "cd_disci", headerClassName: 'text-left' },
-            { Header: "cd_fm_disci", accessor: "cd_fm_disci", headerClassName: 'text-left' },
-            { Header: "seq_disci", accessor: "seq_disci", headerClassName: 'text-left' },
-            { Header: "ano_troca", accessor: "ano_troca", headerClassName: 'text-left' },
-            { Header: "cd_livro", accessor: "cd_livro", headerClassName: 'text-left' },
-            { Header: "ano_troca", accessor: "ano_troca", headerClassName: 'text-left' },
-            { Header: "autor", accessor: "autor", headerClassName: 'text-left' },
-            { Header: "editora", accessor: "editora", headerClassName: 'text-left' },
-            { Header: "series", accessor: "series", headerClassName: 'text-left' },
-            { Header: "disciplina", accessor: "disciplina", headerClassName: 'text-left' },
-            { Header: "titulo", accessor: "titulo", headerClassName: 'text-left' },
-            { Header: "adota_1ano", accessor: "adota_1ano", headerClassName: 'text-left' },
-            { Header: "adota_2anos", accessor: "adota_2anos", headerClassName: 'text-left' },
-            { Header: "adota_3anos", accessor: "adota_3anos", headerClassName: 'text-left' },
-            { Header: "adota_4anos", accessor: "adota_4anos", headerClassName: 'text-left' },
-            { Header: "ano_apuracao", accessor: "ano_apuracao", headerClassName: 'text-left' }
+            { Header: "Login", accessor: "username", headerClassName: 'text-left' },
+            { Header: "Nome", accessor: "email", headerClassName: 'text-left' },
+            { Header: "E-mail", accessor: "full_name", headerClassName: 'text-left' }
         ];
 
         this.setState({ columns: col });
@@ -105,7 +75,7 @@ class SchoolDistributionList extends Component {
         axios.get(baseURL)
             .then((response) => {
                 const dados = response.data
-                
+
                 this.setState({
                     data: dados,
                     totalSize: dados.length,
