@@ -32,6 +32,10 @@
 .globe.active { color: green; }
 .globe.inactive { color: red; }
 
+.circle { margin-right: 10px; }
+.circle.check { color: green; }
+.circle.exclamation { color: #ecc033; }
+
 input, button, textarea, .btn { border-radius: 5px !important; }
 
 .escola-publico { background-color: #ffea87; color: #4a5057; }

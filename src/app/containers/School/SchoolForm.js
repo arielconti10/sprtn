@@ -28,6 +28,8 @@ class SchoolForm extends Component {
             contacts: [],
             authorized: 1,
             contacts_initial: [],
+            active: false,
+            portfolio: false,
             schoolId: this.props.match.params.id,
             students: [],
             total_students_ei: '0',
@@ -60,7 +62,8 @@ class SchoolForm extends Component {
                     students: dados.students || [],                  
                     contacts: dados.contacts || [],
                     contacts_initial: dados.contacts || [],
-                    active: dados.deleted_at === null ? true : false,
+                    active: dados.active == 1 ? true : false,
+                    portfolio: dados.portfolio == 1 ? true : false,
                     schoolCodeTotvs: dados.school_code_totvs,
                     subsidiaryId: dados.subsidiary_id,
                     sectorId: dados.sector_id,
@@ -85,7 +88,8 @@ class SchoolForm extends Component {
                     total_students: dados.total_students || '0',
                     students: dados.students || [],                  
                     contacts: dados.contacts || [],
-                    active: dados.deleted_at === null ? true : false,
+                    active: dados.active == 1 ? true : false,
+                    portfolio: dados.portfolio == 1 ? true : false,
                     schoolCodeTotvs: dados.school_code_totvs,
                     subsidiaryId: dados.subsidiary_id,
                     sectorId: dados.sector_id,
@@ -115,7 +119,8 @@ class SchoolForm extends Component {
                 <h1 className="school-header">
                     <i className="fa fa-building-o"></i> {this.state.schoolName} 
                     <SchoolStudentIcon 
-                        active={true}
+                        portfolio={this.state.portfolio}
+                        active={this.state.active}
                         eiStudents={this.state.total_students_ei} 
                         ef1Students={this.state.total_students_ef1}
                         ef2Students={this.state.total_students_ef2}
