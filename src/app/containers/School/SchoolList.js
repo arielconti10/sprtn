@@ -140,7 +140,7 @@ class SchoolList extends Component {
                     </div>
                 )
             },
-            { Header: "Alunos", accessor: "total_students", sortable: true, filterable: true, width: 70, headerClassName: 'text-left',
+            { Header: "Alunos", accessor: "total_students", sortable: true, width: 70, headerClassName: 'text-left',
                 Cell: props => <span>{props.value || 0}</span>
             },        
             { Header: "Market share", accessor: "marketshare", width: 100, headerClassName: 'text-left',
