@@ -4,9 +4,38 @@ import { Card, CardHeader, CardFooter, CardBody, Button } from 'reactstrap';
 
 import axios from '../../common/axios';
 import GridApi from '../../common/GridApi';
+import { canUser } from '../../common/Permissions';
 
 class JobTitleList extends Component {
+    constructor() {
+        super();
+        this.state = {
+            viewMode: false,
+            viewDeleteMode: false
+        };
+    }
 
+    checkPermission() {
+        canUser('job-title.update', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));       
+    }
+
+    checkDeletePermission() {
+        canUser('job-title.delete', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewDeleteMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));       
+    }
+
+
+    componentWillMount() {
+        this.checkPermission();
+        this.checkDeletePermission();
+    }
     render() {
 
         return (
@@ -23,6 +52,8 @@ class JobTitleList extends Component {
                         { Header: "Nome", accessor: "name", filterable: true, headerClassName: 'text-left' },
                         { Header: "Tipo", accessor: "job_title_type.name", width: 100, filterable: true, headerClassName: 'text-left' }
                     ]}
+                    blockEdit={this.state.viewMode}
+                    blockDelete={this.state.viewDeleteMode}
                 />
             </div>
         )

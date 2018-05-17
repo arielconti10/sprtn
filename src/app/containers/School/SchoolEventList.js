@@ -12,6 +12,8 @@ import 'flatpickr/dist/themes/material_blue.css'
 import 'react-select/dist/react-select.css';
 import 'react-table/react-table.css'
 
+import { canUser } from '../../common/Permissions';
+
 import axios from '../../common/axios';
 const apiSpartan = 'event';
 
@@ -301,7 +303,16 @@ class SchoolEventList extends Component {
         }
     }
 
+    checkPermission() {
+        canUser('school.update', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submit_button_disabled: true});
+            }
+        }.bind(this));
+    }
+
     componentDidMount() {
+        this.checkPermission();
         let col = [
             { Header: "Data início", accessor: "start_date", headerClassName: 'text-left', Cell: (element) => (<span>{this.convertDate(element)}</span>) },
             { Header: "Hora início", accessor: "start_time", headerClassName: 'text-left' },
@@ -513,6 +524,7 @@ class SchoolEventList extends Component {
                                                     id="form_observations"
                                                     name="form_observations"
                                                     readOnly={false}
+                                                    viewMode={this.state.viewMode}
                                                     value={this.state.form_observations}
                                                     onChange={this.handleChange}
                                                     required
@@ -542,7 +554,7 @@ class SchoolEventList extends Component {
                 <div>
                     <Row>
                         <Col md="2">
-                            <Button color='primary' disabled={this.state.blockButton} onClick={() => this.onClickAdd()}><i className="fa fa-plus-circle"></i> Adicionar</Button>
+                            <Button color='primary' disabled={this.state.viewMode} onClick={() => this.onClickAdd()}><i className="fa fa-plus-circle"></i> Adicionar</Button>
                         </Col>
                     </Row>
                     <br />

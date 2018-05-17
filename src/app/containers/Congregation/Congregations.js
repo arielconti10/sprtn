@@ -4,8 +4,12 @@ import { Row, Col, Card, CardHeader, CardFooter, CardBody, Button } from 'reacts
 
 import CongregationList from './CongregationList';
 import CongregationForm from './CongregationForm';
+import { canUser } from '../../common/Permissions';
 
 class Congregations extends Component {
+    componentWillMount() {
+        canUser('congregation.view', this.props.history, "view");
+    }
 
     render() {
         return (

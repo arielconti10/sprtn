@@ -4,8 +4,12 @@ import {Row, Col, Card, CardHeader, CardFooter, CardBody, Button} from 'reactstr
 
 import ProfileList from './ProfileList';
 import ProfileForm from './ProfileForm';
+import { canUser } from '../../common/Permissions';
 
 class Profiles extends Component {
+    componentWillMount() {
+        canUser('profile.view', this.props.history, "view");
+    }
 
     render() {
         return (

@@ -10,12 +10,16 @@ import SchoolForm from './SchoolForm';
 
 const apiSpartan = 'contact';
 
+import { canUser } from '../../common/Permissions';
+
+
 class SchoolConctactList extends Component {
 
     constructor(props) {
         super(props);
         this.toggle = this.toggle.bind(this);
         this.state = {             
+            viewMode: this.props.viewMode,
             page: 1,
             pageSize: 10,
             data: this.props.contacts,
@@ -48,6 +52,7 @@ class SchoolConctactList extends Component {
     }
 
     componentWillReceiveProps() {
+        this.checkPermission();
         this.setState({data:this.props.contacts});
     }
 
@@ -214,6 +219,14 @@ class SchoolConctactList extends Component {
         // this.toggle();
     }
 
+    checkPermission() {
+        canUser('school.update', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));
+    }
+
     render() {
         const { data, pageSize, page, loading, pages, columns } = this.state;
 
@@ -225,12 +238,13 @@ class SchoolConctactList extends Component {
                             <CardBody>
                                 <ContactForm schoolId={this.props.schoolId} contact_find={this.state.contact_find} 
                                     updateTable={this.updateTable.bind(this)} toggle={this.toggle.bind(this)}
-                                    onClickCancel={this.onClickCancel.bind(this)} />
+                                    onClickCancel={this.onClickCancel.bind(this)} 
+                                    viewMode={this.state.viewMode} />
                             </CardBody>
                         </Card>
                     </Collapse>
 
-                    <button className='btn btn-primary' disabled={this.state.blockButton} onClick={this.addNew.bind(this)}>
+                    <button className='btn btn-primary' disabled={this.state.viewMode} onClick={this.addNew.bind(this)}>
                         Adicionar
                     </button>
                 </div>

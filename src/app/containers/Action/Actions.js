@@ -4,8 +4,12 @@ import { Row, Col, Card, CardHeader, CardFooter, CardBody, Button } from 'reacts
 
 import ActionList from './ActionList';
 import ActionForm from './ActionForm';
+import { canUser } from '../../common/Permissions';
 
 class Actions extends Component {
+    componentWillMount() {
+        canUser('action.view', this.props.history, "view");
+    }
 
     render() {
         return (

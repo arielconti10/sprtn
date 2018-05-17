@@ -7,6 +7,7 @@ import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 're
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
+import { canUser } from '../../common/Permissions';
 
 const apiSelectBox = 'role';
 const apiPost = 'user';
@@ -36,10 +37,9 @@ class UserForm extends Component {
     }
 
     componentWillMount() {
-        //console.log(this.props.match.params)
-
-        ///console.log
+        this.checkPermission('user.insert');
         if (this.props.match.params.id !== undefined) {
+            this.checkPermission('user.update');
             axios.get(`${apiPost}/${this.props.match.params.id}`)
                 .then(response => {
                     const dados = response.data.data;
@@ -58,6 +58,14 @@ class UserForm extends Component {
                 })
                 .catch(err => console.log(err));
         }
+    }
+
+    checkPermission(permission) {
+        canUser(permission, this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));       
     }
 
     componentDidMount() {
@@ -173,7 +181,9 @@ class UserForm extends Component {
                         <label className="" style={{marginRight: "10px"}}>Status</label>
                         <div className="">
                             <Label className="switch switch-default switch-pill switch-primary">
-                                <Input type="checkbox" id='active' name="active" className="switch-input"  checked={this.state.active} onChange={this.handleChange}/>
+                                <Input type="checkbox" id='active' name="active" className="switch-input"  
+                                disabled={this.state.viewMode}
+                                checked={this.state.active} onChange={this.handleChange}/>
                                 <span className="switch-label"></span>
                                 <span className="switch-handle"></span>
                             </Label>
@@ -203,8 +213,11 @@ class UserForm extends Component {
                         <div className="row">
                             <div className="col-sm-6">
                                 <FormGroup for="name">
-                                    <FormControlLabel htmlFor="lastname">Nome</FormControlLabel>
+                                    <FormControlLabel htmlFor="name">
+                                        Nome <span className="text-danger"><strong>*</strong></span>
+                                    </FormControlLabel>
                                     <FormControlInput type="text" id="name" name="name"
+                                        readOnly={this.state.viewMode}
                                         value={this.state.name} onChange={this.handleChange}
                                         required />
                                     <FieldFeedbacks for="name">
@@ -215,8 +228,11 @@ class UserForm extends Component {
 
                             <div className="col-sm-6">
                                 <FormGroup for="lastname">
-                                    <FormControlLabel htmlFor="lastname">Sobrenome</FormControlLabel>
+                                    <FormControlLabel htmlFor="lastname">
+                                        Sobrenome <span className="text-danger"><strong>*</strong></span>
+                                    </FormControlLabel>
                                     <FormControlInput type="text" id="lastname" name="lastname"
+                                        readOnly={this.state.viewMode}
                                         value={this.state.lastname} onChange={this.handleChange}
                                         required />
                                     <FieldFeedbacks for="lastname">
@@ -228,8 +244,11 @@ class UserForm extends Component {
                         <div className="row">
                             <div className="col-sm-6">
                                 <FormGroup for="username">
-                                    <FormControlLabel htmlFor="username">Usuário de rede</FormControlLabel>
+                                    <FormControlLabel htmlFor="username">
+                                        Usuário de rede <span className="text-danger"><strong>*</strong></span>
+                                    </FormControlLabel>
                                     <FormControlInput type="text" id="username" name="username"
+                                        readOnly={this.state.viewMode}
                                         value={this.state.username} onChange={this.handleChange}
                                         required />
                                     <FieldFeedbacks for="username">
@@ -239,8 +258,11 @@ class UserForm extends Component {
                             </div>
                             <div className="col-sm-6">
                                 <FormGroup for="email">
-                                    <FormControlLabel htmlFor="email">Email</FormControlLabel>
+                                    <FormControlLabel htmlFor="email">
+                                        Email <span className="text-danger"><strong>*</strong></span>
+                                    </FormControlLabel>
                                     <FormControlInput type="text" id="email" name="email"
+                                        readOnly={this.state.viewMode}
                                         value={this.state.email} onChange={this.handleChange}
                                         required />
                                     <FieldFeedbacks for="email">
@@ -252,20 +274,26 @@ class UserForm extends Component {
                         <div className="row">
                             <div className="col-sm-6">
                                 <FormGroup for="password">
-                                    <FormControlLabel htmlFor="password">Senha</FormControlLabel>
+                                    <FormControlLabel htmlFor="password">
+                                        Senha <span className="text-danger"><strong>*</strong></span>
+                                    </FormControlLabel>
                                     <FormControlInput type="password" id="password" name="password"
+                                        readOnly={this.state.viewMode}
                                         value={this.state.password} onChange={this.handleChange}
                                         required />
                                     <FieldFeedbacks for="password">
                                         {validationPassword}
-                                        <FieldFeedback when={value => value !== this.state.password_confirmation && this.state.password_confirmation != ""}>Senhas não conferem</FieldFeedback>
+                                        <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
                                     </FieldFeedbacks>
                                 </FormGroup>
                             </div>
                             <div className="col-sm-6">
                                 <FormGroup for="password_confirmation">
-                                    <FormControlLabel htmlFor="password_confirmation">Confirmação de Senha</FormControlLabel>
+                                    <FormControlLabel htmlFor="password_confirmation">
+                                        Confirmação de Senha <span className="text-danger"><strong>*</strong></span>
+                                    </FormControlLabel>
                                     <FormControlInput type="password" id="password_confirmation" name="password_confirmation"
+                                        readOnly={this.state.viewMode}
                                         value={this.state.password_confirmation} onChange={this.handleChange}
                                         required />
                                     <FieldFeedbacks for="password_confirmation">
@@ -278,8 +306,11 @@ class UserForm extends Component {
 
                         <div className="">
                             <FormGroup for="role_id">
-                                <label>Tipo de Usuário</label>
-                                <select className="form-control" onChange={this.handleChange}
+                                <label>
+                                    Tipo de Usuário
+                                    <span className="text-danger"><strong>*</strong></span>
+                                </label>
+                                <select className="form-control" onChange={this.handleChange} disabled={this.state.viewMode}
                                     id="role_id" name="role_id" value={this.state.role_id}>
                                     <option key="0" value="0" >Selecione um valor</option>
                                     {

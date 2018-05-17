@@ -15,6 +15,8 @@ import { verifyToken } from '../../../app/common/AuthorizeHelper';
 import { RingLoader } from 'react-spinners';
 import '../../custom.css';
 
+import { canUser } from '../../common/Permissions';
+
 const BOOTSTRAP_CLASSES = {
     filter: 'form-control',
     select: 'form-control',
@@ -37,6 +39,7 @@ class UserSchools extends Component {
         super();
         this.state = {
             ringLoad: false,
+            viewMode: false,
             selectedOptions: [],
             school_types: [],
             school_type_id: 0,
@@ -52,6 +55,19 @@ class UserSchools extends Component {
             total_selected_wallet: 0,
             back_error: ''
         };
+    }
+
+    componentWillMount() {
+        this.checkPermission();
+        canUser('user-schools.view', this.props.history, "view");
+    }
+
+    checkPermission() {
+        canUser('user-school.register', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));
     }
 
     /**
@@ -477,6 +493,7 @@ class UserSchools extends Component {
                                             selectedOptions={selectedOptions}
                                             textProp="label"
                                             valueProp="id"
+                                            disabled={this.state.viewMode}
                                             size={15}
                                         />
                                 </FormGroup>
@@ -501,6 +518,7 @@ class UserSchools extends Component {
                                             button: 'btn btn btn-block btn-default',
                                             buttonActive: 'btn btn btn-block btn-danger'
                                         }}
+                                        disabled={this.state.viewMode}
                                         onChange={this.handleDeselect}
                                         options={selectedOptions}
                                         textProp="label"

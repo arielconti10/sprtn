@@ -4,8 +4,12 @@ import {Row, Col, Card, CardHeader, CardFooter, CardBody, Button} from 'reactstr
 
 import SectorList from './SectorList';
 import SectorForm from './SectorForm';
+import { canUser } from '../../common/Permissions';
 
 class Sectors extends Component {
+    componentWillMount() {
+        canUser('sector.view', this.props.history, "view");
+    }
 
     render() {
         return (

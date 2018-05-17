@@ -7,6 +7,8 @@ import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 're
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
+import { canUser } from '../../common/Permissions';
+
 const apiPost = 'congregation';
 
 class CongregationForm extends Component {
@@ -25,8 +27,19 @@ class CongregationForm extends Component {
         this.submitForm = this.submitForm.bind(this);
     }
 
+    checkPermission(permission) {
+        canUser(permission, this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+                console.log(this.state.viewMode);
+            }
+        }.bind(this));       
+    }
+
     componentWillMount() {
+        this.checkPermission('congregation.insert');
         if (this.props.match.params.id !== undefined) {
+            this.checkPermission('congregation.insert');
             axios.get(`${apiPost}/${this.props.match.params.id}`)
                 .then(response => {
                     const dados = response.data.data;
@@ -145,6 +158,7 @@ class CongregationForm extends Component {
                             <FormGroup for="name">
                                 <FormControlLabel htmlFor="name">Nome da congregação</FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
+                                    readOnly={this.state.viewMode}
                                     value={this.state.name} onChange={this.handleChange}
                                     required />
                                 <FieldFeedbacks for="name">
@@ -155,7 +169,7 @@ class CongregationForm extends Component {
                         
                         {statusField}     
 
-                        <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
+                        <button className="btn btn-primary" disabled={this.state.viewMode}>Salvar</button>
                         <button className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
                     </FormWithConstraints>
                     

@@ -4,8 +4,12 @@ import { Row, Col, Card, CardHeader, CardFooter, CardBody, Button } from 'reacts
 
 import ChainList from './ChainList';
 import ChainForm from './ChainForm';
+import { canUser } from '../../common/Permissions';
 
 class Chains extends Component {
+    componentWillMount() {
+        canUser('chain.view', this.props.history, "view");
+    }
 
     render() {
         return (

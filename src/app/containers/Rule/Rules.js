@@ -4,8 +4,12 @@ import { Row, Col, Card, CardHeader, CardFooter, CardBody, Button } from 'reacts
 
 import RuleList from './RuleList';
 import RuleForm from './RuleForm';
+import { canUser } from '../../common/Permissions';
 
 class Rules extends Component {
+    componentWillMount() {
+        canUser('rule.view', this.props.history, "view");
+    }
 
     render() {
         return (

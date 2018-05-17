@@ -7,6 +7,8 @@ import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 're
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
+import { canUser } from '../../common/Permissions';
+
 const apiPost = 'chain';
 
 class ChainForm extends Component {
@@ -26,7 +28,9 @@ class ChainForm extends Component {
     }
 
     componentWillMount() {
+        this.checkPermission('chain.insert');
         if (this.props.match.params.id !== undefined) {
+            this.checkPermission('chain.insert');
             axios.get(`${apiPost}/${this.props.match.params.id}`)
                 .then(response => {
                     const dados = response.data.data;
@@ -39,6 +43,14 @@ class ChainForm extends Component {
                 })
                 .catch(err => console.log(err));
         }
+    }
+
+    checkPermission(permission) {
+        canUser(permission, this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));       
     }
 
     handleChange(e) {
@@ -121,7 +133,9 @@ class ChainForm extends Component {
                         <label className="" style={{marginRight: "10px"}}>Status</label>
                         <div className="">
                             <Label className="switch switch-default switch-pill switch-primary">
-                                <Input type="checkbox" id='active' name="active" className="switch-input"  checked={this.state.active} onChange={this.handleChange}/>
+                                <Input type="checkbox" id='active' name="active" className="switch-input"  
+                                disabled={this.state.viewMode}
+                                checked={this.state.active} onChange={this.handleChange}/>
                                 <span className="switch-label"></span>
                                 <span className="switch-handle"></span>
                             </Label>
@@ -146,6 +160,7 @@ class ChainForm extends Component {
                                 <FormControlLabel htmlFor="name">Nome da rede</FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
                                     required />
                                 <FieldFeedbacks for="name">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>

@@ -4,8 +4,37 @@ import { Card, CardHeader, CardFooter, CardBody, Button } from 'reactstrap';
 
 import axios from '../../common/axios';
 import GridApi from '../../common/GridApi';
+import { canUser } from '../../common/Permissions';
 
 class SchoolTypeList extends Component {
+    constructor() {
+        super();
+        this.state = {
+            viewMode: false,
+            viewDeleteMode: false
+        };
+    }
+
+    checkPermission() {
+        canUser('sector.update', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));       
+    }
+
+    checkDeletePermission() {
+        canUser('sector.delete', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewDeleteMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));       
+    }
+
+    componentWillMount() {
+        this.checkPermission();
+        this.checkDeletePermission();
+    }
 
     render() {
 
@@ -21,6 +50,8 @@ class SchoolTypeList extends Component {
                         { Header: 'ID', accessor: 'id', filterable: true, width: 100, headerClassName: 'text-left' },
                         { Header: "Nome", accessor: "name", filterable: true, headerClassName: 'text-left' }
                     ]}
+                    blockEdit={this.state.viewMode}
+                    blockDelete={this.state.viewDeleteMode}
                 />
             </div>
         )
