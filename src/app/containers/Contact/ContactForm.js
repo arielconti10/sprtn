@@ -18,6 +18,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import Editable from 'react-x-editable';
 
+import { canUser } from '../../common/Permissions';
 
 const apis = [
     { stateArray: 'job-title', api: 'job-title' },
@@ -31,6 +32,7 @@ class ContactForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            viewMode: this.props.viewMode,
             collapse: false,
             blockButton: false,
             columns: [],
@@ -275,6 +277,7 @@ class ContactForm extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        this.checkPermission();
         this.populateSelectbox();
 
         if (nextProps.contact_find !== this.props.contact_find) {
@@ -556,6 +559,14 @@ class ContactForm extends Component {
         this.props.toggle();
     }
 
+    checkPermission() {
+        canUser('school.update', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));
+    }
+
     render() {
         const { phones_data, pageSize, page, loading, pages, columns } = this.state;
 
@@ -584,6 +595,7 @@ class ContactForm extends Component {
                                 </FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
                                     required/>
                                 <FieldFeedbacks for="name">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -598,6 +610,7 @@ class ContactForm extends Component {
                                 <Select
                                     name="job_title_id"
                                     value={value}
+                                    disabled={this.state.viewMode}
                                     onChange={this.handleChangeSelect}
                                     options={this.state.job_title}
                                 />
@@ -615,6 +628,7 @@ class ContactForm extends Component {
                                 <FormControlLabel htmlFor="email">E-mail</FormControlLabel>
                                 <FormControlInput type="text" id="email" name="email"
                                     value={this.state.email} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
                                     />
                                 <FieldFeedbacks for="email">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -628,6 +642,7 @@ class ContactForm extends Component {
                                 <MaskedInput mask="111.111.111-11"
                                     name="cpf" id="cpf" onChange={this.handleChange}
                                     value = {this.state.cpf}
+                                    readOnly={this.state.viewMode}
                                     className="form-control" 
                                     />
                                 <FieldFeedbacks for="cpf">
@@ -642,6 +657,7 @@ class ContactForm extends Component {
                                 <MaskedInput mask="11/11/1111"
                                     name="birthday" id="birthday" onChange={this.handleChange}
                                     value={this.state.birthday}
+                                    readOnly={this.state.viewMode}
                                     className="form-control" 
                                     />
                                 <FieldFeedbacks for="birthday">
@@ -659,6 +675,7 @@ class ContactForm extends Component {
                                 <MaskedInput mask="11111-111"
                                     name="zip_code" id="zip_code" onChange={this.handleChange}
                                     value = {this.state.zip_code}
+                                    readOnly={this.state.viewMode}
                                     className="form-control" onBlur={this.searchCep}/>
                                 <FieldFeedbacks for="zip_code">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -671,6 +688,7 @@ class ContactForm extends Component {
                                 <FormControlLabel htmlFor="address">Endereço</FormControlLabel>
                                 <FormControlInput type="text" id="address" name="address"
                                     value={this.state.address} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
                                     />
                                 <FieldFeedbacks for="address">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -683,6 +701,7 @@ class ContactForm extends Component {
                                 <FormControlLabel htmlFor="number">Número</FormControlLabel>
                                 <FormControlInput type="text" id="number" name="number"
                                     value={this.state.number} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
                                      />
                                 <FieldFeedbacks for="number">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -695,6 +714,7 @@ class ContactForm extends Component {
                                 <FormControlLabel htmlFor="complement">Complemento</FormControlLabel>
                                 <FormControlInput type="text" id="complement" name="complement"
                                     value={this.state.complement} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
                                     />
                                 <FieldFeedbacks for="complement">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -710,6 +730,7 @@ class ContactForm extends Component {
                                 <FormControlLabel htmlFor="neighborhood">Bairro</FormControlLabel>
                                 <FormControlInput type="text" id="neighborhood" name="neighborhood"
                                     value={this.state.neighborhood} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
                                     />
                                 <FieldFeedbacks for="neighborhood">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -722,6 +743,7 @@ class ContactForm extends Component {
                                 <FormControlLabel htmlFor="city">Cidade</FormControlLabel>
                                 <FormControlInput type="text" id="city" name="city"
                                     value={this.state.city} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
                                     />
                                 <FieldFeedbacks for="city">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -737,6 +759,7 @@ class ContactForm extends Component {
                                     value={value_state}
                                     onChange={this.handleChangeState}
                                     options={this.state.state}
+                                    disabled={this.state.viewMode}
                                 />
                                 <FieldFeedbacks for="state_id">
                                     <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -752,7 +775,7 @@ class ContactForm extends Component {
                                 <div className="">
                                     <Label className="switch switch-default switch-pill switch-primary">
                                         <Input type="checkbox" id='authorize_email' name="authorize_email" className="switch-input" onChange={this.handleChange}
-                                        checked={this.state.authorize_email == 1?'checked':''} />
+                                        checked={this.state.authorize_email == 1?'checked':''} disabled={this.state.viewMode}/>
                                         <span className="switch-label"></span>
                                         <span className="switch-handle"></span>
                                     </Label>
@@ -766,7 +789,7 @@ class ContactForm extends Component {
                                 <div className="">
                                     <Label className="switch switch-default switch-pill switch-primary">
                                         <Input type="checkbox" id='favorite' name="favorite" className="switch-input" onChange={this.handleChange}
-                                        checked={this.state.favorite == 1?'checked':''} />
+                                        checked={this.state.favorite == 1?'checked':''} disabled={this.state.viewMode} />
                                         <span className="switch-label"></span>
                                         <span className="switch-handle"></span>
                                     </Label>
@@ -793,6 +816,7 @@ class ContactForm extends Component {
                                             {label: 'Fax', value: 'fax'},
                                             {label: 'Trabalho', value: 'work'}
                                         ]}
+                                        disabled={this.state.viewMode}
                                     />
                                     <FieldFeedbacks for="phone_type">
                                         <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -805,7 +829,7 @@ class ContactForm extends Component {
                                 <FormGroup for="phone_number">
                                     <FormControlLabel htmlFor="phone_number">Telefone</FormControlLabel>
                                     <MaskedInput className="form-control" mask="(11) 1111-11111" type="text" id="phone_number" name="phone_number" 
-                                        value={this.state.phone_number} onChange={this.handleChange}
+                                        value={this.state.phone_number} onChange={this.handleChange} readOnly={this.state.viewMode}
                                     />
                                     <FieldFeedbacks for="phone_number">
                                         <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -818,6 +842,7 @@ class ContactForm extends Component {
                                     <FormControlLabel htmlFor="phone_extension">Observaçāo</FormControlLabel>
                                     <FormControlInput type="text" id="phone_extension" name="phone_extension"
                                         value={this.state.phone_extension} onChange={this.handleChange}
+                                        readOnly={this.state.viewMode}
                                         />
                                     <FieldFeedbacks for="phone_extension">
                                         <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>

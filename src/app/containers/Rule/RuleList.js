@@ -7,9 +7,37 @@ import GridApi from '../../common/GridApi';
 
 import Select, { Async } from 'react-select';
 import 'react-select/dist/react-select.css';
+import { canUser } from '../../common/Permissions';
 
 class RuleList extends Component {
+    constructor() {
+        super();
+        this.state = {
+            viewMode: false,
+            viewDeleteMode: false
+        };
+    }
 
+    checkPermission() {
+        canUser('rule.update', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));       
+    }
+
+    checkDeletePermission() {
+        canUser('rule.delete', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewDeleteMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));       
+    }
+
+    componentWillMount() {
+        this.checkPermission();
+        this.checkDeletePermission();
+    }
     handleSelectChange = (selectedOption) => {
 
         const role_id = selectedOption.map(function(item) {
@@ -37,6 +65,8 @@ class RuleList extends Component {
                     columnsAlt={[
                         { Header: 'Regras', accessor: 'roles', filterable: true, name: 'role_id', width: 400, type:'selectMulti', api: 'role', headerClassName: 'text-left'},
                     ]}
+                    blockEdit={this.state.viewMode}
+                    blockDelete={this.state.viewDeleteMode}
                 />
             </div>
         )

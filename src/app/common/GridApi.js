@@ -17,6 +17,8 @@ class GridApi extends Component {
 
         this.state = {
             page: 1,
+            viewMode: false,
+            deleteMode: false,
             pageSize: 10,
             authorized: 1,
             data: [],
@@ -28,9 +30,14 @@ class GridApi extends Component {
             columnsAlt: this.props.columnsAlt,
             blockEdit: this.props.blockEdit,
             dataAlt: [],
-            dataAltSelected: []
+            dataAltSelected: [],
+            sortInitial: []
         };
 
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.setState({viewMode: nextProps.blockEdit, deleteMode: nextProps.blockDelete});
     }
 
     onClickDelete(element) {
@@ -114,6 +121,11 @@ class GridApi extends Component {
             this.props.columnsAlt.map(item => {
 
                 if (item.type == 'select' || item.type == 'selectMulti') {
+                    // console.log(item);
+                    // if (item.disable_field) {
+                        // console.log(item.disable_field);
+                        // this.setState({disable_field: true});
+                    // }
                     if (item.api) {
                         axios.get(item.api)
                             .then(response => {
@@ -125,7 +137,6 @@ class GridApi extends Component {
 
                                 this.setState({ dataAlt: dataAltAux });
                                 // this.setState({ dataAlt: {[item.seq]: dados} });
-                                console.log('this.state.dataAlt:', this.state.dataAlt)
                             })
                             .catch(err => console.log(err));
 
@@ -161,7 +172,6 @@ class GridApi extends Component {
                                 return (
 
                                     <div>
-                                        {console.log('return - this.state.dataAlt:', this.state.dataAlt)}
                                         <Select
                                             autosize={true}
                                             name={item.name}
@@ -217,6 +227,7 @@ class GridApi extends Component {
                                             valueKey="id"
                                             value={this.state.dataAltSelected[element.row[""].id] == undefined ? column_value : this.state.dataAltSelected[element.row[""].id]}
                                             multi={multi}
+                                            disabled={this.state.viewMode}
                                             joinValues={false}
                                             // menuContainerStyle={{'zIndex': 99999}}
                                             //isLoading={this.state.roleSelect2Loading}
@@ -267,10 +278,11 @@ class GridApi extends Component {
                         !element.value.deleted_at ?
                             <div>
 
-                                <Link to={this.props.match.url + "/" + element.value.id} params={{ id: element.value.id }} className={`btn btn-primary btn-sm ${this.state.blockEdit ? 'd-none' : ''}`} >
+                                <Link to={this.props.match.url + "/" + element.value.id} params={{ id: element.value.id }} className={`btn btn-primary btn-sm ${this.state.blockEdit ? 'd-none' : ''}`} 
+                                disabled={this.state.viewMode}>
                                     <i className='fa fa-pencil'></i>
                                 </Link>
-                                <button className='btn btn-danger btn-sm' onClick={() => this.onClickDelete(element)}>
+                                <button className='btn btn-danger btn-sm' onClick={() => this.onClickDelete(element)} disabled={this.state.deleteMode}>
                                     <i className='fa fa-ban'></i>
                                 </button>
                                 {/* <Link to={this.props.match.url + "/" + element.value.id + "/permissoes"} params={{id: element.value.id}} title="Permissões" className='btn btn-warning btn-sm' >
@@ -279,7 +291,7 @@ class GridApi extends Component {
                             </div>
                             :
                             <div>
-                                <button className='btn btn-success btn-sm' onClick={() => this.onClickActive(element, fields)}>
+                                <button className='btn btn-success btn-sm' onClick={() => this.onClickActive(element, fields)} disabled={this.state.deleteMode}>
                                     <i className='fa fa-check-circle'></i>
                                 </button>
                             </div>
@@ -291,8 +303,51 @@ class GridApi extends Component {
         this.setState({ columns: col })
     }
 
-    onFetchData = (state, instance, deleted_at) => {
+    /**
+     * verifica a ordenacāo inicial
+     * se foi enviada por parametro via componente, realiza a ordenaçāo
+     * caso nāo, traz do jeito default da tabela
+     */
+    verifySortInitial() {
+        if (this.props.sortInitial) {
+            //ordenacao default
+            let sortInitial = [
+                {
+                    id: this.props.sortInitial,
+                    desc: false
+                }
+            ];
 
+            this.setState({sortInitial:sortInitial});
+        }
+    }
+
+    /**
+     * verifica a ordenaçāo a ser realizada
+     * contempla validaçāo de coluna composta, quando é, por exemplo full_name (nome + sobrenome)
+     * @param {String} sorted_id coluna que será ordenada 
+     * @param {Object} state estado referente ao react table 
+     * @param {Integer} count posiçāo atual dos filtros de ordenaçāo
+     * @return {String} order_by valor que será ordenado 
+     */
+    verifyOrderBy(sorted_id, state, count) {
+        let order_by = sorted_id;     
+
+        //verifica se é uma coluna composta, por exemplo full_name (nome + sobrenome)
+        //para escolher método de ordenaçāo
+        const column_compare = state.columns.filter(function(column){
+            return column.accessor == sorted_id;
+        });
+
+        if (column_compare[count].is_compost) {
+            order_by = column_compare[count].order_by;
+        }
+
+        return order_by;
+    }
+
+    onFetchData = (state, instance, deleted_at) => {      
+        
         let apiSpartan = this.props.apiSpartan
 
         let pageSize = state ? state.pageSize : this.state.pageSize;
@@ -303,7 +358,7 @@ class GridApi extends Component {
 
         let baseURL = `/${apiSpartan}?paginate=${pageSize}&page=${page}`;
 
-        //To do: make filter to deleted_at
+                //To do: make filter to deleted_at
         /*console.log('onFetchData:', deleted_at);
         if(deleted_at != 'all')
             console.log("deleted_at != 'all'", deleted_at);*/
@@ -313,14 +368,13 @@ class GridApi extends Component {
         })
 
         for (let i = 0; i < sorted.length; i++) {
-            baseURL += "&order[" + sorted[i]['id'] + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
+            let order_by = this.verifyOrderBy(sorted[i]['id'], state, i);
+            baseURL += "&order[" + order_by + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
         }
-
-        this.setState({ loading: true });
 
         axios.get(baseURL)
             .then((response) => {
-                const dados = response.data.data
+                const dados = response.data.data;
 
                 this.setState({
                     data: dados,
@@ -331,6 +385,8 @@ class GridApi extends Component {
                     sorted: sorted,
                     filtered: filtered,
                     loading: false
+                }, function() {
+                    this.verifySortInitial();
                 });
 
             })
@@ -338,11 +394,12 @@ class GridApi extends Component {
                 let authorized = verifyToken(error.response.status);
                 this.setState({ authorized: authorized });
             }.bind(this));
+
+        
     }
 
     render() {
-
-        const { data, pageSize, page, loading, pages, columns } = this.state;
+        const { data, pageSize, page, loading, pages, columns, sortInitial } = this.state;
 
         if (this.state.authorized == 0) {
             return (
@@ -351,6 +408,7 @@ class GridApi extends Component {
         }
 
         return (
+            
             <div>
                 <ReactTable
                     columns={columns}
@@ -363,6 +421,7 @@ class GridApi extends Component {
                     onExpandedChange={(expanded, index, event) => {
                         event.persist();
                     }}
+                    defaultSorted={sortInitial}
                     previousText='Anterior'
                     nextText='Próximo'
                     loadingText='Carregando...'
@@ -376,5 +435,13 @@ class GridApi extends Component {
         )
     }
 }
-
+/*
+1 == 2?[
+          defaultSorted={[
+            {
+              id: "age",
+              desc: true
+            }
+          ]}
+*/
 export default withRouter(GridApi);

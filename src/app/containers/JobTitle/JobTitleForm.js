@@ -7,6 +7,7 @@ import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 're
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
+import { canUser } from '../../common/Permissions';
 
 const apiSelectBox = 'job-title-type';
 const apiPost = 'job-title';
@@ -30,11 +31,20 @@ class JobTitleForm extends Component {
         this.submitForm = this.submitForm.bind(this);
     }
 
-    componentWillMount() {
-        //console.log(this.props.match.params)
+    checkPermission(permission) {
+        canUser(permission, this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+                console.log(this.state.viewMode);
+            }
+        }.bind(this));       
+    }
 
-        ///console.log
+    componentWillMount() {
+        this.checkPermission('job-title.insert');
+
         if (this.props.match.params.id !== undefined) {
+            this.checkPermission('job-title.update');
             axios.get(`${apiPost}/${this.props.match.params.id}`)
                 .then(response => {
                     const dados = response.data.data;
@@ -158,7 +168,10 @@ class JobTitleForm extends Component {
                         <label className="" style={{marginRight: "10px"}}>Status</label>
                         <div className="">
                             <Label className="switch switch-default switch-pill switch-primary">
-                                <Input type="checkbox" id='active' name="active" className="switch-input"  checked={this.state.active} onChange={this.handleChange}/>
+                                <Input type="checkbox" id='active' name="active" className="switch-input"  checked={this.state.active} 
+                                onChange={this.handleChange}
+                                disabled={this.state.viewMode}
+                                />
                                 <span className="switch-label"></span>
                                 <span className="switch-handle"></span>
                             </Label>
@@ -184,6 +197,7 @@ class JobTitleForm extends Component {
                                 <FormControlLabel htmlFor="code">Código do cargo</FormControlLabel>
                                 <FormControlInput type="text" id="code" name="code"
                                     value={this.state.code} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
                                     required />
                                 <FieldFeedbacks for="code">
                                     <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -196,6 +210,7 @@ class JobTitleForm extends Component {
                                 <FormControlLabel htmlFor="name">Nome do cargo</FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
                                     required />
                                 <FieldFeedbacks for="name">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -207,7 +222,8 @@ class JobTitleForm extends Component {
                             <FormGroup for="job_title_type_id">
                                 <label>Tipo do cargo</label>
                                 <select className="form-control" onChange={this.handleChange}
-                                    id="job_title_type_id" name="job_title_type_id" value={this.state.job_title_type_id}>
+                                    id="job_title_type_id" name="job_title_type_id" value={this.state.job_title_type_id}
+                                    disabled={this.state.viewMode}>
                                     <option key="0" value="0" >Selecione um valor</option>
                                     {
                                         this.state.job_types.map(data => {

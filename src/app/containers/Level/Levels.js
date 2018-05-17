@@ -4,8 +4,12 @@ import { Row, Col, Card, CardHeader, CardFooter, CardBody, Button } from 'reacts
 
 import LevelList from './LevelList';
 import LevelForm from './LevelForm';
+import { canUser } from '../../common/Permissions';
 
 class Levels extends Component {
+    componentWillMount() {
+        canUser('level.view', this.props.history, "view");
+    }
 
     render() {
         return (

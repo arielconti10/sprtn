@@ -10,6 +10,9 @@ import 'react-select/dist/react-select.css';
 import 'react-table/react-table.css'
 
 import axios from '../../common/axios';
+
+import { canUser } from '../../common/Permissions';
+
 const apiSpartan = 'student';
 
 const apis = [
@@ -375,6 +378,8 @@ class SchoolStudentList extends Component {
     }
 
     componentDidMount() {
+        this.checkPermission();
+
         apis.map(item => {
             axios.get(`${item.api}`)
                 .then(response => {
@@ -387,6 +392,14 @@ class SchoolStudentList extends Component {
                 })
                 .catch(err => console.log(err));
         });
+    }
+
+    checkPermission() {
+        canUser('school.update', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, blockButton: true});
+            }
+        }.bind(this));
     }
 
     onFetchData = (state, instance, deleted_at) => {
@@ -462,7 +475,7 @@ class SchoolStudentList extends Component {
                                         <Col md="2">
                                             <FormGroup for="form_year">
                                                 <FormControlLabel htmlFor="form_year">Ano <span className="text-danger"><strong>*</strong></span></FormControlLabel>
-                                                <FormControlInput type="number" id="form_year" name="form_year" readOnly={false}
+                                                <FormControlInput type="number" id="form_year" name="form_year" readOnly={this.state.viewMode}
                                                     value={this.state.form_year} onChange={this.handleChange}
                                                     required />
                                                 <FieldFeedbacks for="form_year">

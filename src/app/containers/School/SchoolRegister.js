@@ -13,6 +13,8 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import './School.css'
 
+import { canUser } from '../../common/Permissions';
+
 const apiPost = 'school';
 const apiCep = 'cep';
 
@@ -118,8 +120,17 @@ export default class SchoolRegister extends Component {
         });
     }
 
-    componentWillMount() {
-        this.setState({ ringLoad: true });
+    checkPermission() {
+        canUser('school.update', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));
+    }
+
+    componentWillMount() {        
+        this.checkPermission();
+
         if (this.state.id !== undefined) {
             axios.get(`${apiPost}/${this.state.id}`)
                 .then(response => {

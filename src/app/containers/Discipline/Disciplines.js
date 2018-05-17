@@ -4,8 +4,12 @@ import { Row, Col, Card, CardHeader, CardFooter, CardBody, Button } from 'reacts
 
 import DisciplineList from './DisciplineList';
 import DisciplineForm from './DisciplineForm';
+import { canUser } from '../../common/Permissions';
 
 class Disciplines extends Component {
+    componentWillMount() {
+        canUser('discipline.view', this.props.history, "view");
+    }
 
     render() {
         return (

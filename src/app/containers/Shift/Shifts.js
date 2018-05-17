@@ -4,9 +4,12 @@ import {Row, Col, Card, CardHeader, CardFooter, CardBody, Button} from 'reactstr
 
 import ShiftList from './ShiftList';
 import ShiftForm from './ShiftForm';
+import { canUser } from '../../common/Permissions';
 
 class Shifts extends Component {
-
+    componentWillMount() {
+        canUser('shift.view', this.props.history, "view");
+    }
     render() {
         return (
             <Row>

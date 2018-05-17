@@ -4,8 +4,12 @@ import {Row, Col, Card, CardHeader, CardFooter, CardBody, Button} from 'reactstr
 
 import JobTitleList from './JobTitleList';
 import JobTitleForm from './JobTitleForm';
+import { canUser } from '../../common/Permissions';
 
 class JobTitles extends Component {
+    componentWillMount() {
+        canUser('job-title.view', this.props.history, "view");
+    }
 
     render() {
         return (

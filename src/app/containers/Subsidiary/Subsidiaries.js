@@ -4,8 +4,12 @@ import {Row, Col, Card, CardHeader, CardFooter, CardBody, Button} from 'reactstr
 
 import SubsidiaryList from './SubsidiaryList';
 import SubsidiaryForm from './SubsidiaryForm';
+import { canUser } from '../../common/Permissions';
 
 class Subsidiaries extends Component {
+    componentWillMount() {
+        canUser('subsidiary.view', this.props.history, "view");
+    }
 
     render() {
         return (

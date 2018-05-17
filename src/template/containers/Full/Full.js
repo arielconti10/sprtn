@@ -37,8 +37,27 @@ import Marketshare from '../../../app/containers/MarketShare/MarketShare';
 import Indicadores from '../../../app/containers/Indicadores/Indicadores'
 
 import UserSchools from '../../../app/containers/UserSchools/UserSchools';
+import axios from '../../../app/common/axios';
 
 class Full extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            rules: []
+        };
+    }
+
+    componentWillMount() {
+        // sessionStorage.removeItem('block_fields');
+    }
+
+    showMessagePermission() {
+        const message = (sessionStorage.getItem('flash_message'))?
+            <h4 className="alert alert-danger"> Acesso negado. Você nāo está autorizado a realizar esta açāo </h4>
+            :'';
+        sessionStorage.removeItem('flash_message');
+        return message;
+    }
 
     render() {
         
@@ -49,6 +68,8 @@ class Full extends Component {
             );
         }
 
+
+
         return (
             <div className="app">
                 <Header />
@@ -58,6 +79,9 @@ class Full extends Component {
                         <Breadcrumb />
 
                         <Container fluid>
+                            {
+                                this.showMessagePermission()
+                            }
                             <Switch>
                                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
 
@@ -67,8 +91,8 @@ class Full extends Component {
 
 
                                 <Route path="/logout" name="Logout" component={Logout}/>
-                                <Route path="/carteira/escolas" name="Carteira" component={Schools}/>
-                                <Route path="/carteira/distribuicao" name="Distribuicao" component={UserSchools}/>
+                                <Route path="/carteira/escolas" name="Carteira" component={Schools} />
+                                <Route path="/carteira/distribuicao" name="Distribuicao" component={UserSchools} />
                                 {/*<Route path="/carteira/escolas/alunos" name="Carteira" component={SchoolForm}/>*/}
                                 <Route path="/cadastro/cargos" name="Cargos" component={JobTitles}/>
                                 <Route path="/cadastro/filiais" name="Filiais" component={Subsidiaries}/>

@@ -7,6 +7,8 @@ import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 're
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
+import { canUser } from '../../common/Permissions';
+
 const apiPost = 'discipline';
 
 class DisciplineForm extends Component {
@@ -26,13 +28,22 @@ class DisciplineForm extends Component {
         this.submitForm = this.submitForm.bind(this);
     }
 
+    checkPermission(permission) {
+        canUser(permission, this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));       
+    }
+
     componentWillMount() {
+        this.checkPermission('discipline.insert');
         if (this.props.match.params.id !== undefined) {
+            this.checkPermission('discipline.update');
             axios.get(`${apiPost}/${this.props.match.params.id}`)
                 .then(response => {
                     const dados = response.data.data;
 
-                    console.log(dados.deleted_at);
                     this.setState({ 
                         name: dados.name,
                         code: dados.code,
@@ -126,7 +137,9 @@ class DisciplineForm extends Component {
                         <label className="" style={{marginRight: "10px"}}>Status</label>
                         <div className="">
                             <Label className="switch switch-default switch-pill switch-primary">
-                                <Input type="checkbox" id='active' name="active" className="switch-input"  checked={this.state.active} onChange={this.handleChange}/>
+                                <Input type="checkbox" id='active' name="active" className="switch-input"  
+                                disabled={this.state.viewMode}
+                                checked={this.state.active} onChange={this.handleChange}/>
                                 <span className="switch-label"></span>
                                 <span className="switch-handle"></span>
                             </Label>
@@ -151,6 +164,7 @@ class DisciplineForm extends Component {
                                 <FormControlLabel htmlFor="code">Código da disciplina</FormControlLabel>
                                 <FormControlInput type="text" id="code" name="code"
                                     value={this.state.code} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
                                     required />
                                 <FieldFeedbacks for="code">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -163,6 +177,7 @@ class DisciplineForm extends Component {
                                 <FormControlLabel htmlFor="name">Nome da disciplina</FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
                                     required />
                                 <FieldFeedbacks for="name">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>

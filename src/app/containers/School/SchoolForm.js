@@ -18,12 +18,16 @@ import SchoolStudentList from './SchoolStudentList';
 import SchoolAdoptionList from './SchoolAdoptionList';
 import SchoolEventList from './SchoolEventList';
 
+import { canUser, verifyViewMode } from '../../common/Permissions';
+
 class SchoolForm extends Component {
     constructor(props) {
         super(props);
         this.toggle = this.toggle.bind(this);
         this.contacts_global = [];
         this.state = {
+            viewMode: false,
+            permission: true,
             schoolName: '',
             contacts: [],
             authorized: 1,
@@ -40,34 +44,45 @@ class SchoolForm extends Component {
         };
     }
 
-    componentWillMount() {
-
+    getSchool() {
         axios.get(`school/${this.state.schoolId}`)
-            .then(response => {
-                const dados = response.data.data;
+        .then(response => {
+            const dados = response.data.data;
 
-                this.setState({
-                    schoolName: dados.name, 
-                    total_students: dados.total_students || '0',
-                    students: dados.students || [],                  
-                    contacts: dados.contacts || [],
-                    contacts_initial: dados.contacts || [],
-                    active: dados.deleted_at === null ? true : false,
-                    schoolCodeTotvs: dados.school_code_totvs,
-                    subsidiaryId: dados.subsidiary_id,
-                    sectorId: dados.sector_id,
-                    school_type_identify: dados.school_type.identify.toLowerCase(),
-                    marketshare: dados.marketshare
-                });
+            this.setState({
+                schoolName: dados.name, 
+                total_students: dados.total_students || '0',
+                students: dados.students || [],                  
+                contacts: dados.contacts || [],
+                contacts_initial: dados.contacts || [],
+                active: dados.deleted_at === null ? true : false,
+                schoolCodeTotvs: dados.school_code_totvs,
+                subsidiaryId: dados.subsidiary_id,
+                sectorId: dados.sector_id,
+                school_type_identify: dados.school_type.identify.toLowerCase(),
+                marketshare: dados.marketshare
+            });
 
-            })
-            .catch(function (error) {
-                let authorized = verifyToken(error.response.status);
-                this.setState({authorized:authorized});
-            }.bind(this));
+        })
+        .catch(function (error) {
+            let authorized = verifyToken(error.response.status);
+            this.setState({authorized:authorized});
+        }.bind(this));
+    }
+
+    componentWillMount() {   
+        this.getSchool();
+        
+        canUser('school.update', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true}, this.getSchool());
+            }
+        }.bind(this));
+
     }
 
     toggle(tab) {    
+        
         if (this.state.activeTab !== tab) {
             axios.get(`school/${this.state.schoolId}`)
             .then(response => {
@@ -167,7 +182,10 @@ class SchoolForm extends Component {
                     <TabPane tabId="cadastro">
                         <Row>
                             <Col sm="12">
-                                <SchoolRegister viewMode={false} schoolId={this.state.schoolId} />
+                                <SchoolRegister 
+                                    viewMode={this.state.viewMode}
+                                    schoolId={this.state.schoolId} 
+                                />
                             </Col>
                         </Row>
                     </TabPane>
@@ -175,14 +193,14 @@ class SchoolForm extends Component {
                        
                         <Row>
                             <Col sm="12">
-                                <SchoolConctactList schoolId={this.state.schoolId} contacts={this.state.contacts}/>
+                                <SchoolConctactList schoolId={this.state.schoolId} contacts={this.state.contacts} />
                             </Col>
                         </Row>
                     </TabPane>
                     <TabPane tabId="alunos">
                         <Row>
                             <Col sm="12">
-                                <SchoolStudentList viewMode={false}  schoolId={this.state.schoolId} url={this.props.match.url} />
+                                <SchoolStudentList viewMode={this.state.viewMode}  schoolId={this.state.schoolId} url={this.props.match.url} />
                             </Col>
                         </Row>
                     </TabPane>

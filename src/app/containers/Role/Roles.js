@@ -6,8 +6,12 @@ import RoleList from './RoleList';
 import RoleForm from './RoleForm';
 
 import RoleRules from './RoleRules'
+import { canUser } from '../../common/Permissions';
 
 class Roles extends Component {
+    componentWillMount() {
+        canUser('role.view', this.props.history, "view");
+    }
 
     render() {
         return (
