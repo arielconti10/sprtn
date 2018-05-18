@@ -8,6 +8,8 @@ import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints'
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 import Select from 'react-select';
 
+import { canUser } from '../../common/Permissions';
+
 import 'react-select/dist/react-select.css';
 
 const apiPost = 'subsidiary';
@@ -54,8 +56,18 @@ class SubsidiaryForm extends Component {
         });
     }
 
+    checkPermission(permission) {
+        canUser(permission, this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));       
+    }
+
     componentWillMount() {
+        this.checkPermission('subsidiary.insert');
         if (this.props.match.params.id !== undefined) {
+            this.checkPermission('subsidiary.update');
             axios.get(`${apiPost}/${this.props.match.params.id}`)
                 .then(response => {
                     const dados = response.data.data;
@@ -185,7 +197,9 @@ class SubsidiaryForm extends Component {
                         <label className="" style={{ marginRight: "10px" }}>Status</label>
                         <div className="">
                             <Label className="switch switch-default switch-pill switch-primary">
-                                <Input type="checkbox" id='active' name="active" className="switch-input" checked={this.state.active} onChange={this.handleChange} />
+                                <Input type="checkbox" id='active' name="active" className="switch-input" checked={this.state.active} 
+                                disabled={this.state.viewMode}
+                                onChange={this.handleChange} />
                                 <span className="switch-label"></span>
                                 <span className="switch-handle"></span>
                             </Label>
@@ -212,6 +226,7 @@ class SubsidiaryForm extends Component {
                                         <FormControlLabel htmlFor="name">Nome da filial <span className="text-danger"><strong>*</strong></span></FormControlLabel>
                                         <FormControlInput type="text" id="name" name="name"
                                             value={this.state.name} onChange={this.handleChange}
+                                            readOnly={this.state.viewMode}
                                             required />
                                         <FieldFeedbacks for="name">
                                             <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>

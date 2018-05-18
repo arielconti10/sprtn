@@ -15,6 +15,8 @@ import { verifyToken } from '../../../app/common/AuthorizeHelper';
 import { RingLoader } from 'react-spinners';
 import '../../custom.css';
 
+import { canUser } from '../../common/Permissions';
+
 const BOOTSTRAP_CLASSES = {
     filter: 'form-control',
     select: 'form-control',
@@ -37,6 +39,7 @@ class UserSchools extends Component {
         super();
         this.state = {
             ringLoad: false,
+            viewMode: false,
             selectedOptions: [],
             school_types: [],
             school_type_id: 0,
@@ -49,8 +52,22 @@ class UserSchools extends Component {
             schools: [],
             total_available: 0,
             total_selected_available: 0,
-            total_selected_wallet: 0
+            total_selected_wallet: 0,
+            back_error: ''
         };
+    }
+
+    componentWillMount() {
+        this.checkPermission();
+        canUser('user-schools.view', this.props.history, "view");
+    }
+
+    checkPermission() {
+        canUser('user-school.register', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));
     }
 
     /**
@@ -167,7 +184,7 @@ class UserSchools extends Component {
 
     handleSelect = (selectedOptions) => {
 
-        this.setState({ringLoad: true});
+        this.setState({ringLoad: true, back_error:''});
 
         if (this.state.user_id == 0) {
             this.setState({ringLoad:false});
@@ -186,8 +203,18 @@ class UserSchools extends Component {
             this.filterAvailableSchools(selectedOptions);
             this.setState({total_selected_available:0});
         })
-        .catch(err => console.log(err));
-        
+        .catch(function(error) {
+            /*
+            para todos os outros erros, é retornado mensagem de erro com código
+            para estouro de memória, retorna apenas a mensagem "Error: Network Error"
+            condicao para tratar a mensagem
+            */
+            let error_message = error.toString();
+            if (error == "Error: Network Error") {
+                error_message = "Error 500 - Allowed memory size exhausted";
+            }
+            this.setState({ringLoad: false, back_error: error_message, total_selected_available: 0});
+        }.bind(this));        
     }
 
     handleDeselect = (deselectedOptions) => {
@@ -218,6 +245,18 @@ class UserSchools extends Component {
                 this.setState({total_available});
             });
         })
+        .catch(function(error) {
+            /*
+            para todos os outros erros, é retornado mensagem de erro com código
+            para estouro de memória, retorna apenas a mensagem "Error: Network Error"
+            condicao para tratar a mensagem
+            */
+            let error_message = error.toString();
+            if (error == "Error: Network Error") {
+                error_message = "Error 500 - Allowed memory size exhausted";
+            }
+            this.setState({ringLoad: false, back_error: error_message, total_selected_wallet: 0});
+        }.bind(this)); 
     }
 
     handleSelectChange = (field, value, func, obj) => {
@@ -301,6 +340,7 @@ class UserSchools extends Component {
         this.setState({schools: [], ringLoad: true});
 
         let filters = "&filter[active]=1";
+        filters += "&filter[portfolio]=1";
         if (this.state.sector_id == 0 && this.state.school_type_id == 0) {
             return false;
         }
@@ -322,10 +362,11 @@ class UserSchools extends Component {
                     let dados = response.data.data;
                     dados = this.getTextSchool(dados); 
                     
-                    this.setState({ schools: dados, ringLoad: false}, function() {
+                    this.setState({ schools: dados, ringLoad: false, total_selected_available: 0}, function() {
                         this.countTotalSelected();
-                        const total_available = this.state.schools.length - this.state.selectedOptions.length;
-                        this.setState({total_available});
+                        this.filterAvailableSchools(this.state.selectedOptions);
+                        // const total_available = this.state.schools.length - this.state.selectedOptions.length;
+                        // this.setState({total_available});
                     });
                 })
                 .catch(err => console.log(err));
@@ -345,6 +386,10 @@ class UserSchools extends Component {
                             <div className="load"></div>
                         </div>
                     </div>
+                }
+
+                {this.state.back_error !== '' &&
+                    <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                 }
 
                 <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
@@ -448,6 +493,7 @@ class UserSchools extends Component {
                                             selectedOptions={selectedOptions}
                                             textProp="label"
                                             valueProp="id"
+                                            disabled={this.state.viewMode}
                                             size={15}
                                         />
                                 </FormGroup>
@@ -472,6 +518,7 @@ class UserSchools extends Component {
                                             button: 'btn btn btn-block btn-default',
                                             buttonActive: 'btn btn btn-block btn-danger'
                                         }}
+                                        disabled={this.state.viewMode}
                                         onChange={this.handleDeselect}
                                         options={selectedOptions}
                                         textProp="label"

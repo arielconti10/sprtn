@@ -2,21 +2,22 @@ export default {
   items: [
     {
       name: 'Dashboard',
-      url: '/dashboard',
+      url: '/marketshare',
       icon: 'icon-speedometer',
       children: [
         {
             name: 'Market share',
-            url: '#',
+            url: '/marketshare',
             icon: 'fa fa-caret-right'
           },
           {
             name: 'Indicadores',
-            url: '#',
+            url: '/indicadores',
             icon: 'fa fa-caret-right'
           }
       ]
     },
+
     {
       name: 'Carteira',
       url: '/carteira',

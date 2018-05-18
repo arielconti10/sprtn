@@ -4,9 +4,12 @@ import { Row, Col, Card, CardHeader, CardFooter, CardBody, Button } from 'reacts
 
 import LocalizationTypeList from './LocalizationTypeList';
 import LocalizationTypeForm from './LocalizationTypeForm';
+import { canUser } from '../../common/Permissions';
 
 class LocalizationTypes extends Component {
-
+    componentWillMount() {
+        canUser('localization.view', this.props.history, "view");
+    }
     render() {
         return (
             <Row>

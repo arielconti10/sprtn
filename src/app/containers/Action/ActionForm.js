@@ -11,6 +11,8 @@ import ReactTable from 'react-table'
 import Select, { Async } from 'react-select';
 import 'react-select/dist/react-select.css';
 
+import { canUser } from '../../common/Permissions';
+
 const apiPost = 'action';
 
 const apis = [
@@ -27,6 +29,7 @@ class ActionForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            viewMode: false,
             page: 1,
             pageSize: 5,
             columns: [],
@@ -119,8 +122,19 @@ class ActionForm extends Component {
         this.setState({ columns: col });
     }
 
+    checkPermission(permission) {
+        canUser(permission, this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+                console.log(this.state.viewMode);
+            }
+        }.bind(this));       
+    }
+
     componentWillMount() {
+        this.checkPermission('action.insert');
         if (this.props.match.params.id !== undefined) {
+            this.checkPermission('action.update');
             axios.get(`${apiPost}/${this.props.match.params.id}`)
                 .then(response => {
                     const dados = response.data.data;
@@ -404,6 +418,7 @@ class ActionForm extends Component {
                                 <FormControlLabel htmlFor="name">Nome da ação</FormControlLabel>
                                 <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
                                     required />
                                 <FieldFeedbacks for="name">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -422,6 +437,7 @@ class ActionForm extends Component {
                                         onChange={this.handleChangeVisitType}
                                         options={this.state.visit_types}
                                         placeholder="Selecione..."
+                                        disabled={this.state.viewMode}
                                         multi={true}
                                     />
                                     {this.state.valid_select_visit_type_id == 0 &&
@@ -440,6 +456,7 @@ class ActionForm extends Component {
                                         onChange={this.handleChangeSchoolType}
                                         options={this.state.school_types}
                                         placeholder="Selecione..."
+                                        disabled={this.state.viewMode}
                                         multi={true}
                                     />
                                     {this.state.valid_select_school_type_id == 0 &&
@@ -451,7 +468,7 @@ class ActionForm extends Component {
                                 
                                 <FormGroup for="sector_id">
                                     <FormControlLabel htmlFor="sector_id"> </FormControlLabel>
-                                    <Button onClick={this.validSelects}>Adicionar</Button>
+                                    <Button onClick={this.validSelects} disabled={this.state.viewMode}>Adicionar</Button>
                                 </FormGroup>  
                             </Col>
                         </Row>

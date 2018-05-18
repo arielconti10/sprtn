@@ -100,9 +100,9 @@ class SchoolList extends Component {
                 )
             },
             { Header: "Nome", accessor: "name", sortable: true, filterable: true, minWidth: 250, maxWidth: 500, headerClassName: 'text-left' },
-            { Header: 'Tipo', accessor: 'school_type.name', sortable: true, filterable: true, width: 160, headerClassName: 'text-left' },
+            { Header: 'Tipo', accessor: 'school_type.name', sortable: true, filterable: true, width: 160, headerClassName: 'text-left', sortable: false },
             {
-                Header: "Identificação", accessor: "school_type", filterable: true, width: 120, headerClassName: 'text-left',
+                Header: "Identificação", accessor: "school_type", filterable: true, width: 120, headerClassName: 'text-left', sortable: false,
                 Cell: props => <span className={`escola-${props.value.identify.toLowerCase()}`}>{props.value.identify}</span>,
                 Filter: ({ filter, onChange }) => (
                     <select id="school_type" onChange={event => this.onChangeFilter([event.target])} style={{ width: "100%" }} >
@@ -113,9 +113,9 @@ class SchoolList extends Component {
                     </select>
                 )
             },
-            { Header: 'Perfil', accessor: 'profile.name', sortable: true, filterable: true, width: 100, headerClassName: 'text-left' },
-            { Header: 'Filial', accessor: 'subsidiary.name', filterable: true, width: 60, headerClassName: 'text-left' },
-            { Header: 'Setor', accessor: 'sector.name', filterable: true, width: 60, headerClassName: 'text-left' },
+            { Header: 'Perfil', accessor: 'profile.name', sortable: true, filterable: true, width: 100, headerClassName: 'text-left', sortable: false },
+            { Header: 'Filial', accessor: 'subsidiary.name', filterable: true, width: 60, headerClassName: 'text-left', sortable: false },
+            { Header: 'Setor', accessor: 'sector.name', filterable: true, width: 60, headerClassName: 'text-left', sortable: false },
             { Header: "TOTVS", accessor: "school_code_totvs", filterable: true, width: 100, headerClassName: 'text-left' },
             {
                 Header: "Status",
@@ -140,7 +140,7 @@ class SchoolList extends Component {
             },
             { Header: "CEP", accessor: "zip_code", filterable: true, width: 100, headerClassName: 'text-left' },
             { Header: "Cidade", accessor: "city", filterable: true, width: 160, headerClassName: 'text-left' },
-            { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left' }            
+            { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left', sortable: false }            
         ];
 
         this.setState({ columns: col });

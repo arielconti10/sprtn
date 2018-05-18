@@ -6,6 +6,7 @@ import axios from '../../../app/common/axios';
 import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 'reactstrap';
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
+import { canUser } from '../../common/Permissions';
 
 const apiPost = 'school-type';
 
@@ -26,7 +27,9 @@ class SchoolTypeForm extends Component {
     }
 
     componentWillMount() {
+        this.checkPermission('school-type.insert');
         if (this.props.match.params.id !== undefined) {
+            this.checkPermission('school-type.update');
             axios.get(`${apiPost}/${this.props.match.params.id}`)
                 .then(response => {
                     const dados = response.data.data;
@@ -39,6 +42,14 @@ class SchoolTypeForm extends Component {
                 })
                 .catch(err => console.log(err));
         }
+    }
+
+    checkPermission(permission) {
+        canUser(permission, this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));       
     }
 
     handleChange(e) {

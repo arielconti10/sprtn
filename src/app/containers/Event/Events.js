@@ -4,8 +4,12 @@ import {Row, Col, Card, CardHeader, CardFooter, CardBody, Button} from 'reactstr
 
 import EventList from './EventList';
 import EventForm from './EventForm';
+import { canUser } from '../../common/Permissions';
 
 class Events extends Component {
+    componentWillMount() {
+        canUser('event.view', this.props.history, "view");
+    }
 
     render() {
         return (

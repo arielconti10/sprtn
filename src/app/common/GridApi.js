@@ -17,6 +17,8 @@ class GridApi extends Component {
 
         this.state = {
             page: 1,
+            viewMode: false,
+            deleteMode: false,
             pageSize: 10,
             authorized: 1,
             data: [],
@@ -26,10 +28,16 @@ class GridApi extends Component {
             loading: false,
             columns: this.props.columns,
             columnsAlt: this.props.columnsAlt,
+            blockEdit: this.props.blockEdit,
             dataAlt: [],
-            dataAltSelected: []
+            dataAltSelected: [],
+            sortInitial: []
         };
 
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.setState({viewMode: nextProps.blockEdit, deleteMode: nextProps.blockDelete});
     }
 
     onClickDelete(element) {
@@ -51,8 +59,6 @@ class GridApi extends Component {
 
         const updateData = {};
         for (var val in element.value) {
-            //console.log(value);
-
             if (val != 'created_at' && val != 'updated_at' && val != 'deleted_at') {
                 updateData[val] = element.value[val];
             }
@@ -68,23 +74,188 @@ class GridApi extends Component {
 
     }
 
+    getSchoolAndVisitValues(sub, old_value, column_value_changed, val) {
+        let newArrayData = [];
+
+        column_value_changed.map(item => {
+            val.map(register => {
+                let values = {};
+                if (old_value.length > column_value_changed.length) {
+                    if (register[sub] === item) {
+                        values['school_type_id'] = register['school_type_id'];
+                        values['visit_type_id'] = register['visit_type_id'];
+
+                        newArrayData.push(values);
+                    }
+                }
+                else {
+                    if (sub === 'school_type_id') {
+                        values['school_type_id'] = item;
+                        values['visit_type_id'] = register['visit_type_id'];
+                    } else {
+                        values['school_type_id'] = register['school_type_id'];
+                        values['visit_type_id'] = item;
+                    }
+
+                    newArrayData.push(values);
+                }
+            });
+        });
+
+        newArrayData = newArrayData.filter((item, index, self) =>
+            index === self.findIndex((obj) => (
+                obj.school_type_id === item.school_type_id && obj.visit_type_id === item.visit_type_id
+            ))
+        )
+
+        return newArrayData;
+    }
+
     componentDidMount() {
         let col = this.state.columns
 
-        col.push(
-            {
-                Header: "Status",
-                accessor: "",
-                width: 100,
-                headerClassName: 'text-left',
-                
-                sortable: false,
-                Cell: (element) => (
-                    !element.value.deleted_at ?
-                        <div><span className="alert-success grid-record-status">Ativo</span></div>
+        if (this.props.columnsAlt) {
+
+            this.setState({ dataAlt: [] });
+
+            this.props.columnsAlt.map(item => {
+
+                if (item.type == 'select' || item.type == 'selectMulti') {
+                    // console.log(item);
+                    // if (item.disable_field) {
+                        // console.log(item.disable_field);
+                        // this.setState({disable_field: true});
+                    // }
+                    if (item.api) {
+                        axios.get(item.api)
+                            .then(response => {
+                                const dados = response.data.data;
+
+                                let dataAltAux = this.state.dataAlt;
+
+                                dataAltAux.splice(item.seq, 0,dados);
+
+                                this.setState({ dataAlt: dataAltAux });
+                                // this.setState({ dataAlt: {[item.seq]: dados} });
+                            })
+                            .catch(err => console.log(err));
+
+                    }
+
+                    const multi = item.type == 'selectMulti' ? true : false;
+                    col.push(
+                        {
+                            Header: item.Header,
+                            accessor: item.accessor,
+                            width: item.width,
+                            headerClassName: 'text-center',
+                            style: { overflow: 'visible' },
+                            sortable: false,
+                            Cell: (element) => {
+                                let column_value = [];
+
+                                if (item.sub) {
+                                    element.value.map(val => {
+                                        if (!column_value.find(function (obj) { return obj === val[item.sub]; })) {
+                                            column_value.push(val[item.sub])
+                                        }
+                                    });
+
+                                } else {
+                                    column_value = element.value.map(val => {
+                                        return val.id
+                                    });
+                                }
+
+                                let seq = item.seq || 0;
+
+                                return (
+
+                                    <div>
+                                        <Select
+                                            autosize={true}
+                                            name={item.name}
+                                            onChange={(selectedOption) => {
+                                                const column_value_changed = selectedOption.map(function (cv) {
+                                                    return cv.id;
+                                                });
+
+                                                this.setState({
+                                                    dataAltSelected: {
+                                                        [element.row[""].id]: column_value_changed
+                                                    }
+                                                });
+
+                                                let column_value_update = [];
+
+                                                if (item.accessor == 'visit_type_school_type') {
+                                                    let val = this.state.dataAltSelected[element.row[""].id] == undefined ? column_value : this.state.dataAltSelected[element.row[""].id];
+                                                    column_value_update = this.getSchoolAndVisitValues(item.sub, val, column_value_changed, element.value);
+                                                } else {
+                                                    column_value_update = selectedOption.map(function (cv) {
+                                                        let value = {};
+                                                        value[item.name] = cv.id;
+                                                        return value;
+                                                    }, {});
+                                                }
+
+                                                const updateData = {};
+
+                                                let id = 0;
+
+                                                for (var value in element.row['']) {
+                                                    if (value == 'id') {
+                                                        id = element.row[''][value]
+                                                    }
+                                                    else if (value != 'created_at' && value != 'updated_at' && value != 'deleted_at' && value != item.accessor) {
+                                                        updateData[value] = element.row[''][value];
+                                                    }
+                                                    else if (value == item.accessor) {
+                                                        updateData[value] = column_value_update;
+                                                    }
+                                                }
+
+                                                updateData.active = true;
+
+                                                axios.put(`${this.props.apiSpartan}/${id}`, updateData).then(res => {
+                                                    this.onFetchData();
+                                                }).catch(function (error) {
+                                                    console.log(error)
+                                                }.bind(this));
+                                            }}
+                                            labelKey="name"
+                                            valueKey="id"
+                                            value={this.state.dataAltSelected[element.row[""].id] == undefined ? column_value : this.state.dataAltSelected[element.row[""].id]}
+                                            multi={multi}
+                                            disabled={this.state.viewMode}
+                                            joinValues={false}
+                                            // menuContainerStyle={{'zIndex': 99999}}
+                                            //isLoading={this.state.roleSelect2Loading}
+                                            placeholder="Selecione um valor"
+                                            options={this.state.dataAlt[seq]}
+                                            rtl={false}
+                                        /> </div>
+                                )
+                            }
+                        })
+                }
+            })
+
+        }
+
+        col.unshift({
+            Header: "Status",
+            accessor: "",
+            width: 100,
+            headerClassName: 'text-left',
+
+            sortable: false,
+            Cell: (element) => (
+                !element.value.deleted_at ?
+                    <div><span className="alert-success grid-record-status">Ativo</span></div>
                     :
-                        <div><span className="alert-danger grid-record-status">Inativo</span></div>
-                )/*,                
+                    <div><span className="alert-danger grid-record-status">Inativo</span></div>
+            )/*,                
                     filterable: true, 
                     Filter: ({ filter, onChange }) => (
                     
@@ -97,124 +268,21 @@ class GridApi extends Component {
                             <option value="true">Inativo</option>
                         </select>
                     )*/
-            })
+        })
 
-        if (this.props.columnsAlt) {
-
-            
-                        
-            this.props.columnsAlt.map(item => {
-
-                if (item.type == 'select' || item.type == 'selectMulti') {   
-                    
-                    if (item.api) {
-                        axios.get(item.api)
-                        .then(response => {
-                            const dados = response.data.data;
-        
-                            //console.log(dados);
-        
-                            this.setState({ dataAlt: dados});
-                            //this.setState({ job_title_type_id: dados[0].id });
-                        })
-                        .catch(err => console.log(err));
-                    }
-
-                    const multi = item.type == 'selectMulti' ? true : false;
-                    col.push(
-                        {
-                            Header: item.Header,
-                            accessor: item.accessor,
-                            width: item.width,
-                            headerClassName: 'text-center',
-                            style: {overflow: 'visible'},
-                            sortable: false,
-                            Cell: (element) => {
-                                //console.log(element)
-
-                                const column_value = element.value.map(val => {
-                                    return val.id
-                                });
-
-                                return (                                   
-                            
-                                    <div>
-                                        <Select
-                                        name={item.name}
-                                        onChange={(selectedOption) => {
-                                            console.log(item.accessor)
-                                            const column_value_changed = selectedOption.map(function(cv) {
-                                                //console.log(item.name);
-                                                return cv.id;
-                                            });
-
-                                            this.setState({ dataAltSelected: {
-                                                [element.row[""].id]: column_value_changed }
-                                            });
-
-                                            const column_value_update = selectedOption.map(function(cv) {
-                                                let value = {};
-                                                value[item.name] = cv.id;
-                                                return value;
-                                            }, {});
-
-                                            //console.log(column_value_update);
-
-                                            const updateData = {};
-
-                                            let id = 0;
-                                            for (var value in element.row['']) {
-                                                //console.log(value);
-
-                                                if (value == 'id') {
-                                                    id = element.row[''][value]
-                                                }
-                                                else if (value != 'created_at' && value != 'updated_at' && value != 'deleted_at' && value != item.accessor) {
-                                                    updateData[value] = element.row[''][value];
-                                                }
-                                                else if (value == item.accessor) {
-                                                    updateData[value] = column_value_update;
-                                                }
-                                            }
-
-                                            updateData.active = true;
-
-                                            axios.put(`${this.props.apiSpartan}/${id}`, updateData).then(res => {
-                                                this.onFetchData();
-                                            }).catch(function (error) {
-                                                console.log(error)
-                                            }.bind(this));
-                                            //console.log(data_update_role);
-                                        }}
-                                        labelKey="name"
-                                        valueKey="id"
-                                        value={this.state.dataAltSelected[element.row[""].id] == undefined ? column_value : this.state.dataAltSelected[element.row[""].id]}
-                                        multi={multi}
-                                        joinValues={false}
-                                        // menuContainerStyle={{'zIndex': 99999}}
-                                        //isLoading={this.state.roleSelect2Loading}
-                                        placeholder="Selecione um valor"
-                                        options={this.state.dataAlt}
-                                        rtl={false}
-                                    /> </div>
-                            )}
-                        })
-                    }
-            })
-            
-        }
         if (!this.props.hideButtons) {
             let fields = ['id', 'code', 'name'];
-            col.push(
+            col.unshift(
                 {
-                    Header: "Ações", accessor: "", sortable: false, width: 100, headerClassName: 'text-center', Cell: (element) => (
+                    Header: "Ações", accessor: "", sortable: false, width: 80, headerClassName: 'text-center', Cell: (element) => (
                         !element.value.deleted_at ?
                             <div>
 
-                                <Link to={this.props.match.url + "/" + element.value.id} params={{id: element.value.id}} className='btn btn-primary btn-sm' >
+                                <Link to={this.props.match.url + "/" + element.value.id} params={{ id: element.value.id }} className={`btn btn-primary btn-sm ${this.state.blockEdit ? 'd-none' : ''}`} 
+                                disabled={this.state.viewMode}>
                                     <i className='fa fa-pencil'></i>
                                 </Link>
-                                <button className='btn btn-danger btn-sm' onClick={() => this.onClickDelete(element)}>
+                                <button className='btn btn-danger btn-sm' onClick={() => this.onClickDelete(element)} disabled={this.state.deleteMode}>
                                     <i className='fa fa-ban'></i>
                                 </button>
                                 {/* <Link to={this.props.match.url + "/" + element.value.id + "/permissoes"} params={{id: element.value.id}} title="Permissões" className='btn btn-warning btn-sm' >
@@ -223,7 +291,7 @@ class GridApi extends Component {
                             </div>
                             :
                             <div>
-                                <button className='btn btn-success btn-sm' onClick={() => this.onClickActive(element, fields)}>
+                                <button className='btn btn-success btn-sm' onClick={() => this.onClickActive(element, fields)} disabled={this.state.deleteMode}>
                                     <i className='fa fa-check-circle'></i>
                                 </button>
                             </div>
@@ -235,8 +303,51 @@ class GridApi extends Component {
         this.setState({ columns: col })
     }
 
-    onFetchData = (state, instance, deleted_at) => {
+    /**
+     * verifica a ordenacāo inicial
+     * se foi enviada por parametro via componente, realiza a ordenaçāo
+     * caso nāo, traz do jeito default da tabela
+     */
+    verifySortInitial() {
+        if (this.props.sortInitial) {
+            //ordenacao default
+            let sortInitial = [
+                {
+                    id: this.props.sortInitial,
+                    desc: false
+                }
+            ];
 
+            this.setState({sortInitial:sortInitial});
+        }
+    }
+
+    /**
+     * verifica a ordenaçāo a ser realizada
+     * contempla validaçāo de coluna composta, quando é, por exemplo full_name (nome + sobrenome)
+     * @param {String} sorted_id coluna que será ordenada 
+     * @param {Object} state estado referente ao react table 
+     * @param {Integer} count posiçāo atual dos filtros de ordenaçāo
+     * @return {String} order_by valor que será ordenado 
+     */
+    verifyOrderBy(sorted_id, state, count) {
+        let order_by = sorted_id;     
+
+        //verifica se é uma coluna composta, por exemplo full_name (nome + sobrenome)
+        //para escolher método de ordenaçāo
+        const column_compare = state.columns.filter(function(column){
+            return column.accessor == sorted_id;
+        });
+
+        if (column_compare[count].is_compost) {
+            order_by = column_compare[count].order_by;
+        }
+
+        return order_by;
+    }
+
+    onFetchData = (state, instance, deleted_at) => {      
+        
         let apiSpartan = this.props.apiSpartan
 
         let pageSize = state ? state.pageSize : this.state.pageSize;
@@ -247,7 +358,7 @@ class GridApi extends Component {
 
         let baseURL = `/${apiSpartan}?paginate=${pageSize}&page=${page}`;
 
-        //To do: make filter to deleted_at
+                //To do: make filter to deleted_at
         /*console.log('onFetchData:', deleted_at);
         if(deleted_at != 'all')
             console.log("deleted_at != 'all'", deleted_at);*/
@@ -257,14 +368,13 @@ class GridApi extends Component {
         })
 
         for (let i = 0; i < sorted.length; i++) {
-            baseURL += "&order[" + sorted[i]['id'] + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
+            let order_by = this.verifyOrderBy(sorted[i]['id'], state, i);
+            baseURL += "&order[" + order_by + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
         }
-        
-        this.setState({loading: true});
 
         axios.get(baseURL)
             .then((response) => {
-                const dados = response.data.data
+                const dados = response.data.data;
 
                 this.setState({
                     data: dados,
@@ -275,19 +385,22 @@ class GridApi extends Component {
                     sorted: sorted,
                     filtered: filtered,
                     loading: false
+                }, function() {
+                    this.verifySortInitial();
                 });
 
             })
             .catch(function (error) {
                 let authorized = verifyToken(error.response.status);
-                this.setState({authorized:authorized});
+                this.setState({ authorized: authorized });
             }.bind(this));
+
+        
     }
 
     render() {
+        const { data, pageSize, page, loading, pages, columns, sortInitial } = this.state;
 
-        const { data, pageSize, page, loading, pages, columns } = this.state;
-        
         if (this.state.authorized == 0) {
             return (
                 <Redirect to="/login" />
@@ -295,6 +408,7 @@ class GridApi extends Component {
         }
 
         return (
+            
             <div>
                 <ReactTable
                     columns={columns}
@@ -307,6 +421,7 @@ class GridApi extends Component {
                     onExpandedChange={(expanded, index, event) => {
                         event.persist();
                     }}
+                    defaultSorted={sortInitial}
                     previousText='Anterior'
                     nextText='Próximo'
                     loadingText='Carregando...'
@@ -320,5 +435,13 @@ class GridApi extends Component {
         )
     }
 }
-
+/*
+1 == 2?[
+          defaultSorted={[
+            {
+              id: "age",
+              desc: true
+            }
+          ]}
+*/
 export default withRouter(GridApi);

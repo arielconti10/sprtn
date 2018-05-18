@@ -4,9 +4,12 @@ import { Row, Col, Card, CardHeader, CardFooter, CardBody, Button } from 'reacts
 
 import SchoolTypeList from './SchoolTypeList';
 import SchoolTypeForm from './SchoolTypeForm';
+import { canUser } from '../../common/Permissions';
 
 class SchoolTypes extends Component {
-
+    componentWillMount() {
+        canUser('school-type.view', this.props.history, "view");
+    }
     render() {
         return (
             <Row>
