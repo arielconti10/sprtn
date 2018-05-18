@@ -53,7 +53,8 @@ class UserList extends Component {
                             filterable: true, 
                             headerClassName: 'text-left',
                             is_compost: true,
-                            order_by: "name"
+                            order_by: "name",
+                            filter_by: ["name", "lastname"]
                         },
                         { Header: "Email", accessor: "email", filterable: true, headerClassName: 'text-left' },
                         { Header: "Usuário", accessor: "username", width: 100, filterable: true, headerClassName: 'text-left' },                        
