@@ -29,7 +29,7 @@
     "node-sass": "4.7.2",
     "react-form-with-constraints": "^0.7.0",
     "react-form-with-constraints-bootstrap4": "^0.7.1",
-    "rimraf": "2.6.2",
+    "rimraf": "^2.6.2",
     "sass-loader": "6.0.6",
     "shipit-cli": "^4.1.0",
     "shipit-deploy": "^4.1.0",
@@ -79,11 +79,12 @@
   "scripts": {
     "dev": "webpack -d --progress --watch --profile --json > compilation-stats.json --env.dev",
     "start": "webpack-dev-server --progress --color --inline --env.dev",
-    "staging": "webpack-dev-server --progress --color --inline --env.staging",
+    "staging": "npm run clear:babel-cache && webpack-dev-server --progress --color --inline --env.staging",
     "prod": "webpack-dev-server --progress --color --inline --env.prod",
     "build": "webpack -p --progress --env.prod",
     "build_staging": "webpack -p --progress --env.staging",
-    "clean": "rimraf ./build"
+    "clean": "rimraf ./build",
+    "clear:babel-cache": "rimraf -rf ./node_modules/.cache/babel-loader/*"
   },
   "engines": {
     "node": ">= 8.9.4",
