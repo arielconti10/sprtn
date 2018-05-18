@@ -113,7 +113,7 @@ class Full extends Component {
                                 <Route path="/config/regras" name="Regras" component={Roles}/>                                
                                 <Route path="/config/permissoes" name="Permissões" component={Rules}/>
                                 <Route path="/config/usuarios" name="Usuários" component={Users}/>
-                                <Redirect from="/" to="/marketshare" />
+                                {/* <Redirect from="/" to="/marketshare" /> */}
                             </Switch>
                         </Container>
                     </main>

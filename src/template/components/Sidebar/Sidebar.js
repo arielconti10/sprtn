@@ -8,9 +8,6 @@ import SidebarForm from './../SidebarForm';
 import SidebarHeader from './../SidebarHeader';
 import SidebarMinimizer from './../SidebarMinimizer';
 
-import { canUser, verifyViewMode } from '../../../app/common/Permissions';
-
-
 class Sidebar extends Component {
 
   constructor(props) {
@@ -19,32 +16,8 @@ class Sidebar extends Component {
     this.handleClick = this.handleClick.bind(this);
     this.activeRoute = this.activeRoute.bind(this);
     this.hideMobile = this.hideMobile.bind(this);
-
-    this.state = {
-        nav_itens: [], 
-    };
   }
 
-  componentDidMount() {
-    let items = nav.items;
-    let items_permissions = [];
-    items.map(value => {
-        let childrens = value.children;
-        childrens.map((children, key) => {
-            if (children.action) {
-                canUser(children.action, this.props.history, "change", function(rules) {
-                    if (rules.length == 0) {
-                        const childrens_id = childrens.map(a => a.action);
-                        const index = childrens_id.indexOf(children.action);
-                        childrens.splice(index, 1);
-                    }
-                });
-            }
-        });
-    });
-
-    this.setState({nav_itens:items});
-  }
 
   handleClick(e) {
     e.preventDefault();
@@ -67,12 +40,6 @@ class Sidebar extends Component {
   // secondLevelActive(routeName) {
   //   return this.props.location.pathname.indexOf(routeName) > -1 ? "nav nav-second-level collapse in" : "nav nav-second-level collapse";
   // }
-
-//   componentDidUpdate(prevProps, prevState, snapshot) {
-//       console.log(prevProps);
-//       console.log(prevState);
-//       return false;
-//   }
 
 
   render() {
@@ -120,21 +87,18 @@ class Sidebar extends Component {
 
     // nav item with nav link
     const navItem = (item, key) => {
-
-        const classes = {
-            item: classNames( item.class) ,
-            link: classNames( 'nav-link', item.variant ? `nav-link-${item.variant}` : ''),
-            icon: classNames( item.icon )
-        };
-
-        return (
-            navLink(item, key, classes)
-        )
+      const classes = {
+        item: classNames( item.class) ,
+        link: classNames( 'nav-link', item.variant ? `nav-link-${item.variant}` : ''),
+        icon: classNames( item.icon )
+      };
+      return (
+        navLink(item, key, classes)
+      )
     };
 
     // nav link
     const navLink = (item, key, classes) => {
-        // console.log("NAV LINK");
       const url = item.url ? item.url : '';
       return (
         <NavItem key={key} className={classes.item}>
@@ -172,7 +136,7 @@ class Sidebar extends Component {
 
     // nav list
     const navList = (items) => {
-        return items.map( (item, index) => navType(item, index) );
+      return items.map( (item, index) => navType(item, index) );
     };
 
     const isExternal = (url) => {
@@ -183,12 +147,11 @@ class Sidebar extends Component {
     // sidebar-nav root
     return (
       <div className="sidebar">
-                {/* {console.log(this.state.nav_itens)} */}
         <SidebarHeader/>
         <SidebarForm/>
         <nav className="sidebar-nav">
           <Nav>
-            {navList(this.state.nav_itens)}
+            {navList(nav.items)}
           </Nav>
         </nav>
         <SidebarFooter/>

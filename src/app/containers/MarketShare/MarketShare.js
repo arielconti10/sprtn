@@ -4,6 +4,7 @@ import Select from 'react-select';
 import { RingLoader } from 'react-spinners';
 import { Chart } from 'react-google-charts';
 import axios from '../../../app/common/axios';
+import { canUser } from '../../common/Permissions';
 
 const apiPost = 'marketshare?filter[key]=_EDITORAS_CONSOLIDADO&filter[year]=2016';
 
@@ -42,7 +43,7 @@ class MarketShare extends Component {
     }
 
     componentWillMount() {
-
+        canUser('indicator.view', this.props.history, "view");
         this.setState({
             ringLoad: false
         });
