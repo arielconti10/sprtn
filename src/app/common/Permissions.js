@@ -17,14 +17,15 @@ export const canUser=(action, history, mode, callback)=>{
         const rules = dados.role.rules;
         const rules_ids = rules.map(a => a.code);
         rule_exists = rules_ids.filter(function(item) {
-            return rules_ids.indexOf(action) !== -1;
+            return item.indexOf(action) !== -1;
         });
 
         if (rule_exists.length == 0 && mode == "view") {
             history.goBack();
             sessionStorage.setItem('flash_message', 'Você nāo está autorizado a realizar esta açāo');
         }
-        if (rule_exists.length == 0 && mode == "change") {
+
+        if (mode == "change") {
             callback(rule_exists);   
             sessionStorage.setItem('block_fields', 1);
         }
