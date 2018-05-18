@@ -11,6 +11,7 @@ import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints'
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
 import SchoolDashboard from './SchoolDashboard';
+import SchoolDistributionList from './SchoolDistributionList';
 import SchoolRegister from './SchoolRegister';
 import SchoolConctactList from './SchoolContactList';
 import SchoolStudentIcon from './SchoolStudentIcon';
@@ -29,11 +30,18 @@ class SchoolForm extends Component {
             viewMode: false,
             permission: true,
             schoolName: '',
+            viewMode: false,
             contacts: [],
             authorized: 1,
             contacts_initial: [],
+            active: false,
+            portfolio: false,
             schoolId: this.props.match.params.id,
             students: [],
+            total_students_ei: '0',
+            total_students_ef1: '0',
+            total_students_ef2: '0',
+            total_students_em: '0',
             total_students: '0',
             activeTab: 'dashboard',
             schoolCodeTotvs: '0',
@@ -49,61 +57,56 @@ class SchoolForm extends Component {
         .then(response => {
             const dados = response.data.data;
 
-            this.setState({
-                schoolName: dados.name, 
-                total_students: dados.total_students || '0',
-                students: dados.students || [],                  
-                contacts: dados.contacts || [],
-                contacts_initial: dados.contacts || [],
-                active: dados.deleted_at === null ? true : false,
-                schoolCodeTotvs: dados.school_code_totvs,
-                subsidiaryId: dados.subsidiary_id,
-                sectorId: dados.sector_id,
-                school_type_identify: dados.school_type.identify.toLowerCase(),
-                marketshare: dados.marketshare
-            });
-
-        })
-        .catch(function (error) {
-            let authorized = verifyToken(error.response.status);
-            this.setState({authorized:authorized});
-        }.bind(this));
-    }
-
-    componentWillMount() {   
-        this.getSchool();
-        
-        canUser('school.update', this.props.history, "change", function(rules){
-            if (rules.length == 0) {
-                this.setState({viewMode:true}, this.getSchool());
-            }
-        }.bind(this));
-
-    }
-
-    toggle(tab) {    
-        
-        if (this.state.activeTab !== tab) {
-            axios.get(`school/${this.state.schoolId}`)
-            .then(response => {
-                const dados = response.data.data;
                 this.setState({
-                    schoolName: dados.name, 
+                    schoolName: dados.name,
+                    total_students_ei: dados.total_students_ei || '0',
+                    total_students_ef1: dados.total_students_ef1 || '0',
+                    total_students_ef2: dados.total_students_ef2 || '0',
+                    total_students_em: dados.total_students_em || '0',
                     total_students: dados.total_students || '0',
-                    students: dados.students || [],                  
+                    students: dados.students || [],
                     contacts: dados.contacts || [],
-                    active: dados.deleted_at === null ? true : false,
+                    contacts_initial: dados.contacts || [],
+                    active: dados.active == 1 ? true : false,
+                    portfolio: dados.portfolio == 1 ? true : false,
                     schoolCodeTotvs: dados.school_code_totvs,
                     subsidiaryId: dados.subsidiary_id,
                     sectorId: dados.sector_id,
+                    school_type_identify: dados.school_type.identify.toLowerCase(),
                     marketshare: dados.marketshare
                 });
+
             })
             .catch(function (error) {
                 let authorized = verifyToken(error.response.status);
-                this.setState({authorized:authorized});
+                this.setState({ authorized: authorized });
             }.bind(this));
-            
+
+    }
+
+    toggle(tab) {
+        if (this.state.activeTab !== tab) {
+            axios.get(`school/${this.state.schoolId}`)
+                .then(response => {
+                    const dados = response.data.data;
+                    this.setState({
+                        schoolName: dados.name,
+                        total_students: dados.total_students || '0',
+                        students: dados.students || [],
+                        contacts: dados.contacts || [],
+                        active: dados.active == 1 ? true : false,
+                        portfolio: dados.portfolio == 1 ? true : false,
+                        schoolCodeTotvs: dados.school_code_totvs,
+                        subsidiaryId: dados.subsidiary_id,
+                        sectorId: dados.sector_id,
+                        marketshare: dados.marketshare
+                    });
+                })
+                .catch(function (error) {
+                    let authorized = verifyToken(error.response.status);
+                    this.setState({ authorized: authorized });
+                }.bind(this));
+
             this.setState({
                 activeTab: tab,
             });
@@ -119,7 +122,18 @@ class SchoolForm extends Component {
 
         return (
             <div>
-                <h1 className="school-header"><i className="fa fa-building-o"></i> {this.state.schoolName} <SchoolStudentIcon numStudents={this.state.total_students} /></h1>
+                <h1 className="school-header">
+                    <i className="fa fa-building-o"></i> {this.state.schoolName}
+                    <SchoolStudentIcon
+                        portfolio={this.state.portfolio}
+                        active={this.state.active}
+                        eiStudents={this.state.total_students_ei}
+                        ef1Students={this.state.total_students_ef1}
+                        ef2Students={this.state.total_students_ef2}
+                        emStudents={this.state.total_students_em}
+                        numStudents={this.state.total_students}
+                    />
+                </h1>
                 <br />
                 <Nav tabs className={`tab-${this.state.school_type_identify}`}>
                     <NavItem>
@@ -128,7 +142,7 @@ class SchoolForm extends Component {
                             onClick={() => { this.toggle('dashboard'); }}
                         >
                             Dashboard
-                            </NavLink>
+                        </NavLink>
                     </NavItem>
                     <NavItem>
                         <NavLink
@@ -136,15 +150,15 @@ class SchoolForm extends Component {
                             onClick={() => { this.toggle('cadastro'); }}
                         >
                             Cadastro
-                            </NavLink>
+                        </NavLink>
                     </NavItem>
                     <NavItem>
                         <NavLink
                             className={classnames({ active: this.state.activeTab === 'contatos' })}
-                            onClick={() => { this.toggle('contatos');  }}
+                            onClick={() => { this.toggle('contatos'); }}
                         >
                             Contatos
-                            </NavLink>
+                        </NavLink>
                     </NavItem>
                     <NavItem>
                         <NavLink
@@ -152,7 +166,7 @@ class SchoolForm extends Component {
                             onClick={() => { this.toggle('alunos'); }}
                         >
                             Alunos
-                            </NavLink>
+                        </NavLink>
                     </NavItem>
                     <NavItem>
                         <NavLink
@@ -160,7 +174,7 @@ class SchoolForm extends Component {
                             onClick={() => { this.toggle('adocoes'); }}
                         >
                             Adoções
-                            </NavLink>
+                        </NavLink>
                     </NavItem>
                     <NavItem>
                         <NavLink
@@ -168,7 +182,15 @@ class SchoolForm extends Component {
                             onClick={() => { this.toggle('agendas'); }}
                         >
                             Ações
-                            </NavLink>
+                        </NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink
+                            className={classnames({ active: this.state.activeTab === 'distribution' })}
+                            onClick={() => { this.toggle('distribution'); }}
+                        >
+                            Distribuição
+                        </NavLink>
                     </NavItem>
                 </Nav>
                 <TabContent activeTab={this.state.activeTab} className={`cont-${this.state.school_type_identify}`}>
@@ -182,15 +204,11 @@ class SchoolForm extends Component {
                     <TabPane tabId="cadastro">
                         <Row>
                             <Col sm="12">
-                                <SchoolRegister 
-                                    viewMode={this.state.viewMode}
-                                    schoolId={this.state.schoolId} 
-                                />
+                                <SchoolRegister viewMode={this.state.viewMode} schoolId={this.state.schoolId} />
                             </Col>
                         </Row>
                     </TabPane>
                     <TabPane tabId="contatos">
-                       
                         <Row>
                             <Col sm="12">
                                 <SchoolConctactList schoolId={this.state.schoolId} contacts={this.state.contacts} />
@@ -200,7 +218,7 @@ class SchoolForm extends Component {
                     <TabPane tabId="alunos">
                         <Row>
                             <Col sm="12">
-                                <SchoolStudentList viewMode={this.state.viewMode}  schoolId={this.state.schoolId} url={this.props.match.url} />
+                                <SchoolStudentList viewMode={this.state.viewMode} schoolId={this.state.schoolId} url={this.props.match.url} />
                             </Col>
                         </Row>
                     </TabPane>
@@ -215,6 +233,13 @@ class SchoolForm extends Component {
                         <Row>
                             <Col sm="12">
                                 <SchoolEventList schoolId={this.state.schoolId} />
+                            </Col>
+                        </Row>
+                    </TabPane>
+                    <TabPane tabId="distribution">
+                        <Row>
+                            <Col sm="12">
+                                <SchoolDistributionList />
                             </Col>
                         </Row>
                     </TabPane>
