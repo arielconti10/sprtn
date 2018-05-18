@@ -183,7 +183,6 @@ class MarketShare extends Component {
                 <Row>
                     <Col md="2">
                         <label>Tipo</label>
-                        {console.log(selectedOption)}
 
                         <Select
                             name="type_param"
@@ -200,7 +199,7 @@ class MarketShare extends Component {
 
                     <Col md="2">
                         <label>Filial</label>
-                        {console.log(selectedOption)}
+
                         <Select
                             name="subsidiary_param"
                             id="subsidiary_param"

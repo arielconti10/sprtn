@@ -346,6 +346,33 @@ class GridApi extends Component {
         return order_by;
     }
 
+    /**
+     */
+    verifyFilter(filter_id, state, count, value, baseURL) {
+        let filter_by = filter_id;     
+
+        //verifica se é uma coluna composta, por exemplo full_name (nome + sobrenome)
+        //para escolher método de ordenaçāo
+        const column_compare = state.columns.filter(function(column){
+            return column.accessor == filter_id;
+        });
+
+        if (column_compare[count]) {
+            filter_by = column_compare[count].filter_by;
+            if (filter_by) {
+                if (value != "") {
+                    const value_split = value.split(/ (.*)/);
+                    baseURL += `&filter[name]=${value_split[0]}&filter[lastname]=${value_split[1]}`;
+                }
+                return baseURL;
+            } else {
+                return false;
+            }
+        }
+
+        
+    }
+
     onFetchData = (state, instance, deleted_at) => {      
         
         let apiSpartan = this.props.apiSpartan
@@ -362,10 +389,16 @@ class GridApi extends Component {
         /*console.log('onFetchData:', deleted_at);
         if(deleted_at != 'all')
             console.log("deleted_at != 'all'", deleted_at);*/
-
-        filtered.map(function (item) {
-            baseURL += `&filter[${item.id}]=${item.value}`;
-        })
+        
+        filtered.map(function (item, key) {
+            let filter_by = this.verifyFilter(item.id, state, key, item.value, baseURL);
+            if (!filter_by) {
+                filter_by = item.id;
+                baseURL += `&filter[${filter_by}]=${item.value}`;
+            } else {
+                baseURL = filter_by;
+            }
+        }.bind(this))
 
         for (let i = 0; i < sorted.length; i++) {
             let order_by = this.verifyOrderBy(sorted[i]['id'], state, i);

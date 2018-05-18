@@ -178,7 +178,6 @@ class SchoolList extends Component {
         axios.get(baseURL)
             .then((response) => {
                 const dados = response.data.data
-
                 this.setState({
                     data: dados,
                     totalSize: response.data.meta.pagination.total,
