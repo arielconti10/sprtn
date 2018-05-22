@@ -34,7 +34,23 @@ export const canUser=(action, history, mode, callback)=>{
     .catch(function (error) {
         console.log(error);
     }.bind(this));
+}
 
+export const getPermissions = (callback) => {
+    const user_id = sessionStorage.getItem('user_id');
+
+    axios.get(`user/${user_id}`)
+    .then((response) => {
+        const dados = response.data.data;
+        const rules = dados.role.rules;
+        const rules_ids = rules.map(a => a.code);
+
+        callback(rules_ids);
+
+    })
+    .catch(function (error) {
+        console.log(error);
+    }.bind(this));
 }
 
 export const verifyViewMode=() => {

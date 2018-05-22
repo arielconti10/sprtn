@@ -146,7 +146,12 @@ class GridApi extends Component {
 
                                 dataAltAux.splice(item.seq, 0,dados);
 
+                                if (dataAltAux[0][0].code == "super") {
+                                    dataAltAux[0].shift();
+                                }
+
                                 this.setState({ dataAlt: dataAltAux });
+
                                 // this.setState({ dataAlt: {[item.seq]: dados} });
                             })
                             .catch(err => console.log(err));
