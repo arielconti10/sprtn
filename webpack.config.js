@@ -5,8 +5,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 
-const extractCSS = new ExtractTextPlugin('[name].fonts.css');
-const extractSCSS = new ExtractTextPlugin('[name].styles.css');
+var date = new Date();
+var date_str = date.getFullYear() + date.getTime() + date.getMonth();
+
+const extractCSS = new ExtractTextPlugin('[name].fonts.css?v='+date_str);
+const extractSCSS = new ExtractTextPlugin('[name].styles.css?v='+date_str);
 
 const BUILD_DIR = path.resolve(__dirname, 'build');
 const SRC_DIR = path.resolve(__dirname, 'src');
@@ -17,6 +20,8 @@ console.log('SRC_DIR', SRC_DIR);
 module.exports = (env = {}) => {
 
     console.log(env);
+
+    
 
     const dotenvfile = (env) => {
         let file = './.env.dev';
@@ -38,7 +43,7 @@ module.exports = (env = {}) => {
         },
         output: {
             path: BUILD_DIR,
-            filename: '[name].bundle.js'
+            filename: '[name].bundle.js?v='+date_str
         },
         // watch: true,
         devtool: env.prod ? 'source-map' : 'cheap-module-eval-source-map',
