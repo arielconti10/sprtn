@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Router, hashHistory, Link, browserHistory, withRouter, NavLink, Redirect } from 'react-router-dom'
-import { Card, CardHeader, CardFooter, CardBody, Button } from 'reactstrap';
+import { Card, CardHeader, CardFooter, CardBody, Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import ReactTable from 'react-table';
 
 import 'react-table/react-table.css'
@@ -8,12 +8,16 @@ import 'react-table/react-table.css'
 import axios from '../../common/axios';
 import { verifyToken } from '../../common/AuthorizeHelper';
 
+import { exportTermOfAccept } from './SchoolTermOfAccept';
+
 class SchoolList extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
+            dropdownOpen: false,
+
             page: 1,
             pageSize: 10,
             data: [],
@@ -26,6 +30,19 @@ class SchoolList extends Component {
         };
 
         this.onChangeFilter = this.onChangeFilter.bind(this);
+        this.toggle = this.toggle.bind(this);
+        this.actionClick = this.actionClick.bind(this);
+    }
+
+    actionClick(obj) {
+        console.log('obj:', obj);
+        exportTermOfAccept();
+    }
+
+    toggle() {
+        this.setState({
+            dropdownOpen: !this.state.dropdownOpen
+        });
     }
 
     onChangeFilter(target, empty) {
@@ -42,7 +59,7 @@ class SchoolList extends Component {
         if (empty) {
             clearFilters.map(clear => {
                 oldFilters.map((elem, index, arr) => {
-                    if (elem['id'] == clear.id){
+                    if (elem['id'] == clear.id) {
                         auxFilters.push(elem);
                     }
                 });
@@ -57,14 +74,14 @@ class SchoolList extends Component {
                     newFilters.push({ id: obj.id, value: obj.value });
                 }
             });
-        } else if (target && target.length > 0){
+        } else if (target && target.length > 0) {
             target.map(obj => {
                 newFilters = oldFilters.filter((elem, index, arr) => elem['id'] != obj.id);
 
                 if (obj.value != '') {
                     newFilters.push({ id: obj.id, value: obj.value });
                 }
-            });            
+            });
         } else {
             newFilters = auxFilters[0] ? auxFilters : [];
         }
@@ -72,13 +89,13 @@ class SchoolList extends Component {
         const values = this.state;
         values.filtered = newFilters;
 
-        if(target.pageSize){
+        if (target.pageSize) {
             values.pageSize = target.pageSize;
         }
-        if(target.page){
+        if (target.page) {
             values.page = target.page + 1;
         }
-        if(target.sorted){
+        if (target.sorted) {
             values.sorted = target.sorted;
         }
         this.setState({ values });
@@ -140,7 +157,7 @@ class SchoolList extends Component {
             },
             { Header: "CEP", accessor: "zip_code", filterable: true, width: 100, headerClassName: 'text-left' },
             { Header: "Cidade", accessor: "city", filterable: true, width: 160, headerClassName: 'text-left' },
-            { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left', sortable: false }            
+            { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left', sortable: false }
         ];
 
         this.setState({ columns: col });
@@ -160,9 +177,9 @@ class SchoolList extends Component {
 
         let pageSize = state ? state.pageSize : this.state.pageSize;
         let page = state ? state.page + 1 : this.state.page;
-        let sorted = state ? state.sorted : this.state.sorted;     
+        let sorted = state ? state.sorted : this.state.sorted;
         let filtered = this.state.filtered
-        
+
         let baseURL = `/school?paginate=${pageSize}&page=${page}`;
 
         filtered.map(function (item) {
@@ -192,7 +209,7 @@ class SchoolList extends Component {
             })
             .catch(function (error) {
                 let authorized = verifyToken(error.response.status);
-                this.setState({authorized:authorized});
+                this.setState({ authorized: authorized });
             }.bind(this));
     }
 
@@ -208,7 +225,16 @@ class SchoolList extends Component {
         return (
             <div>
                 <p>
-                    <NavLink to={this.props.match.url + "/novo"} exact><Button color='primary' disabled={true}><i className="fa fa-plus-circle"></i> Adicionar</Button></NavLink>
+                    <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+                        <DropdownToggle color='primary' caret>
+                            Ações
+                        </DropdownToggle>
+                        <DropdownMenu>
+                            <DropdownItem disabled><i className="fa fa-plus-circle"></i> Adicionar</DropdownItem>
+                            <DropdownItem onClick={this.actionClick('aaaaaaaaaaaaaaaa')}><i className="fa fa-file-text-o"></i> Termo de aceite</DropdownItem>
+                        </DropdownMenu>
+                    </ButtonDropdown>
+                    {/* <NavLink to={this.props.match.url + "/novo"} exact><Button color='primary' disabled={true}><i className="fa fa-plus-circle"></i> Adicionar</Button></NavLink> */}
                 </p>
                 <ReactTable
                     columns={columns}
