@@ -39,13 +39,16 @@ class SubsidiaryForm extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.submitForm = this.submitForm.bind(this);
         this.handleSelectChange = this.handleSelectChange.bind(this);
+        this.findAll = this.findAll.bind(this);
+        this.findSectors = this.findSectors.bind(this);
     }
 
-    componentDidMount() {
+    findAll() {
         apis.map(item => {
             axios.get(`${item.api}?order[name]=asc`)
                 .then(response => {
                     let dados = response.data.data;
+
                     dados.map(item => {
                         item['value'] = item.id,
                             item['label'] = item.name
@@ -54,6 +57,38 @@ class SubsidiaryForm extends Component {
                 })
                 .catch(err => console.log(err));
         });
+    }
+
+    findSectors() {
+        if (this.props.match.params.id !== undefined) {
+            axios.get(`${apiPost}/${this.props.match.params.id}`)
+                .then(response => {
+                    const dados = response.data.data;
+
+                    const sectors = dados.sectors.map(item => item.id);
+
+                    this.setState({
+                        name: dados.name,
+                        // sectors: dados.sectors,
+                        sector_array: sectors, //setores selecionados
+                        active: dados.deleted_at === null ? true : false
+                    });
+
+                    console.log(this.state.sectors);
+
+                    // console.log(this.state);
+                })
+                .catch(err => console.log(err));
+        }
+    }
+
+    componentDidMount() {
+        if (this.props.match.params.id !== undefined) {
+            this.findAll();
+            this.findSectors();
+        } else {
+            this.findAll();
+        }
     }
 
     checkPermission(permission) {
@@ -66,23 +101,7 @@ class SubsidiaryForm extends Component {
 
     componentWillMount() {
         this.checkPermission('subsidiary.insert');
-        if (this.props.match.params.id !== undefined) {
-            this.checkPermission('subsidiary.update');
-            axios.get(`${apiPost}/${this.props.match.params.id}`)
-                .then(response => {
-                    const dados = response.data.data;
-                    console.log('1 - dados:', dados)
-
-                    const sectors = dados.sectors.map(item => item.name);
-
-                    this.setState({
-                        name: dados.name,
-                        sector_array: sectors,
-                        active: dados.deleted_at === null ? true : false
-                    });
-                })
-                .catch(err => console.log(err));
-        }
+        this.findSectors();
     }
 
     handleChange(e) {

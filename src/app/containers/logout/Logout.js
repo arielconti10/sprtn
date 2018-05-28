@@ -10,7 +10,14 @@ export default class Logout extends Component {
         sessionStorage.removeItem("access_token");
         sessionStorage.removeItem("refresh_token");
         sessionStorage.removeItem("expires_in");
+        sessionStorage.removeItem("block_fields");
+        sessionStorage.removeItem("user_email");
+        sessionStorage.removeItem("user_fullName");
+        sessionStorage.removeItem("user_id");
+        sessionStorage.removeItem("user_name");
+        sessionStorage.removeItem("user_userName");
         window.location.href = "/#/login";
+        window.location.reload();
     }
     render() {
         return ( 

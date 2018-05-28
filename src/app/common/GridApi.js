@@ -57,12 +57,23 @@ class GridApi extends Component {
     onClickActive(element, fields) {
         const { id, code, name } = element.value;
 
-        const updateData = {};
+        let updateData = {};
         for (var val in element.value) {
             if (val != 'created_at' && val != 'updated_at' && val != 'deleted_at') {
                 updateData[val] = element.value[val];
             }
         }
+
+        //condiçāo para regras que possuem arrays multidimensionais
+        const column_map = this.props.columnMap;
+        if (column_map) {
+            const updated_element = element.value;
+            updated_element[column_map] = element.value[column_map].map(item => item.id);
+            updateData = updated_element;
+            console.log(updated_element);
+        }
+
+        console.log(updateData);
 
         updateData.active = true;
 
@@ -135,7 +146,12 @@ class GridApi extends Component {
 
                                 dataAltAux.splice(item.seq, 0,dados);
 
+                                if (dataAltAux[0][0].code == "super") {
+                                    dataAltAux[0].shift();
+                                }
+
                                 this.setState({ dataAlt: dataAltAux });
+
                                 // this.setState({ dataAlt: {[item.seq]: dados} });
                             })
                             .catch(err => console.log(err));
@@ -391,7 +407,12 @@ class GridApi extends Component {
             console.log("deleted_at != 'all'", deleted_at);*/
         
         filtered.map(function (item, key) {
-            let filter_by = this.verifyFilter(item.id, state, key, item.value, baseURL);
+            let filter_by;
+
+            if (state) {
+                filter_by = this.verifyFilter(item.id, state, key, item.value, baseURL);
+            }
+            
             if (!filter_by) {
                 filter_by = item.id;
                 baseURL += `&filter[${filter_by}]=${item.value}`;
