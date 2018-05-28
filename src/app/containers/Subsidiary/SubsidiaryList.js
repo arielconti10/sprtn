@@ -50,6 +50,7 @@ class SubsidiariesList extends Component {
                         { Header: 'ID', accessor: 'id', filterable: true, width: 100, headerClassName: 'text-left' },
                         { Header: "Nome", accessor: "name", filterable: true, headerClassName: 'text-left' }
                     ]}
+                    columnMap={"sectors"}
                     blockEdit={this.state.viewMode}
                     blockDelete={this.state.viewDeleteMode}
                 />

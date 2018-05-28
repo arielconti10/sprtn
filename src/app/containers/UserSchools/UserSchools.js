@@ -29,7 +29,7 @@ const apis = [
     //{ stateArray: 'sectors', fieldLabel:'name', name: 'sector_id', api: 'sector' },
     { stateArray: 'subsidiaries', fieldLabel:'name', name: 'subsidiary_id', api: 'subsidiary' },
     { stateArray: 'users', fieldLabel:'concat_field', name: 'user_id', api: 'hierarchy/childrens', 
-        labelConcat: ['username', 'name', 'email']
+        labelConcat: ['username', 'full_name', 'email']
     }
 ];
 

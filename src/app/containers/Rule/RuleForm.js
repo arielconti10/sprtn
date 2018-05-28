@@ -50,7 +50,7 @@ class RuleForm extends Component {
                     const dados = response.data.data;
 
                     const role_id = dados.roles.map(function(item) {
-                        return item.id;
+                        return item.code !== "super"?item.id:"";
                     });
                     
                     //console.log(dados);
@@ -71,6 +71,8 @@ class RuleForm extends Component {
         axios.get(`role`)
             .then(response => {
                 const dados = response.data.data;
+
+                dados.shift();
 
                 this.setState({ roles: dados, roleSelect2Loading: false });
                 //this.setState({ job_title_type_id: dados[0].id });

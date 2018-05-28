@@ -5,6 +5,8 @@ import { RingLoader } from 'react-spinners';
 import { Chart } from 'react-google-charts';
 import axios from '../../../app/common/axios';
 
+import { canUser } from '../../common/Permissions';
+
 const apiPost = 'school';
 const paletteColors = ["#009de8", "#FD0006", "#1aaf5d", "#f45b00", "#8e0000", "#000000", "#7D7D7D", "#00CB19", "#8C0172", "#F70060", "#1B7474", "#0a3b60", "#f2c500", "#BCF25B", "#00DDCD"];
 
@@ -40,6 +42,7 @@ class MarketShare extends Component {
 
 
     componentWillMount() {
+        canUser('indicator.view', this.props.history, "view");
         this.chargeChart();
     }
 

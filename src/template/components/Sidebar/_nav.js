@@ -8,12 +8,14 @@ export default {
         {
             name: 'Market share',
             url: '/marketshare',
-            icon: 'fa fa-caret-right'
+            icon: 'fa fa-caret-right',
+            action: 'marketshare.view'
           },
           {
             name: 'Indicadores',
             url: '/indicadores',
-            icon: 'fa fa-caret-right'
+            icon: 'fa fa-caret-right',
+            action: 'indicator.view'
           }
       ]
     },
@@ -39,7 +41,7 @@ export default {
             name: 'Termo de aceite',
             url: '#',
             icon: 'fa fa-caret-right',
-            action: 'controller.metodo'
+            action: 'user-school.view'
         }
       ]
     },
@@ -124,7 +126,7 @@ export default {
           name: 'Localizações',
           url: '/cadastro/tipos-localizacao',
           icon: 'fa fa-caret-right',
-          action: 'localization-type.view'
+          action: 'localization.view'
         },
         {
             name: 'Turnos',
@@ -155,19 +157,19 @@ export default {
                 name: 'Usuários',
                 url: '/config/usuarios',
                 icon: 'fa fa-caret-right',
-                // action: 'user.view'
+                action: 'user.view'
             },
             {
                 name: 'Regras',
                 url: '/config/regras',
                 icon: 'fa fa-caret-right',
-                // action: 'rule.view'
+                action: 'rule.view'
             },
             {
                 name: 'Permissões',
                 url: '/config/permissoes',
                 icon: 'fa fa-caret-right',
-                // action: 'role.view'
+                action: 'role.view'
             }
         ]
     }
