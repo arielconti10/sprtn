@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Router, hashHistory, Link, browserHistory, withRouter, NavLink, Redirect } from 'react-router-dom'
-import { Card, CardHeader, CardFooter, CardBody, Button, Row, Col } from 'reactstrap';
+import { Card, CardHeader, CardFooter, CardBody, Button, Row, Col, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import ReactTable from 'react-table';
 import Slider from 'rc-slider';
 
@@ -10,24 +10,25 @@ import 'react-table/react-table.css'
 
 import axios from '../../common/axios';
 import { verifyToken } from '../../common/AuthorizeHelper';
+import { exportTermOfAccept } from './SchoolTermOfAccept';
 
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 const Range = createSliderWithTooltip(Slider.Range);
 const Handle = Slider.Handle;
 
 const handle = (props) => {
-  const { value, dragging, index, ...restProps } = props;
-  return (
-    <Tooltip
-      prefixCls="rc-slider-tooltip"
-      overlay={value}
-      visible={dragging}
-      placement="top"
-      key={index}
-    >
-      <Handle value={value} {...restProps} />
-    </Tooltip>
-  );
+    const { value, dragging, index, ...restProps } = props;
+    return (
+        <Tooltip
+            prefixCls="rc-slider-tooltip"
+            overlay={value}
+            visible={dragging}
+            placement="top"
+            key={index}
+        >
+            <Handle value={value} {...restProps} />
+        </Tooltip>
+    );
 };
 
 const wrapperStyle = { width: 400, margin: 50 };
@@ -38,6 +39,8 @@ class SchoolList extends Component {
         super(props);
 
         this.state = {
+            dropdownOpen: false,
+
             page: 1,
             pageSize: 10,
             data: [],
@@ -54,6 +57,18 @@ class SchoolList extends Component {
         this.onChangeFilter = this.onChangeFilter.bind(this);
         this.executeSearch = this.executeSearch.bind(this);
         this.showMarketShare = this.showMarketShare.bind(this);
+        this.toggle = this.toggle.bind(this);
+        this.actionClick = this.actionClick.bind(this);
+    }
+
+    actionClick(obj) {
+        exportTermOfAccept();
+    }
+
+    toggle() {
+        this.setState({
+            dropdownOpen: !this.state.dropdownOpen
+        });
     }
 
     onChangeFilter(target, empty) {
@@ -114,12 +129,12 @@ class SchoolList extends Component {
         this.onFetchData();
     }
 
-    showMarketShare(marketshare){
+    showMarketShare(marketshare) {
         let value = 0;
-        
-        if(marketshare.length){
+
+        if (marketshare.length) {
             marketshare.map(item => {
-                if(item.key.search(/(?=.*EDITORAS:)(?=.*FTD)/gi) !== -1)
+                if (item.key.search(/(?=.*EDITORAS:)(?=.*FTD)/gi) !== -1)
                     value = item.value
             })
         }
@@ -140,12 +155,14 @@ class SchoolList extends Component {
                     </div>
                 )
             },
-            { Header: "Alunos", accessor: "total_students", sortable: true, width: 70, headerClassName: 'text-left',
+            {
+                Header: "Alunos", accessor: "total_students", sortable: true, width: 70, headerClassName: 'text-left',
                 Cell: props => <span>{props.value || 0}</span>
-            },        
-            { Header: "Market share", accessor: "marketshare", width: 100, headerClassName: 'text-left',
-                Cell: props => <span>{this.showMarketShare(props.value)+'%'}</span>
-            },     
+            },
+            {
+                Header: "Market share", accessor: "marketshare", width: 100, headerClassName: 'text-left',
+                Cell: props => <span>{this.showMarketShare(props.value) + '%'}</span>
+            },
             { Header: "Nome", accessor: "name", sortable: true, filterable: true, minWidth: 250, maxWidth: 500, headerClassName: 'text-left' },
             { Header: 'Tipo', accessor: 'school_type.name', sortable: true, filterable: true, width: 160, headerClassName: 'text-left', sortable: false },
             {
@@ -220,7 +237,7 @@ class SchoolList extends Component {
         })
 
         for (let i = 0; i < sorted.length; i++) {
-            if(sorted[i]['id'] !== 'marketshare')
+            if (sorted[i]['id'] !== 'marketshare')
                 baseURL += "&order[" + sorted[i]['id'] + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
         }
 
@@ -261,17 +278,26 @@ class SchoolList extends Component {
         return (
             <div>
                 <Row>
-                    <Col md="2">                        
-                        <NavLink to={this.props.match.url + "/novo"} exact>
-                            <Button color='primary' disabled={true}><i className="fa fa-plus-circle"></i> Adicionar</Button>
-                        </NavLink>
+                    <Col md="2">
+
+                        <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+                            <DropdownToggle color='primary' caret>
+                                Ações
+                        </DropdownToggle>
+                            <DropdownMenu>
+                                <DropdownItem onClick={this.actionClick}><i className="fa fa-file-text-o"></i> Termo de aceite</DropdownItem>
+                                <DropdownItem disabled><i className="fa fa-plus-circle"></i> Adicionar</DropdownItem>
+                            </DropdownMenu>
+                        </ButtonDropdown>
+                        {/* <NavLink to={this.props.match.url + "/novo"} exact><Button color='primary' disabled={true}><i className="fa fa-plus-circle"></i> Adicionar</Button></NavLink> */}
+
                     </Col>
                     <Col md="5">
                         <label>Alunos</label>
-                        <Range 
-                            min={0} 
-                            max={9999} 
-                            tipFormatter={value => `${value}`} 
+                        <Range
+                            min={0}
+                            max={9999}
+                            tipFormatter={value => `${value}`}
                             value={studentsRange}
                             onChange={value => this.setState({ studentsRange: value })}
                             onAfterChange={this.executeSearch}
@@ -281,10 +307,10 @@ class SchoolList extends Component {
                     </Col>
                     <Col md="5">
                         <label>Market share</label>
-                        <Range 
-                            min={0} 
-                            max={100} 
-                            tipFormatter={value => `${value}%`} 
+                        <Range
+                            min={0}
+                            max={100}
+                            tipFormatter={value => `${value}%`}
                             value={marketshareRange}
                             onChange={value => this.setState({ marketshareRange: value })}
                             onAfterChange={this.executeSearch}
@@ -338,6 +364,7 @@ class SchoolList extends Component {
                         />
                     </Col>
                 </Row>
+                
             </div>
         )
     }
