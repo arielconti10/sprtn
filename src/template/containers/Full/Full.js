@@ -76,6 +76,7 @@ class Full extends Component {
             })
 
             this.setState({nav_itens:nav_itens});
+            sessionStorage.setItem("rules", JSON.stringify(rules));
         }.bind(this));
     }
 
@@ -99,8 +100,6 @@ class Full extends Component {
                 <Redirect to="/login" />
             );
         }
-
-
 
         return (
             <div className="app">

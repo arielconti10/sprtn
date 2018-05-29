@@ -16,6 +16,7 @@ export default class Logout extends Component {
         sessionStorage.removeItem("user_id");
         sessionStorage.removeItem("user_name");
         sessionStorage.removeItem("user_userName");
+        sessionStorage.removeItem("rules");
         window.location.href = "/#/login";
         window.location.reload();
     }
