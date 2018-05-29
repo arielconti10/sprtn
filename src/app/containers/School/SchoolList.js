@@ -292,7 +292,7 @@ class SchoolList extends Component {
                         {/* <NavLink to={this.props.match.url + "/novo"} exact><Button color='primary' disabled={true}><i className="fa fa-plus-circle"></i> Adicionar</Button></NavLink> */}
 
                     </Col>
-                    <Col md="5">
+                    {/* <Col md="5">
                         <label>Alunos</label>
                         <Range
                             min={0}
@@ -317,7 +317,7 @@ class SchoolList extends Component {
                             step={1}
                         />
                         <span>{marketshareRange[0]}% - {marketshareRange[1]}%</span>
-                    </Col>
+                    </Col> */}
                 </Row>
                 <br />
                 <Row>
