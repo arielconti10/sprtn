@@ -145,11 +145,13 @@ export default class SchoolDashboard extends Component {
 
         return (
             <div>
-                <RingLoader
-                    color={'#123abc'}
-                    loading={ringLoad}
-                    margin='50px'
-                />
+                {this.state.ringLoad == true &&
+                    <div className="loader-dashboard"> 
+                        <div className="backLoading"> 
+                            <div className="load"></div> 
+                        </div> 
+                    </div> 
+                } 
                 <Row>
                     <Col md="2">
                         <label>Ano</label>
