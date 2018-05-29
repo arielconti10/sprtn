@@ -224,18 +224,19 @@ class SchoolList extends Component {
 
         return (
             <div>
-                <p>
+                <div>
                     <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
                         <DropdownToggle color='primary' caret>
                             Ações
                         </DropdownToggle>
                         <DropdownMenu>
+                            <DropdownItem onClick={this.actionClick}><i className="fa fa-file-text-o"></i> Termo de aceite</DropdownItem>
                             <DropdownItem disabled><i className="fa fa-plus-circle"></i> Adicionar</DropdownItem>
-                            <DropdownItem onClick={this.actionClick('aaaaaaaaaaaaaaaa')}><i className="fa fa-file-text-o"></i> Termo de aceite</DropdownItem>
                         </DropdownMenu>
                     </ButtonDropdown>
                     {/* <NavLink to={this.props.match.url + "/novo"} exact><Button color='primary' disabled={true}><i className="fa fa-plus-circle"></i> Adicionar</Button></NavLink> */}
-                </p>
+                </div>
+                <br />
                 <ReactTable
                     columns={columns}
                     data={data}

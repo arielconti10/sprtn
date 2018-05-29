@@ -9,15 +9,7 @@ export const exportTermOfAccept = () => {
         .then((response) => {
             const data = response.data.data;
 
-            const filename = 'TERMO_DE_ACEITE_DE_CARTEIRA.txt';
-            const contentType = 'application/octet-stream';
-            const a = document.createElement('a');
-
             let user = sessionStorage.getItem('user_fullName');
-
-            // let numSchools = data.length;
-
-            // let cabec = generateHeader('PÚBLICO', 15);
 
             let schoolDataPublic = '';
             let schoolDataPartic = '';
@@ -87,11 +79,6 @@ export const exportTermOfAccept = () => {
                 `QTD. ESCOLAS PÚBLICO......: ${dataPublic.length} / ${totalPublic} ALUNOS \r\n` +
                 `QTD. ESCOLAS PARTICULAR...: ${dataPartic.length} / ${totalPartic} ALUNOS \r\n` +
                 `QTD. ESCOLAS SECRETARIA...: ${dataSecret.length} / ${totalSecret} ALUNOS \r\n` +
-                // 'QTD. ALUNOS PÚBLICO.......: ' + totalPublic + '\r\n' +
-                // 'QTD. ESCOLAS PARTICULAR...: ' + dataPartic.length + '\r\n' +
-                // 'QTD. ALUNOS PARTICULAR....: ' + totalPartic + '\r\n' +
-                // 'QTD. ESCOLAS SECRETARIA...: ' + dataSecret.length + '\r\n' +
-                // 'QTD. ALUNOS SECRETARIA....: ' + totalSecret + '\r\n' +
                 '\r\n' +
                 'ESTE DOCUMENTO FORMALIZA O ACEITE DA CARTEIRA DE ESCOLAS ABAIXO RELACIONADAS   \r\n' +
                 `PARA ATUACAO COMERCIAL PELO CONSULTOR ${user.toUpperCase()} \r\n` +
@@ -125,7 +112,11 @@ export const exportTermOfAccept = () => {
                 '' + user + '\r\n' +
                 '';
 
+            let filename = 'TERMO_DE_ACEITE_DE_CARTEIRA.txt';
+            let contentType = 'application/octet-stream';
+            let a = document.createElement('a');
             let blob = new Blob([content], { 'type': contentType });
+            
             a.href = window.URL.createObjectURL(blob);
             a.download = filename;
             a.click();
@@ -235,7 +226,7 @@ let getSchoolData = (array) => {
     array.map(school => {
         let j = i + 1;
         numStudents += (isNaN(parseInt(school['total_students']))) ? 0 : parseInt(school['total_students']);
-        
+
         schoolData += `${addZero(j)} / ${addZero(numSchools)}`
             + ' '
             + validateRegister('escola', school['name'])
