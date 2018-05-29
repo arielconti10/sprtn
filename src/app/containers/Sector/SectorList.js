@@ -52,6 +52,7 @@ class SectorList extends Component {
                     ]}
                     blockEdit={this.state.viewMode}
                     blockDelete={this.state.viewDeleteMode}
+                    columnMap={"subsidiaries"}
                 />
             </div>
         )

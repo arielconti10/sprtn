@@ -57,12 +57,23 @@ class GridApi extends Component {
     onClickActive(element, fields) {
         const { id, code, name } = element.value;
 
-        const updateData = {};
+        let updateData = {};
         for (var val in element.value) {
             if (val != 'created_at' && val != 'updated_at' && val != 'deleted_at') {
                 updateData[val] = element.value[val];
             }
         }
+
+        //condiçāo para regras que possuem arrays multidimensionais
+        const column_map = this.props.columnMap;
+        if (column_map) {
+            const updated_element = element.value;
+            updated_element[column_map] = element.value[column_map].map(item => item.id);
+            updateData = updated_element;
+            console.log(updated_element);
+        }
+
+        console.log(updateData);
 
         updateData.active = true;
 
@@ -135,7 +146,12 @@ class GridApi extends Component {
 
                                 dataAltAux.splice(item.seq, 0,dados);
 
+                                if (dataAltAux[0][0].code == "super") {
+                                    dataAltAux[0].shift();
+                                }
+
                                 this.setState({ dataAlt: dataAltAux });
+
                                 // this.setState({ dataAlt: {[item.seq]: dados} });
                             })
                             .catch(err => console.log(err));
@@ -346,6 +362,33 @@ class GridApi extends Component {
         return order_by;
     }
 
+    /**
+     */
+    verifyFilter(filter_id, state, count, value, baseURL) {
+        let filter_by = filter_id;     
+
+        //verifica se é uma coluna composta, por exemplo full_name (nome + sobrenome)
+        //para escolher método de ordenaçāo
+        const column_compare = state.columns.filter(function(column){
+            return column.accessor == filter_id;
+        });
+
+        if (column_compare[count]) {
+            filter_by = column_compare[count].filter_by;
+            if (filter_by) {
+                if (value != "") {
+                    const value_split = value.split(/ (.*)/);
+                    baseURL += `&filter[name]=${value_split[0]}&filter[lastname]=${value_split[1]}`;
+                }
+                return baseURL;
+            } else {
+                return false;
+            }
+        }
+
+        
+    }
+
     onFetchData = (state, instance, deleted_at) => {      
         
         let apiSpartan = this.props.apiSpartan
@@ -362,10 +405,21 @@ class GridApi extends Component {
         /*console.log('onFetchData:', deleted_at);
         if(deleted_at != 'all')
             console.log("deleted_at != 'all'", deleted_at);*/
+        
+        filtered.map(function (item, key) {
+            let filter_by;
 
-        filtered.map(function (item) {
-            baseURL += `&filter[${item.id}]=${item.value}`;
-        })
+            if (state) {
+                filter_by = this.verifyFilter(item.id, state, key, item.value, baseURL);
+            }
+            
+            if (!filter_by) {
+                filter_by = item.id;
+                baseURL += `&filter[${filter_by}]=${item.value}`;
+            } else {
+                baseURL = filter_by;
+            }
+        }.bind(this))
 
         for (let i = 0; i < sorted.length; i++) {
             let order_by = this.verifyOrderBy(sorted[i]['id'], state, i);

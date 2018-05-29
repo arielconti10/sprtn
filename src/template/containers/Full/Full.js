@@ -38,17 +38,50 @@ import Indicadores from '../../../app/containers/Indicadores/Indicadores'
 
 import UserSchools from '../../../app/containers/UserSchools/UserSchools';
 import axios from '../../../app/common/axios';
+import {getPermissions} from '../../../app/common/Permissions';
+
+import nav from '../../../template/components/Sidebar/_nav';
 
 class Full extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            rules: []
+            rules: [],
+            nav_itens: []
         };
     }
 
+    loadMenuPermissions() {
+        getPermissions(function(rules){
+            const nav_itens = nav.items;
+            const array_permissions = [];
+            nav_itens.map(item => {
+                const children_actions = item.children.map(children => children.action);
+                children_actions.map(action => {
+                    const index = rules.indexOf(action);
+                    // console.log(index);
+                    if (index === -1) {    
+                        const index_action = children_actions.indexOf(action);
+                        let childrens = item.children;
+                        delete childrens[index_action];
+                    }
+                }); 
+            });
+
+            nav_itens.map((item, key) => {
+                item.children = item.children.filter(function(n){ return n != undefined });
+                if (item.children.length == 0) {
+                    delete nav_itens[key];
+                }
+            })
+
+            this.setState({nav_itens:nav_itens});
+        }.bind(this));
+    }
+
     componentWillMount() {
-        // sessionStorage.removeItem('block_fields');
+        this.loadMenuPermissions();
+
     }
 
     showMessagePermission() {
@@ -60,7 +93,6 @@ class Full extends Component {
     }
 
     render() {
-        
         const token = sessionStorage.getItem('access_token');
         if (token == undefined) {
             return (
@@ -74,7 +106,7 @@ class Full extends Component {
             <div className="app">
                 <Header />
                 <div className="app-body">
-                    <Sidebar {...this.props}/>
+                    <Sidebar {...this.props} nav_itens={this.state.nav_itens}/>
                     <main className="main">
                         <Breadcrumb />
 
@@ -113,7 +145,7 @@ class Full extends Component {
                                 <Route path="/config/regras" name="Regras" component={Roles}/>                                
                                 <Route path="/config/permissoes" name="Permissões" component={Rules}/>
                                 <Route path="/config/usuarios" name="Usuários" component={Users}/>
-                                <Redirect from="/" to="/marketshare" />
+                                {/* <Redirect from="/" to="/marketshare" /> */}
                             </Switch>
                         </Container>
                     </main>
