@@ -129,7 +129,7 @@ class ContactForm extends Component {
 
     populateSelectbox() {
         apis.map(item => {
-            axios.get(`${item.api}`)
+            axios.get(`${item.api}${item.api == 'job-title' ? '?filter[job_title_type_id]=2' : ''}`)
                 .then(response => {
                     let dados = response.data.data;
                     item.stateArray = item.stateArray.replace("-","_");
