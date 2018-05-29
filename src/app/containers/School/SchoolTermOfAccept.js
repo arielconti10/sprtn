@@ -5,7 +5,7 @@ import axios from '../../common/axios';
  */
 export const exportTermOfAccept = () => {
 
-    axios.get('school')
+    axios.get('school?filter[portfolio]=1&filter[active]=1')
         .then((response) => {
             const data = response.data.data;
 

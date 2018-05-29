@@ -35,7 +35,6 @@ class SchoolList extends Component {
     }
 
     actionClick(obj) {
-        console.log('obj:', obj);
         exportTermOfAccept();
     }
 
