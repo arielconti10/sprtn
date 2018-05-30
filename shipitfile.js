@@ -16,9 +16,9 @@ module.exports = shipit => {
        key: '/home/jenkins/.ssh-deploy-keys/mtz-webh02/deploy.pem'
     },
     production: {
-        servers: 'ftdiw@mtz-webp02:2223',
-        key: '/home/jenkins/.ssh-deploy-keys/mtz-webp02/deploy.pem',
-        port: '2223'
+        servers: 'www-data@35.199.79.242:22',
+        key: '/home/jenkins/.ssh/id_rsa',
+        port: '22'
      },
   });
 

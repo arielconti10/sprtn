@@ -52,6 +52,11 @@ class SchoolForm extends Component {
         };
     }
 
+    componentWillMount(){
+        this.getSchool();
+
+    }
+
     getSchool() {
         axios.get(`school/${this.state.schoolId}`)
         .then(response => {
@@ -91,6 +96,10 @@ class SchoolForm extends Component {
                     const dados = response.data.data;
                     this.setState({
                         schoolName: dados.name,
+                        total_students_ei: dados.total_students_ei || '0',
+                        total_students_ef1: dados.total_students_ef1 || '0',
+                        total_students_ef2: dados.total_students_ef2 || '0',
+                        total_students_em: dados.total_students_em || '0',
                         total_students: dados.total_students || '0',
                         students: dados.students || [],
                         contacts: dados.contacts || [],
@@ -99,6 +108,7 @@ class SchoolForm extends Component {
                         schoolCodeTotvs: dados.school_code_totvs,
                         subsidiaryId: dados.subsidiary_id,
                         sectorId: dados.sector_id,
+                        school_type_identify: dados.school_type.identify.toLowerCase(),
                         marketshare: dados.marketshare
                     });
                 })
