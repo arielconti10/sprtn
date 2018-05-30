@@ -61,7 +61,7 @@ class SchoolEventList extends Component {
             form_start_date: '',
             form_start_time: '',
             form_duration: '00:00:00',
-            form_visit_type_id: 0,
+            form_visit_type_id: 1,
             form_action_id: 0,
             form_school_id: this.props.schoolId,
             form_observations: '',
@@ -130,7 +130,7 @@ class SchoolEventList extends Component {
             // form_name: '',
             form_start_date: '',
             form_start_time: '',
-            form_visit_type_id: 0,
+            // form_visit_type_id: 0,
             form_action_id: 0,
             form_observations: ''
         });
@@ -163,7 +163,7 @@ class SchoolEventList extends Component {
         values.form_name = name;
         values.form_start_date = start_date;
         values.form_start_time = start_time;
-        values.form_visit_type_id = visit_type_id;
+        // values.form_visit_type_id = visit_type_id;
         values.form_action_id = action_id;
         values.form_observations = observations;
         values.blockButton = true;
@@ -372,18 +372,27 @@ class SchoolEventList extends Component {
 
         this.setState({ columns: col });
 
-        apis.map(item => {
-            axios.get(`${item.api}`)
-                .then(response => {
-                    let dados = response.data.data;
-                    dados.map(item => {
-                        item['value'] = item.id,
-                            item['label'] = item.name
-                    });
-                    this.setState({ [item.stateArray]: dados });
-                })
-                .catch(err => console.log(err));
-        });
+        let baseURL = `/school/${this.state.form_school_id}`;
+
+        axios.get(baseURL)
+            .then((response) => {
+                const identify = response.data.data.school_type.identify
+
+                apis.map(item => {
+                    axios.get(`${item.api}${item.api == 'action' ? `?filter[visit_type_school_type.school_type.identify]=${identify}` : ''}`)
+                        .then(response => {
+                            let dados = response.data.data;
+                            dados.map(item => {
+                                item['value'] = item.id,
+                                    item['label'] = item.name
+                            });
+                            this.setState({ [item.stateArray]: dados });
+                        })
+                        .catch(err => console.log(err));
+                });
+            })
+            .catch(err => console.log(err));
+
     }
 
     convertDate(element) {
@@ -487,6 +496,7 @@ class SchoolEventList extends Component {
                                                     options={visit_types}
                                                     placeholder="Selecione..."
                                                     required
+                                                    disabled
                                                 />
                                                 {this.state.validate_form_visit_type_id == 0 &&
                                                     <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
