@@ -36,12 +36,6 @@ export default {
             url: '/carteira/distribuicao',
             icon: 'fa fa-list',
             action: 'user-school.view'
-        },
-        {
-            name: 'Termo de aceite',
-            url: '#',
-            icon: 'fa fa-caret-right',
-            action: 'user-school.view'
         }
       ]
     },
