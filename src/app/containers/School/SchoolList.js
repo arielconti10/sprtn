@@ -10,7 +10,7 @@ import 'react-table/react-table.css'
 
 import axios from '../../common/axios';
 import { verifyToken } from '../../common/AuthorizeHelper';
-import { exportTermOfAccept } from './SchoolTermOfAccept';
+// import { exportTermOfAccept } from './SchoolTermOfAccept';
 
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 const Range = createSliderWithTooltip(Slider.Range);
@@ -40,6 +40,7 @@ class SchoolList extends Component {
 
         this.state = {
             dropdownOpen: false,
+            ringLoad: false,
 
             page: 1,
             pageSize: 10,
@@ -62,7 +63,251 @@ class SchoolList extends Component {
     }
 
     actionClick(obj) {
-        exportTermOfAccept();
+        this.setState({ ringLoad: true });
+
+        this.exportTermOfAccept();
+    }
+
+    exportTermOfAccept(){
+        axios.get('school?filter[portfolio]=1&filter[active]=1')
+        .then((response) => {
+            const data = response.data.data;
+
+            let user = sessionStorage.getItem('user_fullName');
+
+            let schoolDataPublic = '';
+            let schoolDataPartic = '';
+            let schoolDataSecret = '';
+
+            let numStudents = 0;
+
+            let dataPublic = [];
+            let dataPartic = [];
+            let dataSecret = [];
+
+            let totalPublic = 0;
+            let totalPartic = 0;
+            let totalSecret = 0;
+
+            data.map(school => {
+                let type = school['school_type']['identify'];
+
+                let data = {};
+                data['name'] = school['name'];
+                data['mec_inep_code'] = school['mec_inep_code'];
+                data['city'] = school['city'];
+                data['total_students'] = school['total_students'];
+
+                switch (type) {
+                    case 'PUBLICO':
+                        dataPublic.push(data);
+                        break;
+                    case 'PARTICULAR':
+                        dataPartic.push(data);
+                        break;
+                    default:
+                        dataSecret.push(data);
+                }
+            });
+
+            if (dataPublic.length) {
+                let dataReturn = this.getSchoolData(dataPublic);
+
+                schoolDataPublic = dataReturn[0];
+                totalPublic = dataReturn[1];
+            }
+
+            if (dataPartic.length) {
+                let dataReturn = this.getSchoolData(dataPartic);
+
+                schoolDataPartic = dataReturn[0];
+                totalPartic = dataReturn[1];
+            }
+
+            if (dataSecret.length) {
+                let dataReturn = this.getSchoolData(dataSecret);
+
+                schoolDataSecret = dataReturn[0];
+                totalSecret = dataReturn[1];
+            }
+
+            let dtToday = new Date;
+
+            let content = '-------------------------------  FTD EDUCACAO  --------------------- ' + this.brDate(false, dtToday) + '\r\n' +
+                '-------------------------- TERMO DE ACEITE DE CARTEIRA ------------------------\r\n' +
+                '\r\n' +
+                `CONSULTOR.................: ${user} \r\n` +
+                `QTD. TOTAL DE ESCOLAS.....: ${data.length} \r\n` +
+                `QTD. TOTAL DE ALUNOS......: ${parseInt(totalPublic + totalPartic + totalSecret)} \r\n` +
+                '\r\n' +
+                `QTD. ESCOLAS PÚBLICO......: ${dataPublic.length} / ${totalPublic} ALUNOS \r\n` +
+                `QTD. ESCOLAS PARTICULAR...: ${dataPartic.length} / ${totalPartic} ALUNOS \r\n` +
+                `QTD. ESCOLAS SECRETARIA...: ${dataSecret.length} / ${totalSecret} ALUNOS \r\n` +
+                '\r\n' +
+                'ESTE DOCUMENTO FORMALIZA O ACEITE DA CARTEIRA DE ESCOLAS ABAIXO RELACIONADAS   \r\n' +
+                `PARA ATUACAO COMERCIAL PELO CONSULTOR ${user.toUpperCase()} \r\n` +
+                '\r\n';
+
+            if (schoolDataPublic != '') {
+                content += this.generateHeader('PÚBLICO', totalPublic) +
+                    'NU.       ESCOLA                                  INEP     CIDADE              \r\n' +
+                    '-------------------------------------------------------------------------------\r\n' +
+                    schoolDataPublic + '\r\n';
+            }
+
+            if (schoolDataPartic != '') {
+                content += this.generateHeader('PARTICULAR', totalPartic) +
+                    'NU.       ESCOLA                                  INEP     CIDADE              \r\n' +
+                    '-------------------------------------------------------------------------------\r\n' +
+                    schoolDataPartic + '\r\n';
+            }
+
+            if (schoolDataSecret != '') {
+                content += this.generateHeader('SECRETARIA', totalSecret) +
+                    'NU.       ESCOLA                                  INEP     CIDADE              \r\n' +
+                    '-------------------------------------------------------------------------------\r\n' +
+                    schoolDataSecret + '\r\n';
+            }
+
+            content += '-------------------------------------------------------------------------------\r\n' +
+                '' + '\r\n' +
+                '' + '\r\n' +
+                '_______________________________________                                        \r\n' +
+                '' + user + '\r\n' +
+                '';
+
+            let filename = 'TERMO_DE_ACEITE_DE_CARTEIRA.txt';
+            let contentType = 'application/octet-stream';
+            let a = document.createElement('a');
+            let blob = new Blob([content], { 'type': contentType });
+            
+            a.href = window.URL.createObjectURL(blob);
+            a.download = filename;
+            a.click();
+
+            this.setState({ ringLoad: false });
+        })
+        .catch(function (error) {
+            console.log(error);
+            alert(error);
+            this.setState({ ringLoad: false });
+        }.bind(this));        
+    }
+
+    generateHeader = (type, students) => {
+
+        var data = new Date();
+        var nextYear = data.getFullYear() + 1;
+        var text = ` ${type} - ${students} ALUNOS `;
+    
+        var qtd = (80 - text.length) / 2;
+    
+        var header = this.addString('-', qtd)
+            + text
+            + this.addString('-', qtd)
+            + '\r\n';
+    
+        return header;
+    }
+    
+    addZero = (value) => {
+    
+        value = value.toString();
+    
+        if (value.length == 1) {
+            value = `00${value}`;
+        } else if (value.length == 2) {
+            value = `0${value}`;
+        }
+        return value;
+    }
+    
+    validateRegister = (data, value) => {
+        let text = '';
+    
+        if (data == 'escola') {
+            if (value) {
+                text = this.writeRegister(value, 39);
+            } else {
+                text = 'Registro indisponível' + this.addString('\xa0', 18);
+            }
+        } else if (data == 'inep') {
+            if (value) {
+                text = this.writeRegister(value, 8);
+            } else {
+                text = '--------';
+            }
+        } else {
+            if (value) {
+                text = this.writeRegister(value.toUpperCase(), 22);
+            } else {
+                text = 'Registro indisponível';
+            }
+        }
+    
+        return text;
+    }
+    
+    addString = (string, qtd) => {
+        let witheSpace = '';
+        for (let i = 1; i <= qtd; i++) {
+            witheSpace += string;
+        }
+        return witheSpace;
+    }
+    
+    writeRegister = (value, width) => {
+        let ret = '';
+        if (value.length > width) {
+            ret = value.substr(0, width);
+        } else {
+            let i = value.length;
+            let qtd = width - i;
+    
+            ret = value + this.addString('\xa0', qtd);
+        }
+    
+        return ret;
+    }
+    
+    brDate = (calend, d) => {
+        function pad(n) { return n < 10 ? '0' + n : n }
+        if (calend) {
+            return pad(d._d.getUTCDate()) + '/'
+                + pad(d._d.getUTCMonth() + 1) + '/'
+                + pad(d._d.getUTCFullYear());
+        } else {
+            return pad(d.getUTCDate()) + '/'
+                + pad(d.getUTCMonth() + 1) + '/'
+                + pad(d.getUTCFullYear());
+        }
+    }
+    
+    getSchoolData = (array) => {
+        let i = 0;
+        let schoolData = '';
+        let numStudents = 0;
+        let numSchools = array.length;
+    
+        array.map(school => {
+            let j = i + 1;
+            numStudents += (isNaN(parseInt(school['total_students']))) ? 0 : parseInt(school['total_students']);
+    
+            schoolData += `${this.addZero(j)} / ${this.addZero(numSchools)}`
+                + ' '
+                + this.validateRegister('escola', school['name'])
+                + ' '
+                + this.validateRegister('inep', school['mec_inep_code'])
+                + ' '
+                + this.validateRegister('cidade', school['city'])
+                + '\r\n';
+    
+            i++;
+        });
+    
+        let data = [schoolData, numStudents];
+    
+        return data;
     }
 
     toggle() {
@@ -277,6 +522,13 @@ class SchoolList extends Component {
 
         return (
             <div>
+                {this.state.ringLoad == true &&
+                    <div className="loader-schools">
+                        <div className="backLoading">
+                            <div className="load"></div>
+                        </div>
+                    </div>
+                }
                 <Row>
                     <Col md="2">
 
@@ -364,7 +616,7 @@ class SchoolList extends Component {
                         />
                     </Col>
                 </Row>
-                
+
             </div>
         )
     }
