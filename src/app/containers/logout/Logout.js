@@ -17,6 +17,9 @@ export default class Logout extends Component {
         sessionStorage.removeItem("user_name");
         sessionStorage.removeItem("user_userName");
         sessionStorage.removeItem("rules");
+        sessionStorage.removeItem("superior");
+        sessionStorage.removeItem("role_name");
+        sessionStorage.removeItem('sso_token');
         window.location.href = "/#/login";
         window.location.reload();
     }
