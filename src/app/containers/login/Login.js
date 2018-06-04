@@ -41,6 +41,7 @@ class LoginForm extends Component {
 
     saveStorage = (res) => {
         if (res.data.access_token !== undefined) {
+            console.log(res.data);
             sessionStorage.setItem('token_type', res.data.token_type);
             sessionStorage.setItem('access_token', res.data.access_token);
             sessionStorage.setItem('refresh_token', res.data.refresh_token);
@@ -52,11 +53,7 @@ class LoginForm extends Component {
             sessionStorage.setItem('user_fullName', res.data.user.full_name);
             sessionStorage.setItem('superior', res.data.user.superior_name);
             sessionStorage.setItem('sso_token', res.data.sso_token);
-            
-            //condiçāo temporária, até ser liberado na API
-            // if (res.data.user.role.name) {
-            //     sessionStorage.setItem('role_name', res.data.user.role.name);
-            // }
+            sessionStorage.setItem('role_name', res.data.user.role.name);
             
             this.setState({ 'valid_login': true });
         } else {
