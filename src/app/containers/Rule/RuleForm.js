@@ -103,11 +103,22 @@ class RuleForm extends Component {
     submitForm(event) {
 
         event.preventDefault();
+
+        const roles_array = [{ role_id:1 }];
+
+        const roles_id = this.state.role_id.map(function(item) {
+            const object = {role_id:item};
+
+            if (item !== "") {
+                roles_array.push(object);
+            }
+        })
+
         axios.post(`${apiPost}`, {
             'name': this.state.name,
             'code': this.state.code,
             'active': this.state.active,
-            'roles': this.state.role_id
+            'roles': roles_array
         }).then(res => {
             this.setState({
                 saved: true                   
@@ -122,27 +133,21 @@ class RuleForm extends Component {
     updateForm(event) {
         event.preventDefault();
         var id = this.props.match.params.id;
+        const roles_array = [{ role_id:1 }];
 
         const roles_id = this.state.role_id.map(function(item) {
+            const object = {role_id:item};
 
-            let data = [];
-
-            data['role_id'] = item;
-
-            return data;
+            if (item !== "") {
+                roles_array.push(object);
+            }
         })
-
-        //console.log(roles_id);
-
-        // roles_id = [
-
-        // ];        
 
         axios.put(`${apiPost}/${id}`, {
             'name': this.state.name,
             'code': this.state.code,
             'active': this.state.active,
-            'roles': [{'role_id': 1}, {'role_id': 2}]
+            'roles': roles_array
         }).then(res => {
             this.setState({
                 saved: true                   
@@ -173,7 +178,7 @@ class RuleForm extends Component {
     render() {
         let redirect = null;
         if (this.state.saved) {
-            redirect = <Redirect to="/cadastro/disciplinas" />;
+            redirect = <Redirect to="/config/permissoes" />;
         }
 
         let statusField = null;
