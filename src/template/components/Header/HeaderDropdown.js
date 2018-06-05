@@ -6,6 +6,8 @@ import {
     DropdownToggle,
     Dropdown
 } from 'reactstrap';
+import './custom.css';
+import axios from 'axios';
 
 class HeaderDropdown extends Component {
 
@@ -15,8 +17,25 @@ class HeaderDropdown extends Component {
         this.toggle = this.toggle.bind(this);
         this.state = {
             dropdownOpen: false,
-            email: sessionStorage.getItem('user_email')
+            full_name: sessionStorage.getItem('user_fullName'),
+            username: sessionStorage.getItem('user_userName'),
+            role_name: sessionStorage.getItem('role_name'),
+            superior: sessionStorage.getItem('superior'),
+            email: sessionStorage.getItem('user_email'),
+            profile_picture: ''
         };
+    }
+
+    componentWillMount() {
+        this.getUserPhoto();
+    }
+    
+    getUserPhoto() {
+        const key = sessionStorage.getItem('sso_token');
+        const user = sessionStorage.getItem('user_userName');
+        const baseURL = `https://login.ftd.com.br/api/photo/${key}/${user}`;
+
+        this.setState({profile_picture:baseURL});
     }
 
     toggle() {
@@ -26,25 +45,34 @@ class HeaderDropdown extends Component {
     }
 
     dropAccnt() {
+        const { full_name, username, role_name, superior, email, profile_picture } = this.state;
+
         return (
             <div>
                 <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
                     <DropdownToggle nav>
-                        <img src={'img/avatar-user.ico'} className="img-avatar" alt="Avatar" />
+                        <img src={profile_picture} className="img-avatar" alt="Avatar" />
                     </DropdownToggle>
                     <DropdownMenu right>
-                        <DropdownItem header tag="div" className="text-center"><strong>{this.state.email}</strong></DropdownItem>
-                        {/* <DropdownItem><i className="fa fa-bell-o"></i> Updates<Badge color="info">42</Badge></DropdownItem>
-                            <DropdownItem><i className="fa fa-envelope-o"></i> Messages<Badge color="success">42</Badge></DropdownItem>
-                            <DropdownItem><i className="fa fa-tasks"></i> Tasks<Badge color="danger">42</Badge></DropdownItem>
-                            <DropdownItem><i className="fa fa-comments"></i> Comments<Badge color="warning">42</Badge></DropdownItem>
-                            <DropdownItem header tag="div" className="text-center"><strong>Settings</strong></DropdownItem>
-                            <DropdownItem><i className="fa fa-user"></i> Profile</DropdownItem>
-                            <DropdownItem><i className="fa fa-wrench"></i> Settings</DropdownItem>
-                            <DropdownItem><i className="fa fa-usd"></i> Payments<Badge color="secondary">42</Badge></DropdownItem>
-                            <DropdownItem><i className="fa fa-file"></i> Projects<Badge color="primary">42</Badge></DropdownItem>
-                            <DropdownItem divider/>
-                            <DropdownItem><i className="fa fa-shield"></i> Lock Account</DropdownItem> */}
+                        <DropdownItem header tag="div" className="login-title">
+                            <i className="fa fa-user"></i> Informações do Usuário
+                        </DropdownItem>
+                            <DropdownItem className="normal-option">
+                                <strong>Usuário:</strong> {username}
+                            </DropdownItem>
+                            <DropdownItem className="normal-option">
+                                <strong>Nome Completo:</strong> {full_name}
+                            </DropdownItem>
+                            <DropdownItem className="normal-option">
+                                <strong>E-mail:</strong> {email}
+                            </DropdownItem>
+                            <DropdownItem className="normal-option">
+                                <strong>Tipo:</strong> {role_name}
+                            </DropdownItem>
+                            <DropdownItem className="normal-option">
+                                <strong>Superior:</strong> {superior}
+                            </DropdownItem>
+                            {/* <DropdownItem divider/> */}
                         <a href="/#/logout">
                             <DropdownItem>
                                 <i className="fa fa-lock"></i> Sair
