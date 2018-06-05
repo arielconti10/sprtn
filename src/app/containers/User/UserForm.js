@@ -90,10 +90,12 @@ class UserForm extends Component {
     getSubsidiaries() {
         axios.get(`subsidiary?order[name]=asc`)
         .then(response => {
+                console.log(response);
                 const dados = response.data.data;
                 const select_array = [];
                 dados.map(item => {
-                    const item_object = {"value": item.id, "label": item.name};
+                    const label = `${item.code} - ${item.name}`;
+                    const item_object = {"value": item.id, "label": label};
                     select_array.push(item_object);
                 });
                 this.setState({subsidiaries: select_array});
