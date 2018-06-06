@@ -16,6 +16,8 @@ class GridApi extends Component {
         super(props);
 
         this.state = {
+            ringLoad: false,
+
             page: 1,
             viewMode: false,
             deleteMode: false,
@@ -28,6 +30,7 @@ class GridApi extends Component {
             loading: false,
             columns: this.props.columns,
             columnsAlt: this.props.columnsAlt,
+            columnsGrid : [],
             blockEdit: this.props.blockEdit,
             dataAlt: [],
             dataAltSelected: [],
@@ -37,7 +40,7 @@ class GridApi extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({viewMode: nextProps.blockEdit, deleteMode: nextProps.blockDelete});
+        this.setState({ viewMode: nextProps.blockEdit, deleteMode: nextProps.blockDelete });
     }
 
     onClickDelete(element) {
@@ -70,10 +73,7 @@ class GridApi extends Component {
             const updated_element = element.value;
             updated_element[column_map] = element.value[column_map].map(item => item.id);
             updateData = updated_element;
-            console.log(updated_element);
         }
-
-        console.log(updateData);
 
         updateData.active = true;
 
@@ -89,28 +89,43 @@ class GridApi extends Component {
         let newArrayData = [];
 
         column_value_changed.map(item => {
-            val.map(register => {
-                let values = {};
-                if (old_value.length > column_value_changed.length) {
-                    if (register[sub] === item) {
-                        values['school_type_id'] = register['school_type_id'];
-                        values['visit_type_id'] = register['visit_type_id'];
+            if (val.length) {
+                val.map(register => {
+                    let values = {};
+
+                    if (old_value.length > column_value_changed.length) {
+                        if (register[sub] === item) {
+                            values['school_type_id'] = register['school_type_id'];
+                            values['visit_type_id'] = register['visit_type_id'];
+
+                            newArrayData.push(values);
+                        }
+                    }
+                    else {
+                        if (sub === 'school_type_id') {
+                            values['school_type_id'] = item;
+                            values['visit_type_id'] = register['visit_type_id'];
+                        } else {
+                            values['school_type_id'] = register['school_type_id'];
+                            values['visit_type_id'] = item;
+                        }
 
                         newArrayData.push(values);
                     }
-                }
-                else {
-                    if (sub === 'school_type_id') {
-                        values['school_type_id'] = item;
-                        values['visit_type_id'] = register['visit_type_id'];
-                    } else {
-                        values['school_type_id'] = register['school_type_id'];
-                        values['visit_type_id'] = item;
-                    }
+                });
+            } else {
+                let values = {};
 
-                    newArrayData.push(values);
+                if (sub === 'school_type_id') {
+                    values['school_type_id'] = item;
+                    values['visit_type_id'] = 1;
+                } else {
+                    values['school_type_id'] = 1;
+                    values['visit_type_id'] = item;
                 }
-            });
+
+                newArrayData.push(values);
+            }
         });
 
         newArrayData = newArrayData.filter((item, index, self) =>
@@ -123,7 +138,11 @@ class GridApi extends Component {
     }
 
     componentDidMount() {
-        let col = this.state.columns
+        this.createTabel();
+    }
+
+    createTabel() {
+        let col = this.state.columns;
 
         if (this.props.columnsAlt) {
 
@@ -132,11 +151,7 @@ class GridApi extends Component {
             this.props.columnsAlt.map(item => {
 
                 if (item.type == 'select' || item.type == 'selectMulti') {
-                    // console.log(item);
-                    // if (item.disable_field) {
-                        // console.log(item.disable_field);
-                        // this.setState({disable_field: true});
-                    // }
+
                     if (item.api) {
                         axios.get(item.api)
                             .then(response => {
@@ -144,18 +159,15 @@ class GridApi extends Component {
 
                                 let dataAltAux = this.state.dataAlt;
 
-                                dataAltAux.splice(item.seq, 0,dados);
+                                dataAltAux.splice(item.seq, 0, dados);
 
                                 if (dataAltAux[0][0].code == "super") {
                                     dataAltAux[0].shift();
                                 }
 
                                 this.setState({ dataAlt: dataAltAux });
-
-                                // this.setState({ dataAlt: {[item.seq]: dados} });
                             })
                             .catch(err => console.log(err));
-
                     }
 
                     const multi = item.type == 'selectMulti' ? true : false;
@@ -182,38 +194,38 @@ class GridApi extends Component {
                                         return val.id
                                     });
                                 }
-
+                                
                                 let seq = item.seq || 0;
 
                                 return (
-
                                     <div>
                                         <Select
                                             autosize={true}
-                                            name={item.name}
+                                            name={item.sub ? item.sub : item.name}
+                                            id={item.sub ? item.sub : item.name}
                                             onChange={(selectedOption) => {
+
+                                                this.setState({ ringLoad: true });
+
                                                 const column_value_changed = selectedOption.map(function (cv) {
                                                     return cv.id;
                                                 });
 
-                                                this.setState({
-                                                    dataAltSelected: {
-                                                        [element.row[""].id]: column_value_changed
-                                                    }
-                                                });
-
                                                 let column_value_update = [];
 
-                                                if (item.accessor == 'visit_type_school_type') {
-                                                    let val = this.state.dataAltSelected[element.row[""].id] == undefined ? column_value : this.state.dataAltSelected[element.row[""].id];
-                                                    column_value_update = this.getSchoolAndVisitValues(item.sub, val, column_value_changed, element.value);
-                                                } else {
-                                                    column_value_update = selectedOption.map(function (cv) {
-                                                        let value = {};
-                                                        value[item.name] = cv.id;
-                                                        return value;
+                                                if (item.sub) {
+                                                    column_value = selectedOption.map(function (cv) {
+                                                        return cv.id;
                                                     }, {});
                                                 }
+
+                                                let name = item.sub ? item.sub : item.name;
+
+                                                column_value_update = selectedOption.map(function (cv, i) {
+                                                    let value = {};
+                                                    value[name] = cv.id;
+                                                    return value;
+                                                }, {});
 
                                                 const updateData = {};
 
@@ -227,11 +239,23 @@ class GridApi extends Component {
                                                         updateData[value] = element.row[''][value];
                                                     }
                                                     else if (value == item.accessor) {
-                                                        updateData[value] = column_value_update;
+                                                        if (item.accessor == 'visit_type_school_type') {
+                                                             updateData[value] = this.getSchoolAndVisitValues(item.sub, column_value, column_value_changed, element.original.visit_type_school_type);
+                                                        } else {
+                                                            updateData[value] = column_value_update;
+                                                        }
                                                     }
                                                 }
 
                                                 updateData.active = true;
+
+                                                //específico para API de regras
+                                                if (this.props.apiSpartan == "rule") {
+                                                    const object = {role_id:1};
+                                                    updateData.roles.unshift(object);
+                                                }
+
+                                                console.log(updateData, this.props);
 
                                                 axios.put(`${this.props.apiSpartan}/${id}`, updateData).then(res => {
                                                     this.onFetchData();
@@ -241,16 +265,17 @@ class GridApi extends Component {
                                             }}
                                             labelKey="name"
                                             valueKey="id"
-                                            value={this.state.dataAltSelected[element.row[""].id] == undefined ? column_value : this.state.dataAltSelected[element.row[""].id]}
+                                            value={column_value}
                                             multi={multi}
-                                            disabled={this.state.viewMode}
+                                            disabled={element.original.deleted_at ? true : false}
                                             joinValues={false}
                                             // menuContainerStyle={{'zIndex': 99999}}
                                             //isLoading={this.state.roleSelect2Loading}
                                             placeholder="Selecione um valor"
                                             options={this.state.dataAlt[seq]}
                                             rtl={false}
-                                        /> </div>
+                                        />
+                                    </div>
                                 )
                             }
                         })
@@ -294,8 +319,8 @@ class GridApi extends Component {
                         !element.value.deleted_at ?
                             <div>
 
-                                <Link to={this.props.match.url + "/" + element.value.id} params={{ id: element.value.id }} className={`btn btn-primary btn-sm ${this.state.blockEdit ? 'd-none' : ''}`} 
-                                disabled={this.state.viewMode}>
+                                <Link to={this.props.match.url + "/" + element.value.id} params={{ id: element.value.id }} className={`btn btn-primary btn-sm ${this.state.blockEdit ? 'd-none' : ''}`}
+                                    disabled={this.state.viewMode}>
                                     <i className='fa fa-pencil'></i>
                                 </Link>
                                 <button className='btn btn-danger btn-sm' onClick={() => this.onClickDelete(element)} disabled={this.state.deleteMode}>
@@ -316,7 +341,16 @@ class GridApi extends Component {
                 }
             )
         }
-        this.setState({ columns: col })
+
+        col = col.filter((item, index, self) =>
+            index === self.findIndex((obj) => (
+                obj.Header === item.Header
+            ))
+        );
+
+        this.setState({ columnsGrid: [] }, 
+            () => this.setState({ columnsGrid: col, ringLoad: false })            
+        );
     }
 
     /**
@@ -334,7 +368,7 @@ class GridApi extends Component {
                 }
             ];
 
-            this.setState({sortInitial:sortInitial});
+            this.setState({ sortInitial: sortInitial });
         }
     }
 
@@ -347,11 +381,11 @@ class GridApi extends Component {
      * @return {String} order_by valor que será ordenado 
      */
     verifyOrderBy(sorted_id, state, count) {
-        let order_by = sorted_id;     
+        let order_by = sorted_id;
 
         //verifica se é uma coluna composta, por exemplo full_name (nome + sobrenome)
         //para escolher método de ordenaçāo
-        const column_compare = state.columns.filter(function(column){
+        const column_compare = state.columns.filter(function (column) {
             return column.accessor == sorted_id;
         });
 
@@ -365,11 +399,11 @@ class GridApi extends Component {
     /**
      */
     verifyFilter(filter_id, state, count, value, baseURL) {
-        let filter_by = filter_id;     
+        let filter_by = filter_id;
 
         //verifica se é uma coluna composta, por exemplo full_name (nome + sobrenome)
         //para escolher método de ordenaçāo
-        const column_compare = state.columns.filter(function(column){
+        const column_compare = state.columns.filter(function (column) {
             return column.accessor == filter_id;
         });
 
@@ -386,11 +420,11 @@ class GridApi extends Component {
             }
         }
 
-        
+
     }
 
-    onFetchData = (state, instance, deleted_at) => {      
-        
+    onFetchData = (state, instance, deleted_at) => {
+
         let apiSpartan = this.props.apiSpartan
 
         let pageSize = state ? state.pageSize : this.state.pageSize;
@@ -401,18 +435,18 @@ class GridApi extends Component {
 
         let baseURL = `/${apiSpartan}?paginate=${pageSize}&page=${page}`;
 
-                //To do: make filter to deleted_at
+        //To do: make filter to deleted_at
         /*console.log('onFetchData:', deleted_at);
         if(deleted_at != 'all')
             console.log("deleted_at != 'all'", deleted_at);*/
-        
+
         filtered.map(function (item, key) {
             let filter_by;
 
             if (state) {
                 filter_by = this.verifyFilter(item.id, state, key, item.value, baseURL);
             }
-            
+
             if (!filter_by) {
                 filter_by = item.id;
                 baseURL += `&filter[${filter_by}]=${item.value}`;
@@ -439,9 +473,11 @@ class GridApi extends Component {
                     sorted: sorted,
                     filtered: filtered,
                     loading: false
-                }, function() {
+                }, function () {
                     this.verifySortInitial();
                 });
+
+                this.createTabel();
 
             })
             .catch(function (error) {
@@ -449,11 +485,10 @@ class GridApi extends Component {
                 this.setState({ authorized: authorized });
             }.bind(this));
 
-        
     }
 
     render() {
-        const { data, pageSize, page, loading, pages, columns, sortInitial } = this.state;
+        const { data, pageSize, page, loading, pages, columns, columnsGrid, sortInitial } = this.state;
 
         if (this.state.authorized == 0) {
             return (
@@ -462,10 +497,17 @@ class GridApi extends Component {
         }
 
         return (
-            
+
             <div>
+                {this.state.ringLoad == true &&
+                    <div className="loader-actions">
+                        <div className="backLoading">
+                            <div className="load"></div>
+                        </div>
+                    </div>
+                }
                 <ReactTable
-                    columns={columns}
+                    columns={columnsGrid}
                     data={data}
                     pages={pages}
                     loading={loading}

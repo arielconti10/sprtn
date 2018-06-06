@@ -6,6 +6,7 @@ import axios from '../../../app/common/axios';
 import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 'reactstrap';
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
+import Select from 'react-select';
 
 import { canUser } from '../../common/Permissions';
 
@@ -25,35 +26,53 @@ class UserForm extends Component {
             password_confirmation: '',
             role_id: '0',  
             superior: '',  
+            subsidiaries: [],
+            sectors: [],
+            subsidiary_id: null,
+            sector_id: null,
             active: true,       
             back_error: '',
             submitButtonDisabled: false,
+            valid_sector: true,
             saved: false
         };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChangeSubsidiary = this.handleChangeSubsidiary.bind(this);
+        this.handleChangeSector = this.handleChangeSector.bind(this);
+        this.getSubsidiaries = this.getSubsidiaries.bind(this);
+        this.getSectors = this.getSectors.bind(this);
         this.submitForm = this.submitForm.bind(this);
     }
 
     componentWillMount() {
         this.checkPermission('user.insert');
+        this.getSubsidiaries();
+        
         if (this.props.match.params.id !== undefined) {
             this.checkPermission('user.update');
             axios.get(`${apiPost}/${this.props.match.params.id}`)
                 .then(response => {
                     const dados = response.data.data;
 
-                    console.log(dados.deleted_at);
                     this.setState({                         
                         name: dados.name,
                         lastname: dados.lastname, 
                         username: dados.username, 
                         role_id: dados.role_id,
+                        subsidiary_id: dados.subsidiary_id,
+                        sector_id: dados.sector_id,
                         email: dados.email,
                         superior: (dados.parent != null ? dados.parent.full_name : ''),
                         active: dados.deleted_at === null ? true: false
+                    }, function() {
+                        console.log(sector_id);
+                        this.getSectors(dados.subsidiary_id);
+                        this.setState({sector_id: dados.sector_id});
                     });
+
+                    
                     //console.log(this.state.role_id);
                 })
                 .catch(err => console.log(err));
@@ -68,14 +87,64 @@ class UserForm extends Component {
         }.bind(this));       
     }
 
-    componentDidMount() {
+    getSubsidiaries() {
+        axios.get(`subsidiary?order[name]=asc`)
+        .then(response => {
+                console.log(response);
+                const dados = response.data.data;
+                const select_array = [];
+                dados.map(item => {
+                    const label = `${item.code} - ${item.name}`;
+                    const item_object = {"value": item.id, "label": label};
+                    select_array.push(item_object);
+                });
+                this.setState({subsidiaries: select_array});
+            })
+            .catch(function (error) {
+                let authorized = verifyToken(error.response.status);
+                this.setState({ authorized: authorized });
+            }.bind(this));
+    }
 
-        //console.log(this.props)
+    getSectors(subsidiary_id) {
+        axios.get(`subsidiary/${subsidiary_id}`)
+        .then(response => {
+            const sectors = response.data.data.sectors;
+            const values = this.state;
+            const array_sectors = [];
+
+            sectors.map(item => {
+                const sector_obj = {value : item.id, label: item.name};
+                array_sectors.push(sector_obj);
+            });
+            
+
+            this.setState({ sectors: array_sectors });
+
+            this.setState({ringLoad:false});
+
+        }) 
+    }
+
+    handleChangeSubsidiary(selectedOption) {
+        const values = this.state;
+        const subsdiary_id = selectedOption.value;
+        values.subsidiary_id = selectedOption.value;
+        this.setState({values, ringLoad:true, sector_id:null});
+        this.getSectors(subsdiary_id);
+    }
+
+    handleChangeSector(selectedOption) {
+        const values = this.state;
+        values.sector_id = selectedOption.value;
+        this.setState({ values });
+    }
+
+    componentDidMount() {
         axios.get(`${apiSelectBox}`)
             .then(response => {
                 const dados = response.data.data;
                 this.setState({ roles: dados });
-                //this.setState({ role_id: dados[0].id });
             })
             .catch(err => console.log(err));
     }
@@ -95,11 +164,13 @@ class UserForm extends Component {
     }
 
     submitForm(event) {
-        event.preventDefault();
+        event.preventDefault();        
         axios.post(`${apiPost}`, {            
             'name': this.state.name,
             'lastname': this.state.lastname,
             'role_id': this.state.role_id,
+            'subsidiary_id': this.state.subsidiary_id,
+            'sector_id': this.state.sector_id,
             'username': this.state.username, 
             'email': this.state.email, 
             'password': this.state.password, 
@@ -124,6 +195,8 @@ class UserForm extends Component {
             'lastname': this.state.lastname,
             'name': this.state.name,
             'role_id': this.state.role_id,
+            'subsidiary_id': this.state.subsidiary_id,
+            'sector_id': this.state.sector_id,
             'username': this.state.username,
             'email': this.state.email,             
             'active': this.state.active
@@ -150,12 +223,15 @@ class UserForm extends Component {
         e.preventDefault();
 
         this.form.validateFields();
-        
-        //console.log(this.form.isValid());
+
+        this.setState({valid_sector:true});
+        if (this.state.subsidiary_id && !this.state.sector_id) {
+            this.setState({valid_sector:false});
+        }
 
         this.setState({ submitButtonDisabled: !this.form.isValid() });
 
-        if (this.form.isValid()) {
+        if (this.form.isValid() && this.state.valid_sector) {
             if (this.props.match.params.id !== undefined) {
                 this.updateForm(event);
             } else {
@@ -165,8 +241,10 @@ class UserForm extends Component {
     }
 
     render() {
-        //console.log(this.props);
+        console.log(this.state.subsidiary_id);
 
+        const { subsidiaries, sectors } = this.state;
+    
         let redirect = null;
         if (this.state.saved) {
             redirect = <Redirect to="/config/usuarios" />;
@@ -202,7 +280,15 @@ class UserForm extends Component {
         
 
         return (
+            
             <Card>
+                {this.state.ringLoad == true &&
+                    <div className="loader">
+                        <div className="backLoading">
+                            <div className="load"></div>
+                        </div>
+                    </div>
+                }
                 {redirect}
                 <CardBody>
                     {this.state.back_error !== '' &&
@@ -271,6 +357,42 @@ class UserForm extends Component {
                                 </FormGroup>
                             </div>
                         </div>
+
+                        <div className="row">
+                            <div className="col-sm-6">
+                                <FormGroup for="subsidiary_id">
+                                    <label>Filial</label>
+                                    <Select
+                                        name="subsidiary_id"
+                                        id="subsidiary_id"
+                                        disabled={this.state.viewMode}
+                                        value={this.state.subsidiary_id}
+                                        onChange={this.handleChangeSubsidiary}
+                                        options={subsidiaries}
+                                        placeholder="Selecione..."
+                                    />
+                                </FormGroup>
+                            </div>
+                            <div className="col-sm-6">
+                                <FormGroup for="sector_id">
+                                    <label>Setor</label>
+                                    <Select
+                                        name="sector_id"
+                                        id="sector_id"
+                                        disabled={this.state.viewMode}
+                                        value={this.state.sector_id}
+                                        onChange={this.handleChangeSector}
+                                        options={sectors}
+                                        placeholder="Selecione..."
+                                    />
+                                {this.state.valid_sector == false &&
+                                    <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
+                                }
+                                </FormGroup>
+
+                            </div>
+                        </div>
+
                         <div className="row">
                             <div className="col-sm-6">
                                 <FormGroup for="password">
@@ -341,7 +463,7 @@ class UserForm extends Component {
                         {statusField}     
 
                         <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
-                        <button className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
+                        <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
                     </FormWithConstraints>
                     
                 </CardBody>
