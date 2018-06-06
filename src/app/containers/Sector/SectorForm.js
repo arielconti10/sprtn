@@ -44,6 +44,7 @@ class SectorForm extends Component {
                     const dados = response.data.data;
 
                     this.setState({ 
+                        code: dados.code,
                         name: dados.name,
                         active: dados.deleted_at === null ? true: false
                     });
@@ -90,7 +91,7 @@ class SectorForm extends Component {
         }
 
         axios.put(`${apiPost}/${id}`, {
-            'code': this.state.name,
+            'code': this.state.code,
             'name': this.state.name,
             'active': this.state.active
         }).then(res => {
@@ -173,7 +174,7 @@ class SectorForm extends Component {
                         {statusField}     
 
                         <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
-                        <button className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
+                        <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
                     </FormWithConstraints>
                     
                 </CardBody>

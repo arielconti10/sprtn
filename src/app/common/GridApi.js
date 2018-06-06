@@ -161,9 +161,9 @@ class GridApi extends Component {
 
                                 dataAltAux.splice(item.seq, 0, dados);
 
-                                // if (dataAltAux[0][0].code == "super") {
-                                //     dataAltAux[0].shift();
-                                // }
+                                if (dataAltAux[0][0].code == "super") {
+                                    dataAltAux[0].shift();
+                                }
 
                                 this.setState({ dataAlt: dataAltAux });
                             })
@@ -248,6 +248,14 @@ class GridApi extends Component {
                                                 }
 
                                                 updateData.active = true;
+
+                                                //específico para API de regras
+                                                if (this.props.apiSpartan == "rule") {
+                                                    const object = {role_id:1};
+                                                    updateData.roles.unshift(object);
+                                                }
+
+                                                console.log(updateData, this.props);
 
                                                 axios.put(`${this.props.apiSpartan}/${id}`, updateData).then(res => {
                                                     this.onFetchData();

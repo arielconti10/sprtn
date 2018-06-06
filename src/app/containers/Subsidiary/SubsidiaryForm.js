@@ -66,8 +66,9 @@ class SubsidiaryForm extends Component {
                     const dados = response.data.data;
 
                     const sectors = dados.sectors.map(item => item.id);
-
+                    
                     this.setState({
+                        code: dados.code,
                         name: dados.name,
                         // sectors: dados.sectors,
                         sector_array: sectors, //setores selecionados
@@ -143,7 +144,7 @@ class SubsidiaryForm extends Component {
         }
 
         axios.put(`${apiPost}/${id}`, {
-            'code': this.state.name,
+            'code': this.state.code,
             'name': this.state.name,
             'sectors': this.state.sector_array,
             'active': this.state.active
@@ -278,7 +279,7 @@ class SubsidiaryForm extends Component {
                         {statusField}
 
                         <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
-                        <button className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
+                        <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
                     </FormWithConstraints>
 
                 </CardBody>
