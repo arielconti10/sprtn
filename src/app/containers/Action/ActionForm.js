@@ -493,7 +493,7 @@ class ActionForm extends Component {
                         {statusField}
 
                         <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
-                        <button className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
+                        <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
                     </FormWithConstraints>
 
                 </CardBody>
