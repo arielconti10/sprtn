@@ -49,7 +49,6 @@ class JobTitleForm extends Component {
                 .then(response => {
                     const dados = response.data.data;
 
-                    console.log(dados.deleted_at);
                     this.setState({ 
                         code: dados.code, 
                         name: dados.name,
