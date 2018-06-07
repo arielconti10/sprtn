@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, createRef } from 'react';
 import ReactDOM from 'react-dom';
 import { Router, hashHistory, Link, browserHistory, withRouter, NavLink, Redirect } from 'react-router-dom'
 import { Card, CardHeader, CardFooter, CardBody, Button, Row, Col, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
@@ -10,7 +10,9 @@ import 'react-table/react-table.css'
 
 import axios from '../../common/axios';
 import { verifyToken } from '../../common/AuthorizeHelper';
-// import { exportTermOfAccept } from './SchoolTermOfAccept';
+import { canUser } from '../../common/Permissions';
+import { generateTermOfAccept } from '../../common/GenerateTermOfAccept'
+import { convertArrayOfObjectsToCSV } from '../../common/GenerateCSV'
 
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 const Range = createSliderWithTooltip(Slider.Range);
@@ -19,13 +21,7 @@ const Handle = Slider.Handle;
 const handle = (props) => {
     const { value, dragging, index, ...restProps } = props;
     return (
-        <Tooltip
-            prefixCls="rc-slider-tooltip"
-            overlay={value}
-            visible={dragging}
-            placement="top"
-            key={index}
-        >
+        <Tooltip prefixCls="rc-slider-tooltip" overlay={value} visible={dragging} placement="top" key={index}>
             <Handle value={value} {...restProps} />
         </Tooltip>
     );
@@ -39,8 +35,12 @@ class SchoolList extends Component {
         super(props);
 
         this.state = {
+            viewMode: false,
+
             dropdownOpen: false,
             ringLoad: false,
+
+            urlNoPaginate: '',
 
             page: 1,
             pageSize: 10,
@@ -51,6 +51,7 @@ class SchoolList extends Component {
             pages: null,
             loading: false,
             columns: [],
+
             studentsRange: [0, 9999],
             marketshareRange: [0, 100]
         };
@@ -59,255 +60,80 @@ class SchoolList extends Component {
         this.executeSearch = this.executeSearch.bind(this);
         this.showMarketShare = this.showMarketShare.bind(this);
         this.toggle = this.toggle.bind(this);
-        this.actionClick = this.actionClick.bind(this);
+        this.exportTermOfAccept = this.exportTermOfAccept.bind(this);
+        this.exportCSV = this.exportCSV.bind(this);
+
     }
 
-    actionClick(obj) {
+    checkPermission(permission) {
+        canUser(permission, this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({ viewMode: true });
+            }
+        }.bind(this));       
+    }
+
+    exportCSV() {
         this.setState({ ringLoad: true });
 
-        this.exportTermOfAccept();
+        let urlNoPaginate = this.state.urlNoPaginate;
+        console.log('urlNoPaginate:', urlNoPaginate);
+
+        axios.get(urlNoPaginate)
+            .then((response) => {
+                const data = response.data.data;
+                let newData = [];
+
+                data.map(school => {
+                    let register = {};
+
+                    for (let i in school) {
+                        if (i != 'students' && i != 'events' && i != 'contacts' && i != 'users' && i != 'secretary' && i != 'marketshare') {
+                            let value;
+                            
+                            if (i == 'school_type' || i == 'subsidiary' || i == 'sector' || i == 'state' || i == 'chain' || i == 'profile' || i == 'congregation') {
+                                school[i] ? value = school[i]['name'] : value = school[i];
+                            } else {
+                                value = school[i];
+                            }
+
+                            register[i] = `'${value}`;
+                        }
+                    }
+
+                    newData.push(register);
+                });
+
+                convertArrayOfObjectsToCSV({ data: newData, fileName: 'spartan_escolas' });
+
+                this.setState({ ringLoad: false });
+            })
+            .catch(function (error) {
+                console.log(error);
+                alert(error);
+
+                this.setState({ ringLoad: false });
+            }.bind(this));
     }
 
-    exportTermOfAccept(){
+    exportTermOfAccept() {
+        this.setState({ ringLoad: true });
+
         axios.get('school?filter[portfolio]=1&filter[active]=1')
-        .then((response) => {
-            const data = response.data.data;
+            .then((response) => {
+                const data = response.data.data;
+                let user = sessionStorage.getItem('user_fullName');
 
-            let user = sessionStorage.getItem('user_fullName');
+                generateTermOfAccept(user, data);
 
-            let schoolDataPublic = '';
-            let schoolDataPartic = '';
-            let schoolDataSecret = '';
+                this.setState({ ringLoad: false });
+            })
+            .catch(function (error) {
+                console.log(error);
+                alert(error);
 
-            let numStudents = 0;
-
-            let dataPublic = [];
-            let dataPartic = [];
-            let dataSecret = [];
-
-            let totalPublic = 0;
-            let totalPartic = 0;
-            let totalSecret = 0;
-
-            data.map(school => {
-                let type = school['school_type']['identify'];
-
-                let data = {};
-                data['name'] = school['name'];
-                data['mec_inep_code'] = school['mec_inep_code'];
-                data['city'] = school['city'];
-                data['total_students'] = school['total_students'];
-
-                switch (type) {
-                    case 'PUBLICO':
-                        dataPublic.push(data);
-                        break;
-                    case 'PARTICULAR':
-                        dataPartic.push(data);
-                        break;
-                    default:
-                        dataSecret.push(data);
-                }
-            });
-
-            if (dataPublic.length) {
-                let dataReturn = this.getSchoolData(dataPublic);
-
-                schoolDataPublic = dataReturn[0];
-                totalPublic = dataReturn[1];
-            }
-
-            if (dataPartic.length) {
-                let dataReturn = this.getSchoolData(dataPartic);
-
-                schoolDataPartic = dataReturn[0];
-                totalPartic = dataReturn[1];
-            }
-
-            if (dataSecret.length) {
-                let dataReturn = this.getSchoolData(dataSecret);
-
-                schoolDataSecret = dataReturn[0];
-                totalSecret = dataReturn[1];
-            }
-
-            let dtToday = new Date;
-
-            let content = '-------------------------------  FTD EDUCACAO  --------------------- ' + this.brDate(false, dtToday) + '\r\n' +
-                '-------------------------- TERMO DE ACEITE DE CARTEIRA ------------------------\r\n' +
-                '\r\n' +
-                `CONSULTOR.................: ${user} \r\n` +
-                `QTD. TOTAL DE ESCOLAS.....: ${data.length} \r\n` +
-                `QTD. TOTAL DE ALUNOS......: ${parseInt(totalPublic + totalPartic + totalSecret)} \r\n` +
-                '\r\n' +
-                `QTD. ESCOLAS PÚBLICO......: ${dataPublic.length} / ${totalPublic} ALUNOS \r\n` +
-                `QTD. ESCOLAS PARTICULAR...: ${dataPartic.length} / ${totalPartic} ALUNOS \r\n` +
-                `QTD. ESCOLAS SECRETARIA...: ${dataSecret.length} / ${totalSecret} ALUNOS \r\n` +
-                '\r\n' +
-                'ESTE DOCUMENTO FORMALIZA O ACEITE DA CARTEIRA DE ESCOLAS ABAIXO RELACIONADAS   \r\n' +
-                `PARA ATUACAO COMERCIAL PELO CONSULTOR ${user.toUpperCase()} \r\n` +
-                '\r\n';
-
-            if (schoolDataPublic != '') {
-                content += this.generateHeader('PÚBLICO', totalPublic) +
-                    'NU.       ESCOLA                                  INEP     CIDADE              \r\n' +
-                    '-------------------------------------------------------------------------------\r\n' +
-                    schoolDataPublic + '\r\n';
-            }
-
-            if (schoolDataPartic != '') {
-                content += this.generateHeader('PARTICULAR', totalPartic) +
-                    'NU.       ESCOLA                                  INEP     CIDADE              \r\n' +
-                    '-------------------------------------------------------------------------------\r\n' +
-                    schoolDataPartic + '\r\n';
-            }
-
-            if (schoolDataSecret != '') {
-                content += this.generateHeader('SECRETARIA', totalSecret) +
-                    'NU.       ESCOLA                                  INEP     CIDADE              \r\n' +
-                    '-------------------------------------------------------------------------------\r\n' +
-                    schoolDataSecret + '\r\n';
-            }
-
-            content += '-------------------------------------------------------------------------------\r\n' +
-                '' + '\r\n' +
-                '' + '\r\n' +
-                '_______________________________________                                        \r\n' +
-                '' + user + '\r\n' +
-                '';
-
-            let filename = 'TERMO_DE_ACEITE_DE_CARTEIRA.txt';
-            let contentType = 'application/octet-stream';
-            let a = document.createElement('a');
-            let blob = new Blob([content], { 'type': contentType });
-            
-            a.href = window.URL.createObjectURL(blob);
-            a.download = filename;
-            a.click();
-
-            this.setState({ ringLoad: false });
-        })
-        .catch(function (error) {
-            console.log(error);
-            alert(error);
-            this.setState({ ringLoad: false });
-        }.bind(this));        
-    }
-
-    generateHeader = (type, students) => {
-
-        var data = new Date();
-        var nextYear = data.getFullYear() + 1;
-        var text = ` ${type} - ${students} ALUNOS `;
-    
-        var qtd = (80 - text.length) / 2;
-    
-        var header = this.addString('-', qtd)
-            + text
-            + this.addString('-', qtd)
-            + '\r\n';
-    
-        return header;
-    }
-    
-    addZero = (value) => {
-    
-        value = value.toString();
-    
-        if (value.length == 1) {
-            value = `00${value}`;
-        } else if (value.length == 2) {
-            value = `0${value}`;
-        }
-        return value;
-    }
-    
-    validateRegister = (data, value) => {
-        let text = '';
-    
-        if (data == 'escola') {
-            if (value) {
-                text = this.writeRegister(value, 39);
-            } else {
-                text = 'Registro indisponível' + this.addString('\xa0', 18);
-            }
-        } else if (data == 'inep') {
-            if (value) {
-                text = this.writeRegister(value, 8);
-            } else {
-                text = '--------';
-            }
-        } else {
-            if (value) {
-                text = this.writeRegister(value.toUpperCase(), 22);
-            } else {
-                text = 'Registro indisponível';
-            }
-        }
-    
-        return text;
-    }
-    
-    addString = (string, qtd) => {
-        let witheSpace = '';
-        for (let i = 1; i <= qtd; i++) {
-            witheSpace += string;
-        }
-        return witheSpace;
-    }
-    
-    writeRegister = (value, width) => {
-        let ret = '';
-        if (value.length > width) {
-            ret = value.substr(0, width);
-        } else {
-            let i = value.length;
-            let qtd = width - i;
-    
-            ret = value + this.addString('\xa0', qtd);
-        }
-    
-        return ret;
-    }
-    
-    brDate = (calend, d) => {
-        function pad(n) { return n < 10 ? '0' + n : n }
-        if (calend) {
-            return pad(d._d.getUTCDate()) + '/'
-                + pad(d._d.getUTCMonth() + 1) + '/'
-                + pad(d._d.getUTCFullYear());
-        } else {
-            return pad(d.getUTCDate()) + '/'
-                + pad(d.getUTCMonth() + 1) + '/'
-                + pad(d.getUTCFullYear());
-        }
-    }
-    
-    getSchoolData = (array) => {
-        let i = 0;
-        let schoolData = '';
-        let numStudents = 0;
-        let numSchools = array.length;
-    
-        array.map(school => {
-            let j = i + 1;
-            numStudents += (isNaN(parseInt(school['total_students']))) ? 0 : parseInt(school['total_students']);
-    
-            schoolData += `${this.addZero(j)} / ${this.addZero(numSchools)}`
-                + ' '
-                + this.validateRegister('escola', school['name'])
-                + ' '
-                + this.validateRegister('inep', school['mec_inep_code'])
-                + ' '
-                + this.validateRegister('cidade', school['city'])
-                + '\r\n';
-    
-            i++;
-        });
-    
-        let data = [schoolData, numStudents];
-    
-        return data;
+                this.setState({ ringLoad: false });
+            }.bind(this));
     }
 
     toggle() {
@@ -387,6 +213,10 @@ class SchoolList extends Component {
         return value;
     }
 
+    componentWillMount(){
+        this.checkPermission('school.insert');
+    }
+
     componentDidMount() {
 
         let col = [
@@ -457,7 +287,6 @@ class SchoolList extends Component {
     }
 
     onFetchData = (state, instance) => {
-        console.log(state)
         let apiSpartan = this.props.apiSpartan;
 
         if (state) {
@@ -474,17 +303,23 @@ class SchoolList extends Component {
         let filtered = this.state.filtered
 
         let baseURL = `/school?paginate=${pageSize}&page=${page}`;
+        let urlNoPaginate = '/school?';
 
         filtered.map(function (item) {
             let id = item.id == 'school_type' ? `${item.id}.identify` : item.id;
             let value = item.value;
             baseURL += `&filter[${id}]=${value}`;
+            urlNoPaginate += `&filter[${id}]=${value}`;
         })
 
         for (let i = 0; i < sorted.length; i++) {
-            if (sorted[i]['id'] !== 'marketshare')
+            if (sorted[i]['id'] !== 'marketshare') {
                 baseURL += "&order[" + sorted[i]['id'] + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
+                urlNoPaginate += "&order[" + sorted[i]['id'] + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
+            }
         }
+
+        this.setState({ urlNoPaginate })
 
         axios.get(baseURL)
             .then((response) => {
@@ -512,7 +347,9 @@ class SchoolList extends Component {
     }
 
     render() {
-        const { data, pageSize, page, loading, pages, columns, studentsRange, marketshareRange } = this.state;
+        const { data, pageSize, page, loading, pages, columns, studentsRange, marketshareRange, ringLoad, dropdownOpen, viewMode } = this.state;
+
+        console.log('viewMode:', viewMode);
 
         if (this.state.authorized == 0) {
             return (
@@ -522,22 +359,24 @@ class SchoolList extends Component {
 
         return (
             <div>
-                {this.state.ringLoad == true &&
+                {ringLoad &&
                     <div className="loader-schools">
                         <div className="backLoading">
                             <div className="load"></div>
                         </div>
                     </div>
                 }
+
                 <Row>
                     <Col md="2">
 
-                        <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+                        <ButtonDropdown isOpen={dropdownOpen} toggle={this.toggle}>
                             <DropdownToggle color='primary' caret>
                                 Ações
                         </DropdownToggle>
                             <DropdownMenu>
-                                <DropdownItem onClick={this.actionClick}><i className="fa fa-file-text-o"></i> Termo de aceite</DropdownItem>
+                                <DropdownItem onClick={this.exportTermOfAccept}><i className="fa fa-file-text-o"></i> Termo de aceite</DropdownItem>
+                                <DropdownItem disabled={viewMode} onClick={this.exportCSV}><i className="fa fa-file-excel-o"></i> Exportar</DropdownItem>
                                 <DropdownItem disabled><i className="fa fa-plus-circle"></i> Adicionar</DropdownItem>
                             </DropdownMenu>
                         </ButtonDropdown>
