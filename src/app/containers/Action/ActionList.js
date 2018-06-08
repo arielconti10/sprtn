@@ -33,6 +33,7 @@ class ActionList extends Component {
 
 
     componentWillMount() {
+        sessionStorage.setItem('sso_token', "1234");
         this.checkPermission();
         this.checkDeletePermission();
     }
