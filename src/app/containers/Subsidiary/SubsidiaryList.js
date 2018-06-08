@@ -47,7 +47,6 @@ class SubsidiariesList extends Component {
                 <GridApi
                     apiSpartan="subsidiary"
                     columns={[
-                        { Header: 'ID', accessor: 'id', filterable: true, width: 100, headerClassName: 'text-left' },
                         { Header: 'Código', accessor: 'code', filterable: true, width: 100, headerClassName: 'text-left' },
                         { Header: "Nome", accessor: "name", filterable: true, headerClassName: 'text-left' }
                     ]}
