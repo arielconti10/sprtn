@@ -8,10 +8,10 @@ export default class IndicatorNumber extends Component {
                 <div className={`text-white ${backgroundColor} card-indicator`}>
                     <div className="card-body">
                         <div className="row">
-                            <div className="col-md-2">
+                            <div className="col-md-2 padding-icon">
                                 <i className={`fa ${icon} fa-4x`}></i>
                             </div>
-                            <div className="col-md-10">
+                            <div className="col-md-6">
                                 <div className="text-indicator">{total}</div>
                                 <div>{label}</div>
                             </div>
