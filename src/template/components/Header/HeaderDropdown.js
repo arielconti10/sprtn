@@ -31,7 +31,6 @@ class HeaderDropdown extends Component {
     }
 
     restoreSsoKey() {
-        console.log("RESTORE KEY");
         axios.post(`${process.env.API_URL}/login`, {
             'grant_type': 'password',
             'client_id': '2',
