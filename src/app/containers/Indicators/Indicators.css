@@ -19,6 +19,10 @@
     margin-left: 1em;
 }
 
+.padding-icon {
+    padding-right: 4em !important;
+}
+
 .no-overflow-x { overflow-x: hidden !important; }
 
 .schoolInfo { font-size:1.2em; margin: 18px 30px 0 0; float: left; }
