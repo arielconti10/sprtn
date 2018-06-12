@@ -5,7 +5,7 @@
  * @return { Float } number_format número após formataçāo
  */
 export const formatNumber=(number_str)=> {
-    if (number_str.length == 1) {
+    if (number_str.toString().length == 1) {
         return `0${number_str}`;
     }
 

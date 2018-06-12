@@ -13,7 +13,7 @@ export default {
           },
           {
             name: 'Indicadores',
-            url: '/indicadores',
+            url: '/dashboard/indicadores',
             icon: 'fa fa-caret-right',
             action: 'indicator.view'
           }
