@@ -15,6 +15,7 @@ class SectorForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            code: '',
             name: '',
             active: true,       
             back_error: '',
@@ -67,7 +68,7 @@ class SectorForm extends Component {
     submitForm(event) {
         event.preventDefault();
         axios.post(`${apiPost}`, {
-            'code': this.state.name,
+            'code': this.state.code,
             'name': this.state.name,
             'active': this.state.active
         }).then(res => {
@@ -86,6 +87,7 @@ class SectorForm extends Component {
         var id = this.props.match.params.id;
 
         let data = {
+            'code': this.state.code,
             'name': this.state.name,
             'active': this.state.active
         }
@@ -158,6 +160,19 @@ class SectorForm extends Component {
                     <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
                         onSubmit={this.handleSubmit} noValidate>
                         
+                        <div className="">
+                            <FormGroup for="code">
+                                <FormControlLabel htmlFor="code">Código do setor</FormControlLabel>
+                                <FormControlInput type="text" id="code" name="code"
+                                    value={this.state.code} onChange={this.handleChange}
+                                    disabled={this.state.viewMode}
+                                    required />
+                                <FieldFeedbacks for="code">
+                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                </FieldFeedbacks>
+                            </FormGroup>
+                        </div>
+
                         <div className="">
                             <FormGroup for="name">
                                 <FormControlLabel htmlFor="name">Nome do setor</FormControlLabel>
