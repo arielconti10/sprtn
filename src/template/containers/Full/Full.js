@@ -114,11 +114,11 @@ class Full extends Component {
                                 this.showMessagePermission()
                             }
                             <Switch>
-                                <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
+                                {/* <Route path="/dashboard" name="Dashboard" component={Dashboard}/> */}
 
                                 <Route path="/marketshare" name="marketshare" component={Marketshare}/>
                                 
-                                <Route path="/indicadores" name="indicadores" component={Indicators}/>
+                                <Route path="/dashboard/indicadores" name="indicadores" component={Indicators}/>
 
 
                                 <Route path="/logout" name="Logout" component={Logout}/>

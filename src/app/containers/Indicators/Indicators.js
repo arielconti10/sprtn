@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Card, CardHeader, CardBody, Nav, NavItem, NavLink, TabContent, TabPane, Row, Col } from 'reactstrap';
-import { Chart } from 'react-google-charts';
+import { Nav, NavItem, NavLink, TabContent, TabPane, Row, Col } from 'reactstrap';
 import axios from '../../../app/common/axios';
 import { formatNumber } from '../../../app/common/FormatHelper';
 import { mapPieChart } from '../../../app/common/ChartHelper';
@@ -27,9 +26,9 @@ class Indicators extends Component {
             data_action_type: [],
             data_student_level: [],
             data_coverage: [],
-            options_publisher: {pieHole: 0.2, is3D: false},
+            options_publisher: { pieHole: 0.2, is3D: false },
             msg_error: ''
-            
+
         };
 
         this.getActionsRealized = this.getActionsRealized.bind(this);
@@ -39,13 +38,13 @@ class Indicators extends Component {
     //foi utilizado por ser assíncrono, e se chamado de modo síncrono, nāo produz os valores desejados
     componentWillMount() {
         canUser('indicator.view', this.props.history, "view");
-        this.requestTotal("indicator/school/total", "total_schools", function(){
-            this.requestTotal("indicator/student/total", "total_students", function(){
-                this.requestTotal("indicator/school/contact", "total_contacts", function(){
-                    this.requestTotal("indicator/action/total", "total_action", function(){});
+        this.requestTotal("indicator/school/total", "total_schools", function () {
+            this.requestTotal("indicator/student/total", "total_students", function () {
+                this.requestTotal("indicator/school/contact", "total_contacts", function () {
+                    this.requestTotal("indicator/action/total", "total_action", function () { });
                 });
             });
-        });      
+        });
 
         this.getActionsRealized();
         this.getSchoolTypes();
@@ -57,9 +56,9 @@ class Indicators extends Component {
 
     toggle(tab) {
         if (this.state.active_tab !== tab) {
-          this.setState({
-            active_tab: tab
-          });
+            this.setState({
+                active_tab: tab
+            });
         }
     }
 
@@ -69,36 +68,36 @@ class Indicators extends Component {
     getCoverage() {
         const action = "indicator/action/year";
         axios.get(action)
-        .then(res => {
-            console.log(res);
-            const result = res.data.data;
-            if (result.length > 0) {
-                console.log("RESULTADOOO");
-                const actual_year = (new Date()).getFullYear();
+            .then(res => {
+                console.log(res);
+                const result = res.data.data;
+                if (result.length > 0) {
+                    console.log("RESULTADOOO");
+                    const actual_year = (new Date()).getFullYear();
 
-                const results_year = result.find(function(item){
-                    return item.year === actual_year
-                });
+                    const results_year = result.find(function (item) {
+                        return item.year === actual_year
+                    });
 
-                const not_coverage = this.state.total_schools - results_year.total;
+                    const not_coverage = this.state.total_schools - results_year.total;
 
-                const array_chart = [
-                    {"name": "Coberto", "total": results_year.total},
-                    {"name": "Nāo Coberto", "total": not_coverage},
-                ];
+                    const array_chart = [
+                        { "name": "Coberto", "total": results_year.total },
+                        { "name": "Nāo Coberto", "total": not_coverage },
+                    ];
 
-                const data_coverage = mapPieChart("Ações", "name", "total", array_chart);
-                this.setState({ data_coverage });
-            } else {
-                const array_chart = [];
-                const data_coverage = mapPieChart("Ações", "name", "total", array_chart);
-                this.setState({ data_coverage });
-            }
-        })
-        .catch(error => {
-            const response = error.response;
-            this.setState({msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}`});
-        })
+                    const data_coverage = mapPieChart("Ações", "name", "total", array_chart);
+                    this.setState({ data_coverage });
+                } else {
+                    const array_chart = [];
+                    const data_coverage = mapPieChart("Ações", "name", "total", array_chart);
+                    this.setState({ data_coverage });
+                }
+            })
+            .catch(error => {
+                const response = error.response;
+                this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
+            })
     }
 
     /**
@@ -107,15 +106,15 @@ class Indicators extends Component {
     getActionsRealized() {
         const action = "indicator/school/action";
         axios.get(action)
-        .then(res => {
-            const result = res.data.data;
-            const data_actions = mapPieChart("Ações", "name", "total", result);
-            this.setState({ data_actions });
-        })
-        .catch(error => {
-            const response = error.response;
-            this.setState({msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}`});
-        })
+            .then(res => {
+                const result = res.data.data;
+                const data_actions = mapPieChart("Ações", "name", "total", result);
+                this.setState({ data_actions });
+            })
+            .catch(error => {
+                const response = error.response;
+                this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
+            })
     }
 
     /**
@@ -124,15 +123,15 @@ class Indicators extends Component {
     getSchoolTypes() {
         const action = "indicator/school/type";
         axios.get(action)
-        .then(res => {
-            const result = res.data.data;
-            const data_school_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
-            this.setState({ data_school_type });
-        })
-        .catch(error => {
-            const response = error.response;
-            this.setState({msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}`});
-        })
+            .then(res => {
+                const result = res.data.data;
+                const data_school_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
+                this.setState({ data_school_type });
+            })
+            .catch(error => {
+                const response = error.response;
+                this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
+            })
     }
 
     /**
@@ -141,15 +140,15 @@ class Indicators extends Component {
     getStudentTypes() {
         const action = "indicator/student/school-type";
         axios.get(action)
-        .then(res => {
-            const result = res.data.data.total;
-            const data_student_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
-            this.setState({ data_student_type });
-        })
-        .catch(error => {
-            const response = error.response;
-            this.setState({msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}`});
-        })
+            .then(res => {
+                const result = res.data.data.total;
+                const data_student_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
+                this.setState({ data_student_type });
+            })
+            .catch(error => {
+                const response = error.response;
+                this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
+            })
     }
 
     /**
@@ -158,15 +157,15 @@ class Indicators extends Component {
     getActionTypes() {
         const action = "indicator/action/school-type";
         axios.get(action)
-        .then(res => {
-            const result = res.data.data;
-            const data_action_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
-            this.setState({ data_action_type });
-        })
-        .catch(error => {
-            const response = error.response;
-            this.setState({msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}`});
-        })
+            .then(res => {
+                const result = res.data.data;
+                const data_action_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
+                this.setState({ data_action_type });
+            })
+            .catch(error => {
+                const response = error.response;
+                this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
+            })
     }
 
     /**
@@ -175,15 +174,15 @@ class Indicators extends Component {
     getStudentLevel() {
         const action = "indicator/student/level";
         axios.get(action)
-        .then(res => {
-            const result = res.data.data;
-            const data_student_level = mapPieChart("Tipos de Escola", "name", "total", result);
-            this.setState({ data_student_level });
-        })
-        .catch(error => {
-            const response = error.response;
-            this.setState({msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}`});
-        })
+            .then(res => {
+                const result = res.data.data;
+                const data_student_level = mapPieChart("Tipos de Escola", "name", "total", result);
+                this.setState({ data_student_level });
+            })
+            .catch(error => {
+                const response = error.response;
+                this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
+            })
     }
 
     /**
@@ -198,12 +197,12 @@ class Indicators extends Component {
 
         if (result.total) {
             total = parseInt(result.total);
-        }   
+        }
 
         if (result_json.data && !result.total) {
             total = parseInt(result);
         }
-   
+
         const total_format = formatNumber(total);
 
         return total_format;
@@ -216,23 +215,23 @@ class Indicators extends Component {
      */
     requestTotal(action, state_attribute, callback) {
         axios.get(action)
-        .then(res => {
-            const total_format = this.getTotal(res);
+            .then(res => {
+                const total_format = this.getTotal(res);
 
-            this.setState({
-                [state_attribute]: total_format,
-            }, callback);
-        })
-        .catch(error => {
-            const response = error.response;
-            this.setState({msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}`});
-        })
+                this.setState({
+                    [state_attribute]: total_format,
+                }, callback);
+            })
+            .catch(error => {
+                const response = error.response;
+                this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
+            })
 
         return true;
     }
 
     render() {
-        const { total_schools, total_students, total_contacts, total_action, 
+        const { total_schools, total_students, total_contacts, total_action,
             data_actions, data_school_type, data_student_type, data_action_type, data_student_level,
             data_coverage,
             options_publisher
@@ -244,34 +243,38 @@ class Indicators extends Component {
                     <h4 className="alert alert-danger"> {this.state.msg_error} </h4>
                 }
 
-                <div className="row indicators-numbers">
-                    <IndicatorNumber 
+                <div className="row indicators-numbers justify-content-md-center">
+                    <IndicatorNumber
                         cols="col-12 col-sm-6 col-lg-3"
                         backgroundColor="bg-info"
+                        shadowClass="school shadow"
                         icon="fa fa-building-o"
                         total={total_schools}
                         label="Escolas"
                     />
 
-                    <IndicatorNumber 
+                    <IndicatorNumber
                         cols="col-12 col-sm-6 col-lg-3"
                         backgroundColor="bg-success"
+                        shadowClass="students shadow"
                         icon="fa fa-users"
                         total={total_students}
                         label="Alunos"
                     />
 
-                    <IndicatorNumber 
+                    <IndicatorNumber
                         cols="col-12 col-sm-6 col-lg-3"
                         backgroundColor="bg-primary"
+                        shadowClass="contacts shadow"
                         icon="fa fa-book"
                         total={total_contacts}
                         label="Contatos"
                     />
 
-                    <IndicatorNumber 
+                    <IndicatorNumber
                         cols="col-12 col-sm-6 col-lg-3"
                         backgroundColor="bg-warning"
+                        shadowClass="actions shadow"
                         icon="fa fa-bullseye"
                         total={total_action}
                         label="Acões"
@@ -279,147 +282,93 @@ class Indicators extends Component {
 
                 </div>
 
-                      <div className="panel-chart">
-                        <Nav tabs className={`tab-indicators tab-secretaria`}>
-                            <NavItem>
-                                <NavLink
-                                    className={classnames({ active: this.state.active_tab === 'chart_actions' })}
-                                    onClick={() => { this.toggle('chart_actions'); }}
-                                >
-                                    Ações Realizadas
-                                </NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink
-                                    className={classnames({ active: this.state.active_tab === 'chart_actions_type' })}
-                                    onClick={() => { this.toggle('chart_actions_type'); }}
-                                >
-                                    Ações por Tipo de Escola
-                                </NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink
-                                    className={classnames({ active: this.state.active_tab === 'chart_student' })}
-                                    onClick={() => { this.toggle('chart_student'); }}
-                                >
-                                    Alunos por Tipo de Escola
-                                </NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink
-                                    className={classnames({ active: this.state.active_tab === 'coverage_school' })}
-                                    onClick={() => { this.toggle('coverage_school'); }}
-                                >
-                                    Cobertura da Carteira
-                                </NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink
-                                    className={classnames({ active: this.state.active_tab === 'chart_school' })}
-                                    onClick={() => { this.toggle('chart_school'); }}
-                                >
-                                    Escolas por Tipo
-                                </NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink
-                                    className={classnames({ active: this.state.active_tab === 'chart_student_level' })}
-                                    onClick={() => { this.toggle('chart_student_level'); }}
-                                >
-                                    Estudantes por Nível
-                                </NavLink>
-                            </NavItem>
-                        </Nav>
-                        <TabContent activeTab={this.state.active_tab}>
-                            <TabPane tabId="chart_actions">
-                                <Row>
-                                    <Col sm="12">
-                                        <div className="chart-actions ">
-                                            <PieChartComponent 
-                                                data_actions={data_actions} 
-                                                chart_id="pie_actions"
-                                                options_publisher={options_publisher} 
-                                                label_card="Ações Realizadas"
-                                            />
-                                        </div>
-                                    </Col>
-                                </Row>
-                            </TabPane>
-                            <TabPane tabId="chart_actions_type">
-                                <Row>
-                                    <Col sm="12">
-                                        <div className="chart-actions-type ">
-                                            <PieChartComponent 
-                                                data_actions={data_action_type} 
-                                                chart_id="pie_actions_type"
-                                                options_publisher={options_publisher} 
-                                                label_card="Ações por tipo de escola"
-                                            />
-                                        </div>
-                                    </Col>
-                                </Row>
-                            </TabPane>
-                            <TabPane tabId="coverage_school">
-                                <Row>
-                                    <Col sm="12">
-                                        <div className="coverage-school">
-                                            <PieChartComponent 
-                                                data_actions={data_coverage} 
-                                                chart_id="pie_coverage"
-                                                options_publisher={options_publisher} 
-                                                label_card="Cobertura da Carteira"
-                                            />
-                                        </div>
-                                    </Col>
-                                </Row>
-                            </TabPane>
-                            <TabPane tabId="chart_school">
-                                <Row>
-                                    <Col sm="12">
-                                        <div className="chart-school-types ">
-                                            <PieChartComponent 
-                                                data_actions={data_school_type} 
-                                                chart_id="pie_school_types"
-                                                options_publisher={options_publisher} 
-                                                label_card="Escolas por Tipo"
-                                            />
-                                        </div>
-                                    </Col>
-                                </Row>
-                            </TabPane>
-                            <TabPane tabId="chart_student">
-                                <Row>
-                                    <Col sm="12">
-                                        <div className="chart-student-types ">
-                                            <PieChartComponent 
-                                                data_actions={data_student_type} 
-                                                chart_id="pie_student_types"
-                                                options_publisher={options_publisher} 
-                                                label_card="Alunos por tipo de escola"
-                                            />
-                                        </div>
-                                    </Col>
-                                </Row>
-                            </TabPane>
-                            <TabPane tabId="chart_student_level">
-                                <Row>
-                                    <Col sm="12">
-                                        <div className="chart-student-level ">
-                                            <PieChartComponent 
-                                                data_actions={data_student_level} 
-                                                chart_id="pie_student_level"
-                                                options_publisher={options_publisher} 
-                                                label_card="Alunos por nível"
-                                            />
-                                        </div>
-                                    </Col>
-                                </Row>
-                            </TabPane>
-                        </TabContent>
+                <div className="row">
+                    {data_actions.length > 1 &&
+                    <div className="col-xl-4 col-md-6 col-sm-12">
+                        <div className="chart-actions ">
+                            <PieChartComponent
+                                data_actions={data_actions}
+                                chart_id="pie_actions"
+                                options_publisher={options_publisher}
+                                label_card="Ações Realizadas"
+                            />
+                        </div>
+                    </div>
+                    }
+
+                    {data_action_type.length > 1 &&
+                    <div className="col-xl-4 col-md-6 col-sm-12">
+                        <div className="chart-actions-type ">
+                            <PieChartComponent
+                                data_actions={data_action_type}
+                                chart_id="pie_actions_type"
+                                options_publisher={options_publisher}
+                                label_card="Ações por tipo de escola"
+                            />
+                        </div>
+                    </div>
+                    }
+
+                    {data_coverage.length > 1 &&
+                    <div className="col-xl-4 col-md-6 col-sm-12">
+                        <div className="tab-data">
+                            <div className="coverage-school">
+                                <PieChartComponent
+                                    data_actions={data_coverage}
+                                    chart_id="pie_coverage"
+                                    options_publisher={options_publisher}
+                                    label_card="Cobertura da Carteira"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    }
+
+                    {data_school_type.length > 1 &&
+                    <div className="col-xl-4 col-md-6 col-sm-12">
+                        <div className="tab-data">
+                            <div className="chart-school-types ">
+                                <PieChartComponent
+                                    data_actions={data_school_type}
+                                    chart_id="pie_school_types"
+                                    options_publisher={options_publisher}
+                                    label_card="Escolas por Tipo"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    }
+
+                    {data_student_type.length > 1 &&
+                    <div className="col-xl-4 col-md-6 col-sm-12">
+                        <div className="tab-data">
+                            <div className="chart-student-types ">
+                                <PieChartComponent
+                                    data_actions={data_student_type}
+                                    chart_id="pie_student_types"
+                                    options_publisher={options_publisher}
+                                    label_card="Alunos por tipo de escola"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    }
+
+                    {data_student_level.length > 1 &&
+                    <div className="col-xl-4 col-md-6 col-sm-12">
+                        <div className="tab-data">
+                            <div className="chart-student-level ">
+                                <PieChartComponent
+                                    data_actions={data_student_level}
+                                    chart_id="pie_student_level"
+                                    options_publisher={options_publisher}
+                                    label_card="Alunos por nível"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    }
                 </div>
-
-
-                
             </div>
         )
     }

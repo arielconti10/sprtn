@@ -3,6 +3,7 @@ const routes = {
   '/login': 'Login',
   '/logout': 'Logout',
   '/dashboard': 'Dashboard',
+  '/dashboard/indicadores': 'Indicadores',
   '/carteira': 'Carteira',
   '/carteira/escolas': 'Escolas',
   '/carteira/escolas/form': 'Cadastro',
