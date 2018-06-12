@@ -7,11 +7,11 @@ export default class PieChartComponent extends Component {
         const { data_actions, options_publisher, label_card, chart_id } = this.props;
 
         return (
-            <Card>
-                <CardHeader>
+            <Card className="card-chart">
+                <CardHeader className="card-header-chart">
                     <span><strong>{label_card}</strong></span>
                 </CardHeader>
-                <CardBody>
+                <CardBody className="card-body-chart">
                     <Chart
                         chartType="PieChart"
                         data={data_actions}
