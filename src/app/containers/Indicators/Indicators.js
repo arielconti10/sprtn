@@ -289,7 +289,7 @@ class Indicators extends Component {
 
                 <div className="row">
                     {data_actions.length > 1 &&
-                    <div className="col-lg-4 col-md-6 col-sm-12">
+                    <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="chart-actions ">
                             <PieChartComponent
                                 data_actions={data_actions}
@@ -302,7 +302,7 @@ class Indicators extends Component {
                     }
 
                     {data_action_type.length > 1 &&
-                    <div className="col-lg-4 col-md-6 col-sm-12">
+                    <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="chart-actions-type ">
                             <PieChartComponent
                                 data_actions={data_action_type}
@@ -315,7 +315,7 @@ class Indicators extends Component {
                     }
 
                     {data_coverage.length > 1 &&
-                    <div className="col-lg-4 col-md-6 col-sm-12">
+                    <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="coverage-school">
                                 <PieChartComponent
@@ -330,7 +330,7 @@ class Indicators extends Component {
                     }
 
                     {data_school_type.length > 1 &&
-                    <div className="col-lg-4 col-md-6 col-sm-12">
+                    <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="chart-school-types ">
                                 <PieChartComponent
@@ -345,7 +345,7 @@ class Indicators extends Component {
                     }
 
                     {data_student_type.length > 1 &&
-                    <div className="col-lg-4 col-md-6 col-sm-12">
+                    <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="chart-student-types ">
                                 <PieChartComponent
@@ -360,7 +360,7 @@ class Indicators extends Component {
                     }
 
                     {data_student_level.length > 1 &&
-                    <div className="col-lg-4 col-md-6 col-sm-12">
+                    <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="chart-student-level ">
                                 <PieChartComponent
