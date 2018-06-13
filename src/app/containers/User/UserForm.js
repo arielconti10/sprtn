@@ -26,21 +26,26 @@ class UserForm extends Component {
             password_confirmation: '',
             role_id: '0',  
             superior: '',  
+            superior_initial: '',
             subsidiaries: [],
             sectors: [],
+            users: [],
             subsidiary_id: null,
             sector_id: null,
+            superior_id: null,
             active: true,       
             back_error: '',
             submitButtonDisabled: false,
             valid_sector: true,
-            saved: false
+            saved: false,
+            loaderUser: false
         };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChangeSubsidiary = this.handleChangeSubsidiary.bind(this);
         this.handleChangeSector = this.handleChangeSector.bind(this);
+        this.handleChangeSuperior = this.handleChangeSuperior.bind(this);
         this.getSubsidiaries = this.getSubsidiaries.bind(this);
         this.getSectors = this.getSectors.bind(this);
         this.submitForm = this.submitForm.bind(this);
@@ -56,6 +61,11 @@ class UserForm extends Component {
                 .then(response => {
                     const dados = response.data.data;
 
+                    if (!dados.parent) {
+                        this.setState({ loaderUser: true });
+                        this.getUsers();
+                    }
+
                     this.setState({                         
                         name: dados.name,
                         lastname: dados.lastname, 
@@ -65,15 +75,12 @@ class UserForm extends Component {
                         sector_id: dados.sector_id,
                         email: dados.email,
                         superior: (dados.parent != null ? dados.parent.full_name : ''),
+                        superior_initial: (dados.parent != null ? dados.parent.full_name : ''),
                         active: dados.deleted_at === null ? true: false
                     }, function() {
-                        console.log(sector_id);
                         this.getSectors(dados.subsidiary_id);
                         this.setState({sector_id: dados.sector_id});
                     });
-
-                    
-                    //console.log(this.state.role_id);
                 })
                 .catch(err => console.log(err));
         }
@@ -90,7 +97,6 @@ class UserForm extends Component {
     getSubsidiaries() {
         axios.get(`subsidiary?order[name]=asc`)
         .then(response => {
-                console.log(response);
                 const dados = response.data.data;
                 const select_array = [];
                 dados.map(item => {
@@ -106,22 +112,43 @@ class UserForm extends Component {
             }.bind(this));
     }
 
+    getUsers() {
+
+        axios.get(`user?order[name]=asc`)
+        .then(response => {
+                const dados = response.data.data;
+                const select_array = [];
+                dados.map(item => {
+                    const label = `${item.full_name}`;
+                    const item_object = {"value": item.id, "label": label};
+                    select_array.push(item_object);
+                });
+                this.setState({users: select_array, loaderUser: false});
+            })
+            .catch(function (error) {
+                let authorized = verifyToken(error.response.status);
+                this.setState({ authorized: authorized });
+            }.bind(this));
+    }
+
     getSectors(subsidiary_id) {
         axios.get(`subsidiary/${subsidiary_id}`)
         .then(response => {
-            const sectors = response.data.data.sectors;
-            const values = this.state;
-            const array_sectors = [];
+            if (response.data.data) {
+                const sectors = response.data.data.sectors;
+                const values = this.state;
+                const array_sectors = [];
 
-            sectors.map(item => {
-                const sector_obj = {value : item.id, label: item.name};
-                array_sectors.push(sector_obj);
-            });
-            
+                sectors.map(item => {
+                    const sector_obj = {value : item.id, label: item.name};
+                    array_sectors.push(sector_obj);
+                });
+                
 
-            this.setState({ sectors: array_sectors });
+                this.setState({ sectors: array_sectors });
 
-            this.setState({ringLoad:false});
+                this.setState({ringLoad:false});
+            }
 
         }) 
     }
@@ -137,6 +164,12 @@ class UserForm extends Component {
     handleChangeSector(selectedOption) {
         const values = this.state;
         values.sector_id = selectedOption.value;
+        this.setState({ values });
+    }
+
+    handleChangeSuperior(selectedOption) {
+        const values = this.state;
+        values.superior_id = selectedOption.value;
         this.setState({ values });
     }
 
@@ -187,6 +220,32 @@ class UserForm extends Component {
         }.bind(this));
     }
 
+    updateSuperior(dataUpdate, id) {
+        axios.get(`${apiPost}/${this.state.superior_id}`)
+        .then(response => {
+            const data = response.data.data;
+            const superior_data = {
+                superior_registration: data.registration,
+                parent_id: data.id,
+                superior_name: data.full_name
+            }
+            const dataWithSuperior = Object.assign({}, dataUpdate, superior_data);
+
+            return dataWithSuperior;
+        })
+        .then(dataWithSuperior => {
+            axios.put(`${apiPost}/${id}`, dataWithSuperior).then(res => {
+                this.setState({
+                    saved: true                   
+                })
+            }).catch(function (error) {
+                let data_error = error.response.data.errors;
+                let filterId = Object.keys(data_error).toString();
+                this.setState({ back_error: data_error[filterId] });
+            })
+        })
+    }
+
     updateForm(event) {
         event.preventDefault();
         var id = this.props.match.params.id;
@@ -200,6 +259,11 @@ class UserForm extends Component {
             'username': this.state.username,
             'email': this.state.email,             
             'active': this.state.active
+        };
+
+        if (this.state.superior_id) {
+            this.updateSuperior(dataUpdate, id);
+            return true;
         }
 
         if (this.props.match.params.id != undefined && this.state.password != '') {
@@ -240,8 +304,39 @@ class UserForm extends Component {
         }
     }
 
+    showSuperior() {
+        const superior_initial = this.state.superior_initial;
+        const user_id = this.props.match.params.id;
+
+        if (!superior_initial && user_id) {
+            return (
+                <FormGroup for="superior_id">
+                    <label>Superior</label>
+                    <Select
+                        name="superior_id"
+                        id="superior_id"
+                        disabled={this.state.viewMode}
+                        value={this.state.superior_id}
+                        onChange={this.handleChangeSuperior}
+                        options={this.state.users}
+                        placeholder="Selecione..."
+                    />
+                </FormGroup>
+            )
+        }
+
+        return (
+            <FormGroup for="superior">
+                <FormControlLabel htmlFor="superior">Superior</FormControlLabel>
+                <FormControlInput type="text" id="superior" name="superior" 
+                    onChange={this.handleChange}
+                    value={this.state.superior} 
+                    disabled={'disabled'} />                                
+            </FormGroup>
+        );
+    }
+
     render() {
-        console.log(this.state.subsidiary_id);
 
         const { subsidiaries, sectors } = this.state;
     
@@ -282,7 +377,7 @@ class UserForm extends Component {
         return (
             
             <Card>
-                {this.state.ringLoad == true &&
+                {(this.state.ringLoad == true || this.state.loaderUser == true) &&
                     <div className="loader">
                         <div className="backLoading">
                             <div className="load"></div>
@@ -397,12 +492,15 @@ class UserForm extends Component {
                             <div className="col-sm-6">
                                 <FormGroup for="password">
                                     <FormControlLabel htmlFor="password">
-                                        Senha <span className="text-danger"><strong>*</strong></span>
+                                        Senha 
+                                        {!this.props.match.params.id &&
+                                        <span className="text-danger"><strong>*</strong></span>
+                                        }
                                     </FormControlLabel>
                                     <FormControlInput type="password" id="password" name="password"
                                         readOnly={this.state.viewMode}
                                         value={this.state.password} onChange={this.handleChange}
-                                        required />
+                                        required={this.props.match.params.id?'':'required'} />
                                     <FieldFeedbacks for="password">
                                         {validationPassword}
                                         <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -412,12 +510,15 @@ class UserForm extends Component {
                             <div className="col-sm-6">
                                 <FormGroup for="password_confirmation">
                                     <FormControlLabel htmlFor="password_confirmation">
-                                        Confirmação de Senha <span className="text-danger"><strong>*</strong></span>
+                                        Confirmação de Senha 
+                                        {!this.props.match.params.id &&
+                                        <span className="text-danger"><strong>*</strong></span>
+                                        }
                                     </FormControlLabel>
                                     <FormControlInput type="password" id="password_confirmation" name="password_confirmation"
                                         readOnly={this.state.viewMode}
                                         value={this.state.password_confirmation} onChange={this.handleChange}
-                                        required />
+                                        required={this.props.match.params.id?'':'required'} /> 
                                     <FieldFeedbacks for="password_confirmation">
                                         {validationPassword}
                                         <FieldFeedback when={value => value !== this.state.password && this.state.password != ""}>Senhas não conferem</FieldFeedback>
@@ -453,11 +554,7 @@ class UserForm extends Component {
                         </div>  
 
                         <div className="">
-                            <FormGroup for="superior">
-                                <FormControlLabel htmlFor="superior">Superior</FormControlLabel>
-                                <FormControlInput type="text" id="superior" name="superior" 
-                                    value={this.state.superior} disabled />                                
-                            </FormGroup>
+                            {this.showSuperior()}
                         </div> 
 
                         {statusField}     
