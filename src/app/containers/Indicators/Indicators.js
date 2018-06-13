@@ -26,7 +26,14 @@ class Indicators extends Component {
             data_action_type: [],
             data_student_level: [],
             data_coverage: [],
-            options_publisher: { pieHole: 0.2, is3D: false },
+            options_publisher: { pieHole: 0.2, is3D: false, 
+                sliceVisibilityThreshold: 0,
+                chartArea: {  width: "100%", height: "70%" },
+                legend: { 
+                    // position : 'bottom',
+                    alignment: 'center'
+                } 
+            },
             msg_error: ''
 
         };
@@ -69,10 +76,8 @@ class Indicators extends Component {
         const action = "indicator/action/year";
         axios.get(action)
             .then(res => {
-                console.log(res);
                 const result = res.data.data;
                 if (result.length > 0) {
-                    console.log("RESULTADOOO");
                     const actual_year = (new Date()).getFullYear();
 
                     const results_year = result.find(function (item) {
@@ -284,7 +289,7 @@ class Indicators extends Component {
 
                 <div className="row">
                     {data_actions.length > 1 &&
-                    <div className="col-xl-4 col-md-6 col-sm-12">
+                    <div className="col-lg-4 col-md-6 col-sm-12">
                         <div className="chart-actions ">
                             <PieChartComponent
                                 data_actions={data_actions}
@@ -297,7 +302,7 @@ class Indicators extends Component {
                     }
 
                     {data_action_type.length > 1 &&
-                    <div className="col-xl-4 col-md-6 col-sm-12">
+                    <div className="col-lg-4 col-md-6 col-sm-12">
                         <div className="chart-actions-type ">
                             <PieChartComponent
                                 data_actions={data_action_type}
@@ -310,7 +315,7 @@ class Indicators extends Component {
                     }
 
                     {data_coverage.length > 1 &&
-                    <div className="col-xl-4 col-md-6 col-sm-12">
+                    <div className="col-lg-4 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="coverage-school">
                                 <PieChartComponent
@@ -325,7 +330,7 @@ class Indicators extends Component {
                     }
 
                     {data_school_type.length > 1 &&
-                    <div className="col-xl-4 col-md-6 col-sm-12">
+                    <div className="col-lg-4 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="chart-school-types ">
                                 <PieChartComponent
@@ -340,7 +345,7 @@ class Indicators extends Component {
                     }
 
                     {data_student_type.length > 1 &&
-                    <div className="col-xl-4 col-md-6 col-sm-12">
+                    <div className="col-lg-4 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="chart-student-types ">
                                 <PieChartComponent
@@ -355,7 +360,7 @@ class Indicators extends Component {
                     }
 
                     {data_student_level.length > 1 &&
-                    <div className="col-xl-4 col-md-6 col-sm-12">
+                    <div className="col-lg-4 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="chart-student-level ">
                                 <PieChartComponent
