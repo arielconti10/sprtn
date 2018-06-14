@@ -49,7 +49,8 @@ class ActionList extends Component {
                         { Header: "Nome", accessor: "name", filterable: true, width: 250, headerClassName: 'text-left' },
                     ]}
                     columnsAlt={[
-                        { Header: "Tipo Visita", accessor: "visit_type_school_type", sub: 'visit_type_id', seq: 0, type: 'selectMulti', api: 'visit-type', filterable: true, headerClassName: 'text-left' },
+                        { Header: "Tipo Visita", accessor: "visit_type_school_type", sub: 'visit_type_id', seq: 0, type: 'selectMulti', api: 'visit-type', filterable: true, headerClassName: 'text-left',
+                        foldable: true },
                         { Header: "Tipo Escola", accessor: "visit_type_school_type", sub: 'school_type_id', seq: 1, type: 'selectMulti', api: 'school-type', filterable: true, headerClassName: 'text-left' },
                     ]}
                     blockEdit={this.state.viewMode}
