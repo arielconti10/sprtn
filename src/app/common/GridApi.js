@@ -40,7 +40,7 @@ class GridApi extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({ viewMode: nextProps.blockEdit, deleteMode: nextProps.blockDelete });
+        this.setState({ viewMode: nextProps.blockEdit, deleteMode: nextProps.blockDelete, columnsGrid: nextProps.columns });
     }
 
     onClickDelete(element) {

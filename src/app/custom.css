@@ -50,3 +50,7 @@
     /* background-color: #27cf00; */
     color: #198600;
 }
+
+.dropdown-column {
+    padding-left: 1em;
+}
