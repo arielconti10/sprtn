@@ -5,6 +5,7 @@ import { Row, Col, Card, CardHeader, CardFooter, CardBody, Button } from 'reacts
 import ActionList from './ActionList';
 import ActionForm from './ActionForm';
 import { canUser } from '../../common/Permissions';
+import './Action.css';
 
 class Actions extends Component {
     componentWillMount() {
