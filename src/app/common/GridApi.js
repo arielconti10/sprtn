@@ -255,8 +255,6 @@ class GridApi extends Component {
                                                     updateData.roles.unshift(object);
                                                 }
 
-                                                console.log(updateData, this.props);
-
                                                 axios.put(`${this.props.apiSpartan}/${id}`, updateData).then(res => {
                                                     this.onFetchData();
                                                 }).catch(function (error) {
@@ -477,7 +475,8 @@ class GridApi extends Component {
                     this.verifySortInitial();
                 });
 
-                this.createTabel();
+                this.setState({ringLoad : false});
+                // this.createTabel();
 
             })
             .catch(function (error) {

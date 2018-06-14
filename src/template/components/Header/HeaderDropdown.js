@@ -29,11 +29,51 @@ class HeaderDropdown extends Component {
     componentWillMount() {
         this.getUserPhoto();
     }
+
+    restoreSsoKey() {
+        axios.post(`${process.env.API_URL}/login`, {
+            'grant_type': 'password',
+            'client_id': '2',
+            'client_secret': 'X2zabNZ1I8xThjTgfXXIfMZfWm84pLD4ITrE70Yx',
+            'username': sessionStorage.getItem('user_userName'),
+            'password': sessionStorage.getItem('password')
+        }).then(res => {
+            sessionStorage.removeItem('sso_token');
+            sessionStorage.setItem('sso_token', res.data.sso_token);
+
+            const key = sessionStorage.getItem('sso_token');
+            const user = sessionStorage.getItem('user_userName');
+            const baseURL = `https://login.ftd.com.br/api/photo/${key}/${user}`;
+
+            this.setState({profile_picture:baseURL});
+        })
+        .catch(error => {
+            let msg_error = error.response.statusText;
+            if (error.response.status == 403 || error.response.status == 401) {
+                 msg_error = "Usuário ou senha incorretos"; 
+            }
+            this.setState({back_error:msg_error, ringLoad: false, login: '', password: ''});
+        });
+    }
     
     getUserPhoto() {
         const key = sessionStorage.getItem('sso_token');
         const user = sessionStorage.getItem('user_userName');
         const baseURL = `https://login.ftd.com.br/api/photo/${key}/${user}`;
+        
+        axios.get(baseURL, {
+        }).then(res => {
+            return true;
+        }).catch(function (error) {
+            const status = error.response.status;
+
+            if (status == 401) {
+                //realiza a chamada do login pra capturar nova chave
+                this.restoreSsoKey();
+            }
+        }.bind(this));
+
+        
 
         this.setState({profile_picture:baseURL});
     }

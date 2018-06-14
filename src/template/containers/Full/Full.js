@@ -34,7 +34,7 @@ import Users from '../../../app/containers/User/Users';
 
 import Marketshare from '../../../app/containers/MarketShare/MarketShare';
 
-import Indicadores from '../../../app/containers/Indicadores/Indicadores'
+import Indicators from '../../../app/containers/Indicators/Indicators'
 
 import UserSchools from '../../../app/containers/UserSchools/UserSchools';
 import axios from '../../../app/common/axios';
@@ -114,11 +114,11 @@ class Full extends Component {
                                 this.showMessagePermission()
                             }
                             <Switch>
-                                <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
+                                {/* <Route path="/dashboard" name="Dashboard" component={Dashboard}/> */}
 
                                 <Route path="/marketshare" name="marketshare" component={Marketshare}/>
                                 
-                                <Route path="/indicadores" name="indicadores" component={Indicadores}/>
+                                <Route path="/dashboard/indicadores" name="indicadores" component={Indicators}/>
 
 
                                 <Route path="/logout" name="Logout" component={Logout}/>

@@ -1,0 +1,7 @@
+.loader-marketshare { background: rgba( 255, 255, 255, .8 ); width: 100vw; height: calc(100vh - 55px); margin-top: 55px; position: absolute; justify-content: center; align-items: center; display: flex; top: 0; left: 0; z-index: 9999;}
+
+.tab-content { margin-top: -3px !important; background: #fff !important; border-width: 3px 0 0 0 !important; border-style: solid !important; border-color: #2c96e6 !important; }
+
+.marketshare-tab-charts { border-color: #64bbff !important; }
+.nav-tabs.marketshare-tab-charts .nav-link.active { border-bottom-width: 3px; border-color: #fff !important; border-bottom-color: #293960 !important; }
+.nav-tabs.marketshare-tab-charts .nav-link:hover { border-bottom-width: 3px; border-bottom-color: #293960 !important; border-top-color: transparent !important; border-left-color: transparent !important; border-right-color: transparent !important; }
