@@ -1,7 +1,9 @@
 import React, { Component, createRef } from 'react';
-import ReactDOM from 'react-dom';
 import { Router, hashHistory, Link, browserHistory, withRouter, NavLink, Redirect } from 'react-router-dom'
-import { Card, CardHeader, CardFooter, CardBody, Button, Row, Col, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+
+import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, 
+    FormGroup, Label, Input, Row, Col } from 'reactstrap';
+
 import ReactTable from 'react-table';
 import Slider from 'rc-slider';
 
@@ -13,6 +15,8 @@ import { verifyToken } from '../../common/AuthorizeHelper';
 import { canUser } from '../../common/Permissions';
 import { generateTermOfAccept } from '../../common/GenerateTermOfAccept'
 import { convertArrayOfObjectsToCSV } from '../../common/GenerateCSV'
+import { verifySelectChecked, createTable } from '../../common/ToggleTable'; 
+
 
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 const Range = createSliderWithTooltip(Slider.Range);
@@ -37,7 +41,7 @@ class SchoolList extends Component {
         this.state = {
             viewMode: false,
 
-            dropdownOpen: false,
+            dropdownOpenTable: false,
             ringLoad: false,
 
             urlNoPaginate: '',
@@ -51,6 +55,9 @@ class SchoolList extends Component {
             pages: null,
             loading: false,
             columns: [],
+            initial_columns: [],
+            table_columns :[],
+            select_all: true,
 
             studentsRange: [0, 9999],
             marketshareRange: [0, 100]
@@ -62,7 +69,22 @@ class SchoolList extends Component {
         this.toggle = this.toggle.bind(this);
         this.exportTermOfAccept = this.exportTermOfAccept.bind(this);
         this.exportCSV = this.exportCSV.bind(this);
+        this.toggleDrop = this.toggleDrop.bind(this);
+        this.handleChangeDrop = this.handleChangeDrop.bind(this);
+        this.handleSelectAll = this.handleSelectAll.bind(this);
+    }
 
+    toggleDrop() {
+        this.setState({
+          dropdownOpenTable: !this.state.dropdownOpenTable
+        });
+    }
+
+    handleChangeDrop(e) {
+        const target = e.currentTarget;
+        const columns_map = verifySelectChecked(target, this.state.initial_columns);
+        const columns_filter = createTable(this.state.initial_columns);
+        this.setState({ initial_columns: columns_map, table_columns: columns_filter });
     }
 
     checkPermission(permission) {
@@ -213,12 +235,7 @@ class SchoolList extends Component {
         return value;
     }
 
-    componentWillMount(){
-        this.checkPermission('school.insert');
-    }
-
-    componentDidMount() {
-
+    getColumns() {
         let col = [
             {
                 Header: "Ações", accessor: "", sortable: false, width: 50, headerClassName: 'text-left', Cell: (element) => (
@@ -232,16 +249,23 @@ class SchoolList extends Component {
             },
             {
                 Header: "Alunos", accessor: "total_students", sortable: true, width: 70, headerClassName: 'text-left',
+                is_checked: true,
                 Cell: props => <span>{props.value || 0}</span>
             },
             {
                 Header: "Market share", accessor: "marketshare", width: 100, headerClassName: 'text-left',
+                is_checked: true,
                 Cell: props => <span>{this.showMarketShare(props.value) + '%'}</span>
             },
-            { Header: "Nome", accessor: "name", sortable: true, filterable: true, minWidth: 250, maxWidth: 500, headerClassName: 'text-left' },
-            { Header: 'Tipo', accessor: 'school_type.name', sortable: true, filterable: true, width: 160, headerClassName: 'text-left', sortable: false },
+            { Header: "Nome", accessor: "name", sortable: true, filterable: true, minWidth: 250, maxWidth: 500, headerClassName: 'text-left'
+                ,is_checked: true,
+            },
+            { Header: 'Tipo', accessor: 'school_type.name', sortable: true, filterable: true, width: 160, headerClassName: 'text-left', sortable: false 
+            ,is_checked: true,
+            },
             {
                 Header: "Identificação", accessor: "school_type", filterable: true, width: 120, headerClassName: 'text-left', sortable: false,
+                is_checked: true,
                 Cell: props => <span className={`escola-${props.value.identify.toLowerCase()}`}>{props.value.identify}</span>,
                 Filter: ({ filter, onChange }) => (
                     <select id="school_type" onChange={event => this.onChangeFilter([event.target])} style={{ width: "100%" }} >
@@ -252,14 +276,23 @@ class SchoolList extends Component {
                     </select>
                 )
             },
-            { Header: 'Perfil', accessor: 'profile.name', sortable: true, filterable: true, width: 100, headerClassName: 'text-left', sortable: false },
-            { Header: 'Filial', accessor: 'subsidiary.name', filterable: true, width: 60, headerClassName: 'text-left', sortable: false },
-            { Header: 'Setor', accessor: 'sector.name', filterable: true, width: 60, headerClassName: 'text-left', sortable: false },
-            { Header: "TOTVS", accessor: "school_code_totvs", filterable: true, width: 100, headerClassName: 'text-left' },
+            { Header: 'Perfil', accessor: 'profile.name', sortable: true, filterable: true, width: 100, headerClassName: 'text-left', sortable: false
+                ,is_checked: true
+            },
+            { Header: 'Filial', accessor: 'subsidiary.name', filterable: true, width: 60, headerClassName: 'text-left', sortable: false 
+                ,is_checked: true,
+            },
+            { Header: 'Setor', accessor: 'sector.name', filterable: true, width: 60, headerClassName: 'text-left', sortable: false 
+                ,is_checked: true,
+            },
+            { Header: "TOTVS", accessor: "school_code_totvs", filterable: true, width: 100, headerClassName: 'text-left' 
+                ,is_checked: true,
+            },
             {
                 Header: "Status",
                 accessor: "",
                 width: 100,
+                is_checked: true,
                 headerClassName: 'text-left',
                 sortable: false,
                 Cell: (element) => (
@@ -277,10 +310,27 @@ class SchoolList extends Component {
                     </select>
                 )
             },
-            { Header: "CEP", accessor: "zip_code", filterable: true, width: 100, headerClassName: 'text-left' },
-            { Header: "Cidade", accessor: "city", filterable: true, width: 160, headerClassName: 'text-left' },
-            { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left' }
+            { Header: "CEP", accessor: "zip_code", filterable: true, width: 100, headerClassName: 'text-left' 
+                ,is_checked: true,
+            },
+            { Header: "Cidade", accessor: "city", filterable: true, width: 160, headerClassName: 'text-left' 
+                ,is_checked: true,
+            },
+            { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left',is_checked: true }
         ];
+
+        return col;
+    }
+
+    componentWillMount(){
+        this.checkPermission('school.insert');
+        const table_columns = this.getColumns();
+        this.setState({ table_columns, initial_columns : table_columns });
+    }
+
+    componentDidMount() {
+
+        let col = this.getColumns();
 
         this.setState({ columns: col });
 
@@ -346,10 +396,28 @@ class SchoolList extends Component {
         this.onFetchData();
     }
 
-    render() {
-        const { data, pageSize, page, loading, pages, columns, studentsRange, marketshareRange, ringLoad, dropdownOpen, viewMode } = this.state;
+    handleSelectAll(event) {
+        event.preventDefault();
+        const select_inverse = !this.state.select_all;
 
-        console.log('viewMode:', viewMode);
+        this.setState({ select_all: select_inverse });
+        // if(!select_inverse) {
+            const columns_map = this.state.initial_columns;
+
+            columns_map.map((item) => {
+                    item.is_checked = !this.state.select_all;
+            });
+
+            this.setState({ select_all : select_inverse, initial_columns: columns_map }, function() {
+                const columns_filter = createTable(this.state.initial_columns);
+                this.setState({ initial_columns: columns_map, table_columns: columns_filter, table_columns: columns_filter });
+            });
+        // }
+    }
+
+    render() {
+        const { data, pageSize, page, loading, pages, columns, studentsRange, marketshareRange, ringLoad, dropdownOpen, viewMode,
+            initial_columns, table_columns, dropdownOpenTable } = this.state;
 
         if (this.state.authorized == 0) {
             return (
@@ -368,7 +436,7 @@ class SchoolList extends Component {
                 }
 
                 <Row>
-                    <Col md="2">
+                    <Col md="12">
 
                         <ButtonDropdown isOpen={dropdownOpen} toggle={this.toggle}>
                             <DropdownToggle color='primary' caret>
@@ -382,6 +450,40 @@ class SchoolList extends Component {
                         </ButtonDropdown>
                         {/* <NavLink to={this.props.match.url + "/novo"} exact><Button color='primary' disabled={true}><i className="fa fa-plus-circle"></i> Adicionar</Button></NavLink> */}
 
+                        <ButtonDropdown isOpen={dropdownOpenTable} toggle={this.toggleDrop} className="dropdown-column">
+                            <DropdownToggle caret color="primary">
+                                Colunas
+                            </DropdownToggle>
+                            <DropdownMenu>
+                                <DropdownItem>
+                                        <FormGroup check>
+                                            <Label check>
+                                                <Input type="checkbox" 
+                                                    value="all" onChange={this.handleSelectAll}
+                                                    checked={this.state.select_all?"checked":""} 
+                                                />{' '}
+                                               <strong>Alternar Seleçāo</strong>
+                                            </Label>
+                                        </FormGroup>
+                                </DropdownItem>
+                                {initial_columns.map((item, key) => 
+                                    item.accessor == ""?"":
+                                    <DropdownItem disabled key={key}>
+                                        <FormGroup check>
+                                            <Label check>
+                                                <Input type="checkbox" 
+                                                    value={item.accessor} onChange={this.handleChangeDrop}
+                                                    checked={item.is_checked?"checked":""} 
+                                                />{' '}
+                                                {item.Header}
+                                            </Label>
+                                        </FormGroup>
+                                    </DropdownItem>
+                            
+                                )}
+
+                            </DropdownMenu>
+                        </ButtonDropdown>
                     </Col>
                     {/* <Col md="5">
                         <label>Alunos</label>
@@ -414,7 +516,7 @@ class SchoolList extends Component {
                 <Row>
                     <Col md="12">
                         <ReactTable
-                            columns={columns}
+                            columns={table_columns}
                             data={data}
                             pages={pages}
                             loading={loading}

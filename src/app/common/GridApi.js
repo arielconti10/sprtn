@@ -40,7 +40,7 @@ class GridApi extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({ viewMode: nextProps.blockEdit, deleteMode: nextProps.blockDelete });
+        this.setState({ viewMode: nextProps.blockEdit, deleteMode: nextProps.blockDelete, columnsGrid: nextProps.columns });
     }
 
     onClickDelete(element) {
@@ -255,8 +255,6 @@ class GridApi extends Component {
                                                     updateData.roles.unshift(object);
                                                 }
 
-                                                console.log(updateData, this.props);
-
                                                 axios.put(`${this.props.apiSpartan}/${id}`, updateData).then(res => {
                                                     this.onFetchData();
                                                 }).catch(function (error) {
@@ -389,8 +387,12 @@ class GridApi extends Component {
             return column.accessor == sorted_id;
         });
 
-        if (column_compare[count].is_compost) {
-            order_by = column_compare[count].order_by;
+        if(column_compare[count]) {
+            if (column_compare[count].is_compost) {
+                order_by = column_compare[count].order_by;
+            }
+        } else {
+            order_by = "name";
         }
 
         return order_by;
@@ -477,7 +479,8 @@ class GridApi extends Component {
                     this.verifySortInitial();
                 });
 
-                this.createTabel();
+                this.setState({ringLoad : false});
+                // this.createTabel();
 
             })
             .catch(function (error) {

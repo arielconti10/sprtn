@@ -5,7 +5,7 @@ import { Chart } from 'react-google-charts';
 export default class PieChartComponent extends Component {
     render() {
         const { data_actions, options_publisher, label_card, chart_id } = this.props;
-
+        console.log(data_actions);
         return (
             <Card className="card-chart">
                 <CardHeader className="card-header-chart">
@@ -18,7 +18,7 @@ export default class PieChartComponent extends Component {
                         options={options_publisher}
                         graph_id={chart_id}
                         width="100%"
-                        height="400px"
+                        height="450px"
                         legend_toggle
                     />
                 </CardBody>

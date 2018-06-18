@@ -36,8 +36,6 @@ export const getPermissions = (callback) => {
         const rules = dados.role.rules;
         const rules_ids = rules.map(a => a.code);
 
-        console.log(rules);
-
         // sessionStorage.setItem('role_name', dados.role.name);
 
         callback(rules_ids);
