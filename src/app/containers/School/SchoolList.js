@@ -436,7 +436,7 @@ class SchoolList extends Component {
                 }
 
                 <Row>
-                    <Col md="2">
+                    <Col md="12">
 
                         <ButtonDropdown isOpen={dropdownOpen} toggle={this.toggle}>
                             <DropdownToggle color='primary' caret>

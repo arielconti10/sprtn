@@ -8,7 +8,7 @@ export function verifySelectChecked(target, initial_columns) {
     const columns_map = initial_columns;
 
     columns_map.map((item) => {
-        if (item.accessor === target.value) {
+        if (item.accessor === target.value || item.id === target.value) {
             item.is_checked = !item.is_checked;
         }
     });
@@ -23,7 +23,8 @@ export function verifySelectChecked(target, initial_columns) {
  */
 export function createTable(initial_columns) {
     const columns_map = initial_columns;
-    const columns_filter = columns_map.filter((item) => item.is_checked === true || item.accessor == "");
+    const columns_filter = columns_map.filter((item) => item.is_checked === true || item.accessor == "" 
+        || item.accessor == "visit_type_school_type");
     
     return columns_filter;
 }

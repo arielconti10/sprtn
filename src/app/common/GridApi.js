@@ -387,8 +387,12 @@ class GridApi extends Component {
             return column.accessor == sorted_id;
         });
 
-        if (column_compare[count].is_compost) {
-            order_by = column_compare[count].order_by;
+        if(column_compare[count]) {
+            if (column_compare[count].is_compost) {
+                order_by = column_compare[count].order_by;
+            }
+        } else {
+            order_by = "name";
         }
 
         return order_by;
