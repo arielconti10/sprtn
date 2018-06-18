@@ -113,7 +113,7 @@ class JobTitleList extends Component {
                             </DropdownItem>
 
                             {initial_columns.map((item, key) => 
-                                item.accessor == ""?"":
+                                (item.accessor == "")?"":
                                 <DropdownItem disabled key={key}>
                                     <FormGroup check>
                                         <Label check>
