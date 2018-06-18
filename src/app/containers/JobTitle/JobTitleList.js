@@ -5,7 +5,7 @@ import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem,
 
 import GridApi from '../../common/GridApi';
 import { canUser } from '../../common/Permissions';
-import { verifySelectChecked, createTable } from '../../common/ToggleTable'; 
+import { verifySelectChecked, createTable, savePreferences, verifyPreferences } from '../../common/ToggleTable'; 
 
 class JobTitleList extends Component {
     constructor() {
@@ -51,20 +51,28 @@ class JobTitleList extends Component {
     componentWillMount() {
         this.checkPermission();
         this.checkDeletePermission();
-        
+
         const table_columns = [
             { Header: "Código", accessor: "code", filterable: true, headerClassName: 'text-left', is_checked: true },
             { Header: "Nome", accessor: "name", filterable: true, headerClassName: 'text-left', is_checked: true },
             { Header: "Tipo", accessor: "job_title_type.name", width: 100, filterable: true, headerClassName: 'text-left', is_checked: true }
         ];
 
-        this.setState({ table_columns, initial_columns : table_columns });
+        this.setState({ table_columns, initial_columns : table_columns }, function() {
+            const table_preference = verifyPreferences(this.state.table_columns, 'prefs_job-title');
+            const columns_filter = createTable(table_preference);
+    
+            this.setState({ table_columns: columns_filter });
+        } );
     }
 
     handleChange(e) {
         const target = e.currentTarget;
         const columns_map = verifySelectChecked(target, this.state.initial_columns);
         const columns_filter = createTable(this.state.initial_columns);
+
+        savePreferences("prefs_job-title", columns_filter);
+
         this.setState({ initial_columns: columns_map, table_columns: columns_filter, table_columns: columns_filter });
     }
 
