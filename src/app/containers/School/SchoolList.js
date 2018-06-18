@@ -15,7 +15,7 @@ import { verifyToken } from '../../common/AuthorizeHelper';
 import { canUser } from '../../common/Permissions';
 import { generateTermOfAccept } from '../../common/GenerateTermOfAccept'
 import { convertArrayOfObjectsToCSV } from '../../common/GenerateCSV'
-import { verifySelectChecked, createTable } from '../../common/ToggleTable'; 
+import { verifySelectChecked, createTable, savePreferences, verifyPreferences } from '../../common/ToggleTable'; 
 
 
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
@@ -84,6 +84,9 @@ class SchoolList extends Component {
         const target = e.currentTarget;
         const columns_map = verifySelectChecked(target, this.state.initial_columns);
         const columns_filter = createTable(this.state.initial_columns);
+
+        savePreferences("prefs_school", columns_filter);
+
         this.setState({ initial_columns: columns_map, table_columns: columns_filter });
     }
 
@@ -325,7 +328,12 @@ class SchoolList extends Component {
     componentWillMount(){
         this.checkPermission('school.insert');
         const table_columns = this.getColumns();
-        this.setState({ table_columns, initial_columns : table_columns });
+        this.setState({ table_columns, initial_columns : table_columns }, function() {
+            const table_preference = verifyPreferences(this.state.table_columns, 'prefs_school');
+            const columns_filter = createTable(table_preference);
+    
+            this.setState({ table_columns: columns_filter });
+        } );
     }
 
     componentDidMount() {
