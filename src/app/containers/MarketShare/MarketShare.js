@@ -103,8 +103,6 @@ class MarketShare extends Component {
             let subsidiary = [];
             let data = [];
 
-            // console.log('user:', user)
-
             this.setState({ user_role: roleCode });
 
             if (roleCode == 'coord') {
@@ -308,38 +306,20 @@ class MarketShare extends Component {
     }
 
     collectionChart() {
-        let urlPost = `marketshare?filter[subsidiary.id]=${this.state.param_subsidiary}&filter[key]=${this.state.param_type}_COLECOES_CONSOLIDADO:${this.state.param_sector}&filter[year]=${this.state.param_year}`;
+        let urlPost = `marketshare?filter[subsidiary.id]=${this.state.param_subsidiary}&filter[key]=${this.state.param_type}_COLECOES_CONSOLIDADO:${this.state.param_sector}:&filter[year]=${this.state.param_year}`;
 
         axios.get(`${urlPost}`).then(response => {
             let marketShare = response.data.data;
             let collections = this.state.data_collection;
-            let pubFTD = null;
-            let others = 0;
-
+            
             marketShare.sort((a, b) => a.value - b.value).reverse();
 
-            marketShare.map((item, i) => {
-                let register = item.key.split(':');
-                let label = register[2];
+            let coll = this.ftdToUp(marketShare, true);
+            coll.splice(0, 0, collections[0]);
 
-                if (i < 5) {
-                    if (label.search("FTD") !== -1) {
-                        pubFTD = [label, item.value];
-                    } else {
-                        collections.push([label, item.value]);
-                    }
-                } else {
-                    others += item.value;
-                }
-            });
+            let show_col = coll.length > 3 ? true : false;
 
-            if (others !== "") collections.push(["OUTROS", others]);
-
-            if (pubFTD) collections.splice(1, 0, pubFTD);
-
-            let show_col = collections.length > 3 ? true : false;
-
-            this.setState({ data_collection: collections, show_collections: show_col, ring_load: false }/*, () => this.disciplineChart()*/);
+            this.setState({ data_collection: coll, show_collections: show_col, ring_load: false }/*, () => this.disciplineChart()*/);
 
         }).catch(err => console.log(4, err));
     }
