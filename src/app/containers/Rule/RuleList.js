@@ -122,7 +122,7 @@ class RuleList extends Component {
                             </DropdownItem>
 
                             {initial_columns.map((item, key) => 
-                                (item.accessor == "")?"":
+                                (item.accessor == "" || item.accessor == "roles")?"":
                                 <DropdownItem disabled key={key}>
                                     <FormGroup check>
                                         <Label check>
