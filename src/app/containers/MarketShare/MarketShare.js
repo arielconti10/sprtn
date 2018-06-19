@@ -1,32 +1,25 @@
 import React, { Component } from 'react';
-import { Col, Row, Card, CardBody, CardHeader, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
-import classnames from 'classnames';
+import { Col, Row } from 'reactstrap';
 import Select from 'react-select';
-import { Chart } from 'react-google-charts';
 import axios from '../../../app/common/axios';
 import { canUser } from '../../common/Permissions';
 
 import PieChartComponent from '../../common/PieChartComponent';
+import ColChartComponent from '../../common/ColChartComponent';
 
 import './MarketShare.css'
 
 const apiUserCurrent = 'user/current';
 const apiHierarchy = 'hierarchy/childrens';
-const paletteColors = ["#009ce5", "#FD0006", "#1aaf5d", "#f45b00", "#8e0000", "#000000", "#7D7D7D", "#00CB19", "#8C0172", "#F70060", "#1B7474", "#0a3b60", "#f2c500", "#BCF25B", "#00DDCD"];
+const paletteColors = ["#009ce5", "#FD0006", "#1aaf5d", "#f45b00", "#8e0000", "#7D7D7D", "#000000", "#00CB19", "#8C0172", "#F70060", "#1B7474", "#0a3b60", "#f2c500", "#BCF25B", "#00DDCD"];
 
 const pieOptions = {
     pieHole: 0.3,
     slices: [{ color: '#009ce5', }, { color: '#FD0006', }, { color: '#1aaf5d', }, { color: '#f45b00', }, { color: '#8e0000', }, { color: '#7D7D7D', }],
-    // tooltip: { showColorCode: true },
     sliceVisibilityThreshold: 0,
     chartArea: { width: "100%", height: "70%" },
     legend: { alignment: 'center' }
 };
-
-const barOptions = {
-    legend: { position: "none" },
-    bar: { groupWidth: "85%" }
-}
 
 class MarketShare extends Component {
     constructor(props) {
@@ -36,6 +29,7 @@ class MarketShare extends Component {
 
             active_tab: 'publishers',
 
+            show_no_register: false,
             show_publishers: false,
             show_collections: false,
             show_disciplines: false,
@@ -46,21 +40,23 @@ class MarketShare extends Component {
 
             param_subsidiary: '',
             param_sector: '',
-            param_city: '',
             param_type: '',
             param_year: '',
+            param_error: '',
 
+            param_secs: {},
             param_secretary: {},
+            param_discipline: {},
 
             data_year: [{ value: '2016', label: '2016' }],
             data_type: [],
             data_subsidiary: [],
             data_sector: [],
-            data_city: [],
             data_city_header: [],
+            data_discipline_header: [],
             data_publisher: [['EDITORAS', '%']],
             data_collection: [['COLEÇÕES', '%']],
-            data_discipline: [['Coleções', '%', { 'role': 'style' }], ['', 0, '']]
+            data_discipline: [['DISCIPLINAS', '%', { role: 'annotation' }, { 'role': 'style' }], ['', 0, '']]
         };
 
         this.handleChangeSubsidiary = this.handleChangeSubsidiary.bind(this);
@@ -71,14 +67,8 @@ class MarketShare extends Component {
 
     componentWillMount() {
         canUser('marketshare.view', this.props.history, "view");
-    }
-
-    toggle(tab) {
-        if (this.state.active_tab !== tab) {
-            this.setState({
-                active_tab: tab
-            });
-        }
+        this.handleChangeYear({ value: '2016' });
+        this.handleChangeType({ value: 'ESCOLA' });
     }
 
     clearData() {
@@ -88,105 +78,112 @@ class MarketShare extends Component {
             show_collections: false,
             data_collection: [['COLEÇÕES', '%']],
             show_disciplines: false,
-            data_discipline: [['Coleções', '%', { 'role': 'style' }], ['', 0, '']]
+            data_discipline: [['DISCIPLINAS', '%', { role: 'annotation' }, { 'role': 'style' }], ['', 0, '']]
         });
     }
 
     loadType() {
-        this.setState({ data_type: [{ value: 'ESCOLA', label: 'ESCOLA' }, { value: 'SECRETARIA', label: 'SECRETARIA' }] });
+        this.setState({
+            data_type: [
+                { value: 'ESCOLA', label: 'ESCOLA' },
+                { value: 'SECRETARIA', label: 'SECRETARIA' },
+                { value: 'ESCOLA_DISCIPLINAS', label: 'DISCIPLINAS' }
+            ]
+        });
+    }
+
+    createSelectValues(obj) {
+        let param = {};
+        param['label'] = obj.name;
+        param['name'] = obj.name;
+        param['value'] = obj.code;
+        param['code'] = obj.code;
+
+        return param;
     }
 
     loadSubsidiary() {
         axios.get(`${apiUserCurrent}`).then(response => {
             let user = response.data.data;
             let roleCode = user.role.code;
-            let subsidiary = [];
             let data = [];
+            let paramSector = {};
 
             this.setState({ user_role: roleCode });
 
-            if (roleCode == 'coord') {
-                axios.get(`${apiHierarchy}`).then(response => {
-                    let subordinates = response.data.data;
-                    let subsidiaries = [];
-                    let sectors = [];
-                    let arrSectors = [];
+            axios.get(`${apiHierarchy}`).then(response => {
+                let subordinates = response.data.data;
+                let subsidiaries = [];
+                let arrSectors = [];
 
-                    subordinates.map(user => {
-                        if (user.subsidiary_id !== null)
-                            subsidiaries.push(user.subsidiary);
+                subordinates.map(user => {
+                    if (user.subsidiary) {
+                        subsidiaries.push(user.subsidiary);
 
-                        if (user.sector_id !== null)
-                            sectors.push(user.sector);
-                    })
+                        let arr = paramSector[user.subsidiary_id] || [];
+                        arr.push(this.createSelectValues(user.sector));
+                        paramSector[user.subsidiary_id] = arr;
+                    }
+                });
 
-                    sectors.sort(function (a, b) { return a.code - b.code }).map(sec => {
-                        let param = {};
-                        param['value'] = sec.code;
-                        param['label'] = sec.name;
+                subsidiaries.sort(function (a, b) { return a.code - b.code }).map(sub => {
+                    let param = {};
+                    param['value'] = sub.id;
+                    param['label'] = `${sub.code} - ${sub.name}`;
+                    param['sectors'] = arrSectors;
 
-                        arrSectors.push(param);
-                    });
+                    data.push(param);
+                });
 
-                    arrSectors = arrSectors.filter((item, index, self) =>
-                        index === self.findIndex((obj) => (
-                            obj.value === item.value
-                        ))
-                    );
+                data = data.filter((item, index, self) =>
+                    index === self.findIndex((obj) => (
+                        obj.value === item.value
+                    ))
+                );
+                if (data.length) {
+                    this.setState({ show_no_register: false, data_subsidiary: data, param_subsidiary: data[0].value, param_secs: paramSector }, this.loadSector(paramSector, data[0].value));
+                } else {
+                    this.setState({ show_no_register: true });
+                }
 
-                    subsidiaries.sort(function (a, b) { return a.code - b.code }).map(sub => {
-                        let param = {};
-                        param['value'] = sub.id;
-                        param['label'] = `${sub.code} - ${sub.name}`;
-                        param['sectors'] = arrSectors;
+            }).catch(err => {
+                console.log(4, err);
+                let data_error = err.response.data.errors;
+                let filterId = Object.keys(data_error)[0].toString();
+                this.setState({ show_no_register: true, param_error: `(${data_error[filterId]})` });
+            });
 
-                        data.push(param);
-                    });
-
-                    data = data.filter((item, index, self) =>
-                        index === self.findIndex((obj) => (
-                            obj.value === item.value
-                        ))
-                    );
-
-                    this.setState({ data_subsidiary: data });
-                    if (data.length == 1) this.setState({ param_subsidiary: data[0].value }, () => this.loadSector(data[0].sectors));
-
-                }).catch(err => console.log(4, err));
+            if (data.length) {
+                this.setState({ show_no_register: false, data_subsidiary: data, param_subsidiary: data[0].value, param_secs: paramSector }, () => this.loadSector(paramSector, data[0].value));
             } else {
-                subsidiary = user.subsidiary;
-
-                data.push({ value: subsidiary.id, label: `${subsidiary.code} - ${subsidiary.name}`, sectors: user.sector });
+                this.setState({ show_no_register: true });
             }
-
-            this.setState({ data_subsidiary: data });
-
-            if (data.length == 1) this.setState({ param_subsidiary: data[0].value }, () => this.loadSector(data[0].sectors));
-        }).catch(err => console.log(4, err));
+        }).catch(err => {
+            console.log(4, err);
+            let data_error = err.response.data.errors;
+                let filterId = Object.keys(data_error)[0].toString();
+            this.setState({ show_no_register: true, param_error: `(${data_error[filterId]})` });
+        });
 
         this.setState({ ring_load: false });
     }
 
-    loadSector(sectors) {
+    loadSector(paramSector, subsidiary) {
         let data = [];
         let sec = '';
 
-        if (sectors.length) {
-            data = sectors;
-        } else {
-            data = [{ value: sectors.code, label: sectors.name }];
-            sec = sectors.code;
-        }
+        data = paramSector[subsidiary];
+        sec = paramSector[subsidiary][0].code;
 
         this.setState({ data_sector: data, param_sector: sec }, () => this.publisherChart());
     }
-    
+
     ftdToUp(array, isSchool) {
         let pubFTD = null;
         let others = 0;
         let values = [];
-        let positionArray = isSchool? 0 : 1;
-        let contMax = isSchool? 5 : 6;
+        let positionArray = isSchool ? 0 : 1;
+        let contMax = isSchool ? 5 : 6;
         let cont = 0;
 
         array.map(item => {
@@ -216,21 +213,26 @@ class MarketShare extends Component {
     getSchools(marketShare) {
         let publishers = this.state.data_publisher;
 
+        marketShare = marketShare.filter((item, index, self) =>
+            index === self.findIndex((obj) => (
+                obj.key === item.key
+            ))
+        );
+
         let pub = this.ftdToUp(marketShare, true);
         pub.splice(0, 0, publishers[0]);
-        
+
         let show_pub = pub.length > 2 ? true : false;
 
         this.setState({ data_publisher: pub, show_publishers: show_pub }, () => this.collectionChart());
     }
 
     getSecretaries(marketShare) {
-        let cities = this.state.data_city;
         let cityHeaders = this.state.data_city_header;
 
         let paramSecretary = {};
 
-        if (cities.length < 1) {
+        if (cityHeaders.length < 1) {
             marketShare.map(item => {
                 let register = item.key.split(':');
                 let city = register[2];
@@ -239,30 +241,19 @@ class MarketShare extends Component {
                 valueCity['value'] = city;
                 valueCity['label'] = city;
 
-                cities.push(valueCity);
                 cityHeaders.push(city);
             });
-
-            cities = cities.filter((item, index, self) =>
-                index === self.findIndex((obj) => (
-                    obj.value === item.value
-                ))
-            );
 
             cityHeaders = cityHeaders.filter(function (item, pos) {
                 return cityHeaders.indexOf(item) == pos;
             });
 
-            cities.sort((a, b) => a.value.localeCompare(b.value));
             cityHeaders.sort((a, b) => a.localeCompare(b));
 
-            this.setState({ data_city: cities, data_city_header: cityHeaders });
+            this.setState({ data_city_header: cityHeaders });
         }
 
-        if (this.state.param_city == '') {
-            let param = cities.length > 0 ? cities[0].value : '';
-            this.setState({ param_city: param, data_city_header: cityHeaders })
-        };
+        this.setState({ data_city_header: cityHeaders })
 
         let cont = 0;
 
@@ -311,7 +302,7 @@ class MarketShare extends Component {
         axios.get(`${urlPost}`).then(response => {
             let marketShare = response.data.data;
             let collections = this.state.data_collection;
-            
+
             marketShare.sort((a, b) => a.value - b.value).reverse();
 
             let coll = this.ftdToUp(marketShare, true);
@@ -319,46 +310,64 @@ class MarketShare extends Component {
 
             let show_col = coll.length > 3 ? true : false;
 
-            this.setState({ data_collection: coll, show_collections: show_col, ring_load: false }/*, () => this.disciplineChart()*/);
+            this.setState({ data_collection: coll, show_collections: show_col, ring_load: false }, () => this.disciplineChart());
 
         }).catch(err => console.log(4, err));
     }
 
     disciplineChart() {
-        let urlPost = `marketshare?filter[subsidiary.id]=${this.state.param_subsidiary}&filter[key]=ESCOLA_DISCIPLINAS_CONSOLIDADO:${this.state.param_sector}&filter[year]=${this.state.param_year}`;
+        let urlPost = `marketshare?filter[subsidiary.id]=${this.state.param_subsidiary}&filter[key]=${this.state.param_type}_CONSOLIDADO:${this.state.param_sector}:&filter[year]=${this.state.param_year}`;
 
         axios.get(`${urlPost}`).then(response => {
             let marketShare = response.data.data;
-            let disciplines = this.state.data_discipline;
-            let pubFTD = null;
-            let others = 0;
-            let isSchool = this.state.param_type == 'ESCOLA' ? true : false;
+
+            let disciplineHeaders = this.state.data_discipline_header;
+
+            let paramDiscipline = {};
+
+            if (disciplineHeaders.length < 1) {
+                marketShare.map(item => {
+                    let register = item.key.split(':');
+                    let discipline = register[2];
+
+                    let valueDiscipline = {};
+                    valueDiscipline['value'] = discipline;
+                    valueDiscipline['label'] = discipline;
+
+                    disciplineHeaders.push(discipline);
+                });
+
+                disciplineHeaders = disciplineHeaders.filter(function (item, pos) {
+                    return disciplineHeaders.indexOf(item) == pos;
+                });
+
+                disciplineHeaders.sort((a, b) => a.localeCompare(b));
+
+                this.setState({ data_discipline_header: disciplineHeaders });
+            }
+
+            this.setState({ data_discipline_header: disciplineHeaders })
+
+            let cont = 0;
 
             marketShare.sort((a, b) => a.value - b.value).reverse();
 
             marketShare.map((item, i) => {
                 let register = item.key.split(':');
-                let discipline = register[2];
-                let work = register[3]
+                let discipline = register[2]
+                let label = register[3];
 
-                if (i < 5) {
-                    // if (label.search("FTD") !== -1) {
-                    //     pubFTD = [label, item.value, `color: ${paletteColors[0]}`];
-                    // } else {
-                    disciplines.push([label, item.value, `color: ${paletteColors[i + 1]}`]);
-                    // }
-                } else {
-                    others += item.value;
-                }
+                let array = paramDiscipline[discipline] || [['DISCIPLINAS', '%', { role: 'annotation' }, { 'role': 'style' }]];
+                array.push([label, item.value, item.value]);
+
+                paramDiscipline[discipline] = array;
+
+                cont = i;
             });
 
-            if (others !== "") disciplines.push(["OUTROS", others, `color: ${paletteColors[5]}`]);
+            let show_dis = cont > 0 ? true : false;
 
-            if (pubFTD) disciplines.splice(1, 0, pubFTD);
-
-            let show_dis = disciplines.length > 2 ? true : false;
-
-            this.setState({ data_discipline: disciplines, show_disciplines: show_dis, ring_load: false });
+            this.setState({ show_disciplines: show_dis, param_discipline: paramDiscipline, ring_load: false });
 
         }).catch(err => console.log(4, err));
     }
@@ -369,17 +378,15 @@ class MarketShare extends Component {
         this.setState({ values });
         this.clearData();
         this.setState({
-            param_type: '',
+            param_type: 'ESCOLA',
             param_subsidiary: '',
             param_sector: '',
-            param_city: '',
-            data_type: [{ value: 'ESCOLA', label: 'ESCOLA' }, { value: 'SECRETARIA', label: 'SECRETARIA' }],
+            data_type: [{ value: 'ESCOLA', label: 'ESCOLA' }, { value: 'SECRETARIA', label: 'SECRETARIA' }, { value: 'ESCOLA_DISCIPLINAS', label: 'DISCIPLINAS' }],
             data_subsidiary: [],
             data_sector: [],
-            data_city: [],
-            data_city_header: []
+            data_city_header: [],
+            data_discipline_header: []
         });
-
     }
 
     handleChangeType = (selectedOption) => {
@@ -390,11 +397,10 @@ class MarketShare extends Component {
         this.setState({
             param_subsidiary: '',
             param_sector: '',
-            param_city: '',
             data_subsidiary: [],
             data_sector: [],
-            data_city: [],
-            data_city_header: []
+            data_city_header: [],
+            data_discipline_header: []
         });
         this.loadSubsidiary();
     }
@@ -406,12 +412,11 @@ class MarketShare extends Component {
         this.clearData();
         this.setState({
             param_sector: '',
-            param_city: '',
             data_sector: [],
-            data_city: [],
-            data_city_header: []
+            data_city_header: [],
+            data_discipline_header: []
         });
-        this.loadSector(selectedOption.sectors);
+        this.loadSector(this.state.param_secs, values.param_subsidiary);
     }
 
     handleChangeSetor = (selectedOption) => {
@@ -420,40 +425,30 @@ class MarketShare extends Component {
         this.setState({ values });
         this.clearData();
         this.setState({
-            param_city: '',
-            data_city: [],
-            data_city_header: []
+            data_city_header: [],
+            data_discipline_header: []
         });
-        this.publisherChart();
-    }
-
-    handleChangeCity = (selectedOption) => {
-        const values = this.state;
-        values.param_city = selectedOption.value;
-        this.clearData();
-        this.setState({ values });
         this.publisherChart();
     }
 
     render() {
         const {
-            data_publisher, data_collection, ring_load, show_publishers, col_secretaries, param_secretary,
-            show_collections, show_disciplines, data_year, data_type, data_subsidiary, param_year,
-            param_subsidiary, data_sector, data_city, data_city_header, param_sector, param_type,
-            param_city, active_tab
+            data_publisher, data_collection, ring_load, show_publishers, param_secretary, param_error,
+            show_collections, show_disciplines, show_no_register, data_year, data_type, data_subsidiary, param_year,
+            param_subsidiary, data_sector, data_city_header, param_discipline, data_discipline_header,
+            param_sector, param_type
         } = this.state;
 
         let secretaries;
+        let disciplines;
 
         if (show_publishers && param_type != 'ESCOLA') {
             secretaries = data_city_header.map((city, i) => {
 
-                // console.log('antes:', param_secretary[city]);
                 let dataActions = this.ftdToUp(param_secretary[city], false);
-                // console.log('depois:', dataActions);
 
                 return (
-                    <Col xl='6' md='12' sm='12'>
+                    <Col xl='6' md='6' sm='12' xs='12' key={i}>
                         <PieChartComponent
                             data_actions={dataActions}
                             chart_id={`PieChartSecretary_${i}`}
@@ -464,6 +459,44 @@ class MarketShare extends Component {
                 )
             })
         }
+
+        if (show_disciplines) {
+            disciplines = data_discipline_header.map((discipline, i) => {
+
+                let font = param_discipline[discipline].length > 13 ? 6 : 11;
+
+                let colOptions = {};
+                colOptions['chartArea'] = { width: "70%", height: "70%" };
+                colOptions['legend'] = { position: "none" };
+                colOptions['bar'] = { groupWidth: "80%" };
+                colOptions['hAxis'] = { textStyle: { fontSize: font } };
+
+                let valColor = 0;
+                let maxColors = paletteColors.length - 1;
+
+                param_discipline[discipline].map((item, i) => {
+                    if (i != 0) {
+                        if (valColor > maxColors) valColor = 0;
+
+                        item.push(`color: ${paletteColors[valColor]}`);
+
+                        valColor++;
+                    }
+                })
+
+                return (
+                    <Col xl='6' md='6' sm='12' xs='12' key={i}>
+                        <ColChartComponent
+                            data_actions={param_discipline[discipline]}
+                            chart_id={`ColChartDiscipline_${i}`}
+                            options={colOptions}
+                            label_card={discipline}
+                        />
+                    </Col>
+                )
+            })
+        }
+
         return (
             <div>
                 {ring_load == true &&
@@ -475,11 +508,12 @@ class MarketShare extends Component {
                 }
 
                 <Row>
-                    <Col md="2">
+                    <Col xl='2' md='2' sm='12' xs='12'>
                         <label>Ano</label>
                         <Select
                             name="param_year"
                             id="param_year"
+                            disabled={!(data_year.length > 1)}
                             clearable={false}
                             value={param_year}
                             onChange={this.handleChangeYear}
@@ -488,13 +522,13 @@ class MarketShare extends Component {
                         />
                     </Col>
 
-                    <Col md="2">
+                    <Col xl='2' md='2' sm='12' xs='12'>
                         <label>Tipo</label>
 
                         <Select
                             name="param_type"
                             id="param_type"
-                            disabled={!(data_type.length > 0)}
+                            disabled={show_no_register}
                             clearable={false}
                             value={param_type}
                             onChange={(selectedOption) => this.handleChangeType(selectedOption)}
@@ -503,13 +537,13 @@ class MarketShare extends Component {
                         />
                     </Col>
 
-                    <Col md="3">
+                    <Col xl='3' md='3' sm='12' xs='12'>
                         <label>Filial</label>
 
                         <Select
                             name="param_subsidiary"
                             id="param_subsidiary"
-                            disabled={!(data_subsidiary.length > 0)}
+                            disabled={!(data_subsidiary.length > 1)}
                             clearable={false}
                             value={param_subsidiary}
                             onChange={(selectedOption) => this.handleChangeSubsidiary(selectedOption)}
@@ -518,12 +552,12 @@ class MarketShare extends Component {
                         />
                     </Col>
 
-                    <Col md="2">
+                    <Col xl='2' md='2' sm='12' xs='12'>
                         <label>Setor</label>
                         <Select
                             name="param_sector"
                             id="param_sector"
-                            disabled={!(data_sector.length > 0)}
+                            disabled={!(data_sector.length > 1)}
                             clearable={false}
                             value={param_sector}
                             onChange={this.handleChangeSetor}
@@ -536,7 +570,7 @@ class MarketShare extends Component {
 
                 <Row>
                     {show_publishers && param_type == 'ESCOLA' &&
-                        <Col xl={show_collections ? '6' : '12'} md='12' sm='12'>
+                        <Col xl={show_collections ? '6' : '12'} md={show_collections ? '6' : '12'} sm='12' xs='12'>
                             <PieChartComponent
                                 data_actions={data_publisher}
                                 chart_id="PieChartPlublishers"
@@ -551,7 +585,7 @@ class MarketShare extends Component {
                     }
 
                     {show_collections &&
-                        <Col xl='6' md='12' sm='12'>
+                        <Col xl='6' md='12' sm='12' xs='12'>
                             <PieChartComponent
                                 data_actions={data_collection}
                                 chart_id="PieChartCollections"
@@ -561,98 +595,17 @@ class MarketShare extends Component {
                         </Col>
                     }
 
-                </Row>
+                    {show_disciplines &&
+                        disciplines
+                    }
 
-                {/* {show_publishers == true &&
-                    <Row>
-                        <Col md='12'>
-                            <Nav tabs className='marketshare-tab-charts'>
-                                <NavItem>
-                                    <NavLink className={classnames({ active: active_tab === 'publishers' })} onClick={() => { this.toggle('publishers') }} >
-                                        Editoras
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem className={show_collections ? '' : 'd-none'}>
-                                    <NavLink className={classnames({ active: active_tab === 'collections' })} onClick={() => { this.toggle('collections') }} >
-                                        Coleções
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem className={show_disciplines ? '' : 'd-none'}>
-                                    <NavLink className={classnames({ active: active_tab === 'disciplines' })} onClick={() => { this.toggle('disciplines') }} >
-                                        Disciplinas
-                                    </NavLink>
-                                </NavItem>
-                            </Nav>
-                            <TabContent activeTab={active_tab} className='marketshare-cont-charts'>
-                                <TabPane tabId='publishers'>
-                                    <Row>
-                                        <Card style={{ width: "100%" }}>
-                                            <CardHeader className={param_type == 'ESCOLA' ? 'd-none' : ''}>
-                                                <Col md="4">
-                                                    <Select
-                                                        name="param_city"
-                                                        id="param_city"
-                                                        disabled={!(data_city.length > 1)}
-                                                        clearable={false}
-                                                        value={param_city}
-                                                        onChange={this.handleChangeCity}
-                                                        options={data_city}
-                                                        placeholder="Selecione"
-                                                    />
-                                                </Col>
-                                            </CardHeader>
-                                            <CardBody>
-                                                <Chart
-                                                    chartType='PieChart'
-                                                    data={data_publisher}
-                                                    options={pieOptions}
-                                                    graph_id='PieChartPlublishers'
-                                                    width='100%'
-                                                    height='400px'
-                                                    legend_toggle
-                                                />
-                                            </CardBody>
-                                        </Card>
-                                    </Row>
-                                </TabPane>
-                                <TabPane tabId='collections'>
-                                    <Row>
-                                        <Card style={{ width: "100%" }}>
-                                            <CardBody>
-                                                <Chart
-                                                    chartType='PieChart'
-                                                    data={data_collection}
-                                                    options={pieOptions}
-                                                    graph_id='PieChartCollections'
-                                                    width='100%'
-                                                    height='400px'
-                                                    legend_toggle
-                                                />
-                                            </CardBody>
-                                        </Card>
-                                    </Row>
-                                </TabPane>
-                                <TabPane tabId='disciplines'>
-                                    <Row>
-                                        <Card style={{ width: "100%" }}>
-                                            <CardBody>
-                                                <Chart
-                                                    chartType='BarChart'
-                                                    data={data_collection}
-                                                    options={barOptions}
-                                                    graph_id='BarChartDisciplines'
-                                                    width='100%'
-                                                    height='400px'
-                                                    legend_toggle
-                                                />
-                                            </CardBody>
-                                        </Card>
-                                    </Row>
-                                </TabPane>
-                            </TabContent>
-                        </Col>
-                    </Row>
-                } */}
+                    {show_no_register &&
+                        <div className='no-register'>
+                            <span><i className='fa fa-exclamation-circle'></i> Não há registros a serem exibidos!</span><br/>
+                            <span>{param_error}</span>
+                        </div>
+                    }
+                </Row>
             </div>
         )
     }
