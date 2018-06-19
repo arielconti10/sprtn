@@ -9,6 +9,7 @@ import { verifyToken } from '../common/AuthorizeHelper';
 
 import Select, { Async } from 'react-select';
 import 'react-select/dist/react-select.css';
+import { verifyPreferences } from './ToggleTable';
 
 class GridApi extends Component {
 
@@ -139,6 +140,7 @@ class GridApi extends Component {
 
     componentDidMount() {
         this.createTabel();
+        console.log(this.state.columnsGrid);
     }
 
     createTabel() {
@@ -347,8 +349,28 @@ class GridApi extends Component {
         );
 
         this.setState({ columnsGrid: [] }, 
-            () => this.setState({ columnsGrid: col, ringLoad: false })            
+            () => {
+                const api_pref = `prefs_${this.props.apiSpartan}`;
+                if (api_pref !== "prefs_event") {
+                    const table_preference = verifyPreferences(col, api_pref);
+                    const col_filter = table_preference.filter(item => item.accessor === "" || item.is_checked === true 
+                        || item.accessor === "roles" || item.accessor === "visit_type_school_type");
+                    col = col_filter;
+                } else {
+                    const table_preference = verifyPreferences(col, api_pref, 'id');
+                    const col_filter = table_preference.filter(item => item.id === "" || item.is_checked === true);
+                    col = col_filter;
+
+                    console.log(col);
+                }
+
+
+                this.setState({ columnsGrid: col, ringLoad: false }); 
+
+            }
         );
+
+        
     }
 
     /**

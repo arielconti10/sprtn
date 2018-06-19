@@ -6,8 +6,8 @@ import axios from '../../../app/common/axios';
 import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 'reactstrap';
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
+import { Async } from 'react-select';
 import Select from 'react-select';
-
 import { canUser } from '../../common/Permissions';
 
 const apiSelectBox = 'role';
@@ -30,6 +30,7 @@ class UserForm extends Component {
             subsidiaries: [],
             sectors: [],
             users: [],
+            search_options: [],
             subsidiary_id: null,
             sector_id: null,
             superior_id: null,
@@ -49,6 +50,7 @@ class UserForm extends Component {
         this.getSubsidiaries = this.getSubsidiaries.bind(this);
         this.getSectors = this.getSectors.bind(this);
         this.submitForm = this.submitForm.bind(this);
+        this.getOptions = this.getOptions.bind(this);
     }
 
     componentWillMount() {
@@ -62,8 +64,8 @@ class UserForm extends Component {
                     const dados = response.data.data;
 
                     if (!dados.parent) {
-                        this.setState({ loaderUser: true });
-                        this.getUsers();
+                        // this.setState({ loaderUser: true });
+                        // this.getUsers();
                     }
 
                     this.setState({                         
@@ -114,7 +116,7 @@ class UserForm extends Component {
 
     getUsers() {
 
-        axios.get(`user?order[name]=asc`)
+        axios.get(`user?page=1&order[name]=asc`)
         .then(response => {
                 const dados = response.data.data;
                 const select_array = [];
@@ -132,25 +134,27 @@ class UserForm extends Component {
     }
 
     getSectors(subsidiary_id) {
-        axios.get(`subsidiary/${subsidiary_id}`)
-        .then(response => {
-            if (response.data.data) {
-                const sectors = response.data.data.sectors;
-                const values = this.state;
-                const array_sectors = [];
+        if (subsidiary_id) {
+            axios.get(`subsidiary/${subsidiary_id}`)
+            .then(response => {
+                if (response.data.data) {
+                    const sectors = response.data.data.sectors;
+                    const values = this.state;
+                    const array_sectors = [];
 
-                sectors.map(item => {
-                    const sector_obj = {value : item.id, label: item.name};
-                    array_sectors.push(sector_obj);
-                });
-                
+                    sectors.map(item => {
+                        const sector_obj = {value : item.id, label: item.name};
+                        array_sectors.push(sector_obj);
+                    });
+                    
 
-                this.setState({ sectors: array_sectors });
+                    this.setState({ sectors: array_sectors });
 
-                this.setState({ringLoad:false});
-            }
+                    this.setState({ringLoad:false});
+                }
 
-        }) 
+            }) 
+        }
     }
 
     handleChangeSubsidiary(selectedOption) {
@@ -169,7 +173,7 @@ class UserForm extends Component {
 
     handleChangeSuperior(selectedOption) {
         const values = this.state;
-        values.superior_id = selectedOption.value;
+        values.superior_id = selectedOption;
         this.setState({ values });
     }
 
@@ -221,7 +225,7 @@ class UserForm extends Component {
     }
 
     updateSuperior(dataUpdate, id) {
-        axios.get(`${apiPost}/${this.state.superior_id}`)
+        axios.get(`${apiPost}/${this.state.superior_id.value}`)
         .then(response => {
             const data = response.data.data;
             const superior_data = {
@@ -304,6 +308,53 @@ class UserForm extends Component {
         }
     }
 
+    mapSelect(dados) {
+        const select_array = [];
+        dados.map(item => {
+            const label = `${item.full_name}`;
+            const item_object = {"value": item.id, "label": label};
+            select_array.push(item_object);
+        });
+
+        return select_array;
+    }
+
+    searchByName(input_name) {
+        let new_url = `${apiPost}?paginate=10&page=1`;
+        const lastname_exists = input_name.indexOf(" ") !== -1;
+
+        if (!lastname_exists) {
+            new_url = new_url + `&filter[name]=${input_name}`;
+        } else {
+            const firts_name = input_name.substr(0,input_name.indexOf(' '));
+            const last_name = input_name.substr(input_name.indexOf(' ')+1);
+            new_url = new_url + `&filter[name]=${firts_name}&filter[lastname]=${last_name}`;
+        }
+
+        new_url = new_url + "&order[name]=asc";
+        return new_url;
+    } 
+
+    getOptions = (input, callback) => {
+        const search_url = this.searchByName(input);
+        axios.get(search_url)
+        .then(response => {
+            const dados = response.data.data;
+            
+            const select_array = this.mapSelect(dados);
+
+            this.setState({ search_options: select_array }, function(){
+                setTimeout(() => {
+                    callback(null, {
+                    options: this.state.search_options,
+                    complete: true
+                    });
+                }, 500);
+            });
+        })
+
+      };
+
     showSuperior() {
         const superior_initial = this.state.superior_initial;
         const user_id = this.props.match.params.id;
@@ -312,7 +363,17 @@ class UserForm extends Component {
             return (
                 <FormGroup for="superior_id">
                     <label>Superior</label>
-                    <Select
+                    <Async
+                        removeSelected={false}
+                        name="superior_id"
+                        id="superior_id"
+                        disabled={this.state.viewMode}
+                        value={this.state.superior_id}
+                        onChange={this.handleChangeSuperior}
+                        loadOptions={this.getOptions}
+                        placeholder="Selecione..."
+                    />
+                    {/* <Select
                         name="superior_id"
                         id="superior_id"
                         disabled={this.state.viewMode}
@@ -320,7 +381,7 @@ class UserForm extends Component {
                         onChange={this.handleChangeSuperior}
                         options={this.state.users}
                         placeholder="Selecione..."
-                    />
+                    /> */}
                 </FormGroup>
             )
         }

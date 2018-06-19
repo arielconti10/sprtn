@@ -44,7 +44,7 @@ class Indicators extends Component {
     //o "callback hell" será aprimorado após estudo de promises
     //foi utilizado por ser assíncrono, e se chamado de modo síncrono, nāo produz os valores desejados
     componentWillMount() {
-        canUser('indicator.view', this.props.history, "view");
+        // canUser('indicator.view', this.props.history, "view");
         this.requestTotal("indicator/school/total", "total_schools", function () {
             this.requestTotal("indicator/student/total", "total_students", function () {
                 this.requestTotal("indicator/school/contact", "total_contacts", function () {
