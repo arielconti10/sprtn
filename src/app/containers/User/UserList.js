@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, 
     FormGroup, Label, Input } from 'reactstrap';
-import { verifySelectChecked, createTable } from '../../common/ToggleTable'; 
+import { verifySelectChecked, createTable, savePreferences, verifyPreferences } from '../../common/ToggleTable'; 
 import GridApi from '../../common/GridApi';
 import { canUser } from '../../common/Permissions';
 
@@ -67,13 +67,37 @@ class UserList extends Component {
             { Header: "Superior", accessor: "superior_name", filterable: true, headerClassName: 'text-left', is_checked: true }, 
         ];
 
-        this.setState({ table_columns, initial_columns : table_columns });
+        this.setState({ table_columns, initial_columns : table_columns }, function() {
+            const table_preference = verifyPreferences(this.state.table_columns, 'prefs_user');
+            const columns_filter = createTable(table_preference);
+
+            if (columns_filter.length === 2) {
+                this.setState({ select_all : false });
+            }
+    
+            if (columns_filter.length === table_columns.length) {
+                this.setState({ select_all : true });
+            }
+    
+            this.setState({ table_columns: columns_filter });
+        } );
     }
 
     handleChange(e) {
         const target = e.currentTarget;
         const columns_map = verifySelectChecked(target, this.state.initial_columns);
         const columns_filter = createTable(this.state.initial_columns);
+
+        savePreferences("prefs_user", columns_filter);
+
+        if (columns_filter.length === 2) {
+            this.setState({ select_all : false });
+        }
+
+        if (columns_filter.length === columns_map.length) {
+            this.setState({ select_all : true });
+        }
+
         this.setState({ initial_columns: columns_map, table_columns: columns_filter, table_columns: columns_filter });
     }
 
@@ -91,6 +115,7 @@ class UserList extends Component {
 
             this.setState({ select_all : select_inverse, initial_columns: columns_map }, function() {
                 const columns_filter = createTable(this.state.initial_columns);
+                savePreferences("prefs_user", columns_filter);
                 this.setState({ initial_columns: columns_map, table_columns: columns_filter, table_columns: columns_filter });
             });
         // }
