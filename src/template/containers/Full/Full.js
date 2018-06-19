@@ -85,7 +85,6 @@ class Full extends Component {
 
     componentWillMount() {
         this.loadMenuPermissions();
-
     }
 
     showMessagePermission() {
@@ -147,7 +146,8 @@ class Full extends Component {
                                 <Route path="/config/regras" name="Regras" component={Roles}/>                                
                                 <Route path="/config/permissoes" name="Permissões" component={Rules}/>
                                 <Route path="/config/usuarios" name="Usuários" component={Users}/>
-                                {/* <Redirect from="/" to="/marketshare" /> */}
+
+                                {/* <Redirect from="/" to="/dashboard/indicadores" /> */}
                             </Switch>
                         </Container>
                     </main>

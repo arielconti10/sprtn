@@ -91,8 +91,9 @@ class LoginForm extends Component {
 
         if (this.state.valid_login) {
             return (
-                <Redirect to="/" />
+                <Redirect to="/dashboard/indicadores" />
             );
+            window.reload();
         }
         return (
             <div>
