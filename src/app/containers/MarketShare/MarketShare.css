@@ -5,3 +5,5 @@
 .marketshare-tab-charts { border-color: #64bbff !important; }
 .nav-tabs.marketshare-tab-charts .nav-link.active { border-bottom-width: 3px; border-color: #fff !important; border-bottom-color: #293960 !important; }
 .nav-tabs.marketshare-tab-charts .nav-link:hover { border-bottom-width: 3px; border-bottom-color: #293960 !important; border-top-color: transparent !important; border-left-color: transparent !important; border-right-color: transparent !important; }
+
+.no-register { width: 100%; text-align: center; margin-top: 15%; color: #009ce5; font-size: 16px; }
