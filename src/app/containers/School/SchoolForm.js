@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
 
-import { Link, Redirect } from 'react-router-dom';
-
 import axios from '../../../app/common/axios';
 import { verifyToken } from '../../../app/common/AuthorizeHelper';
 
-import { Card, CardHeader, CardFooter, CardBody, CardTitle, CardText, Row, Col, Button, Label, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
+import { Row, Col, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import classnames from 'classnames';
-import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
-import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 
 import SchoolDashboard from './SchoolDashboard';
 import SchoolDistributionList from './SchoolDistributionList';
@@ -18,8 +14,9 @@ import SchoolStudentIcon from './SchoolStudentIcon';
 import SchoolStudentList from './SchoolStudentList';
 import SchoolAdoptionList from './SchoolAdoptionList';
 import SchoolEventList from './SchoolEventList';
+import SchoolMeeting from './SchoolMeeting';
 
-import { canUser, verifyViewMode } from '../../common/Permissions';
+import './School.css';
 
 class SchoolForm extends Component {
     constructor(props) {
@@ -27,26 +24,26 @@ class SchoolForm extends Component {
         this.toggle = this.toggle.bind(this);
         this.contacts_global = [];
         this.state = {
-            viewMode: false,
+            view_mode: false,
             permission: true,
-            schoolName: '',
-            viewMode: false,
+            school_name: '',
+            show_meeting: 'd-none',
             contacts: [],
             authorized: 1,
             contacts_initial: [],
             active: false,
             portfolio: false,
-            schoolId: this.props.match.params.id,
+            school_id: this.props.match.params.id,
             students: [],
             total_students_ei: '0',
             total_students_ef1: '0',
             total_students_ef2: '0',
             total_students_em: '0',
             total_students: '0',
-            activeTab: 'dashboard',
-            schoolCodeTotvs: '0',
-            subsidiaryId: '0',
-            sectorId: '0',
+            active_tab: 'dashboard',
+            school_code_totvs: '0',
+            subsidiary_id: '0',
+            sector_id: '0',
             school_type_identify: '',
             marketshare: []
         };
@@ -54,16 +51,15 @@ class SchoolForm extends Component {
 
     componentWillMount(){
         this.getSchool();
-
     }
 
     getSchool() {
-        axios.get(`school/${this.state.schoolId}`)
+        axios.get(`school/${this.state.school_id}`)
         .then(response => {
             const dados = response.data.data;
 
                 this.setState({
-                    schoolName: dados.name,
+                    school_name: dados.name,
                     total_students_ei: dados.total_students_ei || '0',
                     total_students_ef1: dados.total_students_ef1 || '0',
                     total_students_ef2: dados.total_students_ef2 || '0',
@@ -74,10 +70,11 @@ class SchoolForm extends Component {
                     contacts_initial: dados.contacts || [],
                     active: dados.active == 1 ? true : false,
                     portfolio: dados.portfolio == 1 ? true : false,
-                    schoolCodeTotvs: dados.school_code_totvs,
-                    subsidiaryId: dados.subsidiary_id,
-                    sectorId: dados.sector_id,
+                    school_code_totvs: dados.school_code_totvs,
+                    subsidiary_id: dados.subsidiary_id,
+                    sector_id: dados.sector_id,
                     school_type_identify: dados.school_type.identify.toLowerCase(),
+                    show_meeting: dados.school_type.identify.toLowerCase() == 'secretaria' ? '' : 'd-none',
                     marketshare: dados.marketshare
                 });
 
@@ -85,164 +82,119 @@ class SchoolForm extends Component {
             .catch(function (error) {
                 let authorized = verifyToken(error.response.status);
                 this.setState({ authorized: authorized });
-            }.bind(this));
-
+            }.bind(this)
+        );
     }
 
     toggle(tab) {
-        if (this.state.activeTab !== tab) {
-            axios.get(`school/${this.state.schoolId}`)
-                .then(response => {
-                    const dados = response.data.data;
-                    this.setState({
-                        schoolName: dados.name,
-                        total_students_ei: dados.total_students_ei || '0',
-                        total_students_ef1: dados.total_students_ef1 || '0',
-                        total_students_ef2: dados.total_students_ef2 || '0',
-                        total_students_em: dados.total_students_em || '0',
-                        total_students: dados.total_students || '0',
-                        students: dados.students || [],
-                        contacts: dados.contacts || [],
-                        active: dados.active == 1 ? true : false,
-                        portfolio: dados.portfolio == 1 ? true : false,
-                        schoolCodeTotvs: dados.school_code_totvs,
-                        subsidiaryId: dados.subsidiary_id,
-                        sectorId: dados.sector_id,
-                        school_type_identify: dados.school_type.identify.toLowerCase(),
-                        marketshare: dados.marketshare
-                    });
-                })
-                .catch(function (error) {
-                    let authorized = verifyToken(error.response.status);
-                    this.setState({ authorized: authorized });
-                }.bind(this));
-
-            this.setState({
-                activeTab: tab,
-            });
-        }
+        if (this.state.active_tab !== tab) this.setState({ active_tab: tab });
     }
 
     render() {
-        if (this.state.authorized == 0) {
-            return (
-                <Redirect to="/login" />
-            );
-        }
+        const { 
+            authorized, school_name, portfolio, active, total_students_ei, total_students_ef1, total_students_ef2, total_students_em, show_meeting,
+            total_students, school_type_identify, active_tab, school_id, contacts, view_mode, school_code_totvs, subsidiary_id, sector_id
+        } = this.state;
 
+        if (authorized == 0)  return ( <Redirect to="/login" /> );
+        
         return (
             <div>
                 <h1 className="school-header">
-                    <i className="fa fa-building-o"></i> {this.state.schoolName}
+                    <i className="fa fa-building-o"></i> {school_name}
                     <SchoolStudentIcon
-                        portfolio={this.state.portfolio}
-                        active={this.state.active}
-                        eiStudents={this.state.total_students_ei}
-                        ef1Students={this.state.total_students_ef1}
-                        ef2Students={this.state.total_students_ef2}
-                        emStudents={this.state.total_students_em}
-                        numStudents={this.state.total_students}
+                        portfolio={portfolio}
+                        active={active}
+                        eiStudents={total_students_ei}
+                        ef1Students={total_students_ef1}
+                        ef2Students={total_students_ef2}
+                        emStudents={total_students_em}
+                        numStudents={total_students}
                     />
                 </h1>
                 <br />
-                <Nav tabs className={`tab-${this.state.school_type_identify}`}>
+                <Nav tabs className={`tab-${school_type_identify}`}>
                     <NavItem>
-                        <NavLink
-                            className={classnames({ active: this.state.activeTab === 'dashboard' })}
-                            onClick={() => { this.toggle('dashboard'); }}
-                        >
+                        <NavLink className={classnames({ active: active_tab === 'dashboard' })} onClick={() => { this.toggle('dashboard'); }}>
                             Dashboard
                         </NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink
-                            className={classnames({ active: this.state.activeTab === 'cadastro' })}
-                            onClick={() => { this.toggle('cadastro'); }}
-                        >
+                        <NavLink className={classnames({ active: active_tab === 'register' })} onClick={() => { this.toggle('register'); }}>
                             Cadastro
                         </NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink
-                            className={classnames({ active: this.state.activeTab === 'contatos' })}
-                            onClick={() => { this.toggle('contatos'); }}
-                        >
+                        <NavLink className={classnames({ active: active_tab === 'contacts' })} onClick={() => { this.toggle('contacts'); }}>
                             Contatos
                         </NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink
-                            className={classnames({ active: this.state.activeTab === 'alunos' })}
-                            onClick={() => { this.toggle('alunos'); }}
-                        >
+                        <NavLink className={classnames({ active: active_tab === 'students' })} onClick={() => { this.toggle('students'); }}>
                             Alunos
                         </NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink
-                            className={classnames({ active: this.state.activeTab === 'adocoes' }) + 'd-none'}
-                            onClick={() => { this.toggle('adocoes'); }}
-                        >
+                        <NavLink className={classnames({ active: active_tab === 'adoptions' }) + 'd-none'} onClick={() => { this.toggle('adoptions'); }}>
                             Adoções
                         </NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink
-                            className={classnames({ active: this.state.activeTab === 'agendas' })}
-                            onClick={() => { this.toggle('agendas'); }}
-                        >
+                        <NavLink className={classnames({ active: active_tab === 'actions' })} onClick={() => { this.toggle('actions'); }}>
                             Ações
                         </NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink
-                            className={classnames({ active: this.state.activeTab === 'distribution' })}
-                            onClick={() => { this.toggle('distribution'); }}
-                        >
+                        <NavLink className={classnames({ active: active_tab === 'distribution' })} onClick={() => { this.toggle('distribution'); }}>
                             Distribuição
                         </NavLink>
                     </NavItem>
+                    <NavItem>
+                        <NavLink className={classnames({ active: active_tab === 'meeting' }) + show_meeting} onClick={() => { this.toggle('meeting'); }}>
+                            Reunião
+                        </NavLink>
+                    </NavItem>
                 </Nav>
-                <TabContent activeTab={this.state.activeTab} className={`cont-${this.state.school_type_identify}`}>
+                <TabContent activeTab={active_tab} className={`cont-${school_type_identify}`}>
                     <TabPane tabId="dashboard">
                         <Row>
                             <Col sm="12">
-                                <SchoolDashboard schoolId={this.state.schoolId} />
+                                <SchoolDashboard schoolId={school_id} />
                             </Col>
                         </Row>
                     </TabPane>
-                    <TabPane tabId="cadastro">
+                    <TabPane tabId="register">
                         <Row>
                             <Col sm="12">
-                                <SchoolRegister viewMode={this.state.viewMode} schoolId={this.state.schoolId} />
+                                <SchoolRegister viewMode={view_mode} schoolId={school_id} />
                             </Col>
                         </Row>
                     </TabPane>
-                    <TabPane tabId="contatos">
+                    <TabPane tabId="contacts">
                         <Row>
                             <Col sm="12">
-                                <SchoolConctactList schoolId={this.state.schoolId} contacts={this.state.contacts} />
+                                <SchoolConctactList schoolId={school_id} contacts={contacts} />
                             </Col>
                         </Row>
                     </TabPane>
-                    <TabPane tabId="alunos">
+                    <TabPane tabId="students">
                         <Row>
                             <Col sm="12">
-                                <SchoolStudentList viewMode={this.state.viewMode} schoolId={this.state.schoolId} url={this.props.match.url} />
+                                <SchoolStudentList viewMode={view_mode} schoolId={school_id} url={this.props.match.url} />
                             </Col>
                         </Row>
                     </TabPane>
-                    <TabPane tabId="adocoes">
+                    <TabPane tabId="adoptions">
                         <Row>
                             <Col sm="12">
-                                <SchoolAdoptionList schoolId={this.state.schoolId} schoolCodeTotvs={this.state.schoolCodeTotvs} subsidiaryId={this.state.subsidiaryId} sectorId={this.state.sectorId} />
+                                <SchoolAdoptionList schoolId={school_id} schoolCodeTotvs={school_code_totvs} subsidiaryId={subsidiary_id} sectorId={sector_id} />
                             </Col>
                         </Row>
                     </TabPane>
-                    <TabPane tabId="agendas">
+                    <TabPane tabId="actions">
                         <Row>
                             <Col sm="12">
-                                <SchoolEventList schoolId={this.state.schoolId} />
+                                <SchoolEventList schoolId={school_id} />
                             </Col>
                         </Row>
                     </TabPane>
@@ -250,6 +202,13 @@ class SchoolForm extends Component {
                         <Row>
                             <Col sm="12">
                                 <SchoolDistributionList />
+                            </Col>
+                        </Row>
+                    </TabPane>
+                    <TabPane tabId="meeting">
+                        <Row>
+                            <Col sm="12">
+                                <SchoolMeeting schoolId={school_id} viewMode={view_mode} />
                             </Col>
                         </Row>
                     </TabPane>
