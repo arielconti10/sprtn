@@ -213,7 +213,7 @@ export default class SchoolMeeting extends Component {
                             <Select
                                 name="form_profile"
                                 id="form_profile"
-                                disabled={!(view_mode)}
+                                disabled={view_mode}
                                 clearable={false}
                                 value={form_profile}
                                 onChange={this.handleChange}
@@ -230,7 +230,7 @@ export default class SchoolMeeting extends Component {
                                 <Select
                                     name="form_unified"
                                     id="form_unified"
-                                    disabled={!(view_mode)}
+                                    disabled={view_mode}
                                     clearable={false}
                                     value={form_unified}
                                     onChange={this.handleChange}
@@ -248,6 +248,7 @@ export default class SchoolMeeting extends Component {
                             <Col xl='3' md='3' sm='12' xs='12'>
                                 <label>Perfil de escolha</label>
                                 <Flatpickr
+                                    readonly={view_mode}
                                     className="form-control"
                                     options={{ minDate: 'today' }}
                                     value={form_reunions}
@@ -263,7 +264,7 @@ export default class SchoolMeeting extends Component {
                                 <Select
                                     name="form_shift"
                                     id="form_shift"
-                                    disabled={!(view_mode)}
+                                    disabled={view_mode}
                                     clearable={false}
                                     value={form_shift}
                                     onChange={this.handleChange}
