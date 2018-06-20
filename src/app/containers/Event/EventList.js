@@ -70,6 +70,10 @@ class EventList extends Component {
             const table_preference = verifyPreferences(this.state.table_columns, 'prefs_event', 'id');
             const columns_filter = createTable(table_preference);
 
+            console.log(this.state.table_columns);
+            console.log(table_preference);
+            console.log(columns_filter);
+
             if (columns_filter.length === 2) {
                 this.setState({ select_all : false });
             }

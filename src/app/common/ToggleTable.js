@@ -59,8 +59,6 @@ export function verifyPreferences(columns_table, pref_key, filter_by = '') {
     const columns_preferences = JSON.parse(localStorage.getItem(pref_key));
     let table_preference = columns_table;
 
-    console.log(table_preference);
-
     if (columns_preferences) {
         if (filter_by !== "") {
             table_preference.map(item => {
