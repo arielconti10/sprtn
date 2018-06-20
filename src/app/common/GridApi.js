@@ -38,10 +38,51 @@ class GridApi extends Component {
             sortInitial: []
         };
 
+        this.searchData = this.searchData.bind(this);
+
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({ viewMode: nextProps.blockEdit, deleteMode: nextProps.blockDelete, columnsGrid: nextProps.columns });
+        this.setState({ viewMode: nextProps.blockEdit, deleteMode: nextProps.blockDelete, columnsGrid: nextProps.columns }, function(){
+            this.state.columnsGrid.map(item => {
+                item.filterable === true?
+                item.Filter = ({ filter, onChange }) => (
+                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                        onBlur={event => this.onChangeTextFilter([event.target.value, item.accessor])}
+                        onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter([event.target.value, item.accessor]):''}
+                    />
+                ):""
+            })
+            console.log(this.state.columnsGrid);
+        });
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevState.columns !== this.state.columnsGrid) {
+            this.state.columnsGrid.map(item => {
+                item.filterable === true?
+                item.Filter = ({ filter, onChange }) => (
+                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                        onBlur={event => this.onChangeTextFilter([event.target.value, item.accessor])}
+                        onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter([event.target.value, item.accessor]):''}
+                    />
+                ):""
+            })
+        }
+
+        console.log(this.state.columnsGrid);
+    }
+
+    onChangeTextFilter(target) {
+        const new_object = {id: target[1], value: target[0]};
+        let concat_filter = this.state.filtered.filter(item => item.id !== new_object.id);
+        if (new_object.value !== "") {
+            concat_filter = concat_filter.concat(new_object);
+        }
+                
+        this.setState( { filtered: concat_filter }, function() {
+            this.onFetchData();
+        });
     }
 
     onClickDelete(element) {
@@ -140,7 +181,6 @@ class GridApi extends Component {
 
     componentDidMount() {
         this.createTabel();
-        console.log(this.state.columnsGrid);
     }
 
     createTabel() {
@@ -358,10 +398,10 @@ class GridApi extends Component {
                     col = col_filter;
                 } else {
                     const table_preference = verifyPreferences(col, api_pref, 'id');
-                    const col_filter = table_preference.filter(item => item.id === "" || item.is_checked === true);
+                    console.log(table_preference);
+                    const col_filter = table_preference.filter(item => item.accessor === "" || item.is_checked === true);
+                    console.log(col_filter);
                     col = col_filter;
-
-                    console.log(col);
                 }
 
 
@@ -405,16 +445,19 @@ class GridApi extends Component {
 
         //verifica se é uma coluna composta, por exemplo full_name (nome + sobrenome)
         //para escolher método de ordenaçāo
-        const column_compare = state.columns.filter(function (column) {
-            return column.accessor == sorted_id;
-        });
+        if (this.state.columns) {
+            
+            const column_compare = this.state.columns.filter(function (column) {
+                return column.accessor == sorted_id;
+            });
 
-        if(column_compare[count]) {
-            if (column_compare[count].is_compost) {
-                order_by = column_compare[count].order_by;
+            if(column_compare[count]) {
+                if (column_compare[count].is_compost) {
+                    order_by = column_compare[count].order_by;
+                }
+            } else {
+                order_by = "name";
             }
-        } else {
-            order_by = "name";
         }
 
         return order_by;
@@ -448,14 +491,14 @@ class GridApi extends Component {
     }
 
     onFetchData = (state, instance, deleted_at) => {
-
         let apiSpartan = this.props.apiSpartan
 
         let pageSize = state ? state.pageSize : this.state.pageSize;
         let page = state ? state.page + 1 : this.state.page;
 
         let sorted = state ? state.sorted : this.state.sorted
-        let filtered = state ? state.filtered : this.state.filtered
+        // let filtered = state ? state.filtered : this.state.filtered;
+        let filtered = this.state.filtered;
 
         let baseURL = `/${apiSpartan}?paginate=${pageSize}&page=${page}`;
 
@@ -484,32 +527,36 @@ class GridApi extends Component {
             baseURL += "&order[" + order_by + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
         }
 
+        this.searchData(baseURL, sorted, filtered);
+    }
+
+    searchData(baseURL, sorted, filtered) {
         axios.get(baseURL)
-            .then((response) => {
-                const dados = response.data.data;
+        .then((response) => {
+            const dados = response.data.data;
 
-                this.setState({
-                    data: dados,
-                    totalSize: response.data.meta.pagination.total,
-                    pages: response.data.meta.pagination.last_page,
-                    page: response.data.meta.pagination.current_page,
-                    pageSize: parseInt(response.data.meta.pagination.per_page),
-                    sorted: sorted,
-                    filtered: filtered,
-                    loading: false
-                }, function () {
-                    this.verifySortInitial();
-                });
+            this.setState({
+                data: dados,
+                totalSize: response.data.meta.pagination.total,
+                pages: response.data.meta.pagination.last_page,
+                page: response.data.meta.pagination.current_page,
+                pageSize: parseInt(response.data.meta.pagination.per_page),
+                sorted: sorted,
+                filtered: filtered,
+                loading: false
+            }, function () {
+                this.verifySortInitial();
+            });
 
-                this.setState({ringLoad : false});
-                // this.createTabel();
+            this.setState({ringLoad : false});
+            // this.createTabel();
 
-            })
-            .catch(function (error) {
-                let authorized = verifyToken(error.response.status);
-                this.setState({ authorized: authorized });
-            }.bind(this));
-
+        })
+        .catch(function (error) {
+            console.log(error);
+            // let authorized = verifyToken(error.response.status);
+            // this.setState({ authorized: authorized });
+        }.bind(this));
     }
 
     render() {
@@ -556,13 +603,5 @@ class GridApi extends Component {
         )
     }
 }
-/*
-1 == 2?[
-          defaultSorted={[
-            {
-              id: "age",
-              desc: true
-            }
-          ]}
-*/
+
 export default withRouter(GridApi);
