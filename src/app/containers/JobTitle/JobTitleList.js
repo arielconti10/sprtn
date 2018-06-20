@@ -47,6 +47,11 @@ class JobTitleList extends Component {
         }.bind(this));       
     }
 
+    callChangeText = (callback) => {
+        callback;
+        // this.child.onChangeTextFilter();  ///calling a child function here
+    } 
+
 
     componentWillMount() {
         this.checkPermission();

@@ -230,7 +230,20 @@ class SchoolList extends Component {
         }
         this.setState({ values });
 
-        this.onFetchData();
+        this.onFetchData();        
+    }
+
+    onChangeTextFilter(target, accessor) {
+        const new_object = {id: target[1], value: target[0]};
+        let concat_filter = this.state.filtered.filter(item => item.id !== new_object.id);
+        if (new_object.value !== "") {
+            concat_filter = concat_filter.concat(new_object);
+        }
+        
+        this.setState( { filtered: concat_filter }, function() {
+            console.log(this.state.filtered);
+            this.onFetchData();
+        });
     }
 
     showMarketShare(marketshare) {
@@ -268,11 +281,22 @@ class SchoolList extends Component {
                 is_checked: true,
                 Cell: props => <span>{this.showMarketShare(props.value) + '%'}</span>
             },
-            { Header: "Nome", accessor: "name", sortable: true, filterable: true, minWidth: 250, maxWidth: 500, headerClassName: 'text-left'
-                ,is_checked: true,
+            {
+                Header: "Nome", accessor: "name", filterable: true,  minWidth: 250, maxWidth: 500, headerClassName: 'text-left', sortable: true,
+                is_checked: true,
+                Filter: ({ filter, onChange }) => (
+                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                        onBlur={event => this.onChangeTextFilter([event.target.value, "name"])}
+                    />
+                )
             },
             { Header: 'Tipo', accessor: 'school_type.name', sortable: true, filterable: true, width: 160, headerClassName: 'text-left', sortable: false 
             ,is_checked: true,
+                Filter: ({ filter, onChange }) => (
+                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                        onBlur={event => this.onChangeTextFilter([event.target.value, "school_type.name"])}
+                    />
+                )
             },
             {
                 Header: "Identificação", accessor: "school_type", filterable: true, width: 120, headerClassName: 'text-left', sortable: false,
@@ -288,16 +312,37 @@ class SchoolList extends Component {
                 )
             },
             { Header: 'Perfil', accessor: 'profile.name', sortable: true, filterable: true, width: 100, headerClassName: 'text-left', sortable: false
-                ,is_checked: true
+                ,is_checked: true,
+                Filter: ({ filter, onChange }) => (
+                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                        onBlur={event => this.onChangeTextFilter([event.target.value, "profile.name"])}
+                    />
+                )
             },
             { Header: 'Filial', accessor: 'subsidiary.name', filterable: true, width: 60, headerClassName: 'text-left', sortable: false 
                 ,is_checked: true,
+                Filter: ({ filter, onChange }) => (
+                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                        onBlur={event => this.onChangeTextFilter([event.target.value, "subsidiary.name"])}
+                    />
+                )
             },
             { Header: 'Setor', accessor: 'sector.name', filterable: true, width: 60, headerClassName: 'text-left', sortable: false 
                 ,is_checked: true,
+                Filter: ({ filter, onChange }) => (
+                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                        onBlur={event => this.onChangeTextFilter([event.target.value, "sector.name"])}
+                    />
+                )
+                
             },
             { Header: "TOTVS", accessor: "school_code_totvs", filterable: true, width: 100, headerClassName: 'text-left' 
                 ,is_checked: true,
+                Filter: ({ filter, onChange }) => (
+                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                        onBlur={event => this.onChangeTextFilter([event.target.value, "school_code_totvs"])}
+                    />
+                )
             },
             {
                 Header: "Status",
@@ -323,11 +368,29 @@ class SchoolList extends Component {
             },
             { Header: "CEP", accessor: "zip_code", filterable: true, width: 100, headerClassName: 'text-left' 
                 ,is_checked: true,
+                Filter: ({ filter, onChange }) => (
+                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                        onBlur={event => this.onChangeTextFilter([event.target.value, "zip_code"])}
+                    />
+                )
+                
             },
             { Header: "Cidade", accessor: "city", filterable: true, width: 160, headerClassName: 'text-left' 
                 ,is_checked: true,
+                Filter: ({ filter, onChange }) => (
+                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                        onBlur={event => this.onChangeTextFilter([event.target.value, "city"])}
+                    />
+                )
             },
-            { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left',is_checked: true }
+            { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left',is_checked: true,
+                Filter: ({ filter, onChange }) => (
+                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                        onBlur={event => this.onChangeTextFilter([event.target.value, "state.abbrev"])}
+                    />
+                )
+            },
+            
         ];
 
         return col;
@@ -393,31 +456,36 @@ class SchoolList extends Component {
             }
         }
 
-        this.setState({ urlNoPaginate })
+        this.setState({ urlNoPaginate });
 
+        this.searchData(baseURL, sorted, filtered);
+
+    }
+
+    searchData(baseURL, sorted, filtered) {
         axios.get(baseURL)
-            .then((response) => {
-                const dados = response.data.data
-                this.setState({
-                    data: dados,
-                    totalSize: response.data.meta.pagination.total,
-                    pages: response.data.meta.pagination.last_page,
-                    page: response.data.meta.pagination.current_page,
-                    pageSize: parseInt(response.data.meta.pagination.per_page),
-                    sorted: sorted,
-                    filtered: filtered,
-                    loading: false
-                });
-            })
-            .catch(function (error) {
-                let authorized = verifyToken(error.response.status);
-                this.setState({ authorized: authorized });
-            }.bind(this));
+        .then((response) => {
+            const dados = response.data.data
+            this.setState({
+                data: dados,
+                totalSize: response.data.meta.pagination.total,
+                pages: response.data.meta.pagination.last_page,
+                page: response.data.meta.pagination.current_page,
+                pageSize: parseInt(response.data.meta.pagination.per_page),
+                sorted: sorted,
+                filtered: filtered,
+                loading: false
+            });
+        })
+        .catch(function (error) {
+            let authorized = verifyToken(error.response.status);
+            this.setState({ authorized: authorized });
+        }.bind(this));
     }
 
     executeSearch() {
         console.log('executeSearch:');
-        this.onFetchData();
+        // this.onFetchData();
     }
 
     handleSelectAll(event) {
