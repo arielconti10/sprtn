@@ -47,13 +47,12 @@ class GridApi extends Component {
             this.state.columnsGrid.map(item => {
                 item.filterable === true?
                 item.Filter = ({ filter, onChange }) => (
-                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
-                        onBlur={event => this.onChangeTextFilter([event.target.value, item.accessor])}
-                        onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter([event.target.value, item.accessor]):''}
+                    <input type="text" value={filter} style={{width:  "100%"}} 
+                        onBlur={event => this.onChangeTextFilter([filter, item.accessor])}
+                        onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter([filter, item.accessor]):''}
                     />
                 ):""
             })
-            console.log(this.state.columnsGrid);
         });
     }
 
@@ -62,7 +61,7 @@ class GridApi extends Component {
             this.state.columnsGrid.map(item => {
                 item.filterable === true?
                 item.Filter = ({ filter, onChange }) => (
-                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                    <input type="text" value={filter} style={{width:  "100%"}} 
                         onBlur={event => this.onChangeTextFilter([event.target.value, item.accessor])}
                         onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter([event.target.value, item.accessor]):''}
                     />
@@ -70,7 +69,6 @@ class GridApi extends Component {
             })
         }
 
-        console.log(this.state.columnsGrid);
     }
 
     onChangeTextFilter(target) {
@@ -398,9 +396,7 @@ class GridApi extends Component {
                     col = col_filter;
                 } else {
                     const table_preference = verifyPreferences(col, api_pref, 'id');
-                    console.log(table_preference);
                     const col_filter = table_preference.filter(item => item.accessor === "" || item.is_checked === true);
-                    console.log(col_filter);
                     col = col_filter;
                 }
 
