@@ -110,7 +110,6 @@ class SchoolList extends Component {
         this.setState({ ringLoad: true });
 
         let urlNoPaginate = this.state.urlNoPaginate;
-        console.log('urlNoPaginate:', urlNoPaginate);
 
         axios.get(urlNoPaginate)
             .then((response) => {
@@ -241,7 +240,6 @@ class SchoolList extends Component {
         }
         
         this.setState( { filtered: concat_filter }, function() {
-            console.log(this.state.filtered);
             this.onFetchData();
         });
     }
@@ -285,16 +283,18 @@ class SchoolList extends Component {
                 Header: "Nome", accessor: "name", filterable: true,  minWidth: 250, maxWidth: 500, headerClassName: 'text-left', sortable: true,
                 is_checked: true,
                 Filter: ({ filter, onChange }) => (
-                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                    <input type="text" value={filter} style={{width:  "100%"}} 
                         onBlur={event => this.onChangeTextFilter([event.target.value, "name"])}
+                        onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter([event.target.value,"name"]):''}
                     />
                 )
             },
             { Header: 'Tipo', accessor: 'school_type.name', sortable: true, filterable: true, width: 160, headerClassName: 'text-left', sortable: false 
             ,is_checked: true,
                 Filter: ({ filter, onChange }) => (
-                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                    <input type="text" value={filter} style={{width:  "100%"}} 
                         onBlur={event => this.onChangeTextFilter([event.target.value, "school_type.name"])}
+                        onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter([event.target.value, "school_type.name"]):''}
                     />
                 )
             },
@@ -314,24 +314,27 @@ class SchoolList extends Component {
             { Header: 'Perfil', accessor: 'profile.name', sortable: true, filterable: true, width: 100, headerClassName: 'text-left', sortable: false
                 ,is_checked: true,
                 Filter: ({ filter, onChange }) => (
-                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                    <input type="text" value={filter} style={{width:  "100%"}} 
                         onBlur={event => this.onChangeTextFilter([event.target.value, "profile.name"])}
+                        onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter([event.target.value, "profile.name"]):''}
                     />
                 )
             },
             { Header: 'Filial', accessor: 'subsidiary.name', filterable: true, width: 60, headerClassName: 'text-left', sortable: false 
                 ,is_checked: true,
                 Filter: ({ filter, onChange }) => (
-                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                    <input type="text" value={filter} style={{width:  "100%"}} 
                         onBlur={event => this.onChangeTextFilter([event.target.value, "subsidiary.name"])}
+                        onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter([event.target.value, "subsidiary.name"]):''}
                     />
                 )
             },
             { Header: 'Setor', accessor: 'sector.name', filterable: true, width: 60, headerClassName: 'text-left', sortable: false 
                 ,is_checked: true,
                 Filter: ({ filter, onChange }) => (
-                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                    <input type="text" value={filter} style={{width:  "100%"}} 
                         onBlur={event => this.onChangeTextFilter([event.target.value, "sector.name"])}
+                        onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter([event.target.value, "sector.name"]):''}
                     />
                 )
                 
@@ -339,8 +342,9 @@ class SchoolList extends Component {
             { Header: "TOTVS", accessor: "school_code_totvs", filterable: true, width: 100, headerClassName: 'text-left' 
                 ,is_checked: true,
                 Filter: ({ filter, onChange }) => (
-                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                    <input type="text" value={filter} style={{width:  "100%"}} 
                         onBlur={event => this.onChangeTextFilter([event.target.value, "school_code_totvs"])}
+                        onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter([event.target.value, "school_code_totvs"]):''}
                     />
                 )
             },
@@ -369,8 +373,9 @@ class SchoolList extends Component {
             { Header: "CEP", accessor: "zip_code", filterable: true, width: 100, headerClassName: 'text-left' 
                 ,is_checked: true,
                 Filter: ({ filter, onChange }) => (
-                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                    <input type="text" value={filter} style={{width:  "100%"}} 
                         onBlur={event => this.onChangeTextFilter([event.target.value, "zip_code"])}
+                        onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter([event.target.value, "zip_code"]):''}
                     />
                 )
                 
@@ -378,15 +383,17 @@ class SchoolList extends Component {
             { Header: "Cidade", accessor: "city", filterable: true, width: 160, headerClassName: 'text-left' 
                 ,is_checked: true,
                 Filter: ({ filter, onChange }) => (
-                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                    <input type="text" value={filter} style={{width:  "100%"}} 
                         onBlur={event => this.onChangeTextFilter([event.target.value, "city"])}
+                        onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter([event.target.value, "city"]):''}
                     />
                 )
             },
             { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left',is_checked: true,
                 Filter: ({ filter, onChange }) => (
-                    <input type="text" value={event.target.value} style={{width:  "100%"}} 
+                    <input type="text" value={filter} style={{width:  "100%"}} 
                         onBlur={event => this.onChangeTextFilter([event.target.value, "state.abbrev"])}
+                        onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter([event.target.value, "state.abbrev"]):''}
                     />
                 )
             },
