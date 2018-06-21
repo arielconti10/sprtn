@@ -46,7 +46,7 @@ export default class SchoolMeeting extends Component {
             validate_form_reunions: 1,
             validate_form_shift: 1,
 
-            data_profile: [{ value: 1, label: 'Unificado', field: 'form_profile' }, { value: 2, label: 'Descentralizado', field: 'form_profile' }],
+            data_profile: [{ value: 1, label: 'Descentralizado', field: 'form_profile' }, { value: 2, label: 'Unificado', field: 'form_profile' }],
             data_unified: [{ value: 1, label: 'Voto', field: 'form_unified' }, { value: 2, label: 'Decisão do gestor', field: 'form_unified' }],
             data_shift: []
         }
@@ -57,7 +57,7 @@ export default class SchoolMeeting extends Component {
 
     componentDidMount() {
         apis.map(item => {
-            axios.get(`${item.api}?order[name]=asc`)
+            axios.get(`${item.api}`)
                 .then(response => {
                     let data = response.data.data;
                     data.map(ret => {
@@ -83,8 +83,6 @@ export default class SchoolMeeting extends Component {
             axios.get(`${apiSchool}/${this.state.school_id}`)
                 .then(response => {
                     let secretary = response.data.data.secretary;
-
-                    console.log('secretary:', secretary)
 
                     if (secretary) {
                         this.setState({
@@ -172,7 +170,7 @@ export default class SchoolMeeting extends Component {
         params['school_id'] = parseInt(school_id);
         params['choice_profile'] = form_profile;
 
-        if (form_profile == 1) {
+        if (form_profile == 2) {
             params['unified_by'] = form_unified;
             params['choice_reunions'] = form_reunions;
             params['shift_id'] = form_shift;
@@ -181,7 +179,7 @@ export default class SchoolMeeting extends Component {
         axios.post(`${apiPost}`, params)
             .then(res => {
                 console.log('res:', res);
-                if (form_profile == 2) this.clearUnificate();
+                if (form_profile == 1) this.clearUnificate();
 
                 alert('Dados salvos com sucesso!');
                 this.setState({ submit_button_disabled: true });
@@ -224,7 +222,7 @@ export default class SchoolMeeting extends Component {
                                 <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
                             }
                         </Col>
-                        {form_profile == 1 &&
+                        {form_profile == 2 &&
                             <Col xl='3' md='3' sm='12' xs='12'>
                                 <label>Unificado por</label>
                                 <Select
@@ -243,7 +241,7 @@ export default class SchoolMeeting extends Component {
                             </Col>
                         }
                     </Row>
-                    {form_profile == 1 &&
+                    {form_profile == 2 &&
                         <Row>
                             <Col xl='3' md='3' sm='12' xs='12'>
                                 <label>Perfil de escolha</label>
