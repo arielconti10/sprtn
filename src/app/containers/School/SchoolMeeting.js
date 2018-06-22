@@ -5,6 +5,7 @@ import Select from 'react-select';
 import moment from 'moment';
 import Flatpickr from 'react-flatpickr';
 import { canUser } from '../../common/Permissions';
+import { formatDateToAmerican, formatDateToBrazilian } from '../../common/DateHelper'
 
 import 'flatpickr/dist/themes/material_blue.css'
 import 'react-select/dist/react-select.css';
@@ -88,7 +89,7 @@ export default class SchoolMeeting extends Component {
                         this.setState({
                             form_profile: secretary.choice_profile,
                             form_unified: secretary.unified_by,
-                            form_reunions: secretary.choice_reunions,
+                            form_reunions: formatDateToBrazilian(secretary.choice_reunions),
                             form_shift: secretary.shift_id
                         });
                     }
@@ -105,7 +106,7 @@ export default class SchoolMeeting extends Component {
     checkPermission() {
         canUser('school.update', this.props.history, "change", function (rules) {
             if (rules.length == 0) {
-                this.setState({ view_mode: true, submit_button_disabled: true });
+                this.setState({ view_mode: false, submit_button_disabled: false });
             }
         }.bind(this));
     }
@@ -172,13 +173,12 @@ export default class SchoolMeeting extends Component {
 
         if (form_profile == 2) {
             params['unified_by'] = form_unified;
-            params['choice_reunions'] = form_reunions;
+            params['choice_reunions'] = formatDateToAmerican(form_reunions);
             params['shift_id'] = form_shift;
         }
 
         axios.post(`${apiPost}`, params)
             .then(res => {
-                console.log('res:', res);
                 if (form_profile == 1) this.clearUnificate();
 
                 alert('Dados salvos com sucesso!');
@@ -224,7 +224,7 @@ export default class SchoolMeeting extends Component {
                         </Col>
                         {form_profile == 2 &&
                             <Col xl='3' md='3' sm='12' xs='12'>
-                                <label>Unificado por</label>
+                                <label>Unificado por <strong style={{ color: 'red' }}>*</strong></label>
                                 <Select
                                     name="form_unified"
                                     id="form_unified"
@@ -244,11 +244,11 @@ export default class SchoolMeeting extends Component {
                     {form_profile == 2 &&
                         <Row>
                             <Col xl='3' md='3' sm='12' xs='12'>
-                                <label>Perfil de escolha</label>
+                                <label>Perfil de escolha <strong style={{ color: 'red' }}>*</strong></label>
                                 <Flatpickr
                                     readonly={view_mode}
                                     className="form-control"
-                                    options={{ minDate: 'today' }}
+                                    options={{ minDate: 'today', dateFormat: 'd/m/Y' }}
                                     value={form_reunions}
                                     onChange={this.handleChangeReunions}
                                 />
@@ -258,7 +258,7 @@ export default class SchoolMeeting extends Component {
                             </Col>
 
                             <Col xl='3' md='3' sm='12' xs='12'>
-                                <label>Turno</label>
+                                <label>Turno <strong style={{ color: 'red' }}>*</strong></label>
                                 <Select
                                     name="form_shift"
                                     id="form_shift"
