@@ -246,7 +246,8 @@ export default class SchoolMeeting extends Component {
                             <Col xl='3' md='3' sm='12' xs='12'>
                                 <label>Perfil de escolha <strong style={{ color: 'red' }}>*</strong></label>
                                 <Flatpickr
-                                    readonly={view_mode}
+                                    disabled={view_mode}
+                                    readOnly={true}
                                     className="form-control"
                                     options={{ minDate: 'today', dateFormat: 'd/m/Y' }}
                                     value={form_reunions}
