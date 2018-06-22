@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Router, hashHistory, Link, browserHistory, withRouter } from 'react-router-dom'
-import { Card, CardHeader, CardFooter, CardBody, Button, Collapse, Row, Col } from 'reactstrap';
+import { Card, CardBody, Button, Collapse, Row, Col } from 'reactstrap';
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
-import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput, FormControl } from 'react-form-with-constraints-bootstrap4';
+import { FieldFeedbacks, FormGroup, FormControlLabel } from 'react-form-with-constraints-bootstrap4';
 import ReactTable from 'react-table'
 import Select from 'react-select';
 import moment from 'moment';
@@ -37,18 +36,16 @@ class SchoolEventList extends Component {
         super(props);
 
         this.state = {
+            view_mode: false,
             page: 1,
-            pageSize: 10,
+            page_size: 10,
             data: [],
             filtered: [],
             sorted: [],
-            pages: null,
-            loading: false,
             columns: [],
 
             collapse: false,
-            selectedOption: '',
-            blockButton: false,
+            block_button: false,
             back_error: '',
             submit_button_disabled: false,
             new: true,
@@ -86,7 +83,6 @@ class SchoolEventList extends Component {
         this.handleOpenStartTime = this.handleOpenStartTime.bind(this);
 
         this.formatedHour = this.formatedHour.bind(this);
-        this.convertDate = this.convertDate.bind(this);
     }
 
     handleChangeVisitType = (selectedOption) => {
@@ -127,10 +123,8 @@ class SchoolEventList extends Component {
 
     clearForm() {
         this.setState({
-            // form_name: '',
             form_start_date: '',
             form_start_time: '',
-            // form_visit_type_id: 0,
             form_action_id: 0,
             form_observations: ''
         });
@@ -139,7 +133,7 @@ class SchoolEventList extends Component {
     closeColapse() {
         this.clearForm();
         this.setState({
-            blockButton: false,
+            block_button: false,
             collapse: false
         });
     }
@@ -163,10 +157,9 @@ class SchoolEventList extends Component {
         values.form_name = name;
         values.form_start_date = start_date;
         values.form_start_time = start_time;
-        // values.form_visit_type_id = visit_type_id;
         values.form_action_id = action_id;
         values.form_observations = observations;
-        values.blockButton = true;
+        values.block_button = true;
         values.collapse = true;
         values.new = false;
 
@@ -176,8 +169,7 @@ class SchoolEventList extends Component {
 
     onClickAdd() {
         this.setState({
-            // form_name: '',
-            blockButton: true,
+            block_button: true,
             collapse: true,
             new: true
         });
@@ -306,7 +298,7 @@ class SchoolEventList extends Component {
     checkPermission() {
         canUser('school.update', this.props.history, "change", function(rules){
             if (rules.length == 0) {
-                this.setState({viewMode:true, submit_button_disabled: true});
+                this.setState({ view_mode: false, submit_button_disabled: false });
             }
         }.bind(this));
     }
@@ -352,17 +344,17 @@ class SchoolEventList extends Component {
                     (
                         !element.value.deleted_at ?
                             <div className={this.showButtonAction(element)}>
-                                <button className='btn btn-primary btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickEdit(element)}>
+                                <button className='btn btn-primary btn-sm' disabled={this.state.block_button} onClick={() => this.onClickEdit(element)}>
                                     <i className='fa fa-pencil'></i>
                                 </button>
 
-                                <button className='btn btn-danger btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickDelete(element)}>
+                                <button className='btn btn-danger btn-sm' disabled={this.state.block_button} onClick={() => this.onClickDelete(element)}>
                                     <i className='fa fa-ban'></i>
                                 </button>
                             </div>
                             :
                             <div className={this.showButtonAction(element)}>
-                                <button className='btn btn-success btn-sm' disabled={this.state.blockButton} onClick={() => this.onClickActive(element)}>
+                                <button className='btn btn-success btn-sm' disabled={this.state.block_button} onClick={() => this.onClickActive(element)}>
                                     <i className='fa fa-check-circle'></i>
                                 </button>
                             </div>
@@ -436,16 +428,21 @@ class SchoolEventList extends Component {
     }
 
     render() {
-        const { data, pageSize, page, loading, pages, columns, actions, visit_types, form_name, form_start_date, form_start_time, form_duration, form_visit_type_id, form_action_id, form_school_id, form_observations } = this.state;
+        const { 
+            view_mode, collapse, back_error, submit_button_disabled, data, page_size, 
+            columns, actions, visit_types, form_start_date, form_start_time,
+            validate_form_start_date, validate_form_start_time, validate_form_visit_type_id, 
+            form_visit_type_id, form_action_id, validate_form_action_id, form_observations 
+        } = this.state;
 
         return (
             <div>
-                <Collapse isOpen={this.state.collapse}>
+                <Collapse isOpen={collapse}>
                     <Card>
                         <CardBody>
                             <div>
-                                {this.state.back_error !== '' &&
-                                    <h4 className="alert alert-danger"> {this.state.back_error} </h4>
+                                {back_error !== '' &&
+                                    <h4 className="alert alert-danger"> {back_error} </h4>
                                 }
                                 <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
                                     onSubmit={this.handleSubmit} noValidate>
@@ -460,7 +457,7 @@ class SchoolEventList extends Component {
                                                     value={form_start_date}
                                                     onChange={this.handleChangeStartDate}                                                    
                                                 />
-                                               {this.state.validate_form_start_date == 0 &&
+                                               {validate_form_start_date == 0 &&
                                                     <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
                                                 }
                                             </FormGroup>
@@ -478,7 +475,7 @@ class SchoolEventList extends Component {
                                                     onOpen={this.handleOpenStartTime}
                                                     required
                                                 />
-                                                {this.state.validate_form_start_time == 0 &&
+                                                {validate_form_start_time == 0 &&
                                                     <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
                                                 }
                                             </FormGroup>
@@ -490,7 +487,7 @@ class SchoolEventList extends Component {
                                                 <Select
                                                     name="form_visit_type_id"
                                                     id="form_visit_type_id"
-                                                    disabled={this.state.viewMode}
+                                                    disabled={view_mode}
                                                     value={form_visit_type_id}
                                                     onChange={this.handleChangeVisitType}
                                                     options={visit_types}
@@ -498,7 +495,7 @@ class SchoolEventList extends Component {
                                                     required
                                                     disabled
                                                 />
-                                                {this.state.validate_form_visit_type_id == 0 &&
+                                                {validate_form_visit_type_id == 0 &&
                                                     <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
                                                 }
                                             </FormGroup>
@@ -510,14 +507,14 @@ class SchoolEventList extends Component {
                                                 <Select
                                                     name="form_action_id"
                                                     id="form_action_id"
-                                                    disabled={this.state.viewMode}
+                                                    disabled={view_mode}
                                                     value={form_action_id}
                                                     onChange={this.handleChangeAction}
                                                     options={actions}
                                                     placeholder="Selecione..."
                                                     required
                                                 />
-                                                {this.state.validate_form_action_id == 0 &&
+                                                {validate_form_action_id == 0 &&
                                                     <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
                                                 }
                                             </FormGroup>
@@ -533,9 +530,8 @@ class SchoolEventList extends Component {
                                                     rows="5"
                                                     id="form_observations"
                                                     name="form_observations"
-                                                    readOnly={false}
-                                                    viewMode={this.state.viewMode}
-                                                    value={this.state.form_observations}
+                                                    disabled={view_mode}
+                                                    value={form_observations}
                                                     onChange={this.handleChange}
                                                     required
                                                 />
@@ -551,7 +547,7 @@ class SchoolEventList extends Component {
                             <div>
                                 <Row>
                                     <Col md="1">
-                                        <Button color='primary' onClick={() => this.onClickSave()} disabled={this.state.submit_button_disabled}><i className="fa fa-plus-circle"></i> Salvar</Button>
+                                        <Button color='primary' onClick={() => this.onClickSave()} disabled={submit_button_disabled}><i className="fa fa-plus-circle"></i> Salvar</Button>
                                     </Col>
                                     <Col md="1">
                                         <Button color='danger' onClick={() => this.onClickCancel()}><i className="fa fa-plus-circle"></i> Cancelar</Button>
@@ -564,7 +560,7 @@ class SchoolEventList extends Component {
                 <div>
                     <Row>
                         <Col md="2">
-                            <Button color='primary' disabled={this.state.viewMode} onClick={() => this.onClickAdd()}><i className="fa fa-plus-circle"></i> Adicionar</Button>
+                            <Button color='primary' disabled={view_mode} onClick={() => this.onClickAdd()}><i className="fa fa-plus-circle"></i> Adicionar</Button>
                         </Col>
                     </Row>
                     <br />
@@ -575,7 +571,7 @@ class SchoolEventList extends Component {
                             <ReactTable
                                 columns={columns}
                                 data={data}
-                                defaultPageSize={pageSize}
+                                defaultPageSize={page_size}
                                 onFetchData={this.onFetchData}
                                 previousText='Anterior'
                                 nextText='Próximo'
