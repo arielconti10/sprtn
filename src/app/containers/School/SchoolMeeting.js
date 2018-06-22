@@ -5,6 +5,7 @@ import Select from 'react-select';
 import moment from 'moment';
 import Flatpickr from 'react-flatpickr';
 import { canUser } from '../../common/Permissions';
+import { formatDateToAmerican, formatDateToBrazilian } from '../../common/DateHelper'
 
 import 'flatpickr/dist/themes/material_blue.css'
 import 'react-select/dist/react-select.css';
@@ -88,7 +89,7 @@ export default class SchoolMeeting extends Component {
                         this.setState({
                             form_profile: secretary.choice_profile,
                             form_unified: secretary.unified_by,
-                            form_reunions: secretary.choice_reunions,
+                            form_reunions: formatDateToBrazilian(secretary.choice_reunions),
                             form_shift: secretary.shift_id
                         });
                     }
@@ -172,13 +173,12 @@ export default class SchoolMeeting extends Component {
 
         if (form_profile == 2) {
             params['unified_by'] = form_unified;
-            params['choice_reunions'] = form_reunions;
+            params['choice_reunions'] = formatDateToAmerican(form_reunions);
             params['shift_id'] = form_shift;
         }
 
         axios.post(`${apiPost}`, params)
             .then(res => {
-                console.log('res:', res);
                 if (form_profile == 1) this.clearUnificate();
 
                 alert('Dados salvos com sucesso!');
@@ -248,7 +248,7 @@ export default class SchoolMeeting extends Component {
                                 <Flatpickr
                                     readonly={view_mode}
                                     className="form-control"
-                                    options={{ minDate: 'today' }}
+                                    options={{ minDate: 'today', dateFormat: 'd/m/Y' }}
                                     value={form_reunions}
                                     onChange={this.handleChangeReunions}
                                 />
