@@ -41,6 +41,7 @@ class Indicators extends Component {
                 } 
             },
             ring_load: false,
+            ring_load_change: false,
             msg_error: ''
 
         };
@@ -60,13 +61,9 @@ class Indicators extends Component {
             { "value": "SECRETARIA", "label": "Secretaria" }
         ]});
         // canUser('indicator.view', this.props.history, "view");
-        this.requestTotal("indicator/school/total", "total_schools", function () {
-            this.requestTotal("indicator/student/total", "total_students", function () {
-                this.requestTotal("indicator/school/contact", "total_contacts", function () {
-                    this.requestTotal("indicator/action/total", "total_action", function () { 
-                        this.getCoverage();
-                    });
-                });
+        this.requestTotal("indicator/school/contact", "total_contacts", function () {
+            this.requestTotal("indicator/action/total", "total_action", function () { 
+                this.getCoverage();
             });
         });
 
@@ -119,7 +116,7 @@ class Indicators extends Component {
             })
             .then(chart_return => {
                 const data_coverage = mapPieChart("Ações", "name", "total", chart_return);
-                this.setState({ data_coverage, ring_load: false });
+                this.setState({ data_coverage });
 
                 
             })
@@ -157,9 +154,7 @@ class Indicators extends Component {
                 const result = res.data.data;
                 const data_school_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
 
-                this.groupBySchool(this.state.school_type_id, data_school_type, "data_school_type");
-
-                // this.setState({ data_school_type } );
+                this.groupBySchool(this.state.school_type_id, data_school_type, "data_school_type", "total_schools");
             })
             .catch(error => {
                 const response = error.response;
@@ -177,8 +172,8 @@ class Indicators extends Component {
                 const result = res.data.data.total;
                 const data_student_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
 
-                this.groupBySchool(this.state.school_type_id, data_student_type, "data_student_type");
-                // this.setState({ data_student_type });
+                this.groupBySchool(this.state.school_type_id, data_student_type, "data_student_type", "total_students");
+                this.setState ( { ring_load : false });
             })
             .catch(error => {
                 const response = error.response;
@@ -195,6 +190,7 @@ class Indicators extends Component {
             .then(res => {
                 const result = res.data.data;
                 const data_action_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
+
                 this.setState({ data_action_type, action_type_initial: data_action_type });
             })
             .catch(error => {
@@ -319,15 +315,15 @@ class Indicators extends Component {
      * @param {String} school_type_id tipo de escola, por exemplo: "público", "particular" ou "secretaria"
      */
     getActionsBySchool(school_type_id) {
-        this.setState( { ring_load : true });
+        this.setState({ ring_load : true });
         axios.get("indicator/action/type/school-type")
         .then(res => {
             const data_general = res.data.data;
             const types = data_general.school_type;
 
             this.listTotalActions(school_type_id, types);
-            
-            this.setState({ ring_load : false });
+            this.setState({ ring_load_change : false });
+
         })
     }
 
@@ -356,7 +352,7 @@ class Indicators extends Component {
     /**
      * agrupa as categorias e totais de escola
      */
-    groupBySchool(selected, types, selector) {
+    groupBySchool(selected, types, selector, selector_total = "") {
         const final_array = [];
         final_array[0] = ["LEGENDA", "%"];
         types.map(item => {
@@ -367,7 +363,8 @@ class Indicators extends Component {
             })
         })
 
-        console.log(final_array);
+        const general_total = final_array.reduce( (accum, curr) => curr[1] !== '%'?accum + curr[1]:0, 0 );
+        this.setState( { [ selector_total ]: formatNumber(general_total) } );
 
 
         if (final_array.length > 1) {
@@ -378,6 +375,7 @@ class Indicators extends Component {
     }
 
     handleChangeSchoolType (selectedOption) {
+        this.setState( {ring_load_change : true });
         const values = this.state;
         if(selectedOption.length > 0) {
             values.school_type_id = selectedOption;
@@ -430,12 +428,12 @@ class Indicators extends Component {
         const { total_schools, total_students, total_contacts, total_action,
             data_actions, data_school_type, data_student_type, data_action_type, data_student_level,
             data_coverage,
-            options_publisher, ring_load
+            options_publisher, ring_load, ring_load_change
         } = this.state;
 
         return (
             <div>
-                {ring_load == true &&
+                {(ring_load == true || ring_load_change == true) &&
                     <div className="loader">
                         <div className="backLoading">
                             <div className="load"><img src="https://www.ipswitch.com/library/img/loading.gif" /></div>
