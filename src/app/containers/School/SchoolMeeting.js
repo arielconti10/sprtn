@@ -106,7 +106,7 @@ export default class SchoolMeeting extends Component {
     checkPermission() {
         canUser('school.update', this.props.history, "change", function (rules) {
             if (rules.length == 0) {
-                this.setState({ view_mode: false, submit_button_disabled: false });
+                this.setState({ view_mode: true, submit_button_disabled: true });
             }
         }.bind(this));
     }
