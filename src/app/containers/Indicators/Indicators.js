@@ -21,6 +21,7 @@ class Indicators extends Component {
             total_students: '00',
             total_contacts: '00',
             total_action: '00',
+            total_coverage: 0,
             school_types: [],
             search_options: [],
             school_type_id: '',
@@ -88,25 +89,27 @@ class Indicators extends Component {
      * obtem a cobertura da carteira
      */
     getCoverage() {
-        const action = "indicator/action/year";
+        const action = "indicator/school/coverage";
         axios.get(action)
             .then(res => {
                 const result = res.data.data;
-                if (result.length > 0) {
-                    const actual_year = (new Date()).getFullYear();
+                const data_coverage = mapPieChart("Tipos de Escola", "school_type", "total", result);
 
-                    const results_year = result.find(function (item) {
-                        return item.year === actual_year
-                    });
+                this.groupBySchool(this.state.school_type_id, data_coverage, "tmp_coverage", 'total_coverage');
 
+                const total_coverage = this.state.total_coverage;
+
+                if (total_coverage.length > 0) {
                     const total_schools = this.state.total_schools.replace(/\./g,'');
 
-                    const not_coverage = parseFloat(total_schools) - parseFloat(results_year.total);
+                    const not_coverage = parseFloat(total_schools) - parseFloat(total_coverage);
 
                     const array_chart = [
-                        { "name": "Coberto", "total": parseFloat(results_year.total) },
+                        { "name": "Coberto", "total": parseFloat(total_coverage) },
                         { "name": "Nāo Coberto", "total": not_coverage },
                     ];
+
+                    console.log(total_schools, total_coverage, not_coverage, array_chart);
 
                     return array_chart;
                 } else {
@@ -322,6 +325,7 @@ class Indicators extends Component {
             const types = data_general.school_type;
 
             this.listTotalActions(school_type_id, types);
+
             this.setState({ ring_load_change : false });
 
         })
@@ -390,7 +394,9 @@ class Indicators extends Component {
                         'data_student_type': [],
                         'data_student_level': []
                     });
-    
+                    
+                    // this.setState( {ring_load_change : false });
+
                     return true;
                 }
     
@@ -402,6 +408,8 @@ class Indicators extends Component {
                 this.getStudentTypes();
                 // this.sumBySchool(values.school_type_id, "total_action", "data_action_type");
             });
+        } else {
+            this.setState( { ring_load_change: false });
         }
 
     }
@@ -445,6 +453,23 @@ class Indicators extends Component {
                     <h4 className="alert alert-danger"> {this.state.msg_error} </h4>
                 }
 
+                <div className="search-area">
+                    <FormGroup htmlFor="school_type_id">
+                        <label>Tipo de Escola</label>
+                        <Async
+                            removeSelected={false}
+                            name="school_type_id"
+                            id="school_type_id"
+                            disabled={this.state.viewMode}
+                            value={this.state.school_type_id}
+                            onChange={this.handleChangeSchoolType}
+                            loadOptions={this.getOptions}
+                            placeholder="Selecione..."
+                            multi={true}
+                        />
+                    </FormGroup>
+                </div>
+
                 <div className="row indicators-numbers justify-content-md-center">
                     <IndicatorNumber
                         cols="col-12 col-sm-6 col-lg-3"
@@ -484,23 +509,6 @@ class Indicators extends Component {
 
                 </div>
                 
-                <div className="search-area">
-                    <FormGroup htmlFor="school_type_id">
-                        <label>Tipo de Escola</label>
-                        <Async
-                            removeSelected={false}
-                            name="school_type_id"
-                            id="school_type_id"
-                            disabled={this.state.viewMode}
-                            value={this.state.school_type_id}
-                            onChange={this.handleChangeSchoolType}
-                            loadOptions={this.getOptions}
-                            placeholder="Selecione..."
-                            multi={true}
-                        />
-                    </FormGroup>
-                </div>
-
                 <div className="row">
                     {data_actions.length > 1 &&
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
