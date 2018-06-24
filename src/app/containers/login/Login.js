@@ -41,7 +41,7 @@ class LoginForm extends Component {
 
     saveStorage = (res) => {
         if (res.data.access_token !== undefined) {
-            console.log(res.data);
+            sessionStorage.setItem('password', this.state.password);
             sessionStorage.setItem('token_type', res.data.token_type);
             sessionStorage.setItem('access_token', res.data.access_token);
             sessionStorage.setItem('refresh_token', res.data.refresh_token);
@@ -91,8 +91,9 @@ class LoginForm extends Component {
 
         if (this.state.valid_login) {
             return (
-                <Redirect to="/" />
+                <Redirect to="/dashboard/indicadores" />
             );
+            window.reload();
         }
         return (
             <div>

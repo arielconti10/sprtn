@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import {Link, Switch, Route, Redirect} from 'react-router-dom';
 import {Container} from 'reactstrap';
+
+import '../../../app/custom.css';
+
 import Header from '../../components/Header/';
 import Sidebar from '../../components/Sidebar/';
 import Breadcrumb from '../../components/Breadcrumb/';
@@ -34,7 +37,7 @@ import Users from '../../../app/containers/User/Users';
 
 import Marketshare from '../../../app/containers/MarketShare/MarketShare';
 
-import Indicadores from '../../../app/containers/Indicadores/Indicadores'
+import Indicators from '../../../app/containers/Indicators/Indicators'
 
 import UserSchools from '../../../app/containers/UserSchools/UserSchools';
 import axios from '../../../app/common/axios';
@@ -82,7 +85,6 @@ class Full extends Component {
 
     componentWillMount() {
         this.loadMenuPermissions();
-
     }
 
     showMessagePermission() {
@@ -114,11 +116,11 @@ class Full extends Component {
                                 this.showMessagePermission()
                             }
                             <Switch>
-                                <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
+                                {/* <Route path="/dashboard" name="Dashboard" component={Dashboard}/> */}
 
                                 <Route path="/marketshare" name="marketshare" component={Marketshare}/>
                                 
-                                <Route path="/indicadores" name="indicadores" component={Indicadores}/>
+                                <Route path="/dashboard/indicadores" name="indicadores" component={Indicators}/>
 
 
                                 <Route path="/logout" name="Logout" component={Logout}/>
@@ -144,7 +146,8 @@ class Full extends Component {
                                 <Route path="/config/regras" name="Regras" component={Roles}/>                                
                                 <Route path="/config/permissoes" name="Permissões" component={Rules}/>
                                 <Route path="/config/usuarios" name="Usuários" component={Users}/>
-                                {/* <Redirect from="/" to="/marketshare" /> */}
+
+                                {/* <Redirect from="/" to="/dashboard/indicadores" /> */}
                             </Switch>
                         </Container>
                     </main>

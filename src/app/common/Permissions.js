@@ -30,7 +30,7 @@ export const canUser=(action, history, mode, callback)=>{
 export const getPermissions = (callback) => {
     const user_id = sessionStorage.getItem('user_id');
 
-    axios.get(`user/${user_id}`)
+    axios.get(`user/current`)
     .then((response) => {
         const dados = response.data.data;
         const rules = dados.role.rules;

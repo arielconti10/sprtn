@@ -25,6 +25,7 @@ class SubsidiaryForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            code: '',
             name: '',
             sector_array: [],
             sectors: [],
@@ -119,7 +120,7 @@ class SubsidiaryForm extends Component {
     submitForm(event) {
         event.preventDefault();
         axios.post(`${apiPost}`, {
-            'code': this.state.name,
+            'code': this.state.code,
             'name': this.state.name,
             'sectors': this.state.sector_array,
             'active': this.state.active
@@ -240,7 +241,21 @@ class SubsidiaryForm extends Component {
                     <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
                         onSubmit={this.handleSubmit} noValidate>
                         <Row>
-                            <Col md="3">
+                            <Col md="6">
+                                <div className="">
+                                    <FormGroup for="code">
+                                        <FormControlLabel htmlFor="code">Código da filial <span className="text-danger"><strong>*</strong></span></FormControlLabel>
+                                        <FormControlInput type="text" id="code" name="code"
+                                            value={this.state.code} onChange={this.handleChange}
+                                            readOnly={this.state.viewMode}
+                                            required />
+                                        <FieldFeedbacks for="code">
+                                            <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                        </FieldFeedbacks>
+                                    </FormGroup>
+                                </div>
+                            </Col>
+                            <Col md="6">
                                 <div className="">
                                     <FormGroup for="name">
                                         <FormControlLabel htmlFor="name">Nome da filial <span className="text-danger"><strong>*</strong></span></FormControlLabel>
@@ -254,8 +269,10 @@ class SubsidiaryForm extends Component {
                                     </FormGroup>
                                 </div>
                             </Col>
+                        </Row>
 
-                            <Col md="9">
+                        <Row>
+                            <Col md="12">
                                 <FormGroup for="sector_array">
                                     <label>Setor (es) <span className="text-danger"><strong>*</strong></span></label>
                                     <Select
