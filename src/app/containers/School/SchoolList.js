@@ -433,13 +433,13 @@ class SchoolList extends Component {
     onFetchData = (state, instance) => {
         let apiSpartan = this.props.apiSpartan;
 
-        if (state) {
-            if (state.filtered.length > 0) {
-                this.onChangeFilter(state, false);
-            } else {
-                this.onChangeFilter(state, true);
-            }
-        }
+        // if (state) {
+        //     if (state.filtered.length > 0) {
+        //         this.onChangeFilter(state, false);
+        //     } else {
+        //         this.onChangeFilter(state, true);
+        //     }
+        // }
 
         let pageSize = state ? state.pageSize : this.state.pageSize;
         let page = state ? state.page + 1 : this.state.page;
