@@ -193,6 +193,7 @@ class Indicators extends Component {
                 this.setState ( { ring_load : false });
             })
             .catch(error => {
+                console.log(error);
                 const response = error.response;
                 this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
             })
@@ -484,6 +485,10 @@ class Indicators extends Component {
                 this.getSchoolTypes();
                 this.getStudentTypes();
                 this.getStudentLevel();
+                let url_contact = "indicator/school/contact";
+                url_contact = this.getUrlSearch(url_contact);
+        
+                this.requestTotal(url_contact, "total_contacts", function () {});
                 // this.sumBySchool(values.school_type_id, "total_action", "data_action_type");
             });
         } else {
