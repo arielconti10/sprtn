@@ -3,7 +3,6 @@ import { Col, Row } from 'reactstrap';
 import Select from 'react-select';
 import axios from '../../../app/common/axios';
 import { canUser } from '../../common/Permissions';
-
 import PieChartComponent from '../../common/PieChartComponent';
 import ColChartComponent from '../../common/ColChartComponent';
 
@@ -92,9 +91,9 @@ class MarketShare extends Component {
         });
     }
 
-    createSelectValues(obj) {
+    createSelectValues(obj, user) {
         let param = {};
-        param['label'] = obj.name;
+        param['label'] = `${obj.name} ${user ? ' (' + user + ')': ''}`;
         param['name'] = obj.name;
         param['value'] = obj.code;
         param['code'] = obj.code;
@@ -121,7 +120,7 @@ class MarketShare extends Component {
                         subsidiaries.push(user.subsidiary);
 
                         let arr = paramSector[user.subsidiary_id] || [];
-                        arr.push(this.createSelectValues(user.sector));
+                        arr.push(this.createSelectValues(user.sector, user.full_name));
                         paramSector[user.subsidiary_id] = arr;
                     }
                 });
@@ -171,11 +170,11 @@ class MarketShare extends Component {
     loadSector(paramSector, subsidiary) {
         let data = [];
         let sec = '';
-
-        data = paramSector[subsidiary];
+        
+        data = paramSector[subsidiary].sort((a, b) => a['label'].localeCompare(b['label']));
         sec = paramSector[subsidiary][0].code;
 
-        this.setState({ data_sector: data, param_sector: sec }, () => this.publisherChart());
+        this.setState({ data_sector: data, param_sector: sec, param_subsidiary: subsidiary }, () => this.publisherChart());
     }
 
     ftdToUp(array, isSchool) {
@@ -234,6 +233,7 @@ class MarketShare extends Component {
 
         if (cityHeaders.length < 1) {
             marketShare.map(item => {
+                console.log('item.key:', item.key);
                 let register = item.key.split(':');
                 let city = register[2];
 
@@ -278,6 +278,8 @@ class MarketShare extends Component {
     publisherChart() {
         if (this.state.param_sector != '') {
             this.setState({ ring_load: true });
+
+            console.log('this.state.param_subsidiary:', this.state.param_subsidiary)
 
             let urlPost = `marketshare?filter[subsidiary.id]=${this.state.param_subsidiary}&filter[key]=${this.state.param_type}_EDITORAS_CONSOLIDADO:${this.state.param_sector}:&filter[year]=${this.state.param_year}`;
 
@@ -552,7 +554,7 @@ class MarketShare extends Component {
                         />
                     </Col>
 
-                    <Col xl='2' md='2' sm='12' xs='12'>
+                    <Col xl='5' md='5' sm='12' xs='12'>
                         <label>Setor</label>
                         <Select
                             name="param_sector"
