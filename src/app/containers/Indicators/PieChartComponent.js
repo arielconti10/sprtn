@@ -17,6 +17,7 @@ export default class PieChartComponent extends Component {
                         data={data_actions}
                         options={options_publisher}
                         graph_id={chart_id}
+                        sliceVisibilityThreshold={0}
                         width="100%"
                         height="450px"
                         legend_toggle
