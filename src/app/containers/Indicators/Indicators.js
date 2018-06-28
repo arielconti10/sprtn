@@ -41,8 +41,11 @@ class Indicators extends Component {
                 legend: { 
                     // position : 'bottom',
                     alignment: 'center'
-                } 
+                }
             },
+            options_school_type: {},
+            options_action_school: {},
+            options_student_type: {},
             ring_load: false,
             ring_load_change: false,
             msg_error: ''
@@ -125,7 +128,7 @@ class Indicators extends Component {
             })
             .then(chart_return => {
                 const data_coverage = mapPieChart("Ações", "name", "total", chart_return);
-                this.setState({ data_coverage });
+                this.setState({ data_coverage } );
 
                 
             })
@@ -167,7 +170,11 @@ class Indicators extends Component {
                 const result = res.data.data;
                 const data_school_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
 
-                this.groupBySchool(this.state.school_type_id, data_school_type, "data_school_type", "total_schools");
+                return data_school_type;
+            })
+            .then(data_school_type => {
+
+                this.groupBySchool(this.state.school_type_id, data_school_type, "data_school_type", "total_schools", "options_school_type");
 
                 this.getCoverage();
             })
@@ -189,14 +196,48 @@ class Indicators extends Component {
                 const result = res.data.data.total;
                 const data_student_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
 
-                this.groupBySchool(this.state.school_type_id, data_student_type, "data_student_type", "total_students");
+                this.groupBySchool(this.state.school_type_id, data_student_type, "data_student_type", "total_students", "options_student_type");
+
                 this.setState ( { ring_load : false });
             })
             .catch(error => {
-                console.log(error);
                 const response = error.response;
                 this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
             })
+    }
+
+    drawCustomOptions(chart_result, state_to) {
+        const colors = [
+            {identity: "PARTICULAR", color: "#64bbff"},
+            {identity: "PUBLICO", color: "#ffea87"},
+            {identity: "SECRETARIA", color: "#a3f79c"}
+        ];
+
+        const colors_chart = [];
+
+        colors.map(item_color => {
+            chart_result.map(item => {
+                if (item_color.identity.indexOf(item[0]) !== -1) {
+                    colors_chart.push(item_color.color);
+                }
+            })
+        });
+
+        const new_options = { pieHole: 0.2, is3D: false, 
+            sliceVisibilityThreshold: 0,
+            chartArea: {  width: "100%", height: "70%" },
+            legend: { 
+                // position : 'bottom',
+                alignment: 'center',
+            },
+            pieSliceTextStyle: {
+                color: "#778899",
+                fontSize: "14pt"
+            },
+            colors: colors_chart
+        };
+
+        this.setState( { [state_to] : new_options });
     }
 
     /**
@@ -209,6 +250,8 @@ class Indicators extends Component {
                 const result = res.data.data;
                 const data_action_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
 
+                this.drawCustomOptions(data_action_type, "options_action_school");
+                
                 this.setState({ data_action_type, action_type_initial: data_action_type });
             })
             .catch(error => {
@@ -228,7 +271,6 @@ class Indicators extends Component {
             .then(res => {
                 const result = res.data.data;
                 const data_student_level = mapPieChart("Tipos de Escola", "name", "total", result);
-                console.log(data_student_level);
                 this.setState({ data_student_level });
             })
             .catch(error => {
@@ -335,6 +377,8 @@ class Indicators extends Component {
         const data_action_type = mapPieChart("Tipos de Escola", "school_type", "total", total_array);
         const chart_actions = mapPieChart("Ações Realizadas", "action", "total", action_array);
 
+        this.drawCustomOptions(data_action_type, "options_action_school");
+
         this.setState({ data_action_type, data_actions: chart_actions,  total_action: total_general }, function() {
         });
     }
@@ -371,7 +415,7 @@ class Indicators extends Component {
 
             this.listTotalActions(school_type_id, types);
 
-            this.setState({ ring_load_change : false });
+            this.setState({ ring_load_change : false } );
 
         })
     }
@@ -401,7 +445,7 @@ class Indicators extends Component {
     /**
      * agrupa as categorias e totais de escola
      */
-    groupBySchool(selected, types, selector, selector_total = "") {
+    groupBySchool(selected, types, selector, selector_total = "", selector_options = "") {
         const final_array = [];
         final_array[0] = ["LEGENDA", "%"];
         types.map(item => {
@@ -417,7 +461,11 @@ class Indicators extends Component {
 
 
         if (final_array.length >= 1) {
-            this.setState( { [selector] : final_array });
+            this.setState( { [selector] : final_array }, () => {
+                this.drawCustomOptions(final_array, selector_options);
+                // this.drawCustomOptions(final_array, selector);
+            });
+            
         }
 
         
@@ -485,6 +533,7 @@ class Indicators extends Component {
                 this.getSchoolTypes();
                 this.getStudentTypes();
                 this.getStudentLevel();
+
                 let url_contact = "indicator/school/contact";
                 url_contact = this.getUrlSearch(url_contact);
         
@@ -557,7 +606,8 @@ class Indicators extends Component {
         const { total_schools, total_students, total_contacts, total_action,
             data_actions, data_school_type, data_student_type, data_action_type, data_student_level,
             data_coverage,
-            options_publisher, ring_load, ring_load_change
+            options_publisher, options_school_type, options_action_school, options_student_type,
+            ring_load, ring_load_change
         } = this.state;
 
         return (
@@ -670,7 +720,7 @@ class Indicators extends Component {
                             <PieChartComponent
                                 data_actions={data_action_type}
                                 chart_id="pie_actions_type"
-                                options_publisher={options_publisher}
+                                options_publisher={options_action_school}
                                 label_card="Ações por tipo de escola"
                             />
                         </div>
@@ -699,7 +749,7 @@ class Indicators extends Component {
                                 <PieChartComponent
                                     data_actions={data_school_type}
                                     chart_id="pie_school_types"
-                                    options_publisher={options_publisher}
+                                    options_publisher={options_school_type}
                                     label_card="Escolas por Tipo"
                                 />
                             </div>
@@ -714,7 +764,7 @@ class Indicators extends Component {
                                 <PieChartComponent
                                     data_actions={data_student_type}
                                     chart_id="pie_student_types"
-                                    options_publisher={options_publisher}
+                                    options_publisher={options_student_type}
                                     label_card="Alunos por tipo de escola"
                                 />
                             </div>
