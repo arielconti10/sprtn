@@ -208,9 +208,9 @@ class Indicators extends Component {
 
     drawCustomOptions(chart_result, state_to) {
         const colors = [
-            {identity: "PARTICULAR", color: "#64bbff"},
-            {identity: "PUBLICO", color: "#ffea87"},
-            {identity: "SECRETARIA", color: "#a3f79c"}
+            {identity: "PARTICULAR", color: "#278ad8"},
+            {identity: "PUBLICO", color: "#dabf42"},
+            {identity: "SECRETARIA", color: "#5bdd51"}
         ];
 
         const colors_chart = [];
@@ -231,8 +231,8 @@ class Indicators extends Component {
                 alignment: 'center',
             },
             pieSliceTextStyle: {
-                color: "#778899",
-                fontSize: "14pt"
+                color: "#ffffff",
+                fontSize: "20pt"
             },
             colors: colors_chart
         };
