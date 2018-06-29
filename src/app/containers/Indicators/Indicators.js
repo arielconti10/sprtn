@@ -24,7 +24,9 @@ class Indicators extends Component {
             total_coverage: 0,
             school_types: [],
             search_options: [],
+            search_options_hierarchy: [],
             school_type_id: '',
+            hierarchy_id: '',
             action_type_initial: [],
             actions_initial: [],
             data_actions: [],
@@ -39,8 +41,11 @@ class Indicators extends Component {
                 legend: { 
                     // position : 'bottom',
                     alignment: 'center'
-                } 
+                }
             },
+            options_school_type: {},
+            options_action_school: {},
+            options_student_type: {},
             ring_load: false,
             ring_load_change: false,
             msg_error: ''
@@ -48,6 +53,7 @@ class Indicators extends Component {
         };
 
         this.handleChangeSchoolType = this.handleChangeSchoolType.bind(this);
+        this.handleChangeHierarchy = this.handleChangeHierarchy.bind(this);
         this.getActionsRealized = this.getActionsRealized.bind(this);
     }
 
@@ -61,8 +67,11 @@ class Indicators extends Component {
             { "value": "PUBLICO", "label": "Público" },
             { "value": "SECRETARIA", "label": "Secretaria" }
         ]});
-        // canUser('indicator.view', this.props.history, "view");
-        this.requestTotal("indicator/school/contact", "total_contacts", function () {
+
+        let url_contact = "indicator/school/contact";
+        url_contact = this.getUrlSearch(url_contact);
+
+        this.requestTotal(url_contact, "total_contacts", function () {
             this.requestTotal("indicator/action/total", "total_action", function () { 
                 this.getCoverage();
             });
@@ -89,8 +98,10 @@ class Indicators extends Component {
      * obtem a cobertura da carteira
      */
     getCoverage() {
-        const action = "indicator/school/coverage";
-        axios.get(action)
+        let baseURL = "indicator/school/coverage";
+        baseURL = this.getUrlSearch(baseURL);
+
+        axios.get(baseURL)
             .then(res => {
                 const result = res.data.data;
                 const data_coverage = mapPieChart("Tipos de Escola", "school_type", "total", result);
@@ -109,8 +120,6 @@ class Indicators extends Component {
                         { "name": "Nāo Coberto", "total": not_coverage },
                     ];
 
-                    console.log(total_schools, total_coverage, not_coverage, array_chart);
-
                     return array_chart;
                 } else {
                     const array_chart = [];
@@ -119,7 +128,7 @@ class Indicators extends Component {
             })
             .then(chart_return => {
                 const data_coverage = mapPieChart("Ações", "name", "total", chart_return);
-                this.setState({ data_coverage });
+                this.setState({ data_coverage } );
 
                 
             })
@@ -133,8 +142,10 @@ class Indicators extends Component {
      * obtem o total de ações realizadas pelo usuário
      */
     getActionsRealized() {
-        const action = "indicator/school/action";
-        axios.get(action)
+        let baseURL = "indicator/school/action";
+        baseURL = this.getUrlSearch(baseURL);
+
+        axios.get(baseURL)
             .then(res => {
                 const result = res.data.data;
                 const data_actions = mapPieChart("Ações", "name", "total", result);
@@ -151,13 +162,21 @@ class Indicators extends Component {
      * obtem o total de tipos de escolas, separadas por público, privado e secretaria
      */
     getSchoolTypes() {
-        const action = "indicator/school/type";
-        axios.get(action)
+        let baseURL = "indicator/school/type";
+        baseURL = this.getUrlSearch(baseURL);
+
+        axios.get(baseURL)
             .then(res => {
                 const result = res.data.data;
                 const data_school_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
 
-                this.groupBySchool(this.state.school_type_id, data_school_type, "data_school_type", "total_schools");
+                return data_school_type;
+            })
+            .then(data_school_type => {
+
+                this.groupBySchool(this.state.school_type_id, data_school_type, "data_school_type", "total_schools", "options_school_type");
+
+                this.getCoverage();
             })
             .catch(error => {
                 const response = error.response;
@@ -169,19 +188,56 @@ class Indicators extends Component {
      * obtem o total de alunos, separadas por tipos de escola: público, privado e secretaria
      */
     getStudentTypes() {
-        const action = "indicator/student/school-type";
-        axios.get(action)
+        let baseURL = "indicator/student/school-type";
+        baseURL = this.getUrlSearch(baseURL);
+
+        axios.get(baseURL)
             .then(res => {
                 const result = res.data.data.total;
                 const data_student_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
 
-                this.groupBySchool(this.state.school_type_id, data_student_type, "data_student_type", "total_students");
+                this.groupBySchool(this.state.school_type_id, data_student_type, "data_student_type", "total_students", "options_student_type");
+
                 this.setState ( { ring_load : false });
             })
             .catch(error => {
                 const response = error.response;
                 this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
             })
+    }
+
+    drawCustomOptions(chart_result, state_to) {
+        const colors = [
+            {identity: "PARTICULAR", color: "#278ad8"},
+            {identity: "PUBLICO", color: "#dabf42"},
+            {identity: "SECRETARIA", color: "#5bdd51"}
+        ];
+
+        const colors_chart = [];
+
+        colors.map(item_color => {
+            chart_result.map(item => {
+                if (item_color.identity.indexOf(item[0]) !== -1) {
+                    colors_chart.push(item_color.color);
+                }
+            })
+        });
+
+        const new_options = { pieHole: 0.2, is3D: false, 
+            sliceVisibilityThreshold: 0,
+            chartArea: {  width: "100%", height: "70%" },
+            legend: { 
+                // position : 'bottom',
+                alignment: 'center',
+            },
+            pieSliceTextStyle: {
+                color: "#ffffff",
+                fontSize: "20pt"
+            },
+            colors: colors_chart
+        };
+
+        this.setState( { [state_to] : new_options });
     }
 
     /**
@@ -194,6 +250,8 @@ class Indicators extends Component {
                 const result = res.data.data;
                 const data_action_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
 
+                this.drawCustomOptions(data_action_type, "options_action_school");
+                
                 this.setState({ data_action_type, action_type_initial: data_action_type });
             })
             .catch(error => {
@@ -206,8 +264,10 @@ class Indicators extends Component {
      * obtem o total de estudantes separados por nível. Exemplo: Ensino Fundamental I, Ensino Fundamental II
      */
     getStudentLevel() {
-        const action = "indicator/student/level";
-        axios.get(action)
+        let baseURL = "indicator/student/level";
+        baseURL = this.getUrlSearch(baseURL);
+
+        axios.get(baseURL)
             .then(res => {
                 const result = res.data.data;
                 const data_student_level = mapPieChart("Tipos de Escola", "name", "total", result);
@@ -271,8 +331,13 @@ class Indicators extends Component {
      * @return {Float} total total de ações filtradas
      */
     getTotalActions(actions) {
-        const total = actions.reduce( (accum, current) => accum + current.total, 0);
-        return total;
+        if (actions) {
+            const total = actions.reduce( (accum, current) => accum + current.total, 0);
+            return total;
+        }
+
+        return 0;
+
     }
 
     /**
@@ -289,11 +354,17 @@ class Indicators extends Component {
         const old_action = this.state.actions_initial;
 
         school_type_id.map(item => {
-            const actions = types[item.value];
-            const total_actions = this.getTotalActions(actions);  
-            const total_object = { "school_type" : item.value, "total" : total_actions};  
-            total_array.push(total_object);
-            tmp_array.push(actions);
+            if (types && types.hasOwnProperty(item.value)) {
+                const actions = types[item.value];
+                const total_actions = this.getTotalActions(actions);  
+                const total_object = { "school_type" : item.value, "total" : total_actions};  
+                total_array.push(total_object);
+                if (actions) {
+                    tmp_array.push(actions);
+                }
+            }
+
+            
         });
 
         tmp_array.map(item => item.map(action => {
@@ -305,12 +376,27 @@ class Indicators extends Component {
 
         const data_action_type = mapPieChart("Tipos de Escola", "school_type", "total", total_array);
         const chart_actions = mapPieChart("Ações Realizadas", "action", "total", action_array);
+
+        this.drawCustomOptions(data_action_type, "options_action_school");
+
         this.setState({ data_action_type, data_actions: chart_actions,  total_action: total_general }, function() {
-            if (this.state.data_action_type.length === 1) {
-                this.setState( { data_action_type : old_state, data_actions: old_action });
-                return true;
-            }
         });
+    }
+
+
+    /**
+     * verifica as pesquisas que serāo realizadas, montando a URL base
+     * @param { String } baseURL url atual
+     * @return { String } concatURL url da pesquisa
+     */
+    getUrlSearch(baseURL) {
+        let concatURL = baseURL;
+        if (this.state.hierarchy_id.value && this.state.hierarchy_id.value !== "") {
+            const hierarchy_id = this.state.hierarchy_id.value;
+            concatURL = concatURL + `?filter[user_id][]=${hierarchy_id}`;
+        }
+
+        return concatURL;
     }
 
     /**
@@ -319,14 +405,17 @@ class Indicators extends Component {
      */
     getActionsBySchool(school_type_id) {
         this.setState({ ring_load : true });
-        axios.get("indicator/action/type/school-type")
+        let baseURL = "indicator/action/type/school-type";
+        baseURL = this.getUrlSearch(baseURL);
+
+        axios.get(baseURL)
         .then(res => {
             const data_general = res.data.data;
             const types = data_general.school_type;
 
             this.listTotalActions(school_type_id, types);
 
-            this.setState({ ring_load_change : false });
+            this.setState({ ring_load_change : false } );
 
         })
     }
@@ -356,7 +445,7 @@ class Indicators extends Component {
     /**
      * agrupa as categorias e totais de escola
      */
-    groupBySchool(selected, types, selector, selector_total = "") {
+    groupBySchool(selected, types, selector, selector_total = "", selector_options = "") {
         const final_array = [];
         final_array[0] = ["LEGENDA", "%"];
         types.map(item => {
@@ -371,8 +460,12 @@ class Indicators extends Component {
         this.setState( { [ selector_total ]: formatNumber(general_total) } );
 
 
-        if (final_array.length > 1) {
-            this.setState( { [selector] : final_array });
+        if (final_array.length >= 1) {
+            this.setState( { [selector] : final_array }, () => {
+                this.drawCustomOptions(final_array, selector_options);
+                // this.drawCustomOptions(final_array, selector);
+            });
+            
         }
 
         
@@ -411,7 +504,66 @@ class Indicators extends Component {
         } else {
             this.setState( { ring_load_change: false });
         }
+    }
 
+    handleChangeHierarchy = (selectedOption) => { 
+        this.setState( {ring_load_change : true });
+        const values = this.state;
+        if(selectedOption) {
+            values.hierarchy_id = selectedOption;
+            this.setState({ values }, () => {
+                if (this.state.school_type_id.length === 0) {
+                    this.setState( {
+                        'data_actions': [],
+                        'data_action_type': [],
+                        'data_coverage': [],
+                        'data_action_type': [],
+                        'data_school_type': [],
+                        'data_student_type': [],
+                        'data_student_level': []
+                    });
+                    
+                    return true;
+                }
+    
+                this.getActionsBySchool(values.school_type_id);
+                this.sumBySchool(values.school_type_id, "total_schools", "data_school_type");
+                this.sumBySchool(values.school_type_id, "total_students", "data_student_type");
+                this.getCoverage();
+                this.getSchoolTypes();
+                this.getStudentTypes();
+                this.getStudentLevel();
+
+                let url_contact = "indicator/school/contact";
+                url_contact = this.getUrlSearch(url_contact);
+        
+                this.requestTotal(url_contact, "total_contacts", function () {});
+                // this.sumBySchool(values.school_type_id, "total_action", "data_action_type");
+            });
+        } else {
+            this.setState( { ring_load_change: false });
+        }
+    }
+
+    mapSelect(dados) {
+        const select_array = [];
+        const general_object = {value: "", label: "TODOS"};
+
+        dados.map(item => {
+            const label = `${item.username} - ${item.full_name}`;
+            const item_object = {"value": item.id, "label": label};
+            select_array.push(item_object);
+        });
+
+        select_array.sort(function (a, b) {
+            if(a.label < b.label) return -1;
+            if(a.label > b.label) return 1;
+            return 0;
+        });
+
+        select_array.unshift(general_object);
+
+        return select_array;
     }
 
     getOptions = (input, callback) => {            
@@ -432,11 +584,30 @@ class Indicators extends Component {
 
     };
 
+    getOptionsHierarchy = (input, callback) => {
+        axios.get('hierarchy/childrens')
+        .then(res => {
+            const data = res.data.data;
+            const select_array = this.mapSelect(data);
+
+            this.setState({ search_options_hierarchy: select_array }, function(){
+                setTimeout(() => {
+                    callback(null, {
+                    options: this.state.search_options_hierarchy,
+                    complete: true
+                    });
+                }, 500);
+            });
+        });  
+
+    };
+
     render() {
         const { total_schools, total_students, total_contacts, total_action,
             data_actions, data_school_type, data_student_type, data_action_type, data_student_level,
             data_coverage,
-            options_publisher, ring_load, ring_load_change
+            options_publisher, options_school_type, options_action_school, options_student_type,
+            ring_load, ring_load_change
         } = this.state;
 
         return (
@@ -454,25 +625,45 @@ class Indicators extends Component {
                 }
 
                 <div className="search-area">
-                    <FormGroup htmlFor="school_type_id">
-                        <label>Tipo de Escola</label>
-                        <Async
-                            removeSelected={false}
-                            name="school_type_id"
-                            id="school_type_id"
-                            disabled={this.state.viewMode}
-                            value={this.state.school_type_id}
-                            onChange={this.handleChangeSchoolType}
-                            loadOptions={this.getOptions}
-                            placeholder="Selecione..."
-                            multi={true}
-                        />
-                    </FormGroup>
+                    <div className="row">
+                        <div className="col-md-6">
+                            <FormGroup htmlFor="school_type_id">
+                                <label>Colaborador</label>
+                                <Async
+                                    removeSelected={false}
+                                    name="hierarchy_id"
+                                    id="hierarchy_id"
+                                    disabled={this.state.viewMode}
+                                    value={this.state.hierarchy_id}
+                                    onChange={this.handleChangeHierarchy}
+                                    loadOptions={this.getOptionsHierarchy}
+                                    placeholder="Selecione..."
+                                />
+                            </FormGroup>
+                        </div>
+                        <div className="col-md-6">
+                            <FormGroup htmlFor="school_type_id">
+                            <label>Tipo de Escola</label>
+                            <Async
+                                removeSelected={false}
+                                name="school_type_id"
+                                id="school_type_id"
+                                disabled={this.state.viewMode}
+                                value={this.state.school_type_id}
+                                onChange={this.handleChangeSchoolType}
+                                loadOptions={this.getOptions}
+                                placeholder="Selecione..."
+                                multi={true}
+                            />
+                            </FormGroup>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div className="row indicators-numbers justify-content-md-center">
                     <IndicatorNumber
-                        cols="col-12 col-sm-6 col-lg-3"
+                        cols="col-6 col-sm-6 col-lg-3"
                         backgroundColor="bg-info"
                         shadowClass="school shadow"
                         icon="fa fa-building-o"
@@ -481,7 +672,7 @@ class Indicators extends Component {
                     />
 
                     <IndicatorNumber
-                        cols="col-12 col-sm-6 col-lg-3"
+                        cols="col-6 col-sm-6 col-lg-3"
                         backgroundColor="bg-success"
                         shadowClass="students shadow"
                         icon="fa fa-users"
@@ -490,7 +681,7 @@ class Indicators extends Component {
                     />
 
                     <IndicatorNumber
-                        cols="col-12 col-sm-6 col-lg-3"
+                        cols="col-6 col-sm-6 col-lg-3"
                         backgroundColor="bg-primary"
                         shadowClass="contacts shadow"
                         icon="fa fa-book"
@@ -499,7 +690,7 @@ class Indicators extends Component {
                     />
 
                     <IndicatorNumber
-                        cols="col-12 col-sm-6 col-lg-3"
+                        cols="col-6 col-sm-6 col-lg-3"
                         backgroundColor="bg-warning"
                         shadowClass="actions shadow"
                         icon="fa fa-bullseye"
@@ -529,7 +720,7 @@ class Indicators extends Component {
                             <PieChartComponent
                                 data_actions={data_action_type}
                                 chart_id="pie_actions_type"
-                                options_publisher={options_publisher}
+                                options_publisher={options_action_school}
                                 label_card="Ações por tipo de escola"
                             />
                         </div>
@@ -558,7 +749,7 @@ class Indicators extends Component {
                                 <PieChartComponent
                                     data_actions={data_school_type}
                                     chart_id="pie_school_types"
-                                    options_publisher={options_publisher}
+                                    options_publisher={options_school_type}
                                     label_card="Escolas por Tipo"
                                 />
                             </div>
@@ -573,7 +764,7 @@ class Indicators extends Component {
                                 <PieChartComponent
                                     data_actions={data_student_type}
                                     chart_id="pie_student_types"
-                                    options_publisher={options_publisher}
+                                    options_publisher={options_student_type}
                                     label_card="Alunos por tipo de escola"
                                 />
                             </div>
