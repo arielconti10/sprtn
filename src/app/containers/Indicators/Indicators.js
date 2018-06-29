@@ -663,7 +663,7 @@ class Indicators extends Component {
 
                 <div className="row indicators-numbers justify-content-md-center">
                     <IndicatorNumber
-                        cols="col-12 col-sm-6 col-lg-3"
+                        cols="col-6 col-sm-6 col-lg-3"
                         backgroundColor="bg-info"
                         shadowClass="school shadow"
                         icon="fa fa-building-o"
@@ -672,7 +672,7 @@ class Indicators extends Component {
                     />
 
                     <IndicatorNumber
-                        cols="col-12 col-sm-6 col-lg-3"
+                        cols="col-6 col-sm-6 col-lg-3"
                         backgroundColor="bg-success"
                         shadowClass="students shadow"
                         icon="fa fa-users"
@@ -681,7 +681,7 @@ class Indicators extends Component {
                     />
 
                     <IndicatorNumber
-                        cols="col-12 col-sm-6 col-lg-3"
+                        cols="col-6 col-sm-6 col-lg-3"
                         backgroundColor="bg-primary"
                         shadowClass="contacts shadow"
                         icon="fa fa-book"
@@ -690,7 +690,7 @@ class Indicators extends Component {
                     />
 
                     <IndicatorNumber
-                        cols="col-12 col-sm-6 col-lg-3"
+                        cols="col-6 col-sm-6 col-lg-3"
                         backgroundColor="bg-warning"
                         shadowClass="actions shadow"
                         icon="fa fa-bullseye"
