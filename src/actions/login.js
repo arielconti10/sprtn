@@ -1,11 +1,11 @@
 import { LOGIN_REQUESTING } from '../actionTypes/login'
 
-const signupRequest = function signupRequest ({ email, password }) {  
+const loginRequest = function loginRequest ({ username, password }) {  
   return {
-    type: SIGNUP_REQUESTING,
-    email,
+    type: LOGIN_REQUESTING,
+    username,
     password,
   }
 }
 
-export default signupRequest  
+export default loginRequest  
