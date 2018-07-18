@@ -1,6 +1,8 @@
 import "regenerator-runtime/runtime";
 import { applyMiddleware, createStore, compose } from 'redux'  
 import createSagaMiddleware from 'redux-saga'
+import { persistStore, persistReducer } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
 
 // Import the index reducer and sagas
 import IndexReducer from '../index-reducers'  
@@ -14,11 +16,19 @@ const composeSetup = process.env.NODE_ENV !== 'production' && typeof window === 
   window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : compose
 /*eslint-enable */
 
+const persistConfig = { 
+  key: 'root',
+  storage
+}
+
+const persistedReducer = persistReducer(persistConfig, IndexReducer)
+
 const store = createStore(  
-  IndexReducer,
+  persistedReducer,
   composeSetup(applyMiddleware(sagaMiddleware)), // allows redux devtools to watch sagas
 )
+const persistor = persistStore(store)
 
 sagaMiddleware.run(IndexSagas)
 
-export default store
+export {store, persistor}

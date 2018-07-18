@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {HashRouter, Route, Switch} from 'react-router-dom';
-
+import { HashRouter, Route, Switch } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react'
+import { store, persistor } from './store';
 
 // Styles
 // Import Flag Icons Set
@@ -16,14 +18,20 @@ import '../scss/style.scss'
 import '../scss/core/_dropdown-menu-right.scss'
 
 // Containers
-import Full from './template/containers/Full/'
+import { Full } from './template/containers/Full/'
 import Login from '../src/app/containers/login/Login'
 
 ReactDOM.render((
-  <HashRouter>
-    <Switch>
-      <Route path="/login" name="Login" component={Login}/>
-      <Route path="/" name="Home" component={Full}/>
-    </Switch>
-  </HashRouter>
-), document.getElementById('root'));
+
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <HashRouter>
+        <Switch>
+          <Route path="/login" name="Login" component={Login} />
+          <Route path="/" name="Home" component={Full} />
+        </Switch>
+      </HashRouter>
+    </PersistGate>
+  </Provider>
+
+), document.getElementById('root')); 

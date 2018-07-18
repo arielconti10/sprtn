@@ -9,6 +9,7 @@ const initialState = {
   successful: false,
   messages: [],
   errors: [],
+  valid_login: false,
 }
 const reducer = function loginReducer (state = initialState, action) {
   switch (action.type) {
@@ -28,6 +29,7 @@ const reducer = function loginReducer (state = initialState, action) {
         messages: [],
         requesting: false,
         successful: true,
+        valid_login: true,
       }
 
     // Append the error returned from our api
