@@ -5,7 +5,7 @@ import { Container } from 'reactstrap';
 import '../../../app/custom.css';
 
 import Header from '../../components/Header/';
-import Sidebar from '../../components/Sidebar/';
+import { Sidebar } from '../../components/Sidebar/';
 import Breadcrumb from '../../components/Breadcrumb/';
 import Aside from '../../components/Aside/';
 import Footer from '../../components/Footer/';
@@ -66,7 +66,7 @@ class Full extends Component {
 
     loadMenuPermissions() {
         getPermissions(function (rules) {
-            const nav_itens = nav.items;
+            const nav_itens = this.props.nav_itens;
             const array_permissions = [];
             nav_itens.map(item => {
                 const children_actions = item.children.map(children => children.action);
@@ -87,8 +87,10 @@ class Full extends Component {
                     delete nav_itens[key];
                 }
             })
+            
+            console.log(nav_itens)
 
-            this.setState({ nav_itens: nav_itens });
+            this.props.nav_itens = nav_itens;
             sessionStorage.setItem("rules", JSON.stringify(rules));
         }.bind(this));
     }
@@ -106,20 +108,11 @@ class Full extends Component {
     }
 
     render() {
-        const {
-            user: {
-                access_token,
-                username
-            },
-            nav_itens: items
-        } = this.props
-
         return (
-
             <div className="app">
                 <Header />
                 <div className="app-body">
-                    {/* <Sidebar {...this.props} nav_itens={this.state.nav_itens}/> */}
+                    {/* <Sidebar {...this.props} nav_itens={this.props.nav_itens}/> */}
                     <main className="main">
                         <Breadcrumb />
 
@@ -175,10 +168,9 @@ class Full extends Component {
 // Grab only the piece of state we need
 const mapStateToProps = state => ({
     user: state.user,
+    nav_itens: state.nav_itens
 })
 
-// make Redux state piece of `login` and our action `loginRequest`
-// available in this.props within our component
 const connected = connect(mapStateToProps)(Full)
 
 // Export our well formed login component

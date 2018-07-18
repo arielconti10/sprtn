@@ -8,7 +8,16 @@ import SidebarForm from './../SidebarForm';
 import SidebarHeader from './../SidebarHeader';
 import SidebarMinimizer from './../SidebarMinimizer';
 
+import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+
 class Sidebar extends Component {
+
+  static propTypes = {
+    nav_itens: PropTypes.shape({
+      items: PropTypes.array
+    })
+  }
 
   constructor(props) {
     super(props);
@@ -16,14 +25,14 @@ class Sidebar extends Component {
     this.handleClick = this.handleClick.bind(this);
     this.activeRoute = this.activeRoute.bind(this);
     this.hideMobile = this.hideMobile.bind(this);
-    this.state = {
-        nav_itens: this.props.nav_itens
-    }
+    // this.state = {
+    //     nav_itens: this.props.nav_itens
+    // }
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
       if (prevState.nav_itens.length == 0) {
-        this.setState({ nav_itens: this.props.nav_itens });
+        // this.setState({ nav_itens: this.props.nav_itens });
       }
 
   }
@@ -54,7 +63,7 @@ class Sidebar extends Component {
 
 
   render() {
-    const { nav_itens } = this.state;
+    const { nav_itens } = this.props.nav_itens;
     // console.log(nav_itens);
 
     const props = this.props;
@@ -174,4 +183,13 @@ class Sidebar extends Component {
   }
 }
 
-export default Sidebar;
+// Grab only the piece of state we need
+const mapStateToProps = state => ({
+  user: state.user,
+  nav_itens: state.nav_itens
+})
+
+const connected = connect(mapStateToProps)(Sidebar)
+
+
+export { connected as Sidebar };

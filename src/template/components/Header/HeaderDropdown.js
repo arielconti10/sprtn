@@ -69,7 +69,6 @@ class HeaderDropdown extends Component {
     }
     
     getUserPhoto() {
-        console.log(this.props.user)
         const key = this.props.user.sso_token;
         const user = this.props.user.username;
         // const key = sessionStorage.getItem('sso_token');
@@ -89,8 +88,6 @@ class HeaderDropdown extends Component {
                 this.restoreSsoKey();
             }
         }.bind(this));
-
-        
 
         this.setState({profile_picture:baseURL});
     }
