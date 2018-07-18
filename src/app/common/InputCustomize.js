@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Field } from 'redux-form'
 
 export default class InputCustomize extends Component {
     render() {
@@ -8,7 +9,7 @@ export default class InputCustomize extends Component {
                     {this.props.label != undefined ?
                         <label for={this.props.id}>{this.props.label}</label> : ""
                     }
-                    <input {...this.props} ref={input => this.internal_code = input}/>
+                    <Field {...this.props} ref={input => this.internal_code = input}/>
                     {this.props.helptext != "" ? 
                         <small id="passwordHelp" className="form-text text-muted center-help">{this.props.helptext}</small> : ""
                     }
