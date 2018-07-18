@@ -8,7 +8,7 @@ import {
   Badge
 } from 'reactstrap';
 
-import HeaderDropdown from './HeaderDropdown';
+import { HeaderDropdown } from './HeaderDropdown';
 
 class Header extends Component {
 

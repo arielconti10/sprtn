@@ -69,7 +69,9 @@ function* loginFlow (username, password) {
     // set a stringified version of our token to localstorage on our domain
     sessionStorage.setItem('access_token', token.access_token)
     sessionStorage.setItem('user_id', token.user.id)
-
+    sessionStorage.setItem('sso_token', token.sso_token)
+    sessionStorage.setItem('user_userName', token.user.username)
+    sessionStorage.setItem('password', token.user.password)
     // redirect them to WIDGETS!
     history.push('/dashboard/indicadores')
   } catch (error) {

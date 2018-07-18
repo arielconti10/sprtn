@@ -72,7 +72,7 @@ class Full extends Component {
                 const children_actions = item.children.map(children => children.action);
                 children_actions.map(action => {
                     const index = rules.indexOf(action);
-                    // console.log(index);
+
                     if (index === -1) {
                         const index_action = children_actions.indexOf(action);
                         let childrens = item.children;
@@ -113,8 +113,6 @@ class Full extends Component {
             },
             nav_itens: items
         } = this.props
-
-        console.log(this.props)
 
         return (
 

@@ -9,21 +9,32 @@ import {
 import './custom.css';
 import axios from 'axios';
 
-class HeaderDropdown extends Component {
+import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
 
+class HeaderDropdown extends Component {
+    static propTypes = {
+        user: PropTypes.shape({
+            username: PropTypes.string,
+            access_token: PropTypes.string,
+            sso_token: PropTypes.string,
+        }),
+        dropdownOpen: PropTypes.bool,
+        
+    }
     constructor(props) {
         super(props);
 
         this.toggle = this.toggle.bind(this);
-        this.state = {
-            dropdownOpen: false,
-            full_name: sessionStorage.getItem('user_fullName'),
-            username: sessionStorage.getItem('user_userName'),
-            role_name: sessionStorage.getItem('role_name'),
-            superior: sessionStorage.getItem('superior'),
-            email: sessionStorage.getItem('user_email'),
-            profile_picture: ''
-        };
+        // this.state = {
+        //     dropdownOpen: false,
+        //     full_name: sessionStorage.getItem('user_fullName'),
+        //     username: sessionStorage.getItem('user_userName'),
+        //     role_name: sessionStorage.getItem('role_name'),
+        //     superior: sessionStorage.getItem('superior'),
+        //     email: sessionStorage.getItem('user_email'),
+        //     profile_picture: ''
+        // };
     }
 
     componentWillMount() {
@@ -35,11 +46,12 @@ class HeaderDropdown extends Component {
             'grant_type': 'password',
             'client_id': '2',
             'client_secret': 'X2zabNZ1I8xThjTgfXXIfMZfWm84pLD4ITrE70Yx',
-            'username': sessionStorage.getItem('user_userName'),
+            'username': this.props.user.username,
             'password': sessionStorage.getItem('password')
         }).then(res => {
             sessionStorage.removeItem('sso_token');
             sessionStorage.setItem('sso_token', res.data.sso_token);
+            this.props.user.sso_token = res.data.sso_token;
 
             const key = sessionStorage.getItem('sso_token');
             const user = sessionStorage.getItem('user_userName');
@@ -57,8 +69,13 @@ class HeaderDropdown extends Component {
     }
     
     getUserPhoto() {
-        const key = sessionStorage.getItem('sso_token');
-        const user = sessionStorage.getItem('user_userName');
+        console.log(this.props.user)
+        const key = this.props.user.sso_token;
+        const user = this.props.user.username;
+        // const key = sessionStorage.getItem('sso_token');
+        // const user = sessionStorage.getItem('user_userName');
+
+
         const baseURL = `https://login.ftd.com.br/api/photo/${key}/${user}`;
         
         axios.get(baseURL, {
@@ -85,8 +102,8 @@ class HeaderDropdown extends Component {
     }
 
     dropAccnt() {
-        const { full_name, username, role_name, superior, email, profile_picture } = this.state;
-
+        const { full_name, username, role_name, superior, email, profile_picture } = this.props.user;
+        
         return (
             <div>
                 <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
@@ -131,5 +148,14 @@ class HeaderDropdown extends Component {
         );
     }
 }
+// Grab only the piece of state we need
+const mapStateToProps = state => ({
+    user: state.user,
+    dropdownOpen: state.dropdownOpen
+})
 
-export default HeaderDropdown;
+// make Redux state piece of `login` and our action `loginRequest`
+// available in this.props within our component
+const connected = connect(mapStateToProps)(HeaderDropdown)
+
+export { connected as HeaderDropdown } 
