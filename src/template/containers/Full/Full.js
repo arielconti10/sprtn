@@ -61,12 +61,16 @@ class Full extends Component {
     }
     constructor(props) {
         super(props);
+        
+        this.state = {
+            nav_itens: ""
+        }
 
     }
 
     loadMenuPermissions() {
         getPermissions(function (rules) {
-            const nav_itens = this.props.nav_itens;
+            const nav_itens = this.state.nav_itens;
             const array_permissions = [];
             nav_itens.map(item => {
                 const children_actions = item.children.map(children => children.action);
@@ -112,7 +116,7 @@ class Full extends Component {
             <div className="app">
                 <Header />
                 <div className="app-body">
-                    {/* <Sidebar {...this.props} nav_itens={this.props.nav_itens}/> */}
+                    <Sidebar {...this.props} nav_itens={this.props.nav_itens}/>
                     <main className="main">
                         <Breadcrumb />
 

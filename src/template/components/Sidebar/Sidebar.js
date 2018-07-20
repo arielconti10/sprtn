@@ -25,14 +25,14 @@ class Sidebar extends Component {
     this.handleClick = this.handleClick.bind(this);
     this.activeRoute = this.activeRoute.bind(this);
     this.hideMobile = this.hideMobile.bind(this);
-    // this.state = {
-    //     nav_itens: this.props.nav_itens
-    // }
+    this.state = {
+        nav_itens: ""
+    }
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
       if (prevState.nav_itens.length == 0) {
-        // this.setState({ nav_itens: this.props.nav_itens });
+        this.setState({ nav_itens: this.props.nav_itens });
       }
 
   }
@@ -63,7 +63,7 @@ class Sidebar extends Component {
 
 
   render() {
-    const { nav_itens } = this.props.nav_itens;
+    const { nav_itens } = this.state.nav_itens;
     // console.log(nav_itens);
 
     const props = this.props;
