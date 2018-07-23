@@ -3,8 +3,6 @@ import { take, fork, cancel, call, put, cancelled } from 'redux-saga/effects'
 // We'll use this function to redirect to different routes based on cases
 import { createHashHistory } from 'history'
 
-// Helper for api errors
-// import { handleApiErrors } from '../lib/api-errors'
 export const history = createHashHistory()
 
 // Our login constants
@@ -17,6 +15,7 @@ import {
 // So that we can modify our Client piece of state
 import {
   setUser,
+  setUserPicture,
   unsetUser,
 } from '../actions/user'
 
@@ -41,6 +40,56 @@ function loginApi (username, password) {
     .catch((error) => { throw error })
 }
 
+function toDataURL(src, callback, outputFormat) {
+  var img = new Image();
+  img.crossOrigin = 'Anonymous';
+  img.onload = function() {
+    var canvas = document.createElement('CANVAS');
+    var ctx = canvas.getContext('2d');
+    var dataURL;
+    canvas.height = this.naturalHeight;
+    canvas.width = this.naturalWidth;
+    ctx.drawImage(this, 0, 0);
+    dataURL = canvas.toDataURL(outputFormat);
+    callback(dataURL);
+  };
+  img.src = src;
+  if (img.complete || img.complete === undefined) {
+    img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+    img.src = src;
+  }
+}
+
+function getUserPhoto(username, key) {
+  // const key = this.props.user.sso_token;
+  // const user = this.props.user.username;
+  let base64
+  const sso_token = key
+  const user = username
+  const baseURL = `https://login.ftd.com.br/api/photo/${sso_token}/${user}`
+  const image = new Image()
+
+  image.crossOrigin = 'Anonymous'
+  image.src = baseURL
+
+  toDataURL(baseURL, function(dataUrl){
+    console.log('RESULT:', dataUrl)
+    base64 = dataUrl
+
+  })
+
+  return fetch(baseURL, {
+    method: 'GET',
+    headers: {
+      'Content-Type' : 'application/json',
+    }
+  })
+  .then(response => response = base64)
+  .catch((error) => { throw error })
+
+  // this.setState({profile_picture:baseURL});
+}
+
 function* logout () {
   // dispatches the USER_UNSET action
   yield put(unsetUser())
@@ -54,11 +103,14 @@ function* logout () {
 
 function* loginFlow (username, password) {
   let token
+  let picture
   try {
     // try to call to our loginApi() function.  Redux Saga
     // will pause here until we either are successful or
     // receive an error
     token = yield call(loginApi, username, password)
+
+    picture = yield call(getUserPhoto, username, token.sso_token)
 
     // inform Redux to set our client token, this is non blocking so...
     yield put(setUser(token))
@@ -66,12 +118,13 @@ function* loginFlow (username, password) {
     // .. also inform redux that our login was successful
     yield put({ type: LOGIN_SUCCESS })
 
+    yield put(setUserPicture(picture))
+    
     // set a stringified version of our token to localstorage on our domain
     sessionStorage.setItem('access_token', token.access_token)
     sessionStorage.setItem('user_id', token.user.id)
     sessionStorage.setItem('sso_token', token.sso_token)
     sessionStorage.setItem('user_userName', token.user.username)
-    sessionStorage.setItem('password', token.user.password)
     // redirect them to WIDGETS!
     history.push('/dashboard/indicadores')
   } catch (error) {

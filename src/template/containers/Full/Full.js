@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
-import { Link, Switch, Route, Redirect } from 'react-router-dom';
-import { Container } from 'reactstrap';
+import React, {Component} from 'react';
+import {Link, Switch, Route, Redirect} from 'react-router-dom';
+import {Container} from 'reactstrap';
 
 import '../../../app/custom.css';
 
 import Header from '../../components/Header/';
-import { Sidebar } from '../../components/Sidebar/';
+import Sidebar from '../../components/Sidebar/';
 import Breadcrumb from '../../components/Breadcrumb/';
 import Aside from '../../components/Aside/';
 import Footer from '../../components/Footer/';
@@ -41,60 +41,44 @@ import Indicators from '../../../app/containers/Indicators/Indicators'
 
 import UserSchools from '../../../app/containers/UserSchools/UserSchools';
 import axios from '../../../app/common/axios';
-import { getPermissions } from '../../../app/common/Permissions';
+import {getPermissions} from '../../../app/common/Permissions';
 
 import nav from '../../../template/components/Sidebar/_nav';
 
-import { connect } from 'react-redux'
-import PropTypes from 'prop-types'
-
 class Full extends Component {
-    static propTypes = {
-        user: PropTypes.shape({
-            username: PropTypes.string,
-            access_token: PropTypes.string,
-            sso_token: PropTypes.string,
-        }),
-        nav_itens: PropTypes.shape({
-            items: PropTypes.array
-        })
-    }
     constructor(props) {
         super(props);
-        
         this.state = {
-            nav_itens: ""
-        }
-
+            rules: [],
+            nav_itens: []
+        };
     }
 
     loadMenuPermissions() {
-        getPermissions(function (rules) {
-            const nav_itens = this.state.nav_itens;
+        getPermissions(function(rules){
+            const nav_itens = nav.items;
             const array_permissions = [];
             nav_itens.map(item => {
                 const children_actions = item.children.map(children => children.action);
                 children_actions.map(action => {
                     const index = rules.indexOf(action);
-
-                    if (index === -1) {
+                    // console.log(index);
+                    if (index === -1) {    
                         const index_action = children_actions.indexOf(action);
                         let childrens = item.children;
                         delete childrens[index_action];
                     }
-                });
+                }); 
             });
 
             nav_itens.map((item, key) => {
-                item.children = item.children.filter(function (n) { return n != undefined });
+                item.children = item.children.filter(function(n){ return n != undefined });
                 if (item.children.length == 0) {
                     delete nav_itens[key];
                 }
             })
-            
-            console.log(nav_itens)
 
-            this.props.nav_itens = nav_itens;
+            this.setState({nav_itens:nav_itens});
             sessionStorage.setItem("rules", JSON.stringify(rules));
         }.bind(this));
     }
@@ -104,19 +88,26 @@ class Full extends Component {
     }
 
     showMessagePermission() {
-        const message = (sessionStorage.getItem('flash_message')) ?
+        const message = (sessionStorage.getItem('flash_message'))?
             <h4 className="alert alert-danger"> Acesso negado. Você nāo está autorizado a realizar esta açāo </h4>
-            : '';
+            :'';
         sessionStorage.removeItem('flash_message');
         return message;
     }
 
     render() {
+        const token = sessionStorage.getItem('access_token');
+        if (token == undefined) {
+            return (
+                <Redirect to="/login" />
+            );
+        }
+
         return (
             <div className="app">
                 <Header />
                 <div className="app-body">
-                    <Sidebar {...this.props} nav_itens={this.props.nav_itens}/>
+                    <Sidebar {...this.props} nav_itens={this.state.nav_itens}/>
                     <main className="main">
                         <Breadcrumb />
 
@@ -127,34 +118,34 @@ class Full extends Component {
                             <Switch>
                                 {/* <Route path="/dashboard" name="Dashboard" component={Dashboard}/> */}
 
-                                <Route path="/marketshare" name="marketshare" component={Marketshare} />
+                                <Route path="/marketshare" name="marketshare" component={Marketshare}/>
+                                
+                                <Route path="/dashboard/indicadores" name="indicadores" component={Indicators}/>
 
-                                <Route path="/dashboard/indicadores" name="indicadores" component={Indicators} />
 
-
-                                <Route path="/logout" name="Logout" component={Logout} />
+                                <Route path="/logout" name="Logout" component={Logout}/>
                                 <Route path="/carteira/escolas" name="Carteira" component={Schools} />
                                 <Route path="/carteira/distribuicao" name="Distribuicao" component={UserSchools} />
                                 {/*<Route path="/carteira/escolas/alunos" name="Carteira" component={SchoolForm}/>*/}
-                                <Route path="/cadastro/cargos" name="Cargos" component={JobTitles} />
-                                <Route path="/cadastro/filiais" name="Filiais" component={Subsidiaries} />
-                                <Route path="/cadastro/setores" name="Setores" component={Sectors} />
-                                <Route path="/cadastro/disciplinas" name="Disciplinas" component={Disciplines} />
-                                <Route path="/cadastro/tipos-localizacao" name="Tipos de Localizaçāo" component={LocalizationTypes} />
-                                <Route path="/cadastro/perfis" name="Perfis" component={Profiles} />
-                                <Route path="/cadastro/perfis" name="Níveis" component={Levels} />
-                                <Route path="/cadastro/contatos" name="Contatos" component={Contacts} />
-                                <Route path="/cadastro/acoes" name="Acoes" component={Actions} />
-                                <Route path="/cadastro/eventos" name="Eventos" component={Events} />
-                                <Route path="/cadastro/niveis" name="Níveis" component={Levels} />
-                                <Route path="/cadastro/turnos" name="Turnos" component={Shifts} />
-                                <Route path="/cadastro/congregacoes" name="Congregações" component={Congregations} />
-                                <Route path="/cadastro/redes" name="Redes" component={Chains} />
-                                <Route path="/cadastro/tipos-escola" name="Tipos de Escola" component={SchoolTypes} />
-                                <Route path="/cadastro/estados" name="Estados" component={States} />
-                                <Route path="/config/regras" name="Regras" component={Roles} />
-                                <Route path="/config/permissoes" name="Permissões" component={Rules} />
-                                <Route path="/config/usuarios" name="Usuários" component={Users} />
+                                <Route path="/cadastro/cargos" name="Cargos" component={JobTitles}/>
+                                <Route path="/cadastro/filiais" name="Filiais" component={Subsidiaries}/>
+                                <Route path="/cadastro/setores" name="Setores" component={Sectors}/>
+                                <Route path="/cadastro/disciplinas" name="Disciplinas" component={Disciplines}/>
+                                <Route path="/cadastro/tipos-localizacao" name="Tipos de Localizaçāo" component={LocalizationTypes}/>
+                                <Route path="/cadastro/perfis" name="Perfis" component={Profiles}/>
+                                <Route path="/cadastro/perfis" name="Níveis" component={Levels}/>
+                                <Route path="/cadastro/contatos" name="Contatos" component={Contacts}/>
+                                <Route path="/cadastro/acoes" name="Acoes" component={Actions}/>
+                                <Route path="/cadastro/eventos" name="Eventos" component={Events}/>
+                                <Route path="/cadastro/niveis" name="Níveis" component={Levels}/>
+                                <Route path="/cadastro/turnos" name="Turnos" component={Shifts}/>
+                                <Route path="/cadastro/congregacoes" name="Congregações" component={Congregations}/>
+                                <Route path="/cadastro/redes" name="Redes" component={Chains}/>
+                                <Route path="/cadastro/tipos-escola" name="Tipos de Escola" component={SchoolTypes}/>
+                                <Route path="/cadastro/estados" name="Estados" component={States}/>
+                                <Route path="/config/regras" name="Regras" component={Roles}/>                                
+                                <Route path="/config/permissoes" name="Permissões" component={Rules}/>
+                                <Route path="/config/usuarios" name="Usuários" component={Users}/>
 
                                 {/* <Redirect from="/" to="/dashboard/indicadores" /> */}
                             </Switch>
@@ -163,19 +154,10 @@ class Full extends Component {
                     <Aside />
                 </div>
                 <Footer />
-
+                
             </div>
         );
     }
 }
 
-// Grab only the piece of state we need
-const mapStateToProps = state => ({
-    user: state.user,
-    nav_itens: state.nav_itens
-})
-
-const connected = connect(mapStateToProps)(Full)
-
-// Export our well formed login component
-export { connected as Full }
+export { Full };

@@ -18,6 +18,8 @@ class HeaderDropdown extends Component {
             username: PropTypes.string,
             access_token: PropTypes.string,
             sso_token: PropTypes.string,
+            profile_picture: PropTypes.string,
+
         }),
         dropdownOpen: PropTypes.bool,
         
@@ -26,70 +28,14 @@ class HeaderDropdown extends Component {
         super(props);
 
         this.toggle = this.toggle.bind(this);
-        // this.state = {
-        //     dropdownOpen: false,
-        //     full_name: sessionStorage.getItem('user_fullName'),
-        //     username: sessionStorage.getItem('user_userName'),
-        //     role_name: sessionStorage.getItem('role_name'),
-        //     superior: sessionStorage.getItem('superior'),
-        //     email: sessionStorage.getItem('user_email'),
-        //     profile_picture: ''
-        // };
-    }
-
-    componentWillMount() {
-        this.getUserPhoto();
-    }
-
-    restoreSsoKey() {
-        axios.post(`${process.env.API_URL}/login`, {
-            'grant_type': 'password',
-            'client_id': '2',
-            'client_secret': 'X2zabNZ1I8xThjTgfXXIfMZfWm84pLD4ITrE70Yx',
-            'username': this.props.user.username,
-            'password': sessionStorage.getItem('password')
-        }).then(res => {
-            sessionStorage.removeItem('sso_token');
-            sessionStorage.setItem('sso_token', res.data.sso_token);
-            this.props.user.sso_token = res.data.sso_token;
-
-            const key = sessionStorage.getItem('sso_token');
-            const user = sessionStorage.getItem('user_userName');
-            const baseURL = `https://login.ftd.com.br/api/photo/${key}/${user}`;
-
-            this.setState({profile_picture:baseURL});
-        })
-        .catch(error => {
-            let msg_error = error.response.statusText;
-            if (error.response.status == 403 || error.response.status == 401) {
-                 msg_error = "Usuário ou senha incorretos"; 
-            }
-            this.setState({back_error:msg_error, ringLoad: false, login: '', password: ''});
-        });
-    }
-    
-    getUserPhoto() {
-        const key = this.props.user.sso_token;
-        const user = this.props.user.username;
-        // const key = sessionStorage.getItem('sso_token');
-        // const user = sessionStorage.getItem('user_userName');
-
-
-        const baseURL = `https://login.ftd.com.br/api/photo/${key}/${user}`;
-        
-        axios.get(baseURL, {
-        }).then(res => {
-            return true;
-        }).catch(function (error) {
-            const status = error.response.status;
-
-            if (status == 401) {
-                //realiza a chamada do login pra capturar nova chave
-                this.restoreSsoKey();
-            }
-        }.bind(this));
-
-        this.setState({profile_picture:baseURL});
+        this.state = {
+            dropdownOpen: false,
+            full_name: sessionStorage.getItem('user_fullName'),
+            username: sessionStorage.getItem('user_userName'),
+            role_name: sessionStorage.getItem('role_name'),
+            superior: sessionStorage.getItem('superior'),
+            email: sessionStorage.getItem('user_email'),
+        };
     }
 
     toggle() {
