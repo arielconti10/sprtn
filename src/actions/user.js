@@ -8,7 +8,6 @@ export function setUser(token) {
 }
 
 export function setUserPicture(picture) {
-  console.log(picture)
   return { 
     type: PICTURE_SET,
     picture

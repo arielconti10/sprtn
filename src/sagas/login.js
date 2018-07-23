@@ -73,9 +73,7 @@ function getUserPhoto(username, key) {
   image.src = baseURL
 
   toDataURL(baseURL, function(dataUrl){
-    console.log('RESULT:', dataUrl)
     base64 = dataUrl
-
   })
 
   return fetch(baseURL, {
@@ -86,8 +84,6 @@ function getUserPhoto(username, key) {
   })
   .then(response => response = base64)
   .catch((error) => { throw error })
-
-  // this.setState({profile_picture:baseURL});
 }
 
 function* logout () {
@@ -122,9 +118,7 @@ function* loginFlow (username, password) {
     
     // set a stringified version of our token to localstorage on our domain
     sessionStorage.setItem('access_token', token.access_token)
-    sessionStorage.setItem('user_id', token.user.id)
-    sessionStorage.setItem('sso_token', token.sso_token)
-    sessionStorage.setItem('user_userName', token.user.username)
+
     // redirect them to WIDGETS!
     history.push('/dashboard/indicadores')
   } catch (error) {
