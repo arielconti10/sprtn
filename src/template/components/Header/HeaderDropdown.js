@@ -30,11 +30,11 @@ class HeaderDropdown extends Component {
         this.toggle = this.toggle.bind(this);
         this.state = {
             dropdownOpen: false,
-            full_name: sessionStorage.getItem('user_fullName'),
-            username: sessionStorage.getItem('user_userName'),
-            role_name: sessionStorage.getItem('role_name'),
-            superior: sessionStorage.getItem('superior'),
-            email: sessionStorage.getItem('user_email'),
+            
+            
+            
+            
+            
         };
     }
 
