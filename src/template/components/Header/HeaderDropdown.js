@@ -7,7 +7,6 @@ import {
     Dropdown
 } from 'reactstrap';
 import './custom.css';
-import axios from 'axios';
 
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'

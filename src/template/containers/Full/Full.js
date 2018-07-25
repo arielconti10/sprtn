@@ -45,7 +45,15 @@ import {getPermissions} from '../../../app/common/Permissions';
 
 import nav from '../../../template/components/Sidebar/_nav';
 
+import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+
 class Full extends Component {
+    static propTypes = {
+        rules: PropTypes.array,
+        nav_itens: PropTypes.array
+    }
+
     constructor(props) {
         super(props);
         this.state = {
