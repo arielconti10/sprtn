@@ -1,4 +1,4 @@
-import { USER_SET, UNSER_UNSET, PICTURE_SET } from '../actionTypes/user'
+import { USER_SET, UNSER_UNSET, PICTURE_SET, GET_PERMISSIONS } from '../actionTypes/user'
 
 const initialState = {
   username: null,
@@ -9,6 +9,7 @@ const initialState = {
   sso_token: null,
   role_name: null,
   profile_picture: null,
+  nav_itens: null, 
 }
 
 const reducer = function userReducer(state = initialState, action) {
@@ -32,6 +33,7 @@ const reducer = function userReducer(state = initialState, action) {
         access_token: null,
         sso_token: null,
         profile_picture: null,
+        nav_itens: null, 
       }
 
     case PICTURE_SET:
@@ -39,6 +41,13 @@ const reducer = function userReducer(state = initialState, action) {
         ...state,
         profile_picture: action.picture,
       }
+
+    case GET_PERMISSIONS: {
+      return {
+        ...state,
+        nav_itens: action.nav_itens,
+      }
+    }
     default:
       return state
   }

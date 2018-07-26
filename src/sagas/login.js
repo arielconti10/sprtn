@@ -5,6 +5,8 @@ import { createHashHistory } from 'history'
 
 export const history = createHashHistory()
 
+import nav from '../template/components/Sidebar/_nav';
+
 // Our login constants
 import {
   LOGIN_REQUESTING,
@@ -17,13 +19,15 @@ import {
   setUser,
   setUserPicture,
   unsetUser,
+  permissionsRequest
 } from '../actions/user'
 
 import { USER_UNSET } from '../actionTypes/user';
 
 const loginUrl = `${process.env.API_URL}/login`
+const nav_itens = nav.items;
 
-function loginApi (username, password) {
+function loginApi(username, password) {
   const grant_type = 'password'
   const client_id = '2'
   const client_secret = 'X2zabNZ1I8xThjTgfXXIfMZfWm84pLD4ITrE70Yx'
@@ -43,7 +47,7 @@ function loginApi (username, password) {
 function toDataURL(src, callback, outputFormat) {
   var img = new Image();
   img.crossOrigin = 'Anonymous';
-  img.onload = function() {
+  img.onload = function () {
     var canvas = document.createElement('CANVAS');
     var ctx = canvas.getContext('2d');
     var dataURL;
@@ -72,21 +76,63 @@ function getUserPhoto(username, key) {
   image.crossOrigin = 'Anonymous'
   image.src = baseURL
 
-  toDataURL(baseURL, function(dataUrl){
+  toDataURL(baseURL, function (dataUrl) {
     base64 = dataUrl
   })
 
   return fetch(baseURL, {
     method: 'GET',
     headers: {
-      'Content-Type' : 'application/json',
+      'Content-Type': 'application/json',
     }
   })
-  .then(response => response = base64)
-  .catch((error) => { throw error })
+    .then(response => response = base64)
+    .catch((error) => { throw error })
 }
 
-function* logout () {
+function loadPermissions(rules) {
+  // const array_permissions = [];
+  nav_itens.map(item => {
+    const children_actions = item.children.map(children => children.action);
+
+    children_actions.map(action => {
+      const index = rules.find(rule => rule.code == action);
+
+      if (index === undefined) {
+        const index_action = children_actions.indexOf(action);
+        let childrens = item.children;
+        delete childrens[index_action];
+      }
+    });
+  });
+
+  
+  nav_itens.map((item, key) => {
+
+    item.children = item.children.filter(function (n) { return n != undefined });
+    
+    if (item.children.length == 0) {
+      delete nav_itens[key];
+      delete nav_itens.key;
+    }
+  })
+
+  Array.prototype.clean = function(deleteValue) {
+    for (var i = 0; i < this.length; i++) {
+      if (this[i] == deleteValue) {         
+        this.splice(i, 1);
+        i--;
+      }
+    }
+    return this;
+  };
+
+  nav_itens.clean(null)
+  nav_itens.clean(undefined)
+
+  return nav_itens;
+}
+function* logout() {
   // dispatches the USER_UNSET action
   yield put(unsetUser())
 
@@ -97,15 +143,21 @@ function* logout () {
   history.push('/login')
 }
 
-function* loginFlow (username, password) {
+function* loginFlow(username, password) {
   let token
   let picture
+  let rules
+  let nav_itens
   try {
+
     // try to call to our loginApi() function.  Redux Saga
     // will pause here until we either are successful or
     // receive an error
     token = yield call(loginApi, username, password)
 
+    // try to call to our getUserphoto() function.  Redux Saga
+    // will pause here until we either are successful or
+    // receive an error
     picture = yield call(getUserPhoto, username, token.sso_token)
 
     // inform Redux to set our client token, this is non blocking so...
@@ -115,7 +167,14 @@ function* loginFlow (username, password) {
     yield put({ type: LOGIN_SUCCESS })
 
     yield put(setUserPicture(picture))
-    
+
+    // try to call to our getPermissions() function.  Redux Saga
+    // will pause here until we either are successful or
+    // receive an error
+    nav_itens = yield call(loadPermissions, token.user.role.rules)
+
+    yield put(permissionsRequest(nav_itens))
+
     // set a stringified version of our token to localstorage on our domain
     sessionStorage.setItem('access_token', token.access_token)
 
@@ -137,7 +196,7 @@ function* loginFlow (username, password) {
 }
 
 // Our watcher (saga).  It will watch for many things.
-function* loginWatcher () {
+function* loginWatcher() {
   // Generators halt execution until their next step is ready/occurring
   // So it's not like this loop is firing in the background 1000/sec
   // Instead, it says, "okay, true === true", and hits the first step...

@@ -22,7 +22,7 @@ class HeaderDropdown extends Component {
             email: PropTypes.string,
             superior: PropTypes.string,
             role_name: PropTypes.string,
-
+            rules: PropTypes.array
         }),
         dropdownOpen: PropTypes.bool,
 

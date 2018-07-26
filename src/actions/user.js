@@ -1,4 +1,4 @@
-import { USER_SET, PICTURE_SET, USER_UNSET } from '../actionTypes/user';
+import { USER_SET, PICTURE_SET, USER_UNSET, GET_PERMISSIONS } from '../actionTypes/user';
 
 export function setUser(token) {
   return {
@@ -17,5 +17,13 @@ export function setUserPicture(picture) {
 export function unsetUser() {
   return {
     type: USER_UNSET,
+  }
+}
+
+export function permissionsRequest(nav_itens) {
+
+  return {
+    type: GET_PERMISSIONS,
+    nav_itens
   }
 }

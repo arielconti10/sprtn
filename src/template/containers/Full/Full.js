@@ -45,13 +45,16 @@ import {getPermissions} from '../../../app/common/Permissions';
 
 import nav from '../../../template/components/Sidebar/_nav';
 
+import permissionsRequest from '../../../actions/user'
+
+
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 
 class Full extends Component {
     static propTypes = {
-        rules: PropTypes.array,
-        nav_itens: PropTypes.array
+        user: PropTypes.object,
+        nav_itens: PropTypes.object
     }
 
     constructor(props) {
@@ -85,8 +88,10 @@ class Full extends Component {
                     delete nav_itens[key];
                 }
             })
+            
 
             this.setState({nav_itens:nav_itens});
+            
             sessionStorage.setItem("rules", JSON.stringify(rules));
         }.bind(this));
     }
@@ -104,7 +109,7 @@ class Full extends Component {
     }
 
     render() {
-        const token = sessionStorage.getItem('access_token');
+        const token = sessionStorage.getItem('access_token'); 
         if (token == undefined) {
             return (
                 <Redirect to="/login" />
@@ -115,7 +120,7 @@ class Full extends Component {
             <div className="app">
                 <Header />
                 <div className="app-body">
-                    <Sidebar {...this.props} nav_itens={this.state.nav_itens}/>
+                    <Sidebar {...this.props} nav_itens={this.props.user.nav_itens}/>
                     <main className="main">
                         <Breadcrumb />
 
@@ -168,4 +173,15 @@ class Full extends Component {
     }
 }
 
-export { Full };
+
+// Grab only the piece of state we need
+const mapStateToProps = state => ({
+    user: state.user,
+  })
+  
+  // make Redux state piece of `login` and our action `loginRequest`
+  // available in this.props within our component
+  const connected = connect(mapStateToProps, { permissionsRequest })(Full)
+  
+
+export { connected as Full };
