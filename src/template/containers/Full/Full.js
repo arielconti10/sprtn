@@ -10,9 +10,7 @@ import Breadcrumb from '../../components/Breadcrumb/';
 import Aside from '../../components/Aside/';
 import Footer from '../../components/Footer/';
 
-import Login from '../../../app/containers/login/Login';
 import Logout from '../../../app/containers/logout/Logout';
-import Dashboard from '../../views/Dashboard/';
 import Schools from '../../../app/containers/School/Schools'
 import SchoolForm from '../../../app/containers/School/SchoolForm'
 import JobTitles from '../../../app/containers/JobTitle/JobTitles'
@@ -40,13 +38,8 @@ import Marketshare from '../../../app/containers/MarketShare/MarketShare';
 import Indicators from '../../../app/containers/Indicators/Indicators'
 
 import UserSchools from '../../../app/containers/UserSchools/UserSchools';
-import axios from '../../../app/common/axios';
-import {getPermissions} from '../../../app/common/Permissions';
-
-import nav from '../../../template/components/Sidebar/_nav';
 
 import permissionsRequest from '../../../actions/user'
-
 
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
@@ -59,47 +52,8 @@ class Full extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            rules: [],
-            nav_itens: []
-        };
+
     }
-
-    loadMenuPermissions() {
-        getPermissions(function(rules){
-            const nav_itens = nav.items;
-            const array_permissions = [];
-            nav_itens.map(item => {
-                const children_actions = item.children.map(children => children.action);
-                children_actions.map(action => {
-                    const index = rules.indexOf(action);
-                    // console.log(index);
-                    if (index === -1) {    
-                        const index_action = children_actions.indexOf(action);
-                        let childrens = item.children;
-                        delete childrens[index_action];
-                    }
-                }); 
-            });
-
-            nav_itens.map((item, key) => {
-                item.children = item.children.filter(function(n){ return n != undefined });
-                if (item.children.length == 0) {
-                    delete nav_itens[key];
-                }
-            })
-            
-
-            this.setState({nav_itens:nav_itens});
-            
-            sessionStorage.setItem("rules", JSON.stringify(rules));
-        }.bind(this));
-    }
-
-    componentWillMount() {
-        this.loadMenuPermissions();
-    }
-
     showMessagePermission() {
         const message = (sessionStorage.getItem('flash_message'))?
             <h4 className="alert alert-danger"> Acesso negado. Você nāo está autorizado a realizar esta açāo </h4>
@@ -115,12 +69,12 @@ class Full extends Component {
                 <Redirect to="/login" />
             );
         }
-
+        const { nav_itens } = this.props.user
         return (
             <div className="app">
                 <Header />
                 <div className="app-body">
-                    <Sidebar {...this.props} nav_itens={this.props.user.nav_itens}/>
+                    <Sidebar {...this.props} nav_itens={nav_itens}/>
                     <main className="main">
                         <Breadcrumb />
 
