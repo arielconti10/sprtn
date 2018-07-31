@@ -137,7 +137,7 @@ function* logout() {
   yield put(unsetUser())
 
   // remove our token
-  localStorage.removeItem('token')
+  sessionStorage.removeItem('access_token')
 
   // redirect to the /login screen
   history.push('/login')

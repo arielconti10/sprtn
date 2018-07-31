@@ -9,12 +9,29 @@ import PieChartComponent from './PieChartComponent';
 import { Async } from 'react-select';
 import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 
-import Select from 'react-select';
+import Select from 'react-select'
+
+// include our indicatorsRequest action
+import { indicatorsRequest } from '../../../actions/indicators';
+
+import { connect } from 'react-redux'
+import { PropTypes } from 'prop-types'
 
 class Indicators extends Component {
+    static propTypes = {
+        user: PropTypes.shape({
+            username: PropTypes.string.isRequired,
+            access_token: PropTypes.string.isRequired,
+        }),
+        indicators: PropTypes.shape({
+            contributors: PropTypes.array,
+        }),
+        indicatorsRequest: PropTypes.func.isRequired,
+    }
+
     constructor(props) {
         super(props);
-
+        this.fetchIndicators()
         this.state = {
             active_tab: 'chart_actions',
             total_schools: '00',
@@ -55,6 +72,15 @@ class Indicators extends Component {
         this.handleChangeSchoolType = this.handleChangeSchoolType.bind(this);
         this.handleChangeHierarchy = this.handleChangeHierarchy.bind(this);
         this.getActionsRealized = this.getActionsRealized.bind(this);
+    }
+
+    // the helper function for requesting widgets
+    // with our client as the parameter
+    fetchIndicators = () => {
+        const { user, indicatorsRequest } = this.props
+
+        if (user && user.access_token) return indicatorsRequest(user)
+        return false
     }
 
     //o "callback hell" será aprimorado após estudo de promises
@@ -585,9 +611,8 @@ class Indicators extends Component {
     };
 
     getOptionsHierarchy = (input, callback) => {
-        axios.get('hierarchy/childrens')
-        .then(res => {
-            const data = res.data.data;
+        
+            const data = this.props.indicators.contributors;
             const select_array = this.mapSelect(data);
 
             this.setState({ search_options_hierarchy: select_array }, function(){
@@ -598,7 +623,6 @@ class Indicators extends Component {
                     });
                 }, 500);
             });
-        });  
 
     };
 
@@ -609,6 +633,8 @@ class Indicators extends Component {
             options_publisher, options_school_type, options_action_school, options_student_type,
             ring_load, ring_load_change
         } = this.state;
+
+        const { contributors } = this.props.indicators;
 
         return (
             <div>
@@ -792,4 +818,11 @@ class Indicators extends Component {
     }
 }
 
-export default Indicators;
+const mapStateToProps = state => ({
+    user: state.user,
+    indicators: state.indicators
+})
+
+const connected = connect(mapStateToProps, { indicatorsRequest })(Indicators);
+
+export { connected as Indicators }
