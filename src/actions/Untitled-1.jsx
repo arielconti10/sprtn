@@ -2,18 +2,14 @@ import React, { Component } from 'react'
 import { reduxForm, Field } from 'redux-form'
 import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
-import './Login.css';
-import InputCustomize from '../../common/InputCustomize';
+
 import loginRequest from '../../../actions/login'
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
-
-import Full from '../../../../src/template/containers/Full/Full'
-import Dashboard from '../../../template/views/Dashboard/Dashboard';
 
 // If you were testing, you'd want to export this component
 // so that you can test your custom made component and not
 // test whether or not Redux and Redux Form are doing their jobs
-class Login extends Component { 
+class Login extends Component {
   // Pass the correct proptypes in for validation
   static propTypes = {
     handleSubmit: PropTypes.func,
@@ -29,6 +25,7 @@ class Login extends Component {
   // Remember, Redux Form passes the form values to our handler
   // In this case it will be an object with `username` and `password`
   submit = (values) => {
+    console.log(values)
     this.props.loginRequest(values)
   }
 
@@ -43,44 +40,35 @@ class Login extends Component {
       },
     } = this.props
 
+    
     return (
-      <div id="login-body">
-        <div>
-          <section className="login-form">
-            <h1>
-              <img src="./img/logo.png" // place your logo here
-                alt="Spartan" className="main-logo" />
-            </h1>
-            <form className="widget-form" onSubmit={handleSubmit(this.submit)}>
-              <h1>LOGIN</h1>
-              <div className="row">
-                <InputCustomize
-                  className="form-control"
-                  placeholder="Seu Login"
-                  helptext=""
-                  cols="col-lg-12 col-md-12 col-sm-12"
-                  name="username"
-                  type="text"
-                  id="username"
-                  component="input"
-                />
-              </div>
-              <div className="row">
-                <InputCustomize
-                  className="form-control"
-                  placeholder="Sua Senha"
-                  helptext="Você deve informar as suas credenciais de rede"
-                  cols="col-lg-12 col-md-12 col-sm-12"
-                  name="password"
-                  type="password"
-                  id="password"
-                  component="input"
-                />
-              </div>
-              <button action="submit" className="btn btn-primary btn-block">Acessar</button>
-            </form>
-          </section>
-        </div>
+      
+      <div className="login">
+        <form className="widget-form" onSubmit={handleSubmit(this.submit)}>
+          <h1>LOGIN</h1>
+          <label htmlFor="username">username</label>
+          {/*
+            Our Redux Form Field components that bind username and password
+            to our Redux state's form -> login piece of state.
+          */}
+          <Field
+            name="username"
+            type="text"
+            id="username"
+            className="username"
+            component="input"
+          />
+          <label htmlFor="password">Password</label>
+          <Field
+            name="password"
+            type="password"
+            id="password"
+            className="password"
+            component="input"
+          />
+          <button action="submit">LOGIN</button>
+        </form>
+
       </div>
     )
   }

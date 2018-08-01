@@ -122,7 +122,6 @@ class Full extends Component {
                                 
                                 <Route path="/dashboard/indicadores" name="indicadores" component={Indicators}/>
 
-
                                 <Route path="/logout" name="Logout" component={Logout}/>
                                 <Route path="/carteira/escolas" name="Carteira" component={Schools} />
                                 <Route path="/carteira/distribuicao" name="Distribuicao" component={UserSchools} />
@@ -160,4 +159,4 @@ class Full extends Component {
     }
 }
 
-export default Full;
+export { Full };
