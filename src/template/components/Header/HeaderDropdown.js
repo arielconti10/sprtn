@@ -26,7 +26,6 @@ class HeaderDropdown extends Component {
 
         }),
         dropdownOpen: PropTypes.bool,
-
     }
     constructor(props) {
         super(props);
