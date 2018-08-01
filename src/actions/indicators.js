@@ -13,10 +13,11 @@ export const indicatorsRequest = function indicatorsRequest (client) {
   }
 }
 
-export const indicatorsRequestSuccess = function indicatorsRequestSuccess (indicators) {
+export const indicatorsRequestSuccess = function indicatorsRequestSuccess (indicators, schools) {
   return {
     type: INDICATORS_REQUEST_SUCCESS,
     indicators,
+    schools
   }
 }
 

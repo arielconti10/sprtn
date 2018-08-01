@@ -15,6 +15,12 @@ import {
 
 const apiUrl = `${process.env.API_URL}`
 
+const schools = [
+    { "value": "PARTICULAR", "label": "Particular" },
+    { "value": "PUBLICO", "label": "Público" },
+    { "value": "SECRETARIA", "label": "Secretaria" }
+]
+
 // Nice little helper to deal with the response
 // converting it to json, and handling errors
 function handleRequest (request) {
@@ -48,7 +54,7 @@ function* indicatorsRequestFlow (action) {
     const contributors = yield call(contributorsRequestApi)
     
     // dispatch the action with our widgets!
-    yield put(indicatorsRequestSuccess(contributors))
+    yield put(indicatorsRequestSuccess(contributors, schools))
   } catch (error) {
     yield put(indicatorsRequestError(error))
   }

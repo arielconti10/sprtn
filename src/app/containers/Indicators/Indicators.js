@@ -25,6 +25,7 @@ class Indicators extends Component {
         }),
         indicators: PropTypes.shape({
             contributors: PropTypes.array,
+            schools: PropTypes.array,
         }),
         indicatorsRequest: PropTypes.func.isRequired,
     }
@@ -77,6 +78,7 @@ class Indicators extends Component {
     // the helper function for requesting widgets
     // with our client as the parameter
     fetchIndicators = () => {
+        console.log(this.props)
         const { user, indicatorsRequest } = this.props
 
         if (user && user.access_token) return indicatorsRequest(user)
@@ -132,7 +134,7 @@ class Indicators extends Component {
                 const result = res.data.data;
                 const data_coverage = mapPieChart("Tipos de Escola", "school_type", "total", result);
 
-                this.groupBySchool(this.state.school_type_id, data_coverage, "tmp_coverage", 'total_coverage');
+                this.groupBySchool(this.props.indicators.schools, data_coverage, "tmp_coverage", 'total_coverage');
 
                 const total_coverage = this.state.total_coverage;
 
@@ -200,7 +202,7 @@ class Indicators extends Component {
             })
             .then(data_school_type => {
 
-                this.groupBySchool(this.state.school_type_id, data_school_type, "data_school_type", "total_schools", "options_school_type");
+                this.groupBySchool(this.props.indicators.schools, data_school_type, "data_school_type", "total_schools", "options_school_type");
 
                 this.getCoverage();
             })
@@ -222,7 +224,7 @@ class Indicators extends Component {
                 const result = res.data.data.total;
                 const data_student_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
 
-                this.groupBySchool(this.state.school_type_id, data_student_type, "data_student_type", "total_students", "options_student_type");
+                this.groupBySchool(this.props.indicators.schools, data_student_type, "data_student_type", "total_students", "options_student_type");
 
                 this.setState ( { ring_load : false });
             })
@@ -503,7 +505,7 @@ class Indicators extends Component {
         if(selectedOption.length > 0) {
             values.school_type_id = selectedOption;
             this.setState({ values }, () => {
-                if (this.state.school_type_id.length === 0) {
+                if (this.props.indicators.schools.length === 0) {
                     this.setState( {
                         'data_actions': [],
                         'data_action_type': [],
@@ -538,7 +540,7 @@ class Indicators extends Component {
         if(selectedOption) {
             values.hierarchy_id = selectedOption;
             this.setState({ values }, () => {
-                if (this.state.school_type_id.length === 0) {
+                if (this.props.indicators.schools.length === 0) {
                     this.setState( {
                         'data_actions': [],
                         'data_action_type': [],
@@ -634,7 +636,7 @@ class Indicators extends Component {
             ring_load, ring_load_change
         } = this.state;
 
-        const { contributors } = this.props.indicators;
+        const { contributors, schools } = this.props.indicators;
 
         return (
             <div>
@@ -675,7 +677,7 @@ class Indicators extends Component {
                                 name="school_type_id"
                                 id="school_type_id"
                                 disabled={this.state.viewMode}
-                                value={this.state.school_type_id}
+                                value={this.props.indicators.schools}
                                 onChange={this.handleChangeSchoolType}
                                 loadOptions={this.getOptions}
                                 placeholder="Selecione..."
@@ -820,7 +822,7 @@ class Indicators extends Component {
 
 const mapStateToProps = state => ({
     user: state.user,
-    indicators: state.indicators
+    indicators: state.indicators,
 })
 
 const connected = connect(mapStateToProps, { indicatorsRequest })(Indicators);

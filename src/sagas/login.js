@@ -129,7 +129,7 @@ function loadPermissions(rules) {
 
   nav_itens.clean(null)
   nav_itens.clean(undefined)
-
+  sessionStorage.setItem('rules', rules)
   return nav_itens;
 }
 function* logout() {

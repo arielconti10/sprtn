@@ -1,4 +1,3 @@
-// import { CONTRIBUTORS_SET, CONTRIBUTORS_ERROR } from '../actionTypes/indicators'
 import {
   INDICATORS_REQUESTING,
   INDICATORS_REQUEST_SUCCESS,
@@ -6,7 +5,8 @@ import {
 } from '../actionTypes/indicators'
 
 const initialState = {
-  contributors: {}, // where we'll store widgets
+  contributors: {},
+  schools: [],
   requesting: false,
   successful: false,
   messages: [],
@@ -14,9 +14,8 @@ const initialState = {
 }
 
 const reducer = function contributorsReducer(state = initialState, action) {
-
+  console.log(state)
   switch (action.type) {
-
     case INDICATORS_REQUESTING:
       return {
         ...state, // ensure that we don't erase fetched ones
@@ -31,7 +30,9 @@ const reducer = function contributorsReducer(state = initialState, action) {
 
     case INDICATORS_REQUEST_SUCCESS:
       return {
+        ...state,
         contributors: action.indicators.data, // replace with fresh list
+        schools: action.schools,
         requesting: false,
         successful: true,
         messages: [{
