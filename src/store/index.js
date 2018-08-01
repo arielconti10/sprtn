@@ -18,7 +18,8 @@ const composeSetup = process.env.NODE_ENV !== 'production' && typeof window === 
 
 const persistConfig = { 
   key: 'root',
-  storage
+  storage,
+  blacklist: ['marketshare'] // navigation will not be persisted
 }
 
 const persistedReducer = persistReducer(persistConfig, IndexReducer)
@@ -27,8 +28,21 @@ const store = createStore(
   persistedReducer,
   composeSetup(applyMiddleware(sagaMiddleware)), // allows redux devtools to watch sagas
 )
-const persistor = persistStore(store)
+const persistor = persistStore(store);
 
 sagaMiddleware.run(IndexSagas)
 
 export {store, persistor}
+
+/*
+const persistConfig = {
+  key: 'root',
+  storage: storage,
+  blacklist: ['navigation']
+};
+
+const pReducer = persistReducer(persistConfig, rootReducer);
+
+export const store = createStore(pReducer);
+export const persistor = persistStore(store);
+*/
