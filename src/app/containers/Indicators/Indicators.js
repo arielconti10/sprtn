@@ -78,7 +78,6 @@ class Indicators extends Component {
     // the helper function for requesting widgets
     // with our client as the parameter
     fetchIndicators = () => {
-        console.log(this.props)
         const { user, indicatorsRequest } = this.props
 
         if (user && user.access_token) return indicatorsRequest(user)

@@ -14,7 +14,6 @@ const initialState = {
 }
 
 const reducer = function contributorsReducer(state = initialState, action) {
-
   switch (action.type) {
     case INDICATORS_REQUESTING:
       return {
