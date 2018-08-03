@@ -14,7 +14,7 @@ export const canUser=(action, history, mode, callback)=>{
 
     const rules_ids = JSON.parse(sessionStorage.getItem("rules"));
     rule_exists = rules_ids.filter(function(item) {
-        return item.indexOf(action) !== -1;
+        return item.code !== action
     });
 
     if (rule_exists.length == 0 && mode == "view") {
