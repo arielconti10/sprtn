@@ -36,9 +36,9 @@ class ShiftForm extends Component {
           errors: PropTypes.array,
           current_shift: PropTypes.object
         }).isRequired,
-        shiftCreate: PropTypes.func.isRequired,
         shiftUpdate: PropTypes.func.isRequired,
-        load: PropTypes.func.isRequired,
+        shiftCreate: PropTypes.func.isRequired,
+        shiftLoad: PropTypes.func.isRequired,
         reset: PropTypes.func.isRequired,
         initialValues: PropTypes.object
       }
@@ -71,18 +71,14 @@ class ShiftForm extends Component {
 
 
     componentWillMount() {
-        const { load, user } = this.props
+        const { shiftLoad, user } = this.props
         this.checkPermission('shift.insert');
         if (this.props.match.params.id !== undefined) {
             this.checkPermission('shift.update');
-            load(user, this.props.match.params.id)
+            shiftLoad(user, this.props.match.params.id)
         }
     }
 
-    componentDidMount() {
-        const { load, user } = this.props        
-        load(user, this.props.match.params.id)        
-    }
 
     handleChange(e) {
         const target = e.currentTarget;
@@ -305,24 +301,20 @@ class ShiftForm extends Component {
         )
     }
 }
-// Pull in both the Client and the Widgets state
-const mapStateToProps = state => ({
-    initialValues: state.shifts.current_shift,
-    user: state.user,
-    shifts: state.shifts,
-    current_shift: state.shifts.current_shift
-  })
-  
-  // Make the Client and Widgets available in the props as well
-  // as the shiftCreate() function
-  const connected = connect(
-    mapStateToProps, 
-    { shiftCreate, shiftUpdate, load: shiftLoad }
-  )(ShiftForm)
-  
-  const formed = reduxForm({
-    form: 'shifts',
+
+let InitializeFromStateForm = reduxForm({
+    form: 'InitializeFromState',
     enableReinitialize: true
-  })(connected)
+  })(ShiftForm)
   
-  export default formed
+  InitializeFromStateForm = connect(
+    state => ({
+      user: state.user,
+      shifts: state.shifts,
+      initialValues: state.shifts.current_shift
+    }),
+    { shiftLoad, shiftUpdate, shiftCreate }
+  )(InitializeFromStateForm)
+   
+  
+  export default InitializeFromStateForm

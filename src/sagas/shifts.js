@@ -17,6 +17,7 @@ import {
   shiftRequestSuccess,
   shiftRequestError,
   shiftLoadSuccess,
+  shiftUpdateSuccess,
 } from '../actions/shifts'
 
 const shiftsUrl = `${process.env.API_URL}`
@@ -44,10 +45,9 @@ function shiftCreate(user, shift) {
   const url = `${shiftsUrl}/shift`
   const request = fetch(url, {
     method: 'POST',
-    mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': 'http://localhost:9001',
+      
       // passes our token as an "Authorization" header in
       // every POST request.
       Authorization: 'Bearer ' + user.access_token || undefined, // will throw an error if no login
@@ -60,19 +60,18 @@ function shiftCreate(user, shift) {
 
 function shiftUpdate(user, shift) {
 
-  const url = `${shiftsUrl}/shift/${shift.id}`
-  const request = fetch(url, {
-    method: 'PUT',
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': 'http://localhost:9001',
-      // passes our token as an "Authorization" header in
-      // every POST request.
-      Authorization: 'Bearer ' + user.access_token || undefined, // will throw an error if no login
-    },
-    body: JSON.stringify(shift),
-  })
+  console.log(shift);
+
+  // const url = `${shiftsUrl}/shift/${shift.id}`
+  // const request = fetch(url, {
+  //   method: 'PUT',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //     'Accept': 'application/json', 
+  //     Authorization: 'Bearer ' + user.access_token || undefined, // will throw an error if no login
+  //   },
+  //   body: JSON.stringify(shift),
+  // })
 
   return handleRequest(request)
 }
@@ -86,11 +85,13 @@ function* shiftCreateFlow(action) {
 
     if (shift.id !== undefined) {
       const updatedShift = yield call(shiftUpdate, user, shift)
+      yield put(shiftUpdateSuccess(updated))
+
     } else {
       const createdshift = yield call(shiftCreate, user, shift)
+      yield put(shiftCreateSuccess(createdshift))
     }
 
-    yield put(shiftCreateSuccess(createdshift))
 
     history.push('/cadastro/turnos')
 
