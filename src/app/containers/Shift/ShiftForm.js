@@ -34,7 +34,11 @@ class ShiftForm extends Component {
           successful: PropTypes.bool,
           messages: PropTypes.array,
           errors: PropTypes.array,
-          current_shift: PropTypes.object
+          current_shift: PropTypes.shape({
+              active: PropTypes.bool,
+              name: PropTypes.string,
+              code: PropTypes.string
+          })
         }).isRequired,
         shiftUpdate: PropTypes.func.isRequired,
         shiftCreate: PropTypes.func.isRequired,
@@ -83,12 +87,17 @@ class ShiftForm extends Component {
     handleChange(e) {
         const target = e.currentTarget;
 
-        this.form.validateFields(target);
+        if(target.type == 'checkbox'){
+            this.props.shifts.current_shift.active = target.checked
+        }
 
-        this.setState({
-            [target.name]: (target.type == 'checkbox') ? target.checked : target.value,
-            submitButtonDisabled: !this.form.isValid()
-        });
+        console.log(this.props.shifts.current_shift)
+
+        // // this.form.validateFields(target);
+        // this.setState({
+        //     [target.name]: (target.type == 'checkbox') ? target.checked : target.value,
+        //     // submitButtonDisabled: !this.form.isValid()
+        // });
     }
 
     submitForm(event) {
@@ -221,7 +230,7 @@ class ShiftForm extends Component {
                             <Label className="switch switch-default switch-pill switch-primary">
                                 <Input type="checkbox" id='active' name="active" className="switch-input"  
                                 disabled={this.state.viewMode}
-                                checked={this.state.active} onChange={this.handleChange}/>
+                                checked={this.props.shifts.current_shift.active} onChange={this.handleChange}/>
                                 <span className="switch-label"></span>
                                 <span className="switch-handle"></span>
                             </Label>
