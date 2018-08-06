@@ -13,7 +13,7 @@ import { canUser } from '../../common/Permissions';
 import { PropTypes } from 'prop-types'
 import { reduxForm, Field } from 'redux-form'
 import { connect } from 'react-redux'
-import { shiftCreate, shiftUpdate, shiftLoad } from '../../../actions/shifts';
+import { shiftCreate } from '../../../actions/shifts';
 
 const apiPost = 'shift';
 
@@ -34,18 +34,16 @@ class ShiftForm extends Component {
           successful: PropTypes.bool,
           messages: PropTypes.array,
           errors: PropTypes.array,
-          current_shift: PropTypes.object
         }).isRequired,
         shiftCreate: PropTypes.func.isRequired,
-        shiftUpdate: PropTypes.func.isRequired,
-        load: PropTypes.func.isRequired,
         reset: PropTypes.func.isRequired,
-        initialValues: PropTypes.object
       }
 
 
     constructor(props) {
         super(props);
+
+
         this.state = {
             name: '',
             code: '',
@@ -71,17 +69,21 @@ class ShiftForm extends Component {
 
 
     componentWillMount() {
-        const { load, user } = this.props
         this.checkPermission('shift.insert');
         if (this.props.match.params.id !== undefined) {
             this.checkPermission('shift.update');
-            load(user, this.props.match.params.id)
-        }
-    }
+            axios.get(`${apiPost}/${this.props.match.params.id}`)
+                .then(response => {
+                    const dados = response.data.data;
 
-    componentDidMount() {
-        const { load, user } = this.props        
-        load(user, this.props.match.params.id)        
+                    this.setState({ 
+                        name: dados.name,
+                        code: dados.code,
+                        active: dados.deleted_at === null ? true: false
+                    });
+                })
+                .catch(err => console.log(err));
+        }
     }
 
     handleChange(e) {
@@ -139,20 +141,13 @@ class ShiftForm extends Component {
 
     
     submit = (shift) => {
-
-        const { user, shiftCreate, shiftUpdate, reset } = this.props
+        const { user, shiftCreate, reset } = this.props
         // call to our shiftCreate action.
 
-        if(this.props.match.params.id !== undefined) {
-            shiftCreate(user, shift)
-        } else {
-            shiftUpdate(user, shift)
-        }
-
+        shiftCreate(user, shift)
         // reset the form upon submit.
         reset()
-
-    }
+      }
 
     updateForm(event) {
         event.preventDefault();
@@ -199,14 +194,12 @@ class ShiftForm extends Component {
         const {
             handleSubmit,
             invalid,
-            initialValues,
             shifts: {
               list,
               requesting,
               successful,
               messages,
               errors,
-              current_shift
             },
         } = this.props
 
@@ -232,7 +225,8 @@ class ShiftForm extends Component {
                         </div>                                
                     </div>
                 </div>            
-        }       
+        }
+        
 
         return (
             <Card>
@@ -260,10 +254,9 @@ class ShiftForm extends Component {
                                             name="code"
                                             type="text" 
                                             id="code"
+                                            readOnly={this.state.viewMode}
                                             component="input"
                                             className="form-control"
-                                            placeholder="code"
-
                                         />    
 
                                     {/* <FieldFeedbacks for="code">
@@ -285,6 +278,7 @@ class ShiftForm extends Component {
                                         name="name"
                                         component="input"
                                         className="form-control"
+                                        // onChange={this.handleChange}
                                     />
                                 {/* <FieldFeedbacks for="name">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
@@ -307,22 +301,15 @@ class ShiftForm extends Component {
 }
 // Pull in both the Client and the Widgets state
 const mapStateToProps = state => ({
-    initialValues: state.shifts.current_shift,
     user: state.user,
     shifts: state.shifts,
-    current_shift: state.shifts.current_shift
   })
   
   // Make the Client and Widgets available in the props as well
   // as the shiftCreate() function
-  const connected = connect(
-    mapStateToProps, 
-    { shiftCreate, shiftUpdate, load: shiftLoad }
-  )(ShiftForm)
-  
+  const connected = connect(mapStateToProps, { shiftCreate })(ShiftForm)
   const formed = reduxForm({
     form: 'shifts',
-    enableReinitialize: true
   })(connected)
   
   export default formed
