@@ -35,7 +35,6 @@ import {
   }
 
   export const shiftUpdate = function shiftUpdate (user, shift) {
-    console.log(user, shift)
     return {
       type: SHIFT_UPDATING,
       user,

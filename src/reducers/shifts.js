@@ -59,16 +59,17 @@ const reducer = function shiftReducer(state = initialState, action) {
       }
 
     case SHIFT_UPDATE_SUCCESS:
-      return state.map((shift) => {
-        if (shift.id == action.shift.id) {
-          return {
-            ...shift,
-          }
-        } else {
-          return shift
-        }
-      })
-
+      return {
+        ...state,
+        requesting: false,
+        successful: true,
+        messages: [{
+          body: `shift: ${action.shift.name} updated!`,
+          time: new Date(),
+        }],
+        errors: [],
+      }
+      
 
     case SHIFT_CREATE_ERROR:
       return {
@@ -109,7 +110,12 @@ const reducer = function shiftReducer(state = initialState, action) {
 
     case SHIFT_LOAD_SUCCESS:
       return {
-        current_shift: action.shift.data, // replace with fresh list
+        current_shift: {
+          id: action.shift.data.id,
+          name: action.shift.data.name,
+          code: action.shift.data.code,
+          active: action.shift.data.deleted_at !== null ? false : true
+        }, // replace with fresh list
         requesting: false,
         successful: true,
         messages: [{

@@ -60,18 +60,22 @@ function shiftCreate(user, shift) {
 
 function shiftUpdate(user, shift) {
 
-  console.log(shift);
+  let data = {
+    'name': shift.name,
+    'code': shift.code,
+    'active': shift.active
+  }
 
-  // const url = `${shiftsUrl}/shift/${shift.id}`
-  // const request = fetch(url, {
-  //   method: 'PUT',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //     'Accept': 'application/json', 
-  //     Authorization: 'Bearer ' + user.access_token || undefined, // will throw an error if no login
-  //   },
-  //   body: JSON.stringify(shift),
-  // })
+  const url = `${shiftsUrl}/shift/${shift.id}`
+  const request = fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json', 
+      Authorization: 'Bearer ' + user.access_token || undefined, // will throw an error if no login
+    },
+    body: JSON.stringify(data),
+  })
 
   return handleRequest(request)
 }
@@ -85,13 +89,12 @@ function* shiftCreateFlow(action) {
 
     if (shift.id !== undefined) {
       const updatedShift = yield call(shiftUpdate, user, shift)
-      yield put(shiftUpdateSuccess(updated))
-
+      yield put(shiftUpdateSuccess(updatedShift))
     } else {
       const createdshift = yield call(shiftCreate, user, shift)
       yield put(shiftCreateSuccess(createdshift))
-    }
 
+    }
 
     history.push('/cadastro/turnos')
 
