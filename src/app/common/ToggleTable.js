@@ -21,6 +21,19 @@ export function verifySelectChecked(target, initial_columns) {
  * @param {Array} initial_columns colunas da tabela a serem mapeadas
  * @return {Array} columns_map colunas selecionadas
  */
+export function createTableToggle(initial_columns) {
+    const columns_map = initial_columns;
+    const columns_filter = columns_map.filter((item) => item.is_checked === true || item.accessor === "" 
+        || item.accessor == "visit_type_school_type" || item.accessor == "roles");
+
+    return columns_filter;
+}
+
+/**
+ * adiciona ou remove colunas da tabela de acordo com o dropdown selecionado
+ * @param {Array} initial_columns colunas da tabela a serem mapeadas
+ * @return {Array} columns_map colunas selecionadas
+ */
 export function createTable(initial_columns) {
     const columns_map = initial_columns;
     const columns_filter = columns_map.filter((item) => item.is_checked === true || item.accessor === "" 

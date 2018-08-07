@@ -7,6 +7,7 @@ import marketshare from './reducers/marketshare'
 import userSchool from './reducers/userSchool'
 import indicators from './reducers/indicators'
 import shifts from './reducers/shifts'
+import gridApi from './reducers/gridApi'
 
 const IndexReducer = combineReducers({
   user,
@@ -16,7 +17,8 @@ const IndexReducer = combineReducers({
   marketshare,
   userSchool,
   indicators,
-  shifts
+  shifts,
+  gridApi
 })
 
 export default IndexReducer  

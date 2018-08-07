@@ -5,6 +5,7 @@ import ShiftSaga from './sagas/shifts'
 import DropdownSaga from './sagas/dropdown'
 import MarketshareSaga from './sagas/marketshare';
 import UserSchoolSaga from './sagas/userSchool';
+import GridApiSaga from './sagas/gridApi';
 
 export default function* IndexSaga () {
   yield [
@@ -13,6 +14,7 @@ export default function* IndexSaga () {
     MarketshareSaga(),
     UserSchoolSaga(),
     IndicatorsSaga(),
-    ShiftSaga()
+    ShiftSaga(),
+    GridApiSaga()
   ]
 }

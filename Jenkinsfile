@@ -2,7 +2,7 @@ pipeline {
   agent any
   parameters {
     string(name: 'REQUESTER_MAIL', defaultValue: '')
-    string(name: 'DEVS_MAIL', defaultValue: 'henrique.pessolato@ftd.com.br, marcos.tavares@ftd.com.br, tiago.rodrigues@ftd.com.br, thiago.carnaes@ftd.com.br')
+    string(name: 'DEVS_MAIL', defaultValue: 'henrique.pessolato@ftd.com.br, marcos.tavares@ftd.com.br, tiago.rodrigues@ftd.com.br, thiago.carnaes@ftd.com.br, ariel.agostinho@ftd.com.br')
   }
   stages {
     stage('Build') {
