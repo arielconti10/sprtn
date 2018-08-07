@@ -129,9 +129,7 @@ function loadPermissions(rules) {
 
   nav_itens.clean(null)
   nav_itens.clean(undefined)
-
   sessionStorage.setItem("rules", JSON.stringify(rules));
-
   return nav_itens;
 }
 function* logout() {
@@ -139,7 +137,7 @@ function* logout() {
   yield put(unsetUser())
 
   // remove our token
-  localStorage.removeItem('token')
+  sessionStorage.removeItem('access_token')
 
   // redirect to the /login screen
   history.push('/login')

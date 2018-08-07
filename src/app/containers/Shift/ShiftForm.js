@@ -9,9 +9,37 @@ import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'r
 
 import { canUser } from '../../common/Permissions';
 
+// include our indicatorsRequest action
+import { PropTypes } from 'prop-types'
+import { reduxForm, Field } from 'redux-form'
+import { connect } from 'react-redux'
+import { shiftCreate } from '../../../actions/shifts';
+
 const apiPost = 'shift';
 
+// Our validation function for `name` field.
+const nameRequired = value => (value ? undefined : 'Name Required')
+
 class ShiftForm extends Component {
+    static propTypes = {
+        handleSubmit: PropTypes.func.isRequired,
+        invalid: PropTypes.bool.isRequired,
+        user: PropTypes.shape({
+          username: PropTypes.string.isRequired,
+          access_token: PropTypes.string.isRequired,
+        }),
+        shifts: PropTypes.shape({
+          list: PropTypes.array,
+          requesting: PropTypes.bool,
+          successful: PropTypes.bool,
+          messages: PropTypes.array,
+          errors: PropTypes.array,
+        }).isRequired,
+        shiftCreate: PropTypes.func.isRequired,
+        reset: PropTypes.func.isRequired,
+      }
+
+
     constructor(props) {
         super(props);
         this.state = {
@@ -46,7 +74,6 @@ class ShiftForm extends Component {
                 .then(response => {
                     const dados = response.data.data;
 
-                    console.log(dados.deleted_at);
                     this.setState({ 
                         name: dados.name,
                         code: dados.code,
@@ -84,6 +111,41 @@ class ShiftForm extends Component {
             this.setState({ back_error: data_error[filterId] });
         }.bind(this));
     }
+
+    renderNameInput = ({ input, type, meta: { touched, error } }) => (
+        <div>
+          {/* Spread RF's input properties onto our input */}
+          <input
+            {...input}
+            type={type}
+          />
+          {/*
+            If the form has been touched AND is in error, show `error`.
+            `error` is the message returned from our validate function above
+            which in this case is `Name Required`.
+    
+            `touched` is a live updating property that RF passes in.  It tracks
+            whether or not a field has been "touched" by a user.  This means
+            focused at least once.
+          */}
+          {touched && error && (
+            <div style={{ color: '#cc7a6f', margin: '-10px 0 15px', fontSize: '0.7rem' }}>
+              {error}
+            </div>
+            )
+          }
+        </div>
+      )
+
+    
+    submit = (shift) => {
+        const { user, shiftCreate, reset } = this.props
+        // call to our shiftCreate action.
+
+        shiftCreate(user, shift)
+        // reset the form upon submit.
+        reset()
+      }
 
     updateForm(event) {
         event.preventDefault();
@@ -127,6 +189,18 @@ class ShiftForm extends Component {
     }
 
     render() {
+        const {
+            handleSubmit,
+            invalid,
+            shifts: {
+              list,
+              requesting,
+              successful,
+              messages,
+              errors,
+            },
+        } = this.props
+
         let redirect = null;
         if (this.state.saved) {
             redirect = <Redirect to="/cadastro/turnos" />;
@@ -154,52 +228,86 @@ class ShiftForm extends Component {
 
         return (
             <Card>
-                {redirect}
+                {/* {redirect} */}
 
                 <CardBody>
                    
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                     }
-                    <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
-                        onSubmit={this.handleSubmit} noValidate>
-                        
-                        <div className="">
-                            <FormGroup for="code">
-                                <FormControlLabel htmlFor="code">Código do turno</FormControlLabel>
-                                <FormControlInput type="text" id="code" name="code"
+                    <div className="shifts">
+                        <form onSubmit={handleSubmit(this.submit)}>
+                        {/* <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
+                            onSubmit={handleSubmit(this.submit)} noValidate>
+                             */}
+                            <div className="form-grpup">
+                                {/* <FormGroup for="code"> */}
+                                    {/* <FormControlLabel htmlFor="code">Código do turno</FormControlLabel> */}
+                                    {/* <FormControlInput type="text" id="code" name="code"
                                     value={this.state.code} onChange={this.handleChange}
-                                    readOnly={this.state.viewMode}
-                                    required />
-                                <FieldFeedbacks for="code">
-                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
-                            </FormGroup>
-                        </div>
-                        
-                        <div className="">
-                            <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Nome do turno</FormControlLabel>
-                                <FormControlInput type="text" id="name" name="name"
+                                        readOnly={this.state.viewMode}
+                                        required /> */}
+                                        <label htmlFor="code">Código do turno</label>
+                                        <Field 
+                                            name="code"
+                                            type="text" 
+                                            id="code"
+                                            readOnly={this.state.viewMode}
+                                            component="input"
+                                            className="form-control"
+                                        />    
+
+                                    {/* <FieldFeedbacks for="code">
+                                        <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                    </FieldFeedbacks> */}
+                                </div>
+
+                            
+                            <div className="form-group">
+                                <label htmlFor="name">Nome do turno</label>
+
+                                {/* <FormControlInput type="text" id="name" name="name"
                                     value={this.state.name} onChange={this.handleChange}
                                     readOnly={this.state.viewMode}
-                                    required />
-                                <FieldFeedbacks for="name">
+                                    required /> */}
+                                    <Field 
+                                        type="text" 
+                                        id="name"
+                                        name="name"
+                                        component="input"
+                                        className="form-control"
+                                        // onChange={this.handleChange}
+                                    />
+                                {/* <FieldFeedbacks for="name">
                                     <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
-                            </FormGroup>
-                        </div>
+                                </FieldFeedbacks> */}
+                            </div>
 
-                        {statusField}     
+                            {statusField}     
 
-                        <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
-                        <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
-                    </FormWithConstraints>
+                            <button action="submit" className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
+                            <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
+                        {/* </FormWithConstraints> */}
+                        </form>
+                    </div>
                     
+
                 </CardBody>
             </Card>
         )
     }
 }
-
-export default ShiftForm;
+// Pull in both the Client and the Widgets state
+const mapStateToProps = state => ({
+    user: state.user,
+    shifts: state.shifts,
+  })
+  
+  // Make the Client and Widgets available in the props as well
+  // as the shiftCreate() function
+  const connected = connect(mapStateToProps, { shiftCreate })(ShiftForm)
+  const formed = reduxForm({
+    form: 'shifts',
+  })(connected)
+  
+  export default formed

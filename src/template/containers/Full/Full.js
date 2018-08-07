@@ -35,7 +35,7 @@ import Users from '../../../app/containers/User/Users';
 
 import Marketshare from '../../../app/containers/MarketShare/MarketShare';
 
-import Indicators from '../../../app/containers/Indicators/Indicators'
+import {Indicators} from '../../../app/containers/Indicators/Indicators'
 
 import UserSchools from '../../../app/containers/UserSchools/UserSchools';
 

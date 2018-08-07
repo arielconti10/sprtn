@@ -5,6 +5,9 @@ import login from './reducers/login'
 import dropdown from './reducers/dropdown'
 import marketshare from './reducers/marketshare'
 import userSchool from './reducers/userSchool'
+import indicators from './reducers/indicators'
+import shifts from './reducers/shifts'
+import gridApi from './reducers/gridApi'
 
 const IndexReducer = combineReducers({
   user,
@@ -12,7 +15,10 @@ const IndexReducer = combineReducers({
   form,
   dropdown,
   marketshare,
-  userSchool
+  userSchool,
+  indicators,
+  shifts,
+  gridApi
 })
 
 export default IndexReducer  
