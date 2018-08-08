@@ -401,8 +401,10 @@ function* callTransferSchool(user_id, available_schools, schools, schools_wallet
 }
 
 function* changeUserFlow(action) {
+    yield put(updateLoader(true));
     yield put(setUserId(action.user_id));
     yield call(callGetUserSchools,action.user_id);
+    yield put(updateLoader(false));
 }
 
 function* changeSubsidiaryFlow(action) {
