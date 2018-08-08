@@ -7,7 +7,7 @@ import { verifySelectChecked, createTableToggle, savePreferences, verifyPreferen
 
 import {
     setColumns, setCreateTable, setDropdownStatus, setColumnsSelected, setInitialColumns, setSelectAll,
-    setLoader
+    setLoader, setTableInfo, setFilters
 } from '../actions/gridApi'
 
 const gridUrl = `${process.env.API_URL}`;
@@ -284,6 +284,20 @@ function searchData(baseURL) {
     });
 }
 
+/**
+ * concatena as buscas realizadas
+ * @param {Array} filtered lista com parâmetros utilizados na busca
+ * @param {Object} filter novo filtro utilizado
+ */
+function concatFilter(filtered, filter) {
+    let concat_filter = filtered.filter(item => item.id !== filter.id);
+    if (filter.value !== "") {
+        concat_filter = concat_filter.concat(filter);
+    }
+
+    return concat_filter;
+}
+
 function* loadColumnsFlow(action) {
     const columns = yield call(buildColumns, action.columnsGrid, action.hideButtons, action.urlLink, action.apiSpartan);
     yield put(setInitialColumns(columns));
@@ -310,6 +324,7 @@ function* fetchDataFlow(action) {
     const url_filter = yield call(getUrlSearch, action.table_state);
     const result_data = yield call(searchData, url_filter);
 
+    yield put(setTableInfo(action.table_state));
     yield put(setCreateTable(result_data));
     yield put(setLoader(false));
 }
@@ -367,6 +382,23 @@ function* selectAllFlow(action) {
     yield put(setColumns(columns_filter));
 }
 
+function* loadFilterFlow(action) {
+    const filtered = action.filtered;
+    const filter = action.filter;
+    const tableInfo = action.tableInfo;
+
+    let concat_filter = yield call(concatFilter, filtered, filter);
+    tableInfo.filtered = concat_filter;
+
+    const url_filter = yield call(getUrlSearch, tableInfo);
+    const result_data = yield call(searchData, url_filter);
+
+    yield put(setFilters(concat_filter))
+    yield put(setCreateTable(result_data));
+
+    console.log(url_filter);
+}
+
 // Our watcher (saga).  It will watch for many things.
 function* gridApiWatcher() {
   yield [
@@ -376,7 +408,8 @@ function* gridApiWatcher() {
     takeLatest("ON_ACTIVE_DATA_FLOW", activeDataFlow),
     takeLatest("TOGGLE_DROPDOWN_FLOW", toggleDropdownFlow),
     takeLatest("SELECT_COLUMNS_FLOW", selectColumnsFlow),
-    takeLatest("SELECT_ALL_FLOW", selectAllFlow)
+    takeLatest("SELECT_ALL_FLOW", selectAllFlow),
+    takeLatest("LOAD_FILTER_FLOW", loadFilterFlow)
   ]
 }
 
