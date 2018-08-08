@@ -1,6 +1,6 @@
 import { LOAD_COLUMNS_FLOW, SET_COLUMNS, ON_FETCH_DATA_FLOW, SET_CREATE_TABLE, ON_DELETE_DATA_FLOW, ON_ACTIVE_DATA_FLOW,
     TOGGLE_DROPDOWN_FLOW, SET_DROPDOWN_STATUS, SELECT_COLUMNS_FLOW, SET_COLUMNS_SELECTED, SET_INITIAL_COLUMNS,
-    SELECT_ALL, SELECT_ALL_FLOW, SET_LOADER
+    SELECT_ALL, SELECT_ALL_FLOW, SET_LOADER, LOAD_FILTER_FLOW, SET_TABLE_INFO, SET_FILTERS
 } from '../actionTypes/gridApi';
 
 export function loadColumnsFlow(columnsGrid, hideButtons, urlLink, apiSpartan) {
@@ -109,5 +109,28 @@ export function setLoader(loading) {
     return {
         type: SET_LOADER,
         loading
+    }
+}
+
+export function loadFilterFlow(filter, filtered, tableInfo) {
+    return {
+        type: LOAD_FILTER_FLOW,
+        filter,
+        filtered,
+        tableInfo
+    }
+}
+
+export function setTableInfo(tableInfo) {
+    return {
+        type: SET_TABLE_INFO,
+        tableInfo
+    }
+}
+
+export function setFilters(filtered) {
+    return {
+        type: SET_FILTERS,
+        filtered
     }
 }

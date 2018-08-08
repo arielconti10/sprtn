@@ -14,7 +14,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import { verifySelectChecked, createTable, savePreferences, verifyPreferences } from './ToggleTable'; 
 import { loadColumnsFlow, onFetchDataFlow, onDeleteDataFlow, onActiveDataFlow, toggleDropdownFlow, 
-    selectColumnsFlow, selectAllFlow
+    selectColumnsFlow, selectAllFlow, loadFilterFlow
 } from '../../actions/gridApi';
 
 class GridApi extends Component {
@@ -27,6 +27,7 @@ class GridApi extends Component {
         toggleDropdownFlow: PropTypes.func,
         selectColumns: PropTypes.func,
         selectAllFlow: PropTypes.func, 
+        loadFilterFlow: PropTypes.func,
         gridApi: PropTypes.shape({
             columnsGrid: PropTypes.array,
             data: PropTypes.array,
@@ -44,6 +45,7 @@ class GridApi extends Component {
         this.toggle = this.toggle.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleSelectAll = this.handleSelectAll.bind(this);
+        this.onChangeTextFilter = this.onChangeTextFilter.bind(this);
     }
 
     componentWillMount() {
@@ -52,8 +54,30 @@ class GridApi extends Component {
         const urlLink = this.props.urlLink;
         const apiSpartan = this.props.apiSpartan;
 
+        columns.map(item => {
+            item.filterable === true?
+            item.Filter = ({ filter, onChange }) => (
+                <input type="text" value={filter} style={{width:  "100%"}} 
+                    onBlur={event => this.onChangeTextFilter(event.target.value, item.accessor)}
+                    onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter(event.target.value, item.accessor):''}
+                />
+            ):""
+        })
+
         this.props.loadColumnsFlow(columns, hideButtons, urlLink, apiSpartan);
     }
+
+    onChangeTextFilter(filter, accessor) {
+        const gridApi = this.props.gridApi;
+        const filtered = gridApi.filtered;
+        const tableInfo = gridApi.tableInfo;
+        const new_object = {id: accessor, value: filter};
+
+        this.props.loadFilterFlow(new_object, filtered, tableInfo);
+
+    }
+
+    
 
     toggle() {
         const gridApi = this.props.gridApi;
@@ -179,7 +203,8 @@ const functions_object = {
     onActiveDataFlow,
     toggleDropdownFlow,
     selectColumnsFlow,
-    selectAllFlow
+    selectAllFlow,
+    loadFilterFlow
 }
 
 export default connect(mapStateToProps, functions_object )(GridApi);
