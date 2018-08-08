@@ -1,6 +1,6 @@
 import { LOAD_COLUMNS_FLOW, SET_COLUMNS, ON_FETCH_DATA_FLOW, SET_CREATE_TABLE, ON_DELETE_DATA_FLOW, ON_ACTIVE_DATA_FLOW, 
     TOGGLE_DROPDOWN_FLOW, SET_DROPDOWN_STATUS, SELECT_COLUMNS_FLOW, SET_COLUMNS_SELECTED, SET_INITIAL_COLUMNS,
-    SELECT_ALL, SELECT_ALL_FLOW
+    SELECT_ALL, SELECT_ALL_FLOW, SET_LOADER
 } from "../actionTypes/gridApi";
 
 const initialState = {
@@ -93,6 +93,12 @@ const reducer = function gridApiReducer (state = initialState, action) {
         case SELECT_ALL_FLOW:
             return {
                 ...state
+            }
+        case SET_LOADER:
+            const loading = action.loading;
+            return {
+                ...state,
+                loading
             }
         default:
             return state

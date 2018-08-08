@@ -7,6 +7,7 @@ import { verifySelectChecked, createTableToggle, savePreferences, verifyPreferen
 
 import {
     setColumns, setCreateTable, setDropdownStatus, setColumnsSelected, setInitialColumns, setSelectAll,
+    setLoader
 } from '../actions/gridApi'
 
 const gridUrl = `${process.env.API_URL}`;
@@ -205,10 +206,9 @@ function verifyOrderBy(sorted_id, state, count, columns) {
  */
 function selectAllItems(initialColumns, selectAll) {
     const selectInverse = !selectAll;
-    let columnsMap = [];
+    let columnsMap = initialColumns;
 
-    if(!selectInverse) {
-        columnsMap = initialColumns;
+    if(columnsMap) {
 
         columnsMap.map((item) => {
                 item.is_checked = selectInverse;
@@ -290,14 +290,28 @@ function* loadColumnsFlow(action) {
     yield put(setColumns(columns));
     yield put(setColumnsSelected(columns));
     yield put(setSelectAll(true));
+
+    const table_preference = verifyPreferences(columns, `prefs_${action.apiSpartan}`);
+    const columns_filter = createTableToggle(table_preference);
+    
+    if (columns_filter.length === 2) {
+        yield put(setSelectAll(false));
+    }
+
+    if (columns_filter.length === columns.length) {
+        yield put(setSelectAll(true));
+    }
+
+    yield put(setColumns(columns_filter));
 }
 
 function* fetchDataFlow(action) {
+    yield put(setLoader(true));
     const url_filter = yield call(getUrlSearch, action.table_state);
     const result_data = yield call(searchData, url_filter);
 
-
     yield put(setCreateTable(result_data));
+    yield put(setLoader(false));
 }
 
 function* deleteDataFlow(action) {
@@ -347,19 +361,10 @@ function* selectAllFlow(action) {
     const selectAll = action.selectAll;
     const columns_map = yield call(selectAllItems, initialColumns, selectAll);
     const columns_filter = createTableToggle(initialColumns);
-
-    console.log(columns_map);
-    console.log(columns_filter);
-
+    
     yield put(setSelectAll(select_inverse));
-    yield put(setInitialColumns(columns_map));
-    yield put(setColumns(columns_filter));    
-
-    /*
-                    const columns_filter = createTable(this.state.initial_columns);
-                savePreferences("prefs_discipline", columns_filter);
-                this.setState({ initial_columns: columns_map, table_columns: columns_filter, table_columns: columns_filter });
-    */
+    yield put(setColumnsSelected(columns_map));
+    yield put(setColumns(columns_filter));
 }
 
 // Our watcher (saga).  It will watch for many things.

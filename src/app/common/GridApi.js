@@ -34,7 +34,8 @@ class GridApi extends Component {
             pages: PropTypes.integer,
             pageSize: PropTypes.integer,
             totalSize: PropTypes.integer,
-            dropdownOpen: PropTypes.bool
+            dropdownOpen: PropTypes.bool,
+            loading: PropTypes.bool
         }),
     }
 
@@ -75,12 +76,11 @@ class GridApi extends Component {
         const selectAll = gridApi.selectAll;
         const columsInitial = gridApi.columsInitial;
         
-        console.log("handle select all");
         this.props.selectAllFlow(selectAll, columsInitial);
     }
 
     render() {
-        const { columnsGrid, data, pages ,pageSize, dropdownOpen, columnsSelected, selectAll } = this.props.gridApi;
+        const { columnsGrid, data, pages ,pageSize, dropdownOpen, columnsSelected, selectAll, loading } = this.props.gridApi;
         const { apiSpartan, defaultOrder } = this.props;
 
         return (
@@ -145,7 +145,7 @@ class GridApi extends Component {
                     data={data}
                     pages={pages}
                     defaultPageSize={pageSize}
-                    // loading={loading}
+                    loading={loading}
                     manual
                     onFetchData={this.props.onFetchDataFlow}
                     data_api={apiSpartan}
