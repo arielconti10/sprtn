@@ -2,6 +2,7 @@
 import LoginSaga from './sagas/login'
 import IndicatorsSaga from './sagas/indicators'
 import ShiftSaga from './sagas/shifts'
+import LocalizationSaga from './sagas/localization'
 import DropdownSaga from './sagas/dropdown'
 import MarketshareSaga from './sagas/marketshare';
 import UserSchoolSaga from './sagas/userSchool';
@@ -15,6 +16,7 @@ export default function* IndexSaga () {
     UserSchoolSaga(),
     IndicatorsSaga(),
     ShiftSaga(),
-    GridApiSaga()
+    GridApiSaga(),
+    LocalizationSaga(),
   ]
 }
