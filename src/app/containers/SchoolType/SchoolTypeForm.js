@@ -8,9 +8,38 @@ import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints'
 import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 import { canUser } from '../../common/Permissions';
 
-const apiPost = 'school-type';
+import { PropTypes } from 'prop-types'
+import { reduxForm, Field } from 'redux-form'
+import { connect } from 'react-redux'
+import { schoolTypeCreate, schoolTypeUpdate, schoolTypeLoad } from '../../../actions/schoolTypes';
+
+const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório')
 
 class SchoolTypeForm extends Component {
+    static propTypes = {
+        handleSubmit: PropTypes.func.isRequired,
+        invalid: PropTypes.bool.isRequired,
+        user: PropTypes.shape({
+            username: PropTypes.string.isRequired,
+            access_token: PropTypes.string.isRequired,
+        }),
+        schoolTypes: PropTypes.shape({
+            list: PropTypes.array,
+            requesting: PropTypes.bool,
+            successful: PropTypes.bool,
+            messages: PropTypes.array,
+            errors: PropTypes.array,
+            current_schoolType: PropTypes.shape({
+                active: PropTypes.bool,
+                name: PropTypes.string,
+            })
+        }).isRequired,
+        schoolTypeUpdate: PropTypes.func.isRequired,
+        schoolTypeCreate: PropTypes.func.isRequired,
+        schoolTypeLoad: PropTypes.func.isRequired,
+        reset: PropTypes.func.isRequired,
+        initialValues: PropTypes.object
+    }
     constructor(props) {
         super(props);
         this.state = {
@@ -27,20 +56,12 @@ class SchoolTypeForm extends Component {
     }
 
     componentWillMount() {
+        const { schoolTypeLoad, user } = this.props
+
         this.checkPermission('school-type.insert');
         if (this.props.match.params.id !== undefined) {
             this.checkPermission('school-type.update');
-            axios.get(`${apiPost}/${this.props.match.params.id}`)
-                .then(response => {
-                    const dados = response.data.data;
-
-                    console.log(dados.deleted_at);
-                    this.setState({ 
-                        name: dados.name,
-                        active: dados.deleted_at === null ? true: false
-                    });
-                })
-                .catch(err => console.log(err));
+            schoolTypeLoad(user, this.props.match.params.id)
         }
     }
 
@@ -55,14 +76,44 @@ class SchoolTypeForm extends Component {
     handleChange(e) {
         const target = e.currentTarget;
 
-        this.form.validateFields(target);
-
         this.setState({
             [target.name]: (target.type == 'checkbox') ? target.checked : target.value,
-            submitButtonDisabled: !this.form.isValid()
+            // submitButtonDisabled: !this.form.isValid()
         });
     }
 
+    renderNameInput = ({ input, type, meta: { touched, error } }) => (
+        <div>
+            {/* Spread RF's input properties onto our input */}
+            <input
+                className="form-control"
+                {...input}
+                type={type}
+            />
+
+            {touched && error && (
+                <div style={{ color: 'red'}}>
+                    {error}
+                </div>
+            )
+            }
+        </div>
+    )
+    submit = (schoolType) => {
+
+        const { user, schoolTypeCreate, schoolTypeUpdate, reset } = this.props
+        // call to our shiftCreate action.
+
+        if (this.props.match.params.id !== undefined) {
+            schoolTypeCreate(user, schoolType)
+        } else {
+            schoolTypeUpdate(user, schoolType)
+        }
+
+        // reset the form upon submit.
+        reset()
+
+    }
     submitForm(event) {
         event.preventDefault();
         axios.post(`${apiPost}`, {
@@ -119,6 +170,19 @@ class SchoolTypeForm extends Component {
     }
 
     render() {
+        const {
+            handleSubmit,
+            invalid,
+            schoolTypes: {
+                list,
+                requesting,
+                successful,
+                messages,
+                errors,
+                current_schoolType
+            },
+        } = this.props
+
         let redirect = null;
         if (this.state.saved) {
             redirect = <Redirect to="/cadastro/tipos-escola" />;
@@ -150,26 +214,26 @@ class SchoolTypeForm extends Component {
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                     }
-                    <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
-                        onSubmit={this.handleSubmit} noValidate>
-                        
-                        <div className="">
-                            <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Nome do tipo de escola</FormControlLabel>
-                                <FormControlInput type="text" id="name" name="name"
-                                    value={this.state.name} onChange={this.handleChange}
-                                    required />
-                                <FieldFeedbacks for="name">
-                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
-                            </FormGroup>
-                        </div>
-                        
-                        {statusField}     
+                    <form onSubmit={handleSubmit(this.submit)}>
 
-                        <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
-                        <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
-                    </FormWithConstraints>
+                    <div className="form-group">
+                        <label htmlFor="name">Nome do tipo de escola</label>
+                        <Field
+                            type="text"
+                            id="name"
+                            name="name"
+                            component={this.renderNameInput}
+                            className="form-control"
+                            validate={fieldRequired}
+                        />
+                    </div>
+
+                    {statusField}
+
+                    <button action="submit" className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
+                    <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
+
+                    </form>
                     
                 </CardBody>
             </Card>
@@ -177,4 +241,19 @@ class SchoolTypeForm extends Component {
     }
 }
 
-export default SchoolTypeForm;
+let InitializeFromStateForm = reduxForm({
+    form: 'InitializeFromState',
+    enableReinitialize: true
+})(SchoolTypeForm)
+
+InitializeFromStateForm = connect(
+    state => ({
+        user: state.user,
+        schoolTypes: state.schoolTypes,
+        initialValues: state.schoolTypes.current_schoolType
+    }),
+    { schoolTypeLoad, schoolTypeUpdate, schoolTypeCreate }
+)(InitializeFromStateForm)
+
+
+export default InitializeFromStateForm

@@ -9,13 +9,10 @@ import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'r
 
 import { canUser } from '../../common/Permissions';
 
-// include our indicatorsRequest action
 import { PropTypes } from 'prop-types'
 import { reduxForm, Field } from 'redux-form'
 import { connect } from 'react-redux'
 import { shiftCreate, shiftUpdate, shiftLoad } from '../../../actions/shifts';
-
-const apiPost = 'shift';
 
 // Our validation function for `name` field.
 const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório')
