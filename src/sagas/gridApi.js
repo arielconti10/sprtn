@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import { Router, hashHistory, Link, browserHistory, withRouter, Redirect } from 'react-router-dom'
 
+import Select, { Async } from 'react-select';
 import { take, fork, cancel, call, put, cancelled, takeLatest, select } from 'redux-saga/effects'
 import axios from '../app/common/axios';
 import { verifySelectChecked, createTableToggle, savePreferences, verifyPreferences } from '../app/common/ToggleTable';
 
 import {
     setColumns, setCreateTable, setDropdownStatus, setColumnsSelected, setInitialColumns, setSelectAll,
-    setLoader, setTableInfo, setFilters
+    setLoader, setTableInfo, setFilters, setDataAlternative
 } from '../actions/gridApi'
 
 const gridUrl = `${process.env.API_URL}`;
@@ -130,6 +131,80 @@ function* buildActionColumn(columns, hideButtons, urlLink, apiSpartan) {
     return newColumns;
 }
 
+function getSchoolAndVisitValues(sub, old_value, column_value_changed, val) {
+    let newArrayData = [];
+
+    column_value_changed.map(item => {
+        if (val.length) {
+            val.map(register => {
+                let values = {};
+
+                if (old_value.length > column_value_changed.length) {
+                    if (register[sub] === item) {
+                        values['school_type_id'] = register['school_type_id'];
+                        values['visit_type_id'] = register['visit_type_id'];
+
+                        newArrayData.push(values);
+                    }
+                }
+                else {
+                    if (sub === 'school_type_id') {
+                        values['school_type_id'] = item;
+                        values['visit_type_id'] = register['visit_type_id'];
+                    } else {
+                        values['school_type_id'] = register['school_type_id'];
+                        values['visit_type_id'] = item;
+                    }
+
+                    newArrayData.push(values);
+                }
+            });
+        } else {
+            let values = {};
+
+            if (sub === 'school_type_id') {
+                values['school_type_id'] = item;
+                values['visit_type_id'] = 1;
+            } else {
+                values['school_type_id'] = 1;
+                values['visit_type_id'] = item;
+            }
+
+            newArrayData.push(values);
+        }
+    });
+
+    newArrayData = newArrayData.filter((item, index, self) =>
+        index === self.findIndex((obj) => (
+            obj.school_type_id === item.school_type_id && obj.visit_type_id === item.visit_type_id
+        ))
+    )
+
+    return newArrayData;
+}
+
+function* buildAltColumns(columns) {
+    const columnsAltFilter = columns.filter(item => item.sub && item.sub !== '');
+    let dataAltAux = [];
+    columnsAltFilter.map(item => {
+        axios.get(item.api)
+        .then(response => {
+            const dados = response.data.data;
+
+            dataAltAux.splice(item.seq, 0, dados);
+
+            if (dataAltAux && dataAltAux[0][0].code == "super") {
+                dataAltAux[0].shift();
+            }
+
+            return dataAltAux;
+        })
+        .catch(err => console.log(err));
+    })
+
+    yield put(setDataAlternative(dataAltAux));
+}
+
 /**
  * realiza a construçāo de colunas da tabela
  * @param {Array} columns colunas atuais da tabela
@@ -138,10 +213,12 @@ function* buildActionColumn(columns, hideButtons, urlLink, apiSpartan) {
  */
 function* buildColumns(columns, hideButtons, urlLink, apiSpartan) {
     let newColumns = columns;
+    let newAltColumns = yield call (buildAltColumns, newColumns);
+
     let status_column = buildStatusColumn(newColumns);
     let actions_column = yield call(buildActionColumn, status_column, hideButtons, urlLink, apiSpartan);
 
-    return actions_column;
+    return newColumns;
 }
 
 function verifyFilter(filter_id, state, count, value, baseURL) {
@@ -216,6 +293,25 @@ function selectAllItems(initialColumns, selectAll) {
     }
 
     return columnsMap;
+}
+
+/**
+ * realiza a atualizaçāo de uma coluna alternativa, que possui select2
+ * @param {String} apiSpartan endpoint a ser utilizado
+ * @param {Integer} actionId ID da açāo a ser atualizada
+ * @param {Array} updateData dados a serem atualizados
+ * @return {Bool} updated se a atualizaçāo foi bem-sucedida
+ */
+function updateAltInfo(apiSpartan, actionId, updateData) {
+    return axios.put(`${apiSpartan}/${actionId}`, updateData)
+    .then(res => {
+        if (res.status === 200) {
+            return true;
+        }
+        
+    }).catch(function (error) {
+        console.log("ERRO", error)
+    });
 }
 
 /**
@@ -299,7 +395,7 @@ function concatFilter(filtered, filter) {
 }
 
 function* loadColumnsFlow(action) {
-    const columns = yield call(buildColumns, action.columnsGrid, action.hideButtons, action.urlLink, action.apiSpartan);
+    const columns = yield call(buildColumns, action.columnsGrid, action.hideButtons, action.urlLink, action.apiSpartan, action.columnsAlt, action.tableInfo, action.onFetchDataFlow);
     yield put(setInitialColumns(columns));
     yield put(setColumns(columns));
     yield put(setColumnsSelected(columns));
@@ -370,6 +466,19 @@ function* selectColumnsFlow(action) {
     savePreferences(`prefs_${apiSpartan}`, columns_filter);
 }
 
+function* selectOptionFlow(action) {
+    const updated = yield call(updateAltInfo, action.apiSpartan, action.info_id, action.updatedData);
+    if (updated) {
+        yield put(setLoader(true));
+        const url_filter = yield call(getUrlSearch, action.tableInfo);
+        const result_data = yield call(searchData, url_filter);
+        yield put(setTableInfo(action.tableInfo));
+        yield put(setCreateTable(result_data));
+        yield put(setLoader(false));
+
+    }
+}
+
 function* selectAllFlow(action) {
     const select_inverse = !action.selectAll;
     const initialColumns = action.columsInitial;
@@ -395,8 +504,6 @@ function* loadFilterFlow(action) {
 
     yield put(setFilters(concat_filter))
     yield put(setCreateTable(result_data));
-
-    console.log(url_filter);
 }
 
 // Our watcher (saga).  It will watch for many things.
@@ -409,7 +516,8 @@ function* gridApiWatcher() {
     takeLatest("TOGGLE_DROPDOWN_FLOW", toggleDropdownFlow),
     takeLatest("SELECT_COLUMNS_FLOW", selectColumnsFlow),
     takeLatest("SELECT_ALL_FLOW", selectAllFlow),
-    takeLatest("LOAD_FILTER_FLOW", loadFilterFlow)
+    takeLatest("LOAD_FILTER_FLOW", loadFilterFlow),
+    takeLatest("SELECT_OPTION_FLOW", selectOptionFlow)
   ]
 }
 

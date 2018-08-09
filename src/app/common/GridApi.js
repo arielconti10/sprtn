@@ -8,13 +8,13 @@ import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem,
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import './GridApi.css'
+// import './GridApi.css'
 
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
-import { verifySelectChecked, createTable, savePreferences, verifyPreferences } from './ToggleTable'; 
+import { getSchoolAndVisitValues } from './ToggleTable'; 
 import { loadColumnsFlow, onFetchDataFlow, onDeleteDataFlow, onActiveDataFlow, toggleDropdownFlow, 
-    selectColumnsFlow, selectAllFlow, loadFilterFlow
+    selectColumnsFlow, selectAllFlow, loadFilterFlow, selectOptionFlow
 } from '../../actions/gridApi';
 
 class GridApi extends Component {
@@ -28,6 +28,7 @@ class GridApi extends Component {
         selectColumns: PropTypes.func,
         selectAllFlow: PropTypes.func, 
         loadFilterFlow: PropTypes.func,
+        selectOptionFlow: PropTypes.func,
         gridApi: PropTypes.shape({
             columnsGrid: PropTypes.array,
             data: PropTypes.array,
@@ -49,10 +50,12 @@ class GridApi extends Component {
     }
 
     componentWillMount() {
+        const gridApi = this.props.gridApi;
         const columns = this.props.columns;
         const hideButtons = this.props.hideButtons;
         const urlLink = this.props.urlLink;
         const apiSpartan = this.props.apiSpartan;
+        const columnsAlt = this.props.columnsAlt;
 
         columns.map(item => {
             item.filterable === true?
@@ -64,7 +67,15 @@ class GridApi extends Component {
             ):""
         })
 
-        this.props.loadColumnsFlow(columns, hideButtons, urlLink, apiSpartan);
+        const tableInfo = {
+            data_api: apiSpartan,
+            pageSize: gridApi.pageSize,
+            page: gridApi.page,
+            filtered: gridApi.filtered,
+            sorted: gridApi.sorted
+        }
+
+        this.props.loadColumnsFlow(columns, hideButtons, urlLink, apiSpartan, columnsAlt, tableInfo, onFetchDataFlow);
     }
 
     onChangeTextFilter(filter, accessor) {
@@ -74,10 +85,7 @@ class GridApi extends Component {
         const new_object = {id: accessor, value: filter};
 
         this.props.loadFilterFlow(new_object, filtered, tableInfo);
-
     }
-
-    
 
     toggle() {
         const gridApi = this.props.gridApi;
@@ -103,9 +111,120 @@ class GridApi extends Component {
         this.props.selectAllFlow(selectAll, columsInitial);
     }
 
-    render() {
-        const { columnsGrid, data, pages ,pageSize, dropdownOpen, columnsSelected, selectAll, loading } = this.props.gridApi;
+    /**
+     * renderizaçāo da grid. 
+     * Utilizada, especialmente, para colunas com select2
+     */
+    renderGrid(columnsGrid, dataAlternative, tableInfo) {
+        let final_grid = [];
         const { apiSpartan, defaultOrder } = this.props;
+
+        columnsGrid.map(item => {
+            if (item.sub) {
+                item.Cell = (element) => {
+                    let column_value = [];
+                    if (item.sub) {
+                        element.value.map(val => {
+                            if (!column_value.find(function (obj) { return obj === val[item.sub]; })) {
+                                column_value.push(val[item.sub])
+                            }
+                        });
+                
+                    } else {
+                        column_value = element.value.map(val => {
+                            return val.id
+                        });
+                    }
+
+                    let seq = item.seq || 0;
+
+                    return (
+                        <div>
+                            <Select
+                                autosize={true}
+                                name={item.sub ? item.sub : item.name}
+                                id={item.sub ? item.sub : item.name}
+                                onChange={(selectedOption) => {                
+                                    const column_value_changed = selectedOption.map(function (cv) {
+                                        return cv.id;
+                                    });
+                
+                                    let column_value_update = [];
+                
+                                    if (item.sub) {
+                                        column_value = selectedOption.map(function (cv) {
+                                            return cv.id;
+                                        }, {});
+                                    }
+                
+                                    let name = item.sub ? item.sub : item.name;
+                
+                                    column_value_update = selectedOption.map(function (cv, i) {
+                                        let value = {};
+                                        value[name] = cv.id;
+                                        return value;
+                                    }, {});
+                
+                                    const updateData = {};
+                
+                                    let id = 0;
+                
+                                    for (var value in element.row['']) {
+                                        if (value == 'id') {
+                                            id = element.row[''][value]
+                                        }
+                                        else if (value != 'created_at' && value != 'updated_at' && value != 'deleted_at' && value != item.accessor) {
+                                            updateData[value] = element.row[''][value];
+                                        }
+                                        else if (value == item.accessor) {
+                                            if (item.accessor == 'visit_type_school_type') {
+                                                 updateData[value] = getSchoolAndVisitValues(item.sub, column_value, column_value_changed, element.original.visit_type_school_type);
+                                            } else {
+                                                updateData[value] = column_value_update;
+                                            }
+                                        }
+                                    }
+                
+                                    updateData.active = true;
+                
+                                    // //específico para API de regras
+                                    // if (this.props.apiSpartan == "rule") {
+                                    //     const object = {role_id:1};
+                                    //     updateData.roles.unshift(object);
+                                    // }
+
+                                    this.props.selectOptionFlow(updateData, apiSpartan, id, tableInfo);
+                
+
+                                }}
+                                labelKey="name"
+                                valueKey="id"
+                                value={column_value}
+                                multi={item.type == 'selectMulti' ? true : false}
+                                disabled={element.original.deleted_at ? true : false}
+                                joinValues={false}
+                                placeholder="Selecione um valor"
+                                options={dataAlternative[seq]}
+                                rtl={false}
+                            />
+                        </div>
+                    )
+                }
+            }
+            final_grid = final_grid.concat(item);
+        })
+
+        return final_grid;
+    }
+    
+    render() {
+        const { columnsGrid, data, pages ,pageSize, dropdownOpen, columnsSelected, selectAll, loading, 
+            dataAlternative, tableInfo 
+        } = this.props.gridApi;
+        const { apiSpartan, defaultOrder } = this.props;
+
+        let final_grid = [];
+        final_grid = this.renderGrid(columnsGrid, dataAlternative, tableInfo);
 
         return (
 
@@ -132,7 +251,7 @@ class GridApi extends Component {
                             </DropdownItem>
 
                             {columnsSelected.map((item, key) => 
-                                (item.accessor == "")?"": 
+                                (item.accessor == "" || item.sub)?"": 
                                 <DropdownItem disabled key={item.accessor}>
                                     <FormGroup check>
                                         <Label check>
@@ -153,7 +272,6 @@ class GridApi extends Component {
                 <ReactTable
                     getTdProps={(state, rowInfo, column, instance) => {
                         return {
-                            // fa fa-check-circle
                             onClick: e => {
                                 if (!rowInfo.original.deleted_at && (e.target.className === "fa fa-ban" || e.target.tagName === "BUTTON")) {
                                     this.props.onDeleteDataFlow(apiSpartan, rowInfo, state);
@@ -165,7 +283,7 @@ class GridApi extends Component {
                             }
                         }
                     }}
-                    columns={columnsGrid}
+                    columns={final_grid}
                     data={data}
                     pages={pages}
                     defaultPageSize={pageSize}
@@ -204,7 +322,8 @@ const functions_object = {
     toggleDropdownFlow,
     selectColumnsFlow,
     selectAllFlow,
-    loadFilterFlow
+    loadFilterFlow,
+    selectOptionFlow
 }
 
 export default connect(mapStateToProps, functions_object )(GridApi);

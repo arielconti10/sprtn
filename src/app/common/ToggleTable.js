@@ -1,3 +1,55 @@
+export function getSchoolAndVisitValues(sub, old_value, column_value_changed, val) {
+    let newArrayData = [];
+
+    column_value_changed.map(item => {
+        if (val.length) {
+            val.map(register => {
+                let values = {};
+
+                if (old_value.length > column_value_changed.length) {
+                    if (register[sub] === item) {
+                        values['school_type_id'] = register['school_type_id'];
+                        values['visit_type_id'] = register['visit_type_id'];
+
+                        newArrayData.push(values);
+                    }
+                }
+                else {
+                    if (sub === 'school_type_id') {
+                        values['school_type_id'] = item;
+                        values['visit_type_id'] = register['visit_type_id'];
+                    } else {
+                        values['school_type_id'] = register['school_type_id'];
+                        values['visit_type_id'] = item;
+                    }
+
+                    newArrayData.push(values);
+                }
+            });
+        } else {
+            let values = {};
+
+            if (sub === 'school_type_id') {
+                values['school_type_id'] = item;
+                values['visit_type_id'] = 1;
+            } else {
+                values['school_type_id'] = 1;
+                values['visit_type_id'] = item;
+            }
+
+            newArrayData.push(values);
+        }
+    });
+
+    newArrayData = newArrayData.filter((item, index, self) =>
+        index === self.findIndex((obj) => (
+            obj.school_type_id === item.school_type_id && obj.visit_type_id === item.visit_type_id
+        ))
+    )
+
+    return newArrayData;
+}
+
 /**
  * com base no evento disparado, verifica as checkbox do dropdown que estāo marcadas como check
  * @param {Object} target evento disparado no campo
