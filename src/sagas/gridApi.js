@@ -183,26 +183,36 @@ function getSchoolAndVisitValues(sub, old_value, column_value_changed, val) {
     return newArrayData;
 }
 
-function* buildAltColumns(columns) {
+function buildAltColumns(columns) {
     const columnsAltFilter = columns.filter(item => item.sub && item.sub !== '');
-    let dataAltAux = [];
-    columnsAltFilter.map(item => {
-        axios.get(item.api)
+    
+    let promises = columnsAltFilter.map(item => {
+        return axios.get(item.api)
         .then(response => {
+            let dataAltAux = [];
             const dados = response.data.data;
 
-            dataAltAux.splice(item.seq, 0, dados);
+            // dataAltAux.splice(item.seq, 0, dados);
+            dataAltAux.splice(0, 0, dados);
 
-            if (dataAltAux && dataAltAux[0][0].code == "super") {
-                dataAltAux[0].shift();
+            // if (dataAltAux && dataAltAux[0][0].code == "super") {
+            //     dataAltAux[0].shift();
+            // }
+
+            if (response.status === 200) {
+                return dataAltAux;
             }
-
-            return dataAltAux;
         })
+        // .then(final_response => final_response)
         .catch(err => console.log(err));
     })
 
-    yield put(setDataAlternative(dataAltAux));
+
+    // yield put(setDataAlternative(dataAltAux));
+    
+    return promises;
+    // return dataAltAux;
+    
 }
 
 /**
@@ -214,6 +224,14 @@ function* buildAltColumns(columns) {
 function* buildColumns(columns, hideButtons, urlLink, apiSpartan) {
     let newColumns = columns;
     let newAltColumns = yield call (buildAltColumns, newColumns);
+    let finalAltColumn = [];
+
+    let result = yield Promise.all(newAltColumns).then(function(results) {
+        finalAltColumn = results;
+        // return results;
+    })
+
+    yield put(setDataAlternative(finalAltColumn));
 
     let status_column = buildStatusColumn(newColumns);
     let actions_column = yield call(buildActionColumn, status_column, hideButtons, urlLink, apiSpartan);

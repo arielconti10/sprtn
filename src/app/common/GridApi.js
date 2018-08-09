@@ -119,113 +119,132 @@ class GridApi extends Component {
         let final_grid = [];
         const { apiSpartan, defaultOrder } = this.props;
 
-        columnsGrid.map(item => {
-            if (item.sub) {
-                item.Cell = (element) => {
-                    let column_value = [];
-                    if (item.sub) {
-                        element.value.map(val => {
-                            if (!column_value.find(function (obj) { return obj === val[item.sub]; })) {
-                                column_value.push(val[item.sub])
-                            }
-                        });
-                
-                    } else {
-                        column_value = element.value.map(val => {
-                            return val.id
-                        });
-                    }
 
-                    let seq = item.seq || 0;
+        if (columnsGrid) {
+            columnsGrid.map(item => {
+                if (item.sub) {
+                    item.Cell = (element) => {
+                        let column_value = [];
+                        if (item.sub) {
+                            element.value.map(val => {
+                                if (!column_value.find(function (obj) { return obj === val[item.sub]; })) {
+                                    column_value.push(val[item.sub])
+                                }
+                            });
+                    
+                        } else {
+                            column_value = element.value.map(val => {
+                                return val.id
+                            });
+                        }
 
-                    return (
-                        <div>
-                            <Select
-                                autosize={true}
-                                name={item.sub ? item.sub : item.name}
-                                id={item.sub ? item.sub : item.name}
-                                onChange={(selectedOption) => {                
-                                    const column_value_changed = selectedOption.map(function (cv) {
-                                        return cv.id;
-                                    });
-                
-                                    let column_value_update = [];
-                
-                                    if (item.sub) {
-                                        column_value = selectedOption.map(function (cv) {
+                        let seq = item.seq || 0;
+
+                        console.log(typeof dataAlternative[seq][0], dataAlternative[seq][0]);
+
+                        return (
+                            <div>
+                                <Select
+                                    autosize={true}
+                                    name={item.sub ? item.sub : item.name}
+                                    id={item.sub ? item.sub : item.name}
+                                    onChange={(selectedOption) => {                
+                                        const column_value_changed = selectedOption.map(function (cv) {
                                             return cv.id;
+                                        });
+                    
+                                        let column_value_update = [];
+                    
+                                        if (item.sub) {
+                                            column_value = selectedOption.map(function (cv) {
+                                                return cv.id;
+                                            }, {});
+                                        }
+
+                                        
+                    
+                                        let name = item.sub ? item.sub : item.name;
+                    
+                                        column_value_update = selectedOption.map(function (cv, i) {
+                                            let value = {};
+                                            value[name] = cv.id;
+                                            return value;
                                         }, {});
-                                    }
-                
-                                    let name = item.sub ? item.sub : item.name;
-                
-                                    column_value_update = selectedOption.map(function (cv, i) {
-                                        let value = {};
-                                        value[name] = cv.id;
-                                        return value;
-                                    }, {});
-                
-                                    const updateData = {};
-                
-                                    let id = 0;
-                
-                                    for (var value in element.row['']) {
-                                        if (value == 'id') {
-                                            id = element.row[''][value]
-                                        }
-                                        else if (value != 'created_at' && value != 'updated_at' && value != 'deleted_at' && value != item.accessor) {
-                                            updateData[value] = element.row[''][value];
-                                        }
-                                        else if (value == item.accessor) {
-                                            if (item.accessor == 'visit_type_school_type') {
-                                                 updateData[value] = getSchoolAndVisitValues(item.sub, column_value, column_value_changed, element.original.visit_type_school_type);
-                                            } else {
-                                                updateData[value] = column_value_update;
+                    
+                                        const updateData = {};
+                    
+                                        let id = 0;
+                    
+                                        for (var value in element.row['']) {
+                                            if (value == 'id') {
+                                                id = element.row[''][value]
+                                            }
+                                            else if (value != 'created_at' && value != 'updated_at' && value != 'deleted_at' && value != item.accessor) {
+                                                updateData[value] = element.row[''][value];
+                                            }
+                                            else if (value == item.accessor) {
+                                                if (item.accessor == 'visit_type_school_type') {
+                                                    updateData[value] = getSchoolAndVisitValues(item.sub, column_value, column_value_changed, element.original.visit_type_school_type);
+                                                } else {
+                                                    updateData[value] = column_value_update;
+                                                }
                                             }
                                         }
-                                    }
-                
-                                    updateData.active = true;
-                
-                                    // //específico para API de regras
-                                    // if (this.props.apiSpartan == "rule") {
-                                    //     const object = {role_id:1};
-                                    //     updateData.roles.unshift(object);
-                                    // }
+                    
+                                        updateData.active = true;
+                    
+                                        // //específico para API de regras
+                                        // if (this.props.apiSpartan == "rule") {
+                                        //     const object = {role_id:1};
+                                        //     updateData.roles.unshift(object);
+                                        // }
 
-                                    this.props.selectOptionFlow(updateData, apiSpartan, id, tableInfo);
-                
+                                        this.props.selectOptionFlow(updateData, apiSpartan, id, tableInfo);
+                    
 
-                                }}
-                                labelKey="name"
-                                valueKey="id"
-                                value={column_value}
-                                multi={item.type == 'selectMulti' ? true : false}
-                                disabled={element.original.deleted_at ? true : false}
-                                joinValues={false}
-                                placeholder="Selecione um valor"
-                                options={dataAlternative[seq]}
-                                rtl={false}
-                            />
-                        </div>
-                    )
+                                    }}
+                                    labelKey="name"
+                                    valueKey="id"
+                                    value={column_value}
+                                    multi={item.type == 'selectMulti' ? true : false}
+                                    disabled={element.original.deleted_at ? true : false}
+                                    joinValues={false}
+                                    placeholder="Selecione um valor"
+                                    options={dataAlternative[seq][0]}
+                                    rtl={false}
+                                />
+                            </div>
+                        )
+                    }
                 }
-            }
-            final_grid = final_grid.concat(item);
-        })
+                final_grid = final_grid.concat(item);
+            })
+        }
 
         return final_grid;
     }
-    
-    render() {
+
+    componentDidMount() {
+        const { columnsGrid, data, pages ,pageSize, dropdownOpen, columnsSelected, selectAll, loading, 
+            dataAlternative, tableInfo 
+        } = this.props.gridApi;
+
+        console.log(this.props.gridApi);
+    }
+
+    render() {        
         const { columnsGrid, data, pages ,pageSize, dropdownOpen, columnsSelected, selectAll, loading, 
             dataAlternative, tableInfo 
         } = this.props.gridApi;
         const { apiSpartan, defaultOrder } = this.props;
 
         let final_grid = [];
-        final_grid = this.renderGrid(columnsGrid, dataAlternative, tableInfo);
+        
 
+        if (dataAlternative) {
+            final_grid = this.renderGrid(columnsGrid, dataAlternative, tableInfo);
+        }
+        
         return (
 
             <div>
