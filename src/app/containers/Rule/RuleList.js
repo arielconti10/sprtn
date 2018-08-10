@@ -23,6 +23,7 @@ class RuleList extends Component {
                                 api: 'role', filterable: false, headerClassName: 'text-left',
                                 width: 400, seq: 0,
                                 sub: 'id',
+                                name: "role_id",
                                 id: 'roles'
                             },
                             // { Header: 'Regras', accessor: 'roles', filterable: true, name: 'role_id', width: 400, type:'selectMulti', api: 'role', headerClassName: 'text-left'},

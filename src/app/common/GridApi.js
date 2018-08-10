@@ -123,6 +123,7 @@ class GridApi extends Component {
         if (columnsGrid) {
             columnsGrid.map(item => {
                 if (item.sub) {
+                    item.style = { overflow: 'visible' },
                     item.Cell = (element) => {
                         let column_value = [];
                         if (item.sub) {
@@ -139,8 +140,6 @@ class GridApi extends Component {
                         }
 
                         let seq = item.seq || 0;
-
-                        console.log(typeof dataAlternative[seq][0], dataAlternative[seq][0]);
 
                         return (
                             <div>
@@ -161,13 +160,13 @@ class GridApi extends Component {
                                             }, {});
                                         }
 
-                                        
-                    
-                                        let name = item.sub ? item.sub : item.name;
+                                        let name = item.sub && !item.name? item.sub : item.name;
                     
                                         column_value_update = selectedOption.map(function (cv, i) {
                                             let value = {};
                                             value[name] = cv.id;
+
+                                            console.log(value);
                                             return value;
                                         }, {});
                     

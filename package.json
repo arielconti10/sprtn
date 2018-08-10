@@ -26,7 +26,7 @@
     "html-loader": "0.5.5",
     "html-webpack-plugin": "2.30.1",
     "namor": "^1.0.1",
-    "node-sass": "4.7.2",
+    "gulp-sass": "^3.1.0",
     "react-form-with-constraints": "^0.7.0",
     "react-form-with-constraints-bootstrap4": "^0.7.1",
     "rimraf": "^2.6.2",

@@ -485,9 +485,9 @@ function* selectColumnsFlow(action) {
 }
 
 function* selectOptionFlow(action) {
+    yield put(setLoader(true));
     const updated = yield call(updateAltInfo, action.apiSpartan, action.info_id, action.updatedData);
     if (updated) {
-        yield put(setLoader(true));
         const url_filter = yield call(getUrlSearch, action.tableInfo);
         const result_data = yield call(searchData, url_filter);
         yield put(setTableInfo(action.tableInfo));
