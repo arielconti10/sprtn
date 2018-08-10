@@ -75,7 +75,7 @@ class GridApi extends Component {
             sorted: gridApi.sorted
         }
 
-        this.props.loadColumnsFlow(columns, hideButtons, urlLink, apiSpartan, columnsAlt, tableInfo, onFetchDataFlow);
+        this.props.loadColumnsFlow(columns, hideButtons, urlLink, apiSpartan);
     }
 
     onChangeTextFilter(filter, accessor) {
@@ -127,11 +127,13 @@ class GridApi extends Component {
                     item.Cell = (element) => {
                         let column_value = [];
                         if (item.sub) {
-                            element.value.map(val => {
-                                if (!column_value.find(function (obj) { return obj === val[item.sub]; })) {
-                                    column_value.push(val[item.sub])
-                                }
-                            });
+                            if (element.value) {
+                                element.value.map(val => {
+                                    if (!column_value.find(function (obj) { return obj === val[item.sub]; })) {
+                                        column_value.push(val[item.sub])
+                                    }
+                                });
+                            }
                     
                         } else {
                             column_value = element.value.map(val => {
@@ -165,8 +167,6 @@ class GridApi extends Component {
                                         column_value_update = selectedOption.map(function (cv, i) {
                                             let value = {};
                                             value[name] = cv.id;
-
-                                            console.log(value);
                                             return value;
                                         }, {});
                     
@@ -209,7 +209,10 @@ class GridApi extends Component {
                                     disabled={element.original.deleted_at ? true : false}
                                     joinValues={false}
                                     placeholder="Selecione um valor"
-                                    options={dataAlternative[seq][0]}
+                                    options={
+                                        dataAlternative && dataAlternative[seq]?
+                                        dataAlternative[seq][0]
+                                        :[]}
                                     rtl={false}
                                 />
                             </div>
@@ -223,17 +226,9 @@ class GridApi extends Component {
         return final_grid;
     }
 
-    componentDidMount() {
-        const { columnsGrid, data, pages ,pageSize, dropdownOpen, columnsSelected, selectAll, loading, 
-            dataAlternative, tableInfo 
-        } = this.props.gridApi;
-
-        console.log(this.props.gridApi);
-    }
-
     render() {        
         const { columnsGrid, data, pages ,pageSize, dropdownOpen, columnsSelected, selectAll, loading, 
-            dataAlternative, tableInfo 
+            dataAlternative, tableInfo, filtered 
         } = this.props.gridApi;
         const { apiSpartan, defaultOrder } = this.props;
 
@@ -310,6 +305,7 @@ class GridApi extends Component {
                     onFetchData={this.props.onFetchDataFlow}
                     data_api={apiSpartan}
                     defaultOrder={defaultOrder}
+                    customFiltered={filtered}
                     onExpandedChange={(expanded, index, event) => {
                         event.persist();
                     }}

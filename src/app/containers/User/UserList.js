@@ -20,7 +20,7 @@ class UserList extends Component {
                                 filterable: true, 
                                 headerClassName: 'text-left',
                                 is_compost: true,
-                                order_by: "name",
+                                orderBy: "name",
                                 filter_by: ["name", "lastname"],
                                 is_checked: true
                             },
