@@ -126,9 +126,9 @@ class ShiftForm extends Component {
         // call to our shiftCreate action.
 
         if (this.props.match.params.id !== undefined) {
-            shiftCreate(user, shift)
-        } else {
             shiftUpdate(user, shift)
+        } else {
+            shiftCreate(user, shift)
         }
 
         // reset the form upon submit.

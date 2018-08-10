@@ -72,10 +72,14 @@ class LocalizationTypeForm extends Component {
     componentWillMount() {
         const { localizationLoad, user } = this.props
         this.checkPermission('localization.insert')
+
+        this.props.localizations.current_localization = null;        
+
         if (this.props.match.params.id !== undefined) {
             this.checkPermission('localization.update')
             localizationLoad(user, this.props.match.params.id)
         }
+        
     }
 
     renderInput = ({ input, type, meta: { touched, error } }) => (
@@ -149,9 +153,9 @@ class LocalizationTypeForm extends Component {
         const { user, localizationCreate, localizationUpdate, reset } = this.props
 
         if (this.props.match.params.id !== undefined) {
-            localizationCreate(user, localization)
-        } else {
             localizationUpdate(user, localization)
+        } else {
+            localizationCreate(user, localization)
         }
 
         reset()
