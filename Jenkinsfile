@@ -40,7 +40,7 @@ pipeline {
 }
 
 def runNpm() {
-    return 'npm install'
+    return 'npm update'
 }
 
 def getEnvironment() {

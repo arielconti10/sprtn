@@ -1,6 +1,7 @@
 import { LOAD_COLUMNS_FLOW, SET_COLUMNS, ON_FETCH_DATA_FLOW, SET_CREATE_TABLE, ON_DELETE_DATA_FLOW, ON_ACTIVE_DATA_FLOW,
     TOGGLE_DROPDOWN_FLOW, SET_DROPDOWN_STATUS, SELECT_COLUMNS_FLOW, SET_COLUMNS_SELECTED, SET_INITIAL_COLUMNS,
-    SELECT_ALL, SELECT_ALL_FLOW, SET_LOADER, LOAD_FILTER_FLOW, SET_TABLE_INFO, SET_FILTERS
+    SELECT_ALL, SELECT_ALL_FLOW, SET_LOADER, LOAD_FILTER_FLOW, SET_TABLE_INFO, SET_FILTERS, SET_DATA_ALTERNATIVE,
+    SELECT_OPTION_FLOW, SET_CUSTOM_FILTER
 } from '../actionTypes/gridApi';
 
 export function loadColumnsFlow(columnsGrid, hideButtons, urlLink, apiSpartan) {
@@ -132,5 +133,30 @@ export function setFilters(filtered) {
     return {
         type: SET_FILTERS,
         filtered
+    }
+}
+
+export function setDataAlternative(dataAlternative) {
+    return {
+        type: SET_DATA_ALTERNATIVE,
+        dataAlternative
+    }
+}
+
+export function selectOptionFlow(updatedData, apiSpartan, info_id, tableInfo) {
+    return {
+        type: SELECT_OPTION_FLOW,
+        updatedData,
+        apiSpartan,
+        info_id,
+        tableInfo
+    }
+}
+
+export function setCustomFilter(customFilter) {
+    console.log("ACTION");
+    return {
+        type: SET_CUSTOM_FILTER,
+        customFilter
     }
 }

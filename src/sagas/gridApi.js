@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import { Router, hashHistory, Link, browserHistory, withRouter, Redirect } from 'react-router-dom'
 
+import Select, { Async } from 'react-select';
 import { take, fork, cancel, call, put, cancelled, takeLatest, select } from 'redux-saga/effects'
 import axios from '../app/common/axios';
 import { verifySelectChecked, createTableToggle, savePreferences, verifyPreferences } from '../app/common/ToggleTable';
 
 import {
     setColumns, setCreateTable, setDropdownStatus, setColumnsSelected, setInitialColumns, setSelectAll,
-    setLoader, setTableInfo, setFilters
+    setLoader, setTableInfo, setFilters, setDataAlternative, setCustomFilter
 } from '../actions/gridApi'
 
 const gridUrl = `${process.env.API_URL}`;
@@ -130,6 +131,90 @@ function* buildActionColumn(columns, hideButtons, urlLink, apiSpartan) {
     return newColumns;
 }
 
+function getSchoolAndVisitValues(sub, old_value, column_value_changed, val) {
+    let newArrayData = [];
+
+    column_value_changed.map(item => {
+        if (val.length) {
+            val.map(register => {
+                let values = {};
+
+                if (old_value.length > column_value_changed.length) {
+                    if (register[sub] === item) {
+                        values['school_type_id'] = register['school_type_id'];
+                        values['visit_type_id'] = register['visit_type_id'];
+
+                        newArrayData.push(values);
+                    }
+                }
+                else {
+                    if (sub === 'school_type_id') {
+                        values['school_type_id'] = item;
+                        values['visit_type_id'] = register['visit_type_id'];
+                    } else {
+                        values['school_type_id'] = register['school_type_id'];
+                        values['visit_type_id'] = item;
+                    }
+
+                    newArrayData.push(values);
+                }
+            });
+        } else {
+            let values = {};
+
+            if (sub === 'school_type_id') {
+                values['school_type_id'] = item;
+                values['visit_type_id'] = 1;
+            } else {
+                values['school_type_id'] = 1;
+                values['visit_type_id'] = item;
+            }
+
+            newArrayData.push(values);
+        }
+    });
+
+    newArrayData = newArrayData.filter((item, index, self) =>
+        index === self.findIndex((obj) => (
+            obj.school_type_id === item.school_type_id && obj.visit_type_id === item.visit_type_id
+        ))
+    )
+
+    return newArrayData;
+}
+
+function buildAltColumns(columns) {
+    const columnsAltFilter = columns.filter(item => item.sub && item.sub !== '');
+    
+    let promises = columnsAltFilter.map(item => {
+        return axios.get(item.api)
+        .then(response => {
+            let dataAltAux = [];
+            const dados = response.data.data;
+
+            // dataAltAux.splice(item.seq, 0, dados);
+            dataAltAux.splice(0, 0, dados);
+
+            // if (dataAltAux && dataAltAux[0][0].code == "super") {
+            //     dataAltAux[0].shift();
+            // }
+
+            if (response.status === 200) {
+                return dataAltAux;
+            }
+        })
+        // .then(final_response => final_response)
+        .catch(err => console.log(err));
+    })
+
+
+    // yield put(setDataAlternative(dataAltAux));
+    
+    return promises;
+    // return dataAltAux;
+    
+}
+
 /**
  * realiza a construçāo de colunas da tabela
  * @param {Array} columns colunas atuais da tabela
@@ -138,64 +223,20 @@ function* buildActionColumn(columns, hideButtons, urlLink, apiSpartan) {
  */
 function* buildColumns(columns, hideButtons, urlLink, apiSpartan) {
     let newColumns = columns;
+    let newAltColumns = yield call (buildAltColumns, newColumns);
+    let finalAltColumn = [];
+
+    let result = yield Promise.all(newAltColumns).then(function(results) {
+        finalAltColumn = results;
+        // return results;
+    })
+
+    yield put(setDataAlternative(finalAltColumn));
+
     let status_column = buildStatusColumn(newColumns);
     let actions_column = yield call(buildActionColumn, status_column, hideButtons, urlLink, apiSpartan);
 
-    return actions_column;
-}
-
-function verifyFilter(filter_id, state, count, value, baseURL) {
-    let filter_by = filter_id;
-
-    //verifica se é uma coluna composta, por exemplo full_name (nome + sobrenome)
-    //para escolher método de ordenaçāo
-    const column_compare = state.columns.filter(function (column) {
-        return column.accessor == filter_id;
-    });
-
-    if (column_compare[count]) {
-        filter_by = column_compare[count].filter_by;
-        if (filter_by) {
-            if (value != "") {
-                const value_split = value.split(/ (.*)/);
-                baseURL += `&filter[name]=${value_split[0]}&filter[lastname]=${value_split[1]}`;
-            }
-            return baseURL;
-        } else {
-            return false;
-        }
-    }
-}
-
-/**
- * verifica a ordenaçāo a ser realizada
- * contempla validaçāo de coluna composta, quando é, por exemplo full_name (nome + sobrenome)
- * @param {String} sorted_id coluna que será ordenada 
- * @param {Object} state estado referente ao react table 
- * @param {Integer} count posiçāo atual dos filtros de ordenaçāo
- * @return {String} order_by valor que será ordenado 
- */
-function verifyOrderBy(sorted_id, state, count, columns) {
-    let order_by = sorted_id;
-
-    //verifica se é uma coluna composta, por exemplo full_name (nome + sobrenome)
-    //para escolher método de ordenaçāo
-    if (columns) {
-        
-        const column_compare = columns.filter(function (column) {
-            return column.accessor == sorted_id;
-        });
-
-        if(column_compare[count]) {
-            if (column_compare[count].is_compost) {
-                order_by = column_compare[count].order_by;
-            }
-        } else {
-            order_by = "name";
-        }
-    }
-
-    return order_by;
+    return newColumns;
 }
 
 /**
@@ -219,6 +260,25 @@ function selectAllItems(initialColumns, selectAll) {
 }
 
 /**
+ * realiza a atualizaçāo de uma coluna alternativa, que possui select2
+ * @param {String} apiSpartan endpoint a ser utilizado
+ * @param {Integer} actionId ID da açāo a ser atualizada
+ * @param {Array} updateData dados a serem atualizados
+ * @return {Bool} updated se a atualizaçāo foi bem-sucedida
+ */
+function updateAltInfo(apiSpartan, actionId, updateData) {
+    return axios.put(`${apiSpartan}/${actionId}`, updateData)
+    .then(res => {
+        if (res.status === 200) {
+            return true;
+        }
+        
+    }).catch(function (error) {
+        console.log("ERRO", error)
+    });
+}
+
+/**
  * obtem a URL a ser pesquisada, de acordo com paginaçāo, filtros e ordenaçāo
  * @param {Object} action objeto referente a uma açāo via react table
  * @return {String} baseURL url a ser retornada e pesquisada
@@ -228,19 +288,29 @@ function getUrlSearch(action) {
     const pageSize = action.pageSize;
     const page = action.page + 1;
     const filtered = action.filtered;
+    const customFiltered = action.customFiltered;
     const sorted = action.sorted;
     const defaultOrder = action.defaultOrder;
 
     let baseURL = `/${apiSpartan}?paginate=${pageSize}&page=${page}`;
 
-    if (filtered) {
+    if (filtered && filtered.length > 0) {
         filtered.map(function (item, key) {    
             let filter_by = item.id;
             baseURL += `&filter[${filter_by}]=${item.value}`;
         })
     }
 
-    if (defaultOrder) {
+    console.log(filtered, customFiltered);
+
+    if (filtered.length === 0 && customFiltered && customFiltered.length > 0) {
+        customFiltered.map(function (item, key) {    
+            let filter_by = item.id;
+            baseURL += `&filter[${filter_by}]=${item.value}`;
+        })
+    }
+
+    if (defaultOrder && sorted.length === 0) {
         let order_by = defaultOrder;
         baseURL += "&order[" + order_by + "]=asc";
     }
@@ -248,7 +318,13 @@ function getUrlSearch(action) {
     if (sorted) {
         for (let i = 0; i < sorted.length; i++) {
             let order_by = sorted[i]['id'];
-            baseURL += "&order[" + order_by + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
+
+            if (order_by !== "full_name") {
+                baseURL += "&order[" + order_by + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
+            } else {
+                baseURL += "&order[name]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
+            }
+
         }
     }
 
@@ -295,6 +371,8 @@ function concatFilter(filtered, filter) {
         concat_filter = concat_filter.concat(filter);
     }
 
+    console.log(concat_filter);
+
     return concat_filter;
 }
 
@@ -321,6 +399,7 @@ function* loadColumnsFlow(action) {
 
 function* fetchDataFlow(action) {
     yield put(setLoader(true));
+
     const url_filter = yield call(getUrlSearch, action.table_state);
     const result_data = yield call(searchData, url_filter);
 
@@ -370,6 +449,19 @@ function* selectColumnsFlow(action) {
     savePreferences(`prefs_${apiSpartan}`, columns_filter);
 }
 
+function* selectOptionFlow(action) {
+    yield put(setLoader(true));
+    const updated = yield call(updateAltInfo, action.apiSpartan, action.info_id, action.updatedData);
+    if (updated) {
+        const url_filter = yield call(getUrlSearch, action.tableInfo);
+        const result_data = yield call(searchData, url_filter);
+        yield put(setTableInfo(action.tableInfo));
+        yield put(setCreateTable(result_data));
+        yield put(setLoader(false));
+
+    }
+}
+
 function* selectAllFlow(action) {
     const select_inverse = !action.selectAll;
     const initialColumns = action.columsInitial;
@@ -395,8 +487,6 @@ function* loadFilterFlow(action) {
 
     yield put(setFilters(concat_filter))
     yield put(setCreateTable(result_data));
-
-    console.log(url_filter);
 }
 
 // Our watcher (saga).  It will watch for many things.
@@ -409,7 +499,8 @@ function* gridApiWatcher() {
     takeLatest("TOGGLE_DROPDOWN_FLOW", toggleDropdownFlow),
     takeLatest("SELECT_COLUMNS_FLOW", selectColumnsFlow),
     takeLatest("SELECT_ALL_FLOW", selectAllFlow),
-    takeLatest("LOAD_FILTER_FLOW", loadFilterFlow)
+    takeLatest("LOAD_FILTER_FLOW", loadFilterFlow),
+    takeLatest("SELECT_OPTION_FLOW", selectOptionFlow)
   ]
 }
 

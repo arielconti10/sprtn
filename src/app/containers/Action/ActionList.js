@@ -18,11 +18,18 @@ class ActionList extends Component {
                         apiSpartan="action"
                         columns={[
                             { Header: "Nome", accessor: "name", filterable: true, width: 250, headerClassName: 'text-left', is_checked: true },
+                            { Header: "Tipo Visita", accessor: "visit_type_school_type", sub: 'visit_type_id', seq: 0, type: 'selectMulti', api: 'visit-type', filterable: false, headerClassName: 'text-left',
+                            foldable: true, id: "visit_type_school_type" },
+                            { Header: "Tipo Escola", accessor: "visit_type_school_type", sub: 'school_type_id', seq: 1, type: 'selectMulti', 
+                                api: 'school-type', filterable: false, headerClassName: 'text-left',
+                                id: "visit_type_school_type"
+                            },
+
                         ]}
                         columnsAlt={[
-                            { Header: "Tipo Visita", accessor: "visit_type_school_type", sub: 'visit_type_id', seq: 0, type: 'selectMulti', api: 'visit-type', filterable: true, headerClassName: 'text-left',
-                            foldable: true },
-                            { Header: "Tipo Escola", accessor: "visit_type_school_type", sub: 'school_type_id', seq: 1, type: 'selectMulti', api: 'school-type', filterable: true, headerClassName: 'text-left' },
+                            // { Header: "Tipo Visita", accessor: "ddsf", sub: 'visit_type_id', seq: 0, type: 'selectMulti', api: 'visit-type', filterable: true, headerClassName: 'text-left',
+                            // foldable: true },
+                            // { Header: "Tipo Escola", accessor: "visit_type_school_type", sub: 'school_type_id', seq: 1, type: 'selectMulti', api: 'school-type', filterable: true, headerClassName: 'text-left' },
                         ]}
                         urlLink={this.props.match.url}
                     />
