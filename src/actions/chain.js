@@ -35,16 +35,17 @@ import {
     }
   }
 
-  export const chainUpdate = function chainUpdate (user, chain) {
+  export const chainUpdate = function chainUpdate (user, chain, active) {
     return {
       type: CHAIN_UPDATING,
       user,
       chain,
+      active
     }
   }
   
   export const chainLoad = function chainLoad(user, chain) {  
-      console.log(chain)  
+
       return {
           type: CHAIN_LOADING,
           user,
