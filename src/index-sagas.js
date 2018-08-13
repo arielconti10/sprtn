@@ -4,6 +4,7 @@ import IndicatorsSaga from './sagas/indicators'
 import ShiftSaga from './sagas/shifts'
 import LocalizationSaga from './sagas/localization'
 import SetorSaga from './sagas/setor'
+import ChainSaga from './sagas/chain'
 import SchoolTypesSaga from './sagas/schoolTypes'
 import DropdownSaga from './sagas/dropdown'
 import MarketshareSaga from './sagas/marketshare';
@@ -21,6 +22,7 @@ export default function* IndexSaga () {
     GridApiSaga(),
     LocalizationSaga(),
     SetorSaga(),
+    ChainSaga(),
     SchoolTypesSaga(),
 
   ]

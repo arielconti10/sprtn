@@ -83,7 +83,6 @@ function* sectorCreateFlow(action) {
       user,
       sector
     } = action
-    console.log(sector)
     if (sector.id !== undefined) {
       const updatedsector = yield call(sectorUpdate, user, sector)
       yield put(sectorUpdateSuccess(updatedsector))
