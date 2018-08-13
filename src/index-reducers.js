@@ -12,6 +12,7 @@ import sectors from './reducers/sector'
 import chains from './reducers/chain'
 import profiles from './reducers/profile'
 import levels from './reducers/level'
+import disciplines from './reducers/discipline'
 import schoolTypes from './reducers/schoolTypes'
 import gridApi from './reducers/gridApi'
 
@@ -30,6 +31,7 @@ const IndexReducer = combineReducers({
   chains,
   profiles,
   levels,
+  disciplines,
   schoolTypes,
 })
 

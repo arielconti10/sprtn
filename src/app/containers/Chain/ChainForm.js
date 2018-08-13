@@ -159,7 +159,7 @@ class ChainForm extends Component {
 
         return (
             <Card>
-            {redirect}
+                {redirect}
             <CardBody>
                 {this.state.back_error !== '' &&
                     <h4 className="alert alert-danger"> {this.state.back_error} </h4>

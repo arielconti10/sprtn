@@ -7,6 +7,7 @@ import SetorSaga from './sagas/setor'
 import ChainSaga from './sagas/chain'
 import ProfileSaga from './sagas/profile'
 import LevelSaga from './sagas/level'
+import DisciplineSaga from './sagas/discipline'
 import SchoolTypesSaga from './sagas/schoolTypes'
 import DropdownSaga from './sagas/dropdown'
 import MarketshareSaga from './sagas/marketshare';
@@ -27,6 +28,7 @@ export default function* IndexSaga () {
     ChainSaga(),
     ProfileSaga(),
     LevelSaga(),
+    DisciplineSaga(),
     SchoolTypesSaga(),
 
   ]
