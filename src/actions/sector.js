@@ -52,7 +52,6 @@ import {
   }
 
   export const sectorLoadSuccess = function sectorLoadSuccess(sector){
-      console.log(sector)
       return {
           type: SECTOR_LOAD_SUCCESS,
           sector
