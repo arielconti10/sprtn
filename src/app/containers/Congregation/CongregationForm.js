@@ -11,11 +11,45 @@ import { canUser } from '../../common/Permissions';
 
 const apiPost = 'congregation';
 
+import { PropTypes } from 'prop-types'
+import { reduxForm, Field } from 'redux-form'
+import { connect } from 'react-redux'
+import { congregationCreate, congregationUpdate, congregationLoad, congregationCurrentClear } from '../../../actions/congregation';
+
+const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório')
+
 class CongregationForm extends Component {
+    static propTypes = {
+        handleSubmit: PropTypes.func.isRequired,
+        invalid: PropTypes.bool.isRequired,
+        user: PropTypes.shape({
+            username: PropTypes.string.isRequired,
+            access_token: PropTypes.string.isRequired,
+        }),
+        congregations: PropTypes.shape({
+            list: PropTypes.array,
+            requesting: PropTypes.bool,
+            successful: PropTypes.bool,
+            messages: PropTypes.array,
+            errors: PropTypes.array,
+            current_congregation: PropTypes.shape({
+                active: PropTypes.bool,
+                name: PropTypes.string,
+                code: PropTypes.string,
+            })
+        }).isRequired,
+        congregationUpdate: PropTypes.func.isRequired,
+        congregationCreate: PropTypes.func.isRequired,
+        congregationLoad: PropTypes.func.isRequired,
+        congregationCurrentClear: PropTypes.func.isRequired,
+        reset: PropTypes.func.isRequired,
+        initialValues: PropTypes.object
+    }
     constructor(props) {
         super(props);
         this.state = {
             name: '',
+            code: '',
             active: true,       
             back_error: '',
             submitButtonDisabled: false,
@@ -23,108 +57,85 @@ class CongregationForm extends Component {
         };
 
         this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.submitForm = this.submitForm.bind(this);
     }
 
     checkPermission(permission) {
         canUser(permission, this.props.history, "change", function(rules){
             if (rules.length == 0) {
                 this.setState({viewMode:true, submitButtonDisabled: true});
-                console.log(this.state.viewMode);
             }
         }.bind(this));       
     }
 
     componentWillMount() {
         this.checkPermission('congregation.insert');
+        const { congregationLoad, user } = this.props
+        
+        this.props.congregations.current_congregation = null;
         if (this.props.match.params.id !== undefined) {
-            this.checkPermission('congregation.insert');
-            axios.get(`${apiPost}/${this.props.match.params.id}`)
-                .then(response => {
-                    const dados = response.data.data;
-
-                    console.log(dados.deleted_at);
-                    this.setState({ 
-                        code: dados.code,
-                        name: dados.name,
-                        active: dados.deleted_at === null ? true: false
-                    });
-                })
-                .catch(err => console.log(err));
+            this.checkPermission('congregation.update')
+            congregationLoad(user, this.props.match.params.id)
         }
     }
+
+    renderInput = ({ input, type, meta: { touched, error } }) => (
+        <div>
+            <input
+                className="form-control"
+                {...input}
+                type={type}
+            />
+            {touched && error && (
+                <div style={{ color: 'red'}}>
+                    {error}
+                </div>
+            )
+            }
+        </div>
+    )
 
     handleChange(e) {
         const target = e.currentTarget;
-
-        this.form.validateFields(target);
-
+        let active = true;
         this.setState({
-            [target.name]: (target.type == 'checkbox') ? target.checked : target.value,
-            submitButtonDisabled: !this.form.isValid()
+            [target.name]: (target.type == 'checkbox') ? target.checked : target.value,    
         });
-    }
-
-    submitForm(event) {
-        event.preventDefault();
-        axios.post(`${apiPost}`, {
-            'name': this.state.name,
-            'active': this.state.active
-        }).then(res => {
-            this.setState({
-                saved: true                   
-            })
-        }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error)[0].toString();
-            this.setState({ back_error: data_error[filterId] });
-        }.bind(this));
-    }
-
-    updateForm(event) {
-        event.preventDefault();
-        var id = this.props.match.params.id;
-
-        let data = {
-            'name': this.state.name,
-            'active': this.state.active
+        if(target.type == 'checkbox'){
+            active = target.checked
+            this.props.congregations.current_congregation.active = active
         }
-
-        axios.put(`${apiPost}/${id}`, {
-            'name': this.state.name,
-            'active': this.state.active
-        }).then(res => {
-            this.setState({
-                saved: true                   
-            })
-        }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error).toString();
-            this.setState({ back_error: data_error[filterId] });
-        })
     }
 
-    handleSubmit(e) {
-        e.preventDefault();
-
-        this.form.validateFields();
+    submit = (congregation) => {
+        const { user, congregationCreate, congregationUpdate, reset } = this.props
         
-        this.setState({ submitButtonDisabled: !this.form.isValid() });
-
-        if (this.form.isValid()) {
-            if (this.props.match.params.id !== undefined) {
-                this.updateForm(event);
-            } else {
-                this.submitForm(event);
-            }
+        if (this.props.match.params.id !== undefined) {  
+            congregation.active = this.props.congregations.current_congregation.active         
+            congregationUpdate(user, congregation, this.props.congregations.current_congregation.active)
+        } else {
+            congregationCreate(user, congregation)
         }
+
+        reset()
     }
 
     render() {
+        const {
+            handleSubmit,
+            invalid,
+            congregations: {
+                congregation,
+                requesting,
+                successful,
+                messages,
+                errors,
+                current_congregation
+            },
+        } = this.props
+
         let redirect = null;
         if (this.state.saved) {
-            redirect = <Redirect to="/cadastro/congregacoes" />;
+            redirect = <Redirect to="/cadastro/disciplinas" />;
         }
 
         let statusField = null;
@@ -135,7 +146,9 @@ class CongregationForm extends Component {
                         <label className="" style={{marginRight: "10px"}}>Status</label>
                         <div className="">
                             <Label className="switch switch-default switch-pill switch-primary">
-                                <Input type="checkbox" id='active' name="active" className="switch-input"  checked={this.state.active} onChange={this.handleChange}/>
+                                <Input type="checkbox" id='active' name="active" className="switch-input"  
+                                disabled={this.state.viewMode}
+                                checked={this.state.active} onChange={this.handleChange}/>
                                 <span className="switch-label"></span>
                                 <span className="switch-handle"></span>
                             </Label>
@@ -151,33 +164,40 @@ class CongregationForm extends Component {
                 <CardBody>
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
-                    }
-                    <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
-                        onSubmit={this.handleSubmit} noValidate>
+                    }                
+                    <form onSubmit={handleSubmit(this.submit)}>
                         
-                        <div className="">
-                            <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Nome da congregação</FormControlLabel>
-                                <FormControlInput type="text" id="name" name="name"
-                                    readOnly={this.state.viewMode}
-                                    value={this.state.name} onChange={this.handleChange}
-                                    required />
-                                <FieldFeedbacks for="name">
-                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
-                            </FormGroup>
-                        </div>
-                        
-                        {statusField}     
-
-                        <button className="btn btn-primary" disabled={this.state.viewMode}>Salvar</button>
-                        <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
-                    </FormWithConstraints>
-                    
+                        <div className="form-group">
+                            <label htmlFor="name">Nome da Congregação</label>
+                            <Field
+                                name="name"
+                                id="name"
+                                component={this.renderInput}
+                                validate={fieldRequired}
+                                placeholder="Nome da Congregação"
+                            />
+                        </div>                        
+                    {statusField}     
+                    <button className="btn btn-primary" action="submit" disabled={this.state.submitButtonDisabled}>Salvar</button>
+                    <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
+                </form>
                 </CardBody>
             </Card>
         )
     }
 }
+let InitializeFromStateForm = reduxForm({
+    form: 'InitializeFromState',
+    enableReinitialize: true
+})(CongregationForm)
 
-export default CongregationForm;
+InitializeFromStateForm = connect(
+    state => ({
+        user: state.user,
+        congregations: state.congregations,
+        initialValues: state.congregations.current_congregation
+    }),
+    { congregationLoad, congregationUpdate, congregationCreate, congregationCurrentClear }
+)(InitializeFromStateForm)
+
+export default InitializeFromStateForm
