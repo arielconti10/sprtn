@@ -11,6 +11,7 @@ import localizations from './reducers/localization'
 import sectors from './reducers/sector'
 import chains from './reducers/chain'
 import profiles from './reducers/profile'
+import levels from './reducers/level'
 import schoolTypes from './reducers/schoolTypes'
 import gridApi from './reducers/gridApi'
 
@@ -28,6 +29,7 @@ const IndexReducer = combineReducers({
   sectors,
   chains,
   profiles,
+  levels,
   schoolTypes,
 })
 
