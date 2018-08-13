@@ -9,6 +9,7 @@ import ProfileSaga from './sagas/profile'
 import LevelSaga from './sagas/level'
 import DisciplineSaga from './sagas/discipline'
 import CongregationSaga from './sagas/congregation'
+import SubsidiarySaga from './sagas/subsidiary'
 import SchoolTypesSaga from './sagas/schoolTypes'
 import DropdownSaga from './sagas/dropdown'
 import MarketshareSaga from './sagas/marketshare';
@@ -31,6 +32,7 @@ export default function* IndexSaga () {
     LevelSaga(),
     DisciplineSaga(),
     CongregationSaga(),
+    SubsidiarySaga(),
     SchoolTypesSaga(),
 
   ]

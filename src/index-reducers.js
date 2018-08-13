@@ -14,6 +14,7 @@ import profiles from './reducers/profile'
 import levels from './reducers/level'
 import disciplines from './reducers/discipline'
 import congregations from './reducers/congregation'
+import subsidiarys from './reducers/subsidiary'
 import schoolTypes from './reducers/schoolTypes'
 import gridApi from './reducers/gridApi'
 
@@ -23,6 +24,7 @@ const IndexReducer = combineReducers({
   form,
   dropdown,
   marketshare,
+  subsidiarys,
   userSchool,
   indicators,
   shifts,
