@@ -1,77 +1,77 @@
 import {
-  SHIFT_CREATING,
-  SHIFT_CREATE_SUCCESS,
-  SHIFT_CREATE_ERROR,
-  SHIFT_REQUESTING,
-  SHIFT_REQUEST_SUCCESS,
-  SHIFT_LOAD_SUCCESS,
-  SHIFT_LOADING,
-  SHIFT_REQUEST_ERROR,
-  SHIFT_UPDATE_SUCCESS,
-} from '../actionTypes/shifts'
+  SCHOOL_TYPES_CREATING,
+  SCHOOL_TYPES_CREATE_SUCCESS,
+  SCHOOL_TYPES_CREATE_ERROR,
+  SCHOOL_TYPES_REQUESTING,
+  SCHOOL_TYPES_REQUEST_SUCCESS,
+  SCHOOL_TYPES_LOAD_SUCCESS,
+  SCHOOL_TYPES_LOADING,
+  SCHOOL_TYPES_REQUEST_ERROR,
+  SCHOOL_TYPES_UPDATE_SUCCESS,
+} from '../actionTypes/schoolTypes'
 
 const initialState = {
-  list: [], // where we'll store shifts
-  current_shift: null,
+  list: [], // where we'll store schoolTypes
+  current_schoolType: null,
   requesting: false,
   successful: false,
   messages: [],
   errors: [],
 }
 
-const reducer = function shiftReducer(state = initialState, action) {
+const reducer = function schoolTypeReducer(state = initialState, action) {
   switch (action.type) {
-    case SHIFT_CREATING:
+    case SCHOOL_TYPES_CREATING:
       return {
         ...state,
         requesting: true,
         successful: false,
         messages: [{
-          body: `shift: ${action.shift.name} being created...`,
+          body: `schoolType: ${action.schoolType.name} being created...`,
           time: new Date(),
         }],
         errors: [],
       }
 
-      // On success include the new shift into our list
-    case SHIFT_CREATE_SUCCESS:
+      // On success include the new schoolType into our list
+    case SCHOOL_TYPES_CREATE_SUCCESS:
       return {
-        list: state.list.concat([action.shift]),
+        list: state.list.concat([action.schoolType]),
         requesting: false,
         successful: true,
         messages: [{
-          body: `shift: ${action.shift.name} awesomely created!`,
+          body: `schoolType: ${action.schoolType.name} awesomely created!`,
           time: new Date(),
         }],
         errors: [],
       }
 
-    case SHIFT_CREATING:
+    case SCHOOL_TYPES_CREATING:
       return {
         ...state,
         requesting: true,
         successful: false,
         messages: [{
-          body: `shift: ${action.shift.name} being updated...`,
+          body: `schoolType: ${action.schoolType.name} being updated...`,
           time: new Date(),
         }],
         errors: [],
       }
 
-    case SHIFT_UPDATE_SUCCESS:
+    case SCHOOL_TYPES_UPDATE_SUCCESS:
       return {
         ...state,
         requesting: false,
         successful: true,
         messages: [{
-          body: `shift: ${action.shift.name} updated!`,
+          body: `schoolType: ${action.schoolType.name} updated!`,
           time: new Date(),
         }],
         errors: [],
       }
       
 
-    case SHIFT_CREATE_ERROR:
+    case SCHOOL_TYPES_CREATE_ERROR:
       return {
         ...state,
         requesting: false,
@@ -83,61 +83,61 @@ const reducer = function shiftReducer(state = initialState, action) {
         }]),
       }
 
-    case SHIFT_REQUESTING:
+    case SCHOOL_TYPES_REQUESTING:
       return {
         ...state, // ensure that we don't erase fetched ones
         requesting: false,
         successful: true,
         messages: [{
-          body: 'Fetching shifts...!',
+          body: 'Fetching schoolTypes...!',
           time: new Date(),
         }],
         errors: [],
       }
 
-    case SHIFT_LOADING:
+    case SCHOOL_TYPES_LOADING:
       return {
         ...state,
-        current_shift: null,
+        current_schoolType: null,
         requesting: false,
         successful: true,
         messages: [{
-          body: 'Fetching current shift',
+          body: 'Fetching current schoolType',
           time: new Date()
         }],
         errors: []
       }
 
-    case SHIFT_LOAD_SUCCESS:
+    case SCHOOL_TYPES_LOAD_SUCCESS:
+
       return {
-        current_shift: {
-          id: action.shift.data.id,
-          name: action.shift.data.name,
-          code: action.shift.data.code,
-          active: action.shift.data.deleted_at !== null ? false : true
+        current_schoolType: {
+          id: action.schoolType.data.id,
+          name: action.schoolType.data.name,
+          active: action.schoolType.data.deleted_at !== null ? false : true
         }, // replace with fresh list
         requesting: false,
         successful: true,
         messages: [{
-          body: 'current shift awesomely fetched!',
+          body: 'current schoolType awesomely fetched!',
           time: new Date(),
         }],
         errors: [],
       }
 
-    case SHIFT_REQUEST_SUCCESS:
+    case SCHOOL_TYPES_REQUEST_SUCCESS:
       return {
-        list: action.shifts, // replace with fresh list
+        list: action.schoolTypes, // replace with fresh list
         requesting: false,
         successful: true,
         messages: [{
-          body: 'shifts awesomely fetched!',
+          body: 'schoolTypes awesomely fetched!',
           time: new Date(),
         }],
         errors: [],
       }
 
-    case SHIFT_REQUEST_ERROR:
+    case SCHOOL_TYPES_REQUEST_ERROR:
       return {
         requesting: false,
         successful: false,

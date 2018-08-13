@@ -9,46 +9,14 @@ import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'r
 
 import { canUser } from '../../common/Permissions';
 
-import { PropTypes } from 'prop-types'
-import { reduxForm, Field } from 'redux-form'
-import { connect } from 'react-redux'
-import { localizationCreate, localizationUpdate, localizationLoad } from '../../../actions/localization';
+const apiPost = 'shift';
 
-const apiPost = 'localization';
-
-const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório')
-
-class LocalizationTypeForm extends Component {
-
-    static propTypes = {
-        handleSubmit: PropTypes.func.isRequired,
-        invalid: PropTypes.bool.isRequired,
-        user: PropTypes.shape({
-            username: PropTypes.string.isRequired,
-            access_token: PropTypes.string.isRequired,
-        }),
-        localizations: PropTypes.shape({
-            list: PropTypes.array,
-            requesting: PropTypes.bool,
-            successful: PropTypes.bool,
-            messages: PropTypes.array,
-            errors: PropTypes.array,
-            current_localization: PropTypes.shape({
-                active: PropTypes.bool,
-                name: PropTypes.string,
-            })
-        }).isRequired,
-        localizationUpdate: PropTypes.func.isRequired,
-        localizationCreate: PropTypes.func.isRequired,
-        localizationLoad: PropTypes.func.isRequired,
-        reset: PropTypes.func.isRequired,
-        initialValues: PropTypes.object
-    }
-
+class ShiftForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
             name: '',
+            code: '',
             active: true,       
             back_error: '',
             submitButtonDisabled: false,
@@ -69,35 +37,25 @@ class LocalizationTypeForm extends Component {
         }.bind(this));       
     }
 
+
     componentWillMount() {
-        const { localizationLoad, user } = this.props
-        this.checkPermission('localization.insert')
-
-        this.props.localizations.current_localization = null;        
-
+        this.checkPermission('shift.insert');
         if (this.props.match.params.id !== undefined) {
-            this.checkPermission('localization.update')
-            localizationLoad(user, this.props.match.params.id)
+            this.checkPermission('shift.update');
+            axios.get(`${apiPost}/${this.props.match.params.id}`)
+                .then(response => {
+                    const dados = response.data.data;
+
+                    console.log(dados.deleted_at);
+                    this.setState({ 
+                        name: dados.name,
+                        code: dados.code,
+                        active: dados.deleted_at === null ? true: false
+                    });
+                })
+                .catch(err => console.log(err));
         }
-        
     }
-
-    renderInput = ({ input, type, meta: { touched, error } }) => (
-        <div>
-            <input
-                className="form-control"
-                {...input}
-                type={type}
-            />
-            {touched && error && (
-                <div style={{ color: 'red'}}>
-                    {error}
-                </div>
-            )
-            }
-        </div>
-    )
-
 
     handleChange(e) {
         const target = e.currentTarget;
@@ -114,6 +72,7 @@ class LocalizationTypeForm extends Component {
         event.preventDefault();
         axios.post(`${apiPost}`, {
             'name': this.state.name,
+            'code': this.state.code,
             'active': this.state.active
         }).then(res => {
             this.setState({
@@ -132,11 +91,13 @@ class LocalizationTypeForm extends Component {
 
         let data = {
             'name': this.state.name,
+            'code': this.state.code,
             'active': this.state.active
         }
 
         axios.put(`${apiPost}/${id}`, {
             'name': this.state.name,
+            'code': this.state.code,
             'active': this.state.active
         }).then(res => {
             this.setState({
@@ -149,23 +110,11 @@ class LocalizationTypeForm extends Component {
         })
     }
 
-    submit = (localization) => {
-        const { user, localizationCreate, localizationUpdate, reset } = this.props
-
-        if (this.props.match.params.id !== undefined) {
-            localizationUpdate(user, localization)
-        } else {
-            localizationCreate(user, localization)
-        }
-
-        reset()
-    }
-
     handleSubmit(e) {
         e.preventDefault();
 
         this.form.validateFields();
-
+        
         this.setState({ submitButtonDisabled: !this.form.isValid() });
 
         if (this.form.isValid()) {
@@ -178,21 +127,9 @@ class LocalizationTypeForm extends Component {
     }
 
     render() {
-        const {
-            handleSubmit,
-            invalid,
-            localizations: {
-                list,
-                requesting,
-                successful,
-                messages,
-                errors,
-                current_localization
-            },
-        } = this.props
         let redirect = null;
         if (this.state.saved) {
-            redirect = <Redirect to="/cadastro/tipos-localizacao" />;
+            redirect = <Redirect to="/cadastro/turnos" />;
         }
 
         let statusField = null;
@@ -212,48 +149,57 @@ class LocalizationTypeForm extends Component {
                         </div>                                
                     </div>
                 </div>            
-        }        
+        }
+        
 
         return (
             <Card>
                 {redirect}
+
                 <CardBody>
+                   
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
-                    }                
-                    <form onSubmit={handleSubmit(this.submit)}>
-                        <div className="form-group">
-                            <label htmlFor="name">Nome do tipo de localização</label>
-                            <Field
-                                name="name"
-                                id="name"
-                                component={this.renderInput}
-                                validate={fieldRequired}
-                                placeholder="Nome"
-                            />
+                    }
+                    <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
+                        onSubmit={this.handleSubmit} noValidate>
+                        
+                        <div className="">
+                            <FormGroup for="code">
+                                <FormControlLabel htmlFor="code">Código do turno</FormControlLabel>
+                                <FormControlInput type="text" id="code" name="code"
+                                    value={this.state.code} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
+                                    required />
+                                <FieldFeedbacks for="code">
+                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                </FieldFeedbacks>
+                            </FormGroup>
                         </div>
-                    {statusField}     
-                    <button className="btn btn-primary" action="submit" disabled={this.state.submitButtonDisabled}>Salvar</button>
-                    <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
-                </form>
+                        
+                        <div className="">
+                            <FormGroup for="name">
+                                <FormControlLabel htmlFor="name">Nome do turno</FormControlLabel>
+                                <FormControlInput type="text" id="name" name="name"
+                                    value={this.state.name} onChange={this.handleChange}
+                                    readOnly={this.state.viewMode}
+                                    required />
+                                <FieldFeedbacks for="name">
+                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
+                                </FieldFeedbacks>
+                            </FormGroup>
+                        </div>
+
+                        {statusField}     
+
+                        <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
+                        <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
+                    </FormWithConstraints>
+                    
                 </CardBody>
             </Card>
         )
     }
 }
 
-let InitializeFromStateForm = reduxForm({
-    form: 'InitializeFromState',
-    enableReinitialize: true
-})(LocalizationTypeForm)
-
-InitializeFromStateForm = connect(
-    state => ({
-        user: state.user,
-        localizations: state.localizations,
-        initialValues: state.localizations.current_localization
-    }),
-    { localizationLoad, localizationUpdate, localizationCreate }
-)(InitializeFromStateForm)
-
-export {InitializeFromStateForm as LocalizationTypeForm}
+export default ShiftForm;

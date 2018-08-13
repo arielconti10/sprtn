@@ -1,77 +1,77 @@
 import {
-  SHIFT_CREATING,
-  SHIFT_CREATE_SUCCESS,
-  SHIFT_CREATE_ERROR,
-  SHIFT_REQUESTING,
-  SHIFT_REQUEST_SUCCESS,
-  SHIFT_LOAD_SUCCESS,
-  SHIFT_LOADING,
-  SHIFT_REQUEST_ERROR,
-  SHIFT_UPDATE_SUCCESS,
-} from '../actionTypes/shifts'
+  LOCALIZATION_CREATING,
+  LOCALIZATION_CREATE_SUCCESS,
+  LOCALIZATION_CREATE_ERROR,
+  LOCALIZATION_REQUESTING,
+  LOCALIZATION_REQUEST_SUCCESS,
+  LOCALIZATION_LOAD_SUCCESS,
+  LOCALIZATION_LOADING,
+  LOCALIZATION_REQUEST_ERROR,
+  LOCALIZATION_UPDATE_SUCCESS,
+} from '../actionTypes/localization'
 
 const initialState = {
-  list: [], // where we'll store shifts
-  current_shift: null,
+  list: [], 
+  current_localization: null,
   requesting: false,
   successful: false,
   messages: [],
   errors: [],
 }
 
-const reducer = function shiftReducer(state = initialState, action) {
+const reducer = function localizationReducer(state = initialState, action) {
   switch (action.type) {
-    case SHIFT_CREATING:
+    case LOCALIZATION_CREATING:
       return {
         ...state,
         requesting: true,
         successful: false,
         messages: [{
-          body: `shift: ${action.shift.name} being created...`,
+          body: `localization: ${action.localization.name} being created...`,
           time: new Date(),
         }],
         errors: [],
       }
 
-      // On success include the new shift into our list
-    case SHIFT_CREATE_SUCCESS:
+
+    case LOCALIZATION_CREATE_SUCCESS:
       return {
-        list: state.list.concat([action.shift]),
+        list: state.list.concat([action.localization]),
         requesting: false,
         successful: true,
         messages: [{
-          body: `shift: ${action.shift.name} awesomely created!`,
+          body: `localization: ${action.localization.name} awesomely created!`,
           time: new Date(),
         }],
         errors: [],
       }
 
-    case SHIFT_CREATING:
+    case LOCALIZATION_CREATING:
       return {
         ...state,
         requesting: true,
         successful: false,
         messages: [{
-          body: `shift: ${action.shift.name} being updated...`,
+          body: `LOCALIZATION: ${action.localization.name} being updated...`,
           time: new Date(),
         }],
         errors: [],
       }
 
-    case SHIFT_UPDATE_SUCCESS:
+    case LOCALIZATION_UPDATE_SUCCESS:
       return {
         ...state,
         requesting: false,
         successful: true,
         messages: [{
-          body: `shift: ${action.shift.name} updated!`,
+          body: `localization: ${action.localization.name} updated!`,
           time: new Date(),
         }],
         errors: [],
       }
       
 
-    case SHIFT_CREATE_ERROR:
+    case LOCALIZATION_CREATE_ERROR:
       return {
         ...state,
         requesting: false,
@@ -83,61 +83,61 @@ const reducer = function shiftReducer(state = initialState, action) {
         }]),
       }
 
-    case SHIFT_REQUESTING:
+    case LOCALIZATION_REQUESTING:
       return {
         ...state, // ensure that we don't erase fetched ones
         requesting: false,
         successful: true,
         messages: [{
-          body: 'Fetching shifts...!',
+          body: 'Fetching localization...!',
           time: new Date(),
         }],
         errors: [],
       }
 
-    case SHIFT_LOADING:
+    case LOCALIZATION_LOADING:
       return {
         ...state,
-        current_shift: null,
+        current_localization: null,
         requesting: false,
         successful: true,
         messages: [{
-          body: 'Fetching current shift',
+          body: 'Fetching current LOCALIZATION',
           time: new Date()
         }],
         errors: []
       }
 
-    case SHIFT_LOAD_SUCCESS:
+    case LOCALIZATION_LOAD_SUCCESS:
+      console.log(action.localization)
       return {
-        current_shift: {
-          id: action.shift.data.id,
-          name: action.shift.data.name,
-          code: action.shift.data.code,
-          active: action.shift.data.deleted_at !== null ? false : true
+        current_localization: {
+          id: action.localization.data.id,
+          name: action.localization.data.name,
+          active: action.localization.data.deleted_at !== null ? false : true
         }, // replace with fresh list
         requesting: false,
         successful: true,
         messages: [{
-          body: 'current shift awesomely fetched!',
+          body: 'current localization awesomely fetched!',
           time: new Date(),
         }],
         errors: [],
       }
 
-    case SHIFT_REQUEST_SUCCESS:
+    case LOCALIZATION_REQUEST_SUCCESS:
       return {
-        list: action.shifts, // replace with fresh list
+        list: action.LOCALIZATIONs, // replace with fresh list
         requesting: false,
         successful: true,
         messages: [{
-          body: 'shifts awesomely fetched!',
+          body: 'LOCALIZATIONs awesomely fetched!',
           time: new Date(),
         }],
         errors: [],
       }
 
-    case SHIFT_REQUEST_ERROR:
+    case LOCALIZATION_REQUEST_ERROR:
       return {
         requesting: false,
         successful: false,

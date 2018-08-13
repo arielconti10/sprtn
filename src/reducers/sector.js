@@ -1,77 +1,80 @@
 import {
-  SHIFT_CREATING,
-  SHIFT_CREATE_SUCCESS,
-  SHIFT_CREATE_ERROR,
-  SHIFT_REQUESTING,
-  SHIFT_REQUEST_SUCCESS,
-  SHIFT_LOAD_SUCCESS,
-  SHIFT_LOADING,
-  SHIFT_REQUEST_ERROR,
-  SHIFT_UPDATE_SUCCESS,
-} from '../actionTypes/shifts'
+  SECTOR_CREATING,
+  SECTOR_CREATE_SUCCESS,
+  SECTOR_CREATE_ERROR,
+  SECTOR_REQUESTING,
+  SECTOR_REQUEST_SUCCESS,
+  SECTOR_LOAD_SUCCESS,
+  SECTOR_LOADING,
+  SECTOR_REQUEST_ERROR,
+  SECTOR_UPDATING,
+  SECTOR_UPDATE_SUCCESS,
+  SECTOR_CURRENT_CLEAR
+} from '../actionTypes/sector'
 
 const initialState = {
-  list: [], // where we'll store shifts
-  current_shift: null,
+  list: [], 
+  current_sector: null,
   requesting: false,
   successful: false,
   messages: [],
   errors: [],
 }
 
-const reducer = function shiftReducer(state = initialState, action) {
+const reducer = function sectorReducer(state = initialState, action) {
   switch (action.type) {
-    case SHIFT_CREATING:
+    case SECTOR_CREATING:
+      return {
+        ...state,
+        requesting: true,
+        successful: false,
+        current_sector: null,
+        messages: [{
+          body: `sector: ${action.sector.name} being created...`,
+          time: new Date(),
+        }],
+        errors: [],
+      }
+
+
+    case SECTOR_CREATE_SUCCESS:
+      return {
+        list: state.list.concat([action.sector]),
+        requesting: false,
+        successful: true,
+        messages: [{
+          body: `sector: ${action.sector.name} awesomely created!`,
+          time: new Date(),
+        }],
+        errors: [],
+      }
+
+    case SECTOR_UPDATING:
       return {
         ...state,
         requesting: true,
         successful: false,
         messages: [{
-          body: `shift: ${action.shift.name} being created...`,
+          body: `sector: ${action.sector.name} being updated...`,
           time: new Date(),
         }],
         errors: [],
       }
 
-      // On success include the new shift into our list
-    case SHIFT_CREATE_SUCCESS:
-      return {
-        list: state.list.concat([action.shift]),
-        requesting: false,
-        successful: true,
-        messages: [{
-          body: `shift: ${action.shift.name} awesomely created!`,
-          time: new Date(),
-        }],
-        errors: [],
-      }
-
-    case SHIFT_CREATING:
-      return {
-        ...state,
-        requesting: true,
-        successful: false,
-        messages: [{
-          body: `shift: ${action.shift.name} being updated...`,
-          time: new Date(),
-        }],
-        errors: [],
-      }
-
-    case SHIFT_UPDATE_SUCCESS:
+    case SECTOR_UPDATE_SUCCESS:
       return {
         ...state,
         requesting: false,
         successful: true,
         messages: [{
-          body: `shift: ${action.shift.name} updated!`,
+          body: `sector: ${action.sector.name} updated!`,
           time: new Date(),
         }],
         errors: [],
       }
       
 
-    case SHIFT_CREATE_ERROR:
+    case SECTOR_CREATE_ERROR:
       return {
         ...state,
         requesting: false,
@@ -83,61 +86,62 @@ const reducer = function shiftReducer(state = initialState, action) {
         }]),
       }
 
-    case SHIFT_REQUESTING:
+    case SECTOR_REQUESTING:
       return {
         ...state, // ensure that we don't erase fetched ones
         requesting: false,
         successful: true,
+        current_sector: null,        
         messages: [{
-          body: 'Fetching shifts...!',
+          body: 'Fetching sector...!',
           time: new Date(),
         }],
         errors: [],
       }
 
-    case SHIFT_LOADING:
+    case SECTOR_LOADING:
       return {
         ...state,
-        current_shift: null,
+        current_sector: null,
         requesting: false,
         successful: true,
         messages: [{
-          body: 'Fetching current shift',
+          body: 'Fetching current sector',
           time: new Date()
         }],
         errors: []
       }
 
-    case SHIFT_LOAD_SUCCESS:
+    case SECTOR_LOAD_SUCCESS:
       return {
-        current_shift: {
-          id: action.shift.data.id,
-          name: action.shift.data.name,
-          code: action.shift.data.code,
-          active: action.shift.data.deleted_at !== null ? false : true
+        current_sector: {
+          id: action.sector.data.id,
+          name: action.sector.data.name,
+          code: action.sector.data.code,
+          active: action.sector.data.deleted_at !== null ? false : true
         }, // replace with fresh list
         requesting: false,
         successful: true,
         messages: [{
-          body: 'current shift awesomely fetched!',
+          body: 'current sector awesomely fetched!',
           time: new Date(),
         }],
         errors: [],
       }
 
-    case SHIFT_REQUEST_SUCCESS:
+    case SECTOR_REQUEST_SUCCESS:
       return {
-        list: action.shifts, // replace with fresh list
+        list: action.sectors, // replace with fresh list
         requesting: false,
         successful: true,
         messages: [{
-          body: 'shifts awesomely fetched!',
+          body: 'sectors awesomely fetched!',
           time: new Date(),
         }],
         errors: [],
       }
 
-    case SHIFT_REQUEST_ERROR:
+    case SECTOR_REQUEST_ERROR:
       return {
         requesting: false,
         successful: false,
@@ -147,6 +151,11 @@ const reducer = function shiftReducer(state = initialState, action) {
           time: new Date(),
         }]),
       }
+
+      case SECTOR_CURRENT_CLEAR:
+        return {
+            current_sector: null,
+        }
 
     default:
       return state
