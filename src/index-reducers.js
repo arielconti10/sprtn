@@ -9,9 +9,17 @@ import indicators from './reducers/indicators'
 import shifts from './reducers/shifts'
 import localizations from './reducers/localization'
 import sectors from './reducers/sector'
+import chains from './reducers/chain'
+import profiles from './reducers/profile'
+import levels from './reducers/level'
+import disciplines from './reducers/discipline'
+import congregations from './reducers/congregation'
+import subsidiarys from './reducers/subsidiary'
+import job_titles from './reducers/job_title'
 import schoolTypes from './reducers/schoolTypes'
 import gridApi from './reducers/gridApi'
 import roles from './reducers/roles'
+import rules from './reducers/rules'
 
 const IndexReducer = combineReducers({
   user,
@@ -19,14 +27,22 @@ const IndexReducer = combineReducers({
   form,
   dropdown,
   marketshare,
+  subsidiarys,
   userSchool,
   indicators,
   shifts,
   gridApi,
   localizations,
   sectors,
+  chains,
+  profiles,
+  levels,
+  disciplines,
+  congregations,
+  job_titles,
   schoolTypes,
-  roles
+  roles,
+  rules
 })
 
 export default IndexReducer  

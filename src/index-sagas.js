@@ -4,13 +4,21 @@ import IndicatorsSaga from './sagas/indicators'
 import ShiftSaga from './sagas/shifts'
 import LocalizationSaga from './sagas/localization'
 import SetorSaga from './sagas/setor'
+import ChainSaga from './sagas/chain'
+import ProfileSaga from './sagas/profile'
+import LevelSaga from './sagas/level'
+import DisciplineSaga from './sagas/discipline'
+import CongregationSaga from './sagas/congregation'
+import SubsidiarySaga from './sagas/subsidiary'
 import SchoolTypesSaga from './sagas/schoolTypes'
 import DropdownSaga from './sagas/dropdown'
 import MarketshareSaga from './sagas/marketshare';
+import JobTitleSaga from './sagas/job_title';
 import UserSchoolSaga from './sagas/userSchool';
 import GridApiSaga from './sagas/gridApi';
 import UserSaga from './sagas/user';
 import RoleSaga from './sagas/roles';
+import RuleSaga from './sagas/rules';
 
 export default function* IndexSaga () {
   yield [
@@ -23,8 +31,16 @@ export default function* IndexSaga () {
     GridApiSaga(),
     LocalizationSaga(),
     SetorSaga(),
+    ChainSaga(),
+    ProfileSaga(),
+    LevelSaga(),
+    DisciplineSaga(),
+    CongregationSaga(),
+    SubsidiarySaga(),
     SchoolTypesSaga(),
     UserSaga(),
-    RoleSaga()
+    RoleSaga(),
+    JobTitleSaga(),
+    RuleSaga()
   ]
 }

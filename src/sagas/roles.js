@@ -9,7 +9,7 @@ import {
     ROLE_UPDATING,
     ROLE_REQUESTING,
     ROLE_LOADING 
-  } from '../actionTypes/roleS'
+  } from '../actionTypes/roles'
   
   import {
     roleCreateSuccess,

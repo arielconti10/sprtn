@@ -12,7 +12,41 @@ import { canUser } from '../../common/Permissions';
 const apiSelectBox = 'job-title-type';
 const apiPost = 'job-title';
 
+import { PropTypes } from 'prop-types'
+import { reduxForm, Field } from 'redux-form'
+import { connect } from 'react-redux'
+import { job_titleCreate, job_titleUpdate, job_titleLoad, job_titleCurrentClear } from '../../../actions/job_title';
+
+const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório')
+
+
 class JobTitleForm extends Component {
+    static propTypes = {
+        handleSubmit: PropTypes.func.isRequired,
+        invalid: PropTypes.bool.isRequired,
+        user: PropTypes.shape({
+            username: PropTypes.string.isRequired,
+            access_token: PropTypes.string.isRequired,
+        }),
+        job_titles: PropTypes.shape({
+            list: PropTypes.array,
+            requesting: PropTypes.bool,
+            successful: PropTypes.bool,
+            messages: PropTypes.array,
+            errors: PropTypes.array,
+            current_job_title: PropTypes.shape({
+                active: PropTypes.bool,
+                name: PropTypes.string,
+                job_title_type_id: PropTypes.number
+            })
+        }).isRequired,
+        job_titleUpdate: PropTypes.func.isRequired,
+        job_titleCreate: PropTypes.func.isRequired,
+        job_titleLoad: PropTypes.func.isRequired,
+        job_titleCurrentClear: PropTypes.func.isRequired,
+        reset: PropTypes.func.isRequired,
+        initialValues: PropTypes.object
+    }
     constructor(props) {
         super(props);
         this.state = {
@@ -27,8 +61,7 @@ class JobTitleForm extends Component {
         };
 
         this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.submitForm = this.submitForm.bind(this);
+       
     }
 
     checkPermission(permission) {
@@ -39,119 +72,106 @@ class JobTitleForm extends Component {
             }
         }.bind(this));       
     }
+    
+    renderInput = ({ input, type, meta: { touched, error } }) => (
+        <div>
+            <input
+                className="form-control"
+                {...input}
+                type={type}
+            />
+            {touched && error && (
+                <div style={{ color: 'red'}}>
+                    {error}
+                </div>
+            )
+            }
+        </div>
+    )
 
     componentWillMount() {
-        this.checkPermission('job-title.insert');
-
-        if (this.props.match.params.id !== undefined) {
-            this.checkPermission('job-title.update');
-            axios.get(`${apiPost}/${this.props.match.params.id}`)
-                .then(response => {
-                    const dados = response.data.data;
-
-                    this.setState({ 
-                        code: dados.code, 
-                        name: dados.name,
-                        job_title_type_id: dados.job_title_type_id,
-                        active: dados.deleted_at === null ? true: false
-                    });
-                    //console.log(this.state.job_title_type_id);
-                })
-                .catch(err => console.log(err));
-        }
+        
     }
 
     componentDidMount() {
-
-        //console.log(this.props)
-        axios.get(`${apiSelectBox}`)
-            .then(response => {
-                const dados = response.data.data;
-                this.setState({ job_types: dados });
-                //this.setState({ job_title_type_id: dados[0].id });
-            })
-            .catch(err => console.log(err));
-    }
-
-    handleChange(e) {
-        const target = e.currentTarget;
-
-        this.form.validateFields(target);
-
-        //console.log(this.form.isValid());
-
-        this.setState({
-            [target.name]: (target.type == 'checkbox') ? target.checked : target.value,
-            submitButtonDisabled: !this.form.isValid()
-        });
-
-    }
-
-    submitForm(event) {
-        event.preventDefault();
-        axios.post(`${apiPost}`, {
-            'code': this.state.code.toUpperCase(),
-            'name': this.state.name,
-            'job_title_type_id': this.state.job_title_type_id,
-            'active': this.state.active
-        }).then(res => {
-            this.setState({
-                saved: true                   
-            })
-        }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error)[0].toString();
-            this.setState({ back_error: data_error[filterId] });
-        }.bind(this));
-    }
-
-    updateForm(event) {
-        event.preventDefault();
-        var id = this.props.match.params.id;
-
-        let data = {
-            'code': this.state.code.toUpperCase(),
-            'name': this.state.name,
-            'job_title_type_id': this.state.job_title_type_id,
-            'active': this.state.active
-        }
-
-        //return false;
-        axios.put(`${apiPost}/${id}`, {
-            'code': this.state.code.toUpperCase(),
-            'name': this.state.name,
-            'job_title_type_id': this.state.job_title_type_id,
-            'active': this.state.active
-        }).then(res => {
-            this.setState({
-                saved: true                   
-            })
-        }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error).toString();
-            this.setState({ back_error: data_error[filterId] });
-        })
-    }
-
-    handleSubmit(e) {
-        e.preventDefault();
-
-        this.form.validateFields();
+        const { job_titleLoad, user } = this.props
+        this.checkPermission('job-title.insert');
         
-        //console.log(this.form.isValid());
+        this.setState({job_title_type_id: "0"})
+        if (this.props.match.params.id !== undefined) {
+            this.checkPermission('job-title.update');
+            job_titleLoad(user, this.props.match.params.id)
+            this.findJobTitles()
+            
+        }
+        
+    }
 
-        this.setState({ submitButtonDisabled: !this.form.isValid() });
-
-        if (this.form.isValid()) {
-            if (this.props.match.params.id !== undefined) {
-                this.updateForm(event);
-            } else {
-                this.submitForm(event);
+    componentDidUpdate(previousProps, previousState){
+        if (this.props.match.params.id !== undefined) {
+            if(this.props.job_titles.current_job_title != undefined){
+                if(this.props.job_titles.current_job_title.job_title_type_id != previousState.job_title_type_id){
+                    this.setState({job_title_type_id: this.props.job_titles.current_job_title.job_title_type_id})
+                }
             }
         }
     }
 
+    findJobTitles(){
+        axios.get(`${apiSelectBox}`)
+        .then(response => {
+            const dados = response.data.data;
+            this.setState({ job_types: dados });
+        })
+        .catch(err => console.log(err));
+    }
+
+    handleChange(e) {
+        const target = e.currentTarget;
+        let active = true;
+
+        this.setState({
+            [target.name]: (target.type == 'checkbox') ? target.checked : target.value,    
+        });
+        if(target.type == 'checkbox'){
+            active = target.checked
+            this.props.job_titles.current_job_title.active = active
+        }
+
+    }
+
+    submit = (job_title) => {
+        const { user, job_titleCreate, job_titleUpdate, reset } = this.props
+        console.log(job_title)
+        job_title.job_title_type_id = this.state.job_title_type_id; 
+        if (this.props.match.params.id !== undefined) { 
+            job_title.active = this.props.job_titles.current_job_title.active         
+            job_titleUpdate(user, job_title)
+        } else {
+            job_titleCreate(user, job_title)
+        }
+
+        reset()
+    }
+
+    shouldComponentUpdate(nextProps, nextState){
+        return nextProps
+     }
+
     render() {
+        const {
+            handleSubmit,
+            invalid,
+            job_titles: {
+                job_title,
+                requesting,
+                successful,
+                messages,
+                errors,
+                current_job_title
+            },
+        } = this.props
+
         //console.log(this.props);
 
         let redirect = null;
@@ -188,69 +208,75 @@ class JobTitleForm extends Component {
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                     }
-                    <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
-                        onSubmit={this.handleSubmit} noValidate>
-
-                        <div className="">
-                            <FormGroup for="code">
-                                <FormControlLabel htmlFor="code">Código do cargo</FormControlLabel>
-                                <FormControlInput type="text" id="code" name="code"
-                                    value={this.state.code} onChange={this.handleChange}
-                                    readOnly={this.state.viewMode}
-                                    required />
-                                <FieldFeedbacks for="code">
-                                    <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
-                            </FormGroup>
+                    <form onSubmit={handleSubmit(this.submit)}>
+                        <div className="row">
+                            <div className="form-group col-md-6">
+                                <label htmlFor="name">Código do cargo</label>
+                                <Field
+                                    name="code"
+                                    id="code"
+                                    component={this.renderInput}
+                                    validate={fieldRequired}
+                                    placeholder="Código do cargo"
+                                />
+                            </div>    
+                            <div className="form-group col-md-6">
+                                <label htmlFor="name">Nome do cargo</label>
+                                <Field
+                                    name="name"
+                                    id="name"
+                                    component={this.renderInput}
+                                    validate={fieldRequired}
+                                    placeholder="Nome do cargo"
+                                />
+                            </div> 
                         </div>
-
                         <div className="">
-                            <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Nome do cargo</FormControlLabel>
-                                <FormControlInput type="text" id="name" name="name"
-                                    value={this.state.name} onChange={this.handleChange}
-                                    readOnly={this.state.viewMode}
-                                    required />
-                                <FieldFeedbacks for="name">
-                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
-                            </FormGroup>
-                        </div>
-
-                        <div className="">
-                            <FormGroup for="job_title_type_id">
+                            <div className="form-group">
                                 <label>Tipo do cargo</label>
-                                <select className="form-control" onChange={this.handleChange}
+                                <select required className="form-control" onChange={this.handleChange}
                                     id="job_title_type_id" name="job_title_type_id" value={this.state.job_title_type_id}
                                     disabled={this.state.viewMode}>
                                     <option key="0" value="0" >Selecione um valor</option>
                                     {
                                         this.state.job_types.map(data => {
-                                            const checked = data.id == this.state.job_title_type_id ? "checked" : "";
                                             return (
-                                                <option key={data.id} value={data.id}>
+                                                <option key={data.id} value={data.id} >
                                                     {data.name}
                                                 </option>
                                             )
                                         })
                                     }
                                 </select>
-                                <FieldFeedbacks for="job_title_type_id">
+                                {/* <FieldFeedbacks for="job_title_type_id">
                                     <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
-                            </FormGroup>
+                                </FieldFeedbacks> */}
+                            </div>
                         </div>   
 
                         {statusField}     
 
                         <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
                         <button className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
-                    </FormWithConstraints>
+                    </form>
                     
                 </CardBody>
             </Card>
         )
     }
 }
+let InitializeFromStateForm = reduxForm({
+    form: 'InitializeFromState',
+    enableReinitialize: true
+})(JobTitleForm)
 
-export default JobTitleForm;
+InitializeFromStateForm = connect(
+    state => ({
+        user: state.user,
+        job_titles: state.job_titles,
+        initialValues: state.job_titles.current_job_title
+    }),
+    { job_titleLoad, job_titleUpdate, job_titleCreate, job_titleCurrentClear }
+)(InitializeFromStateForm)
+
+export default InitializeFromStateForm

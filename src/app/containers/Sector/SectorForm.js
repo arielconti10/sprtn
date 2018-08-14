@@ -126,31 +126,6 @@ class SectorForm extends Component {
         }.bind(this));
     }
 
-    updateForm(event) {
-        event.preventDefault();
-        var id = this.props.match.params.id;
-
-        let data = {
-            'code': this.state.code,
-            'name': this.state.name,
-            'active': this.state.active
-        }
-
-        axios.put(`${apiPost}/${id}`, {
-            'code': this.state.code,
-            'name': this.state.name,
-            'active': this.state.active
-        }).then(res => {
-            this.setState({
-                saved: true                   
-            })
-        }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error).toString();
-            this.setState({ back_error: data_error[filterId] });
-        })
-    }
-
     submit = (sector) => {
         const { user, sectorCreate, sectorUpdate, reset } = this.props
         
@@ -219,7 +194,7 @@ class SectorForm extends Component {
         
 
         return (
-            <Card>
+        <Card>
             {redirect}
             <CardBody>
                 {this.state.back_error !== '' &&
