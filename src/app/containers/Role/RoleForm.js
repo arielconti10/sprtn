@@ -1,16 +1,45 @@
 import React, { Component } from 'react';
-import { Link, Redirect } from 'react-router-dom';
 
-import axios from '../../../app/common/axios';
+import { canUser } from '../../common/Permissions';
 
 import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 'reactstrap';
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
-import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
-import { canUser } from '../../common/Permissions';
-
+import { PropTypes } from 'prop-types'
+import { reduxForm, Field } from 'redux-form'
+import { connect } from 'react-redux'
+import { roleCreate, roleUpdate, roleLoad } from '../../../actions/role';
 const apiPost = 'role';
 
+// Our validation function for `name` field.
+const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório')
+
 class RoleForm extends Component {
+    static propTypes = {
+        handleSubmit: PropTypes.func.isRequired,
+        invalid: PropTypes.bool.isRequired,
+        user: PropTypes.shape({
+            username: PropTypes.string.isRequired,
+            access_token: PropTypes.string.isRequired,
+        }),
+        roles: PropTypes.shape({
+            list: PropTypes.array,
+            requesting: PropTypes.bool,
+            successful: PropTypes.bool,
+            messages: PropTypes.array,
+            errors: PropTypes.array,
+            current_role: PropTypes.shape({
+                active: PropTypes.bool,
+                name: PropTypes.string,
+                code: PropTypes.string
+            })
+        }).isRequired,
+        roleUpdate: PropTypes.func.isRequired,
+        roleCreate: PropTypes.func.isRequired,
+        roleLoad: PropTypes.func.isRequired,
+        reset: PropTypes.func.isRequired,
+        initialValues: PropTypes.object
+    }
+
     constructor(props) {
         super(props);
         this.state = {
@@ -24,7 +53,6 @@ class RoleForm extends Component {
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.submitForm = this.submitForm.bind(this);
     }
 
     checkPermission(permission) {
@@ -36,82 +64,75 @@ class RoleForm extends Component {
     }
 
     componentWillMount() {
+        const { roleLoad, user } = this.props
         this.checkPermission('role.insert');
         if (this.props.match.params.id !== undefined) {
             this.checkPermission('role.update');
-            axios.get(`${apiPost}/${this.props.match.params.id}`)
-                .then(response => {
-                    const dados = response.data.data;
-
-                    console.log(dados.deleted_at);
-                    this.setState({ 
-                        name: dados.name,
-                        code: dados.code,
-                        active: dados.deleted_at === null ? true: false
-                    });
-                })
-                .catch(err => console.log(err));
+            roleLoad(user, this.props.match.params.id)
         }
     }
 
     handleChange(e) {
         const target = e.currentTarget;
 
-        this.form.validateFields(target);
+        if (target.type == 'checkbox') {
+            this.props.roles.current_role.active = target.checked
+        }
 
+        // // this.form.validateFields(target);
         this.setState({
             [target.name]: (target.type == 'checkbox') ? target.checked : target.value,
             submitButtonDisabled: !this.form.isValid()
         });
     }
 
-    submitForm(event) {
-        event.preventDefault();
-        axios.post(`${apiPost}`, {
-            'name': this.state.name,
-            'code': this.state.code,
-            'active': this.state.active
-        }).then(res => {
-            this.setState({
-                saved: true                   
-            })
-        }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error)[0].toString();
-            this.setState({ back_error: data_error[filterId] });
-        }.bind(this));
-    }
+    renderNameInput = ({ input, type, meta: { touched, error } }) => (
+        <div className="form-group">
+            {/* Spread RF's input properties onto our input */}
+            <input
+                className="form-control"
+                {...input}
+                type={type}
+            />
+            {/*
+            If the form has been touched AND is in error, show `error`.
+            `error` is the message returned from our validate function above
+            which in this case is `Name Required`.
+    
+            `touched` is a live updating property that RF passes in.  It tracks
+            whether or not a field has been "touched" by a user.  This means
+            focused at least once.
+          */}
+            {touched && error && (
+                <div style={{ color: 'red'}}>
+                    {error}
+                </div>
+            )
+            }
+        </div>
+    )
 
-    updateForm(event) {
-        event.preventDefault();
-        var id = this.props.match.params.id;
+    submit = (role) => {
 
-        let data = {
-            'name': this.state.name,
-            'code': this.state.code,
-            'active': this.state.active
+        const { user, roleCreate, roleUpdate, reset } = this.props
+        // call to our roleCreate action.
+
+        if (this.props.match.params.id !== undefined) {
+            roleUpdate(user, role)
+        } else {
+            roleCreate(user, role)
         }
 
-        axios.put(`${apiPost}/${id}`, {
-            'name': this.state.name,
-            'code': this.state.code,
-            'active': this.state.active
-        }).then(res => {
-            this.setState({
-                saved: true                   
-            })
-        }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error).toString();
-            this.setState({ back_error: data_error[filterId] });
-        })
+        // reset the form upon submit.
+        reset()
+
     }
 
     handleSubmit(e) {
         e.preventDefault();
 
         this.form.validateFields();
-        
+
         this.setState({ submitButtonDisabled: !this.form.isValid() });
 
         if (this.form.isValid()) {
@@ -124,9 +145,22 @@ class RoleForm extends Component {
     }
 
     render() {
+        const {
+            handleSubmit,
+            // invalid,
+            roles: {
+                list,
+                requesting,
+                successful,
+                messages,
+                errors,
+                current_role
+            },
+        } = this.props
+
         let redirect = null;
         if (this.state.saved) {
-            redirect = <Redirect to="/cadastro/regras" />;
+            redirect = <Redirect to="/cadastro/turnos" />;
         }
 
         let statusField = null;
@@ -137,9 +171,7 @@ class RoleForm extends Component {
                         <label className="" style={{marginRight: "10px"}}>Status</label>
                         <div className="">
                             <Label className="switch switch-default switch-pill switch-primary">
-                                <Input type="checkbox" id='active' name="active" className="switch-input"  
-                                disabled={this.state.viewMode}
-                                checked={this.state.active} onChange={this.handleChange}/>
+                                <Input type="checkbox" id='active' name="active" className="switch-input"  checked={this.state.active} onChange={this.handleChange}/>
                                 <span className="switch-label"></span>
                                 <span className="switch-handle"></span>
                             </Label>
@@ -147,54 +179,83 @@ class RoleForm extends Component {
                     </div>
                 </div>            
         }
-        
 
         return (
             <Card>
-                {redirect}
+                {/* {redirect} */}
                 <CardBody>
+
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                     }
+                    <div className="roles">
                     <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
-                        onSubmit={this.handleSubmit} noValidate>
-                        
-                        <div className="">
-                            <FormGroup for="code">
-                                <FormControlLabel htmlFor="code">Código da regra</FormControlLabel>
-                                <FormControlInput type="text" id="code" name="code"
-                                    value={this.state.code} onChange={this.handleChange}
-                                    readOnly={this.state.viewMode}
-                                    required />
-                                <FieldFeedbacks for="code">
-                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
-                            </FormGroup>
-                        </div>
+                        onSubmit={handleSubmit(this.submit)} noValidate>
 
-                        <div className="">
-                            <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Nome da regra</FormControlLabel>
-                                <FormControlInput type="text" id="name" name="name"
-                                    value={this.state.name} onChange={this.handleChange}
-                                    readOnly={this.state.viewMode}
-                                    required />
-                                <FieldFeedbacks for="name">
-                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
-                            </FormGroup>
-                        </div>                       
-                        
-                        {statusField}     
+                            <div className="form-grpup">
 
-                        <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
-                        <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
-                    </FormWithConstraints>
-                    
+                                <label htmlFor="code">
+                                    Código da Regra
+                                    <span className="text-danger"><strong>*</strong></span>
+                                </label>
+                                <Field
+                                    name="code"
+                                    type="text"
+                                    id="code"
+                                    validate={fieldRequired}
+                                    placeholder="code"
+                                    component={this.renderNameInput}
+                                />
+
+
+                            </div>
+
+
+                            <div className="form-group">
+                                <label htmlFor="name">
+                                    Nome da Regra
+                                    <span className="text-danger"><strong>*</strong></span>
+                                </label>
+
+                                <Field
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    component={this.renderNameInput}
+                                    className="form-control"
+                                    validate={fieldRequired}
+                                />
+
+                            </div>
+
+                            {statusField}
+
+                            <button action="submit" className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
+                            <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
+
+                        </FormWithConstraints>
+                    </div>
+
+
                 </CardBody>
             </Card>
         )
     }
 }
 
-export default RoleForm;
+let InitializeFromStateForm = reduxForm({
+    form: 'InitializeFromState',
+    enableReinitialize: true
+})(RoleForm)
+
+InitializeFromStateForm = connect(
+    state => ({
+        user: state.user,
+        roles: state.roles,
+        initialValues: state.roles.current_role
+    }),
+    { roleLoad, roleUpdate, roleCreate }
+)(InitializeFromStateForm)
+
+
+export default InitializeFromStateForm

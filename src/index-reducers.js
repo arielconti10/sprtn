@@ -11,6 +11,7 @@ import localizations from './reducers/localization'
 import sectors from './reducers/sector'
 import schoolTypes from './reducers/schoolTypes'
 import gridApi from './reducers/gridApi'
+import roles from './reducers/roles'
 
 const IndexReducer = combineReducers({
   user,
@@ -25,6 +26,7 @@ const IndexReducer = combineReducers({
   localizations,
   sectors,
   schoolTypes,
+  roles
 })
 
 export default IndexReducer  

@@ -3,7 +3,6 @@ import {
   put,
   takeLatest
 } from 'redux-saga/effects'
-// import { handleApiErrors } from '../lib/api-errors'
 import {
   USER_CREATING,
   USER_UPDATING,
@@ -168,20 +167,6 @@ function* userUpdateFlow(action) {
       yield put(userCreateError(error))
     }
   }
-
-function shiftsRequest(userCurrent) {
-  const url = `${usersUrl}/users`
-  const request = fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      // passe our token as an "Authorization" header
-      Authorization: 'Bearer ' + userCurrent.access_token || undefined,
-    },
-  })
-
-  return handleRequest(request)
-}
 
 function getUrlSearch(input_name) {
     let new_url = `${usersUrl}/user?paginate=10&page=1`;

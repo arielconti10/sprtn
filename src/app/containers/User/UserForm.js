@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
-import { Link, Redirect } from 'react-router-dom';
 
 import axios from '../../../app/common/axios';
 
 import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input } from 'reactstrap';
-import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
-import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
 import { Async } from 'react-select';
 import Select from 'react-select';
 import { canUser } from '../../common/Permissions';

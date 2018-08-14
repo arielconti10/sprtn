@@ -10,6 +10,7 @@ import MarketshareSaga from './sagas/marketshare';
 import UserSchoolSaga from './sagas/userSchool';
 import GridApiSaga from './sagas/gridApi';
 import UserSaga from './sagas/user';
+import RoleSaga from './sagas/roles';
 
 export default function* IndexSaga () {
   yield [
@@ -23,7 +24,7 @@ export default function* IndexSaga () {
     LocalizationSaga(),
     SetorSaga(),
     SchoolTypesSaga(),
-    UserSaga()
-
+    UserSaga(),
+    RoleSaga()
   ]
 }
