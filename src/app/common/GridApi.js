@@ -71,11 +71,11 @@ class GridApi extends Component {
             data_api: apiSpartan,
             pageSize: gridApi.pageSize,
             page: gridApi.page,
-            filtered: gridApi.filtered,
+            filtered: [],
             sorted: gridApi.sorted
         }
 
-        this.props.loadColumnsFlow(columns, hideButtons, urlLink, apiSpartan);
+        this.props.loadColumnsFlow(columns, hideButtons, urlLink, apiSpartan, tableInfo);
     }
 
     onChangeTextFilter(filter, accessor) {

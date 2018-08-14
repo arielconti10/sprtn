@@ -18,6 +18,8 @@ import subsidiarys from './reducers/subsidiary'
 import job_titles from './reducers/job_title'
 import schoolTypes from './reducers/schoolTypes'
 import gridApi from './reducers/gridApi'
+import roles from './reducers/roles'
+import rules from './reducers/rules'
 
 const IndexReducer = combineReducers({
   user,
@@ -39,6 +41,8 @@ const IndexReducer = combineReducers({
   congregations,
   job_titles,
   schoolTypes,
+  roles,
+  rules
 })
 
 export default IndexReducer  

@@ -16,6 +16,9 @@ import MarketshareSaga from './sagas/marketshare';
 import JobTitleSaga from './sagas/job_title';
 import UserSchoolSaga from './sagas/userSchool';
 import GridApiSaga from './sagas/gridApi';
+import UserSaga from './sagas/user';
+import RoleSaga from './sagas/roles';
+import RuleSaga from './sagas/rules';
 
 export default function* IndexSaga () {
   yield [
@@ -35,6 +38,9 @@ export default function* IndexSaga () {
     CongregationSaga(),
     SubsidiarySaga(),
     SchoolTypesSaga(),
+    UserSaga(),
+    RoleSaga(),
     JobTitleSaga(),
+    RuleSaga()
   ]
 }

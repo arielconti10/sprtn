@@ -138,7 +138,10 @@ class Sidebar extends Component {
 
     // nav list
     const navList = (items) => {
-        return items.map( (item, index) => navType(item, index) );
+        if (items) {
+            return items.map( (item, index) => navType(item, index) );
+        }
+        
     };
 
     const isExternal = (url) => {

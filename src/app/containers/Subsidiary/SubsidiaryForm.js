@@ -107,6 +107,7 @@ class SubsidiaryForm extends Component {
         this.props.subsidiarys.current_subsidiary = null;
         
     }
+    
     componentDidMount() {
         
         this.checkPermission('subsidiary.insert');

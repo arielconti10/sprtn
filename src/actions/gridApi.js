@@ -4,13 +4,14 @@ import { LOAD_COLUMNS_FLOW, SET_COLUMNS, ON_FETCH_DATA_FLOW, SET_CREATE_TABLE, O
     SELECT_OPTION_FLOW, SET_CUSTOM_FILTER
 } from '../actionTypes/gridApi';
 
-export function loadColumnsFlow(columnsGrid, hideButtons, urlLink, apiSpartan) {
+export function loadColumnsFlow(columnsGrid, hideButtons, urlLink, apiSpartan, tableInfo) {
     return {
         type: LOAD_COLUMNS_FLOW,
         columnsGrid,
         hideButtons,
         urlLink,
-        apiSpartan
+        apiSpartan,
+        tableInfo
     }
 }
 

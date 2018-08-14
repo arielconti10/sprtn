@@ -301,14 +301,16 @@ function getUrlSearch(action) {
         })
     }
 
-    console.log(filtered, customFiltered);
-
+    /*
     if (filtered.length === 0 && customFiltered && customFiltered.length > 0) {
         customFiltered.map(function (item, key) {    
             let filter_by = item.id;
             baseURL += `&filter[${filter_by}]=${item.value}`;
         })
     }
+
+    console.log(action, filtered, customFiltered);
+    */
 
     if (defaultOrder && sorted.length === 0) {
         let order_by = defaultOrder;
@@ -371,8 +373,6 @@ function concatFilter(filtered, filter) {
         concat_filter = concat_filter.concat(filter);
     }
 
-    console.log(concat_filter);
-
     return concat_filter;
 }
 
@@ -399,11 +399,12 @@ function* loadColumnsFlow(action) {
 
 function* fetchDataFlow(action) {
     yield put(setLoader(true));
+    yield put(setTableInfo(action.table_state));
 
     const url_filter = yield call(getUrlSearch, action.table_state);
     const result_data = yield call(searchData, url_filter);
 
-    yield put(setTableInfo(action.table_state));
+    
     yield put(setCreateTable(result_data));
     yield put(setLoader(false));
 }
