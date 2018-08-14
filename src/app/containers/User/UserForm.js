@@ -10,281 +10,203 @@ import { Async } from 'react-select';
 import Select from 'react-select';
 import { canUser } from '../../common/Permissions';
 
+import { PropTypes } from 'prop-types'
+import { reduxForm, Field } from 'redux-form'
+import { connect } from 'react-redux'
+import { userCreate, userUpdate, userLoad, roleListFlow, 
+    changeRoleFlow, getSubsidiariesFlow, 
+    changeSubsidiaryFlow, 
+    changeSectorFlow,
+    changeStatusFlow,
+    searchByNameFlow,
+    userUpdateWithSuperior,
+    unloadUser
+} from '../../../actions/user';
+
+// Our validation function for `name` field.
+const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório')
+
+const validate = values => {
+    const errors = {};
+
+    if (values.password !== values.password_confirmation) {
+        errors.password_confirmation = "Senhas nāo conferem";
+    }
+
+    if (values.subsidiary_id && !values.sector_id) {
+        errors.sector_id = "Este campo é de preenchimento obrigatório";
+    }
+
+    return errors;
+}
+
 const apiSelectBox = 'role';
 const apiPost = 'user';
 
 class UserForm extends Component {
+    static propTypes = {
+        handleSubmit: PropTypes.func.isRequired,
+        invalid: PropTypes.bool.isRequired,
+        user: PropTypes.shape({
+            username: PropTypes.string.isRequired,
+            access_token: PropTypes.string.isRequired,
+        }),
+        user: PropTypes.shape({
+            list: PropTypes.array,
+            requesting: PropTypes.bool,
+            successful: PropTypes.bool,
+            messages: PropTypes.array,
+            errors: PropTypes.array,
+            current_user: PropTypes.shape({
+                active: PropTypes.bool,
+                name: PropTypes.string,
+                code: PropTypes.string
+            })
+        }).isRequired,
+        userUpdate: PropTypes.func.isRequired,
+        userCreate: PropTypes.func.isRequired,
+        userLoad: PropTypes.func.isRequired,
+        changeRoleFlow: PropTypes.func.isRequired,
+        roleListFlow: PropTypes.func.isRequired,
+        getSubsidiariesFlow: PropTypes.func.isRequired,
+        changeSubsidiaryFlow: PropTypes.func.isRequired,
+        changeSectorFlow: PropTypes.func.isRequired,
+        changeStatusFlow: PropTypes.func.isRequired,
+        searchByNameFlow: PropTypes.func.isRequired,
+        userUpdateWithSuperior: PropTypes.func.isRequired,
+        reset: PropTypes.func.isRequired,
+        initialValues: PropTypes.object
+    }
+
     constructor(props) {
         super(props);
+        
         this.state = {
-            roles: [],            
-            name: '',
-            lastname: '',
-            email: '',
-            username: '',
-            password: '',
-            password_confirmation: '',
-            role_id: '0',  
-            superior: '',  
-            superior_initial: '',
-            subsidiaries: [],
-            sectors: [],
-            users: [],
-            search_options: [],
-            subsidiary_id: null,
-            sector_id: null,
-            superior_id: null,
-            active: true,       
-            back_error: '',
-            submitButtonDisabled: false,
-            valid_sector: true,
-            saved: false,
-            loaderUser: false
         };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChangeRole = this.handleChangeRole.bind(this);
         this.handleChangeSubsidiary = this.handleChangeSubsidiary.bind(this);
         this.handleChangeSector = this.handleChangeSector.bind(this);
         this.handleChangeSuperior = this.handleChangeSuperior.bind(this);
-        this.getSubsidiaries = this.getSubsidiaries.bind(this);
-        this.getSectors = this.getSectors.bind(this);
-        this.submitForm = this.submitForm.bind(this);
         this.getOptions = this.getOptions.bind(this);
     }
 
+    checkPermission(permission){
+        canUser(permission, this.props.history, "change", function(rules){
+            if(rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true})
+            }
+        })
+    }
+
     componentWillMount() {
+        const { user, reset } = this.props
+
         this.checkPermission('user.insert');
-        this.getSubsidiaries();
-        
+        this.props.roleListFlow(user);
+        this.props.getSubsidiariesFlow(user);
+        this.props.unloadUser();
+
         if (this.props.match.params.id !== undefined) {
             this.checkPermission('user.update');
-            axios.get(`${apiPost}/${this.props.match.params.id}`)
-                .then(response => {
-                    const dados = response.data.data;
-
-                    if (!dados.parent) {
-                        // this.setState({ loaderUser: true });
-                        // this.getUsers();
-                    }
-
-                    this.setState({                         
-                        name: dados.name,
-                        lastname: dados.lastname, 
-                        username: dados.username, 
-                        role_id: dados.role_id,
-                        subsidiary_id: dados.subsidiary_id,
-                        sector_id: dados.sector_id,
-                        email: dados.email,
-                        superior: (dados.parent != null ? dados.parent.full_name : ''),
-                        superior_initial: (dados.parent != null ? dados.parent.full_name : ''),
-                        active: dados.deleted_at === null ? true: false
-                    }, function() {
-                        this.getSectors(dados.subsidiary_id);
-                        this.setState({sector_id: dados.sector_id});
-                    });
-                })
-                .catch(err => console.log(err));
+            this.props.userLoad(user, this.props.match.params.id);
         }
-    }
-
-    checkPermission(permission) {
-        canUser(permission, this.props.history, "change", function(rules){
-            if (rules.length == 0) {
-                this.setState({viewMode:true, submitButtonDisabled: true});
-            }
-        }.bind(this));       
-    }
-
-    getSubsidiaries() {
-        axios.get(`subsidiary?order[name]=asc`)
-        .then(response => {
-                const dados = response.data.data;
-                const select_array = [];
-                dados.map(item => {
-                    const label = `${item.code} - ${item.name}`;
-                    const item_object = {"value": item.id, "label": label};
-                    select_array.push(item_object);
-                });
-                this.setState({subsidiaries: select_array});
-            })
-            .catch(function (error) {
-                let authorized = verifyToken(error.response.status);
-                this.setState({ authorized: authorized });
-            }.bind(this));
-    }
-
-    getUsers() {
-
-        axios.get(`user?page=1&order[name]=asc`)
-        .then(response => {
-                const dados = response.data.data;
-                const select_array = [];
-                dados.map(item => {
-                    const label = `${item.full_name}`;
-                    const item_object = {"value": item.id, "label": label};
-                    select_array.push(item_object);
-                });
-                this.setState({users: select_array, loaderUser: false});
-            })
-            .catch(function (error) {
-                let authorized = verifyToken(error.response.status);
-                this.setState({ authorized: authorized });
-            }.bind(this));
-    }
-
-    getSectors(subsidiary_id) {
-        if (subsidiary_id) {
-            axios.get(`subsidiary/${subsidiary_id}`)
-            .then(response => {
-                if (response.data.data) {
-                    const sectors = response.data.data.sectors;
-                    const values = this.state;
-                    const array_sectors = [];
-
-                    sectors.map(item => {
-                        const sector_obj = {value : item.id, label: item.name};
-                        array_sectors.push(sector_obj);
-                    });
-                    
-
-                    this.setState({ sectors: array_sectors });
-
-                    this.setState({ringLoad:false});
-                }
-
-            }) 
-        }
-    }
-
-    handleChangeSubsidiary(selectedOption) {
-        const values = this.state;
-        const subsdiary_id = selectedOption.value;
-        values.subsidiary_id = selectedOption.value;
-        this.setState({values, ringLoad:true, sector_id:null});
-        this.getSectors(subsdiary_id);
-    }
-
-    handleChangeSector(selectedOption) {
-        const values = this.state;
-        values.sector_id = selectedOption.value;
-        this.setState({ values });
-    }
-
-    handleChangeSuperior(selectedOption) {
-        const values = this.state;
-        values.superior_id = selectedOption;
-        this.setState({ values });
-    }
-
-    componentDidMount() {
-        axios.get(`${apiSelectBox}`)
-            .then(response => {
-                const dados = response.data.data;
-                this.setState({ roles: dados });
-            })
-            .catch(err => console.log(err));
     }
 
     handleChange(e) {
         const target = e.currentTarget;
 
-        this.form.validateFields(target);
+        const { userSearch, active } = this.props.user;
 
-        //console.log(this.form.isValid());
-
-        this.setState({
-            [target.name]: (target.type == 'checkbox') ? target.checked : target.value,
-            submitButtonDisabled: !this.form.isValid()
-        });
+        if (target.type == 'checkbox') {
+            const new_status = !active;
+            this.props.changeStatusFlow(new_status);
+        }
 
     }
 
-    submitForm(event) {
-        event.preventDefault();        
-        axios.post(`${apiPost}`, {            
-            'name': this.state.name,
-            'lastname': this.state.lastname,
-            'role_id': this.state.role_id,
-            'subsidiary_id': this.state.subsidiary_id,
-            'sector_id': this.state.sector_id,
-            'username': this.state.username, 
-            'email': this.state.email, 
-            'password': this.state.password, 
-            'password_confirmation': this.state.password_confirmation, 
-            'active': this.state.active
-        }).then(res => {
-            this.setState({
-                saved: true                   
-            })
-        }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error)[0].toString();
-            this.setState({ back_error: data_error[filterId] });
-        }.bind(this));
+    handleChangeRole(selectedOption) {
+        this.props.changeRoleFlow(selectedOption);
     }
 
-    updateSuperior(dataUpdate, id) {
-        axios.get(`${apiPost}/${this.state.superior_id.value}`)
-        .then(response => {
-            const data = response.data.data;
-            const superior_data = {
-                superior_registration: data.registration,
-                parent_id: data.id,
-                superior_name: data.full_name
+    handleChangeSubsidiary(selectedOption) {
+        const { shiftLoad, user } = this.props
+        this.props.changeSubsidiaryFlow(selectedOption, user);
+    }
+
+    handleChangeSector(selectedOption) {
+        const { shiftLoad, user } = this.props
+        this.props.changeSectorFlow(selectedOption, user);
+    }
+
+    renderNameInput = ({ input, type, disabled, valueOption ,meta: { touched, error } }) => (
+        <div>
+            {/* Spread RF's input properties onto our input */}
+            <input
+                className="form-control"
+                {...input}
+                type={type}
+                disabled={disabled}
+            />
+            {touched && error && (
+                <div style={{ color: 'red'}}>
+                    {error}
+                </div>
+            )
             }
-            const dataWithSuperior = Object.assign({}, dataUpdate, superior_data);
+        </div>
+    )
 
-            return dataWithSuperior;
-        })
-        .then(dataWithSuperior => {
-            axios.put(`${apiPost}/${id}`, dataWithSuperior).then(res => {
-                this.setState({
-                    saved: true                   
-                })
-            }).catch(function (error) {
-                let data_error = error.response.data.errors;
-                let filterId = Object.keys(data_error).toString();
-                this.setState({ back_error: data_error[filterId] });
-            })
-        })
-    }
+    renderSelectInput = ({ input, name, valueOption, options, labelKey, valueKey, onChangeFunction ,meta: { touched, error } }) => (
+        <div className="form-group">
+            <Select
+                {...input}
+                name={name}
+                id={name}
+                // disabled={this.state.viewMode}
+                value={valueOption}
+                onChange={onChangeFunction}
+                options={options}
+                placeholder="Selecione..."
+                labelKey={labelKey}
+                valueKey={valueKey}
+                onBlur={() => input.onBlur(input.value)}
+            />
 
-    updateForm(event) {
-        event.preventDefault();
-        var id = this.props.match.params.id;
+            {touched && error && (
+                <div style={{ color: 'red'}}>
+                    {error}
+                </div>
+            )
+            }
+        </div>
+    )
 
-        let dataUpdate = {
-            'lastname': this.state.lastname,
-            'name': this.state.name,
-            'role_id': this.state.role_id,
-            'subsidiary_id': this.state.subsidiary_id,
-            'sector_id': this.state.sector_id,
-            'username': this.state.username,
-            'email': this.state.email,             
-            'active': this.state.active
-        };
 
-        if (this.state.superior_id) {
-            this.updateSuperior(dataUpdate, id);
-            return true;
+    submit = (userObject) => {
+        const { user, userCreate, userUpdate, reset } = this.props;
+
+        userObject.subsidiary_id = user.subsidiary_id;
+        userObject.sector_id = user.sector_id;
+        userObject.role_id = user.role_id;
+        userObject.active = user.active;
+
+        if (this.props.match.params.id !== undefined) {
+            if (this.state.superior_id) {
+                this.props.userUpdateWithSuperior(this.state.superior_id, userObject, user);
+            } else {
+                userUpdate(userObject, user);
+            }
+            
+        } else {
+            userCreate(userObject, user);
         }
 
-        if (this.props.match.params.id != undefined && this.state.password != '') {
-            dataUpdate.password = this.state.password, 
-            dataUpdate.password_confirmation = this.state.password_confirmation
-        }
+        // reset the form upon submit.
+        reset()
 
-        //return false;
-        axios.put(`${apiPost}/${id}`, dataUpdate).then(res => {
-            this.setState({
-                saved: true                   
-            })
-        }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error).toString();
-            this.setState({ back_error: data_error[filterId] });
-        })
     }
 
     handleSubmit(e) {
@@ -292,31 +214,15 @@ class UserForm extends Component {
 
         this.form.validateFields();
 
-        this.setState({valid_sector:true});
-        if (this.state.subsidiary_id && !this.state.sector_id) {
-            this.setState({valid_sector:false});
-        }
-
         this.setState({ submitButtonDisabled: !this.form.isValid() });
 
-        if (this.form.isValid() && this.state.valid_sector) {
+        if (this.form.isValid()) {
             if (this.props.match.params.id !== undefined) {
                 this.updateForm(event);
             } else {
                 this.submitForm(event);
             }
         }
-    }
-
-    mapSelect(dados) {
-        const select_array = [];
-        dados.map(item => {
-            const label = `${item.full_name}`;
-            const item_object = {"value": item.id, "label": label};
-            select_array.push(item_object);
-        });
-
-        return select_array;
     }
 
     searchByName(input_name) {
@@ -334,6 +240,23 @@ class UserForm extends Component {
         new_url = new_url + "&order[name]=asc";
         return new_url;
     } 
+
+    handleChangeSuperior(selectedOption) {
+        const values = this.state;
+        values.superior_id = selectedOption;
+        this.setState({ values });
+    }
+
+    mapSelect(dados) {
+        const select_array = [];
+        dados.map(item => {
+            const label = `${item.full_name}`;
+            const item_object = {"value": item.id, "label": label};
+            select_array.push(item_object);
+        });
+
+        return select_array;
+    }
 
     getOptions = (input, callback) => {
         const search_url = this.searchByName(input);
@@ -356,278 +279,284 @@ class UserForm extends Component {
       };
 
     showSuperior() {
-        const superior_initial = this.state.superior_initial;
+        const { superiors, userSearch } = this.props.user;
+        
+        let { superior_name } = userSearch;
+
         const user_id = this.props.match.params.id;
 
-        if (!superior_initial && user_id) {
+        if (user_id && userSearch && !superior_name) {
             return (
-                <FormGroup for="superior_id">
+                <div className="form-group">
                     <label>Superior</label>
                     <Async
                         removeSelected={false}
                         name="superior_id"
                         id="superior_id"
-                        disabled={this.state.viewMode}
+                        // disabled={this.state.viewMode}
                         value={this.state.superior_id}
                         onChange={this.handleChangeSuperior}
                         loadOptions={this.getOptions}
                         placeholder="Selecione..."
                     />
-                    {/* <Select
-                        name="superior_id"
-                        id="superior_id"
-                        disabled={this.state.viewMode}
-                        value={this.state.superior_id}
-                        onChange={this.handleChangeSuperior}
-                        options={this.state.users}
-                        placeholder="Selecione..."
-                    /> */}
-                </FormGroup>
+                </div>
             )
         }
 
         return (
-            <FormGroup for="superior">
-                <FormControlLabel htmlFor="superior">Superior</FormControlLabel>
-                <FormControlInput type="text" id="superior" name="superior" 
-                    onChange={this.handleChange}
-                    value={this.state.superior} 
-                    disabled={'disabled'} />                                
-            </FormGroup>
+            <div className="row">
+                <div className="col-sm-12">
+                    <div className="form-group">
+                        <label>
+                            Superior
+                        </label>
+                        <Field
+                            name="superior_name"
+                            type="text"
+                            id="superior_name"
+                            component={this.renderNameInput}
+                            disabled={"disabled"} 
+                            // valueOption={superior_name}
+                        />
+                    </div>
+                </div>
+            </div>
         );
     }
 
     render() {
+        const {
+            handleSubmit,
+            invalid,
+            user: {
+                requesting,
+                successful,
+                messages,
+                errors,
+                current_user
+            },
+        } = this.props
 
-        const { subsidiaries, sectors } = this.state;
-    
-        let redirect = null;
-        if (this.state.saved) {
-            redirect = <Redirect to="/config/usuarios" />;
-        }
+        const { roles, role_id, subsidiaries, subsidiary_id, sectors, 
+            sector_id, ringLoad, userSearch, active
+        } = this.props.user;
 
         let statusField = null;
-        let validationPassword = null;
-        if (this.props.match.params.id != undefined) {
-            statusField = (
-                <div className="">
-                    <div className="form-group form-inline">
-                        <label className="" style={{marginRight: "10px"}}>Status</label>
-                        <div className="">
-                            <Label className="switch switch-default switch-pill switch-primary">
-                                <Input type="checkbox" id='active' name="active" className="switch-input"  
-                                disabled={this.state.viewMode}
-                                checked={this.state.active} onChange={this.handleChange}/>
-                                <span className="switch-label"></span>
-                                <span className="switch-handle"></span>
-                            </Label>
-                        </div>                                
-                    </div>
-                </div>
-            );
-
-            
-        }
-        else {
-            validationPassword = (
-                <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-            );
-        }
         
+        if(userSearch !== undefined && userSearch !== null){
+            if (this.props.match.params.id !== undefined) {
+                statusField =
+                    <div className="">
+                        <div className="form-group form-inline">
+                            <label className="" style={{ marginRight: "10px" }}>Status</label>
+                            <div className="">
+                                <Label className="switch switch-default switch-pill switch-primary">
+                                    <Input type="checkbox" id='active' name="active" className="switch-input"
+                                        disabled={this.state.viewMode}
+                                        checked={active?1:0} 
+                                        onChange={this.handleChange} />
+                                    <span className="switch-label"></span>
+                                    <span className="switch-handle"></span>
+                                </Label>
+                            </div>
+                        </div>
+                    </div>
+            }
+        }
 
         return (
-            
             <Card>
-                {(this.state.ringLoad == true || this.state.loaderUser == true) &&
-                    <div className="loader">
-                        <div className="backLoading">
-                            <div className="load"></div>
-                        </div>
-                    </div>
-                }
-                {redirect}
                 <CardBody>
-                    {this.state.back_error !== '' &&
-                        <h4 className="alert alert-danger"> {this.state.back_error} </h4>
-                    }
-                    <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
-                        onSubmit={this.handleSubmit} noValidate>
-                        <div className="row">
-                            <div className="col-sm-6">
-                                <FormGroup for="name">
-                                    <FormControlLabel htmlFor="name">
-                                        Nome <span className="text-danger"><strong>*</strong></span>
-                                    </FormControlLabel>
-                                    <FormControlInput type="text" id="name" name="name"
-                                        readOnly={this.state.viewMode}
-                                        value={this.state.name} onChange={this.handleChange}
-                                        required />
-                                    <FieldFeedbacks for="name">
-                                        <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                    </FieldFeedbacks>
-                                </FormGroup>
+                    <div className="user">
+                        {ringLoad == true &&
+                            <div className="loader">
+                                <div className="backLoading">
+                                    <div className="load"></div>
+                                </div>
+                            </div>
+                        }
+                        <form onSubmit={handleSubmit(this.submit)}>
+                            <div className="row">
+                                <div className="col-sm-6">
+                                    <div className="form-group">
+                                        <label>
+                                            Nome <span className="text-danger"><strong>*</strong></span>
+                                        </label>
+                                        <Field
+                                            name="name"
+                                            type="text"
+                                            id="name"
+                                            validate={fieldRequired}
+                                            component={this.renderNameInput}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="col-sm-6">
+                                    <div className="form-group">
+                                        <label>
+                                            Sobrenome <span className="text-danger"><strong>*</strong></span>
+                                        </label>
+                                        <Field
+                                            name="lastname"
+                                            type="text"
+                                            id="lastname"
+                                            validate={fieldRequired}
+                                            component={this.renderNameInput}
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="col-sm-6">
-                                <FormGroup for="lastname">
-                                    <FormControlLabel htmlFor="lastname">
-                                        Sobrenome <span className="text-danger"><strong>*</strong></span>
-                                    </FormControlLabel>
-                                    <FormControlInput type="text" id="lastname" name="lastname"
-                                        readOnly={this.state.viewMode}
-                                        value={this.state.lastname} onChange={this.handleChange}
-                                        required />
-                                    <FieldFeedbacks for="lastname">
-                                        <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                    </FieldFeedbacks>
-                                </FormGroup>
+                            <div className="row">
+                                <div className="col-sm-6">
+                                    <div className="form-group">
+                                        <label>
+                                            Usuário de rede <span className="text-danger"><strong>*</strong></span>
+                                        </label>
+                                        <Field
+                                            name="username"
+                                            type="text"
+                                            id="username"
+                                            validate={fieldRequired}
+                                            component={this.renderNameInput}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-sm-6">
+                                    <div className="form-group">
+                                        <label>
+                                            E-mail <span className="text-danger"><strong>*</strong></span>
+                                        </label>
+                                        <Field
+                                            name="email"
+                                            type="text"
+                                            id="email"
+                                            validate={fieldRequired}
+                                            component={this.renderNameInput}
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-sm-6">
-                                <FormGroup for="username">
-                                    <FormControlLabel htmlFor="username">
-                                        Usuário de rede <span className="text-danger"><strong>*</strong></span>
-                                    </FormControlLabel>
-                                    <FormControlInput type="text" id="username" name="username"
-                                        readOnly={this.state.viewMode}
-                                        value={this.state.username} onChange={this.handleChange}
-                                        required />
-                                    <FieldFeedbacks for="username">
-                                        <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                    </FieldFeedbacks>
-                                </FormGroup>
+
+                            <div className="row">
+                                <div className="col-sm-6">
+                                    <div className="form-group">
+                                        <label>Filial</label>
+                                        <Field
+                                            name="subsidiary_id"
+                                            options={subsidiaries}
+                                            onChangeFunction={this.handleChangeSubsidiary}
+                                            placeholder="Selecione..."
+                                            valueOption={subsidiary_id}
+                                            component={this.renderSelectInput}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-sm-6">
+                                    <div className="form-group">
+                                        <label>Setor</label>
+                                        <Field
+                                            name="sector_id"
+                                            options={sectors}
+                                            valueOption={sector_id}
+                                            onChangeFunction={this.handleChangeSector}
+                                            placeholder="Selecione..."
+                                            component={this.renderSelectInput}
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                            <div className="col-sm-6">
-                                <FormGroup for="email">
-                                    <FormControlLabel htmlFor="email">
-                                        Email <span className="text-danger"><strong>*</strong></span>
-                                    </FormControlLabel>
-                                    <FormControlInput type="text" id="email" name="email"
-                                        readOnly={this.state.viewMode}
-                                        value={this.state.email} onChange={this.handleChange}
-                                        required />
-                                    <FieldFeedbacks for="email">
-                                        <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                    </FieldFeedbacks>
-                                </FormGroup>
+
+                            <div className="row">
+                                <div className="col-sm-6">
+                                    <div className="form-group">
+                                        <label>
+                                            Senha 
+                                            {!this.props.match.params.id &&
+                                                <span className="text-danger"><strong>*</strong></span>
+                                            }
+                                        </label>
+                                        <Field
+                                            name="password"
+                                            type="password"
+                                            id="password"
+                                            validate={!this.props.match.params.id?fieldRequired:[]}
+                                            component={this.renderNameInput}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-sm-6">
+                                    <div className="form-group">
+                                        <label>
+                                            Confirmação de Senha  
+                                            {!this.props.match.params.id &&
+                                                <span className="text-danger"><strong>*</strong></span>
+                                            }
+                                        </label>
+                                        <Field
+                                            name="password_confirmation"
+                                            type="password"
+                                            id="password_confirmation"
+                                            component={this.renderNameInput}
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="row">
-                            <div className="col-sm-6">
-                                <FormGroup for="subsidiary_id">
-                                    <label>Filial</label>
-                                    <Select
-                                        name="subsidiary_id"
-                                        id="subsidiary_id"
-                                        disabled={this.state.viewMode}
-                                        value={this.state.subsidiary_id}
-                                        onChange={this.handleChangeSubsidiary}
-                                        options={subsidiaries}
-                                        placeholder="Selecione..."
-                                    />
-                                </FormGroup>
-                            </div>
-                            <div className="col-sm-6">
-                                <FormGroup for="sector_id">
-                                    <label>Setor</label>
-                                    <Select
-                                        name="sector_id"
-                                        id="sector_id"
-                                        disabled={this.state.viewMode}
-                                        value={this.state.sector_id}
-                                        onChange={this.handleChangeSector}
-                                        options={sectors}
-                                        placeholder="Selecione..."
-                                    />
-                                {this.state.valid_sector == false &&
-                                    <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
-                                }
-                                </FormGroup>
+                            <div className="">
+                                <div className="form-group">
+                                    <label>
+                                        Tipo de Usuário <span className="text-danger"><strong>*</strong></span>
+                                    </label>
 
-                            </div>
-                        </div>
+                                        <Field
+                                            name="role_id"
+                                            options={roles}
+                                            placeholder="Selecione..."
+                                            onChangeFunction={this.handleChangeRole}
+                                            valueOption={role_id}
+                                            component={this.renderSelectInput}
+                                        />
 
-                        <div className="row">
-                            <div className="col-sm-6">
-                                <FormGroup for="password">
-                                    <FormControlLabel htmlFor="password">
-                                        Senha 
-                                        {!this.props.match.params.id &&
-                                        <span className="text-danger"><strong>*</strong></span>
-                                        }
-                                    </FormControlLabel>
-                                    <FormControlInput type="password" id="password" name="password"
-                                        readOnly={this.state.viewMode}
-                                        value={this.state.password} onChange={this.handleChange}
-                                        required={this.props.match.params.id?'':'required'} />
-                                    <FieldFeedbacks for="password">
-                                        {validationPassword}
-                                        <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                    </FieldFeedbacks>
-                                </FormGroup>
-                            </div>
-                            <div className="col-sm-6">
-                                <FormGroup for="password_confirmation">
-                                    <FormControlLabel htmlFor="password_confirmation">
-                                        Confirmação de Senha 
-                                        {!this.props.match.params.id &&
-                                        <span className="text-danger"><strong>*</strong></span>
-                                        }
-                                    </FormControlLabel>
-                                    <FormControlInput type="password" id="password_confirmation" name="password_confirmation"
-                                        readOnly={this.state.viewMode}
-                                        value={this.state.password_confirmation} onChange={this.handleChange}
-                                        required={this.props.match.params.id?'':'required'} /> 
-                                    <FieldFeedbacks for="password_confirmation">
-                                        {validationPassword}
-                                        <FieldFeedback when={value => value !== this.state.password && this.state.password != ""}>Senhas não conferem</FieldFeedback>
-                                    </FieldFeedbacks>
-                                </FormGroup>
-                            </div>
-                        </div>
+                                </div>
+                            </div> 
 
-                        <div className="">
-                            <FormGroup for="role_id">
-                                <label>
-                                    Tipo de Usuário
-                                    <span className="text-danger"><strong>*</strong></span>
-                                </label>
-                                <select className="form-control" onChange={this.handleChange} disabled={this.state.viewMode}
-                                    id="role_id" name="role_id" value={this.state.role_id}>
-                                    <option key="0" value="0" >Selecione um valor</option>
-                                    {
-                                        this.state.roles.map(data => {
-                                            const checked = data.id == this.state.role_id ? "checked" : "";
-                                            return (
-                                                <option key={data.id} value={data.id}>
-                                                    {data.name}
-                                                </option>
-                                            )
-                                        })
-                                    }
-                                </select>
-                                <FieldFeedbacks for="role_id">
-                                    <FieldFeedback when={value => value == 0}>Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
-                            </FormGroup>
-                        </div>  
+                            <div className="">
+                                {this.showSuperior()}
+                            </div> 
 
-                        <div className="">
-                            {this.showSuperior()}
-                        </div> 
+                            {statusField}
 
-                        {statusField}     
+                            <button action="submit" className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
+                            <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
 
-                        <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
-                        <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
-                    </FormWithConstraints>
-                    
+                        </form>
+                    </div>
+
+
                 </CardBody>
             </Card>
         )
     }
 }
 
-export default UserForm;
+let InitializeFromStateForm = reduxForm({
+    form: 'InitializeFromState',
+    enableReinitialize: true,
+    validate,
+})(UserForm)
+
+InitializeFromStateForm = connect(
+    state => ({
+        userCurrent: state.userCurrent,
+        user: state.user,
+        initialValues: state.user.userSearch
+    }),
+    { userLoad, userUpdate, userCreate, roleListFlow, changeRoleFlow, getSubsidiariesFlow, changeSubsidiaryFlow, changeSectorFlow, 
+        changeStatusFlow, searchByNameFlow, userUpdateWithSuperior, unloadUser
+    }
+)(InitializeFromStateForm)
+
+
+export default InitializeFromStateForm

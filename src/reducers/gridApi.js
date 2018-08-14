@@ -110,7 +110,7 @@ const reducer = function gridApiReducer (state = initialState, action) {
         case SET_TABLE_INFO:
             const tableInfo = action.tableInfo;
 
-            if (state.filtered.length > 0 && tableInfo.sorted.length > 0) {
+            if (state.filtered.length > 0 && (tableInfo.sorted.length > 0 || tableInfo.page >= 0)) {
                 tableInfo.filtered = state.filtered;
             }
             

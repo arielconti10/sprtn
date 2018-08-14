@@ -9,6 +9,7 @@ import DropdownSaga from './sagas/dropdown'
 import MarketshareSaga from './sagas/marketshare';
 import UserSchoolSaga from './sagas/userSchool';
 import GridApiSaga from './sagas/gridApi';
+import UserSaga from './sagas/user';
 
 export default function* IndexSaga () {
   yield [
@@ -22,6 +23,7 @@ export default function* IndexSaga () {
     LocalizationSaga(),
     SetorSaga(),
     SchoolTypesSaga(),
+    UserSaga()
 
   ]
 }
