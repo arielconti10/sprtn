@@ -15,6 +15,7 @@ import levels from './reducers/level'
 import disciplines from './reducers/discipline'
 import congregations from './reducers/congregation'
 import subsidiarys from './reducers/subsidiary'
+import job_titles from './reducers/job_title'
 import schoolTypes from './reducers/schoolTypes'
 import gridApi from './reducers/gridApi'
 
@@ -36,6 +37,7 @@ const IndexReducer = combineReducers({
   levels,
   disciplines,
   congregations,
+  job_titles,
   schoolTypes,
 })
 

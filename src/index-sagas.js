@@ -13,6 +13,7 @@ import SubsidiarySaga from './sagas/subsidiary'
 import SchoolTypesSaga from './sagas/schoolTypes'
 import DropdownSaga from './sagas/dropdown'
 import MarketshareSaga from './sagas/marketshare';
+import JobTitleSaga from './sagas/job_title';
 import UserSchoolSaga from './sagas/userSchool';
 import GridApiSaga from './sagas/gridApi';
 
@@ -34,6 +35,6 @@ export default function* IndexSaga () {
     CongregationSaga(),
     SubsidiarySaga(),
     SchoolTypesSaga(),
-
+    JobTitleSaga(),
   ]
 }
