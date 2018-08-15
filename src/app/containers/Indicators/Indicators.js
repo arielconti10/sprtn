@@ -24,7 +24,7 @@ class Indicators extends Component {
             access_token: PropTypes.string.isRequired,
         }),
         indicators: PropTypes.shape({
-            contributors: PropTypes.array,
+            contributors: PropTypes.object,
             schools: PropTypes.array,
         }),
         indicatorsRequest: PropTypes.func.isRequired,
@@ -576,19 +576,22 @@ class Indicators extends Component {
         const select_array = [];
         const general_object = {value: "", label: "TODOS"};
 
-        dados.map(item => {
-            const label = `${item.username} - ${item.full_name}`;
-            const item_object = {"value": item.id, "label": label};
-            select_array.push(item_object);
-        });
+        if (dados.length) {
+            dados.map(item => {
+                const label = `${item.username} - ${item.full_name}`;
+                const item_object = {"value": item.id, "label": label};
+                select_array.push(item_object);
+            });
+    
+            select_array.sort(function (a, b) {
+                if(a.label < b.label) return -1;
+                if(a.label > b.label) return 1;
+                return 0;
+            });
+    
+            select_array.unshift(general_object);
+        }
 
-        select_array.sort(function (a, b) {
-            if(a.label < b.label) return -1;
-            if(a.label > b.label) return 1;
-            return 0;
-        });
-
-        select_array.unshift(general_object);
 
         return select_array;
     }
