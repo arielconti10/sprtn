@@ -453,7 +453,7 @@ function* userSchoolWatcher() {
     takeLatest("LOAD_USER_SCHOOL", loadUserSchool),
     takeLatest("CHANGE_USER_FLOW", changeUserFlow),
     takeLatest("CHANGE_SUBSIDIARY_FLOW", changeSubsidiaryFlow),
-    takeLatest("CHANGE_SECTOR_FLOW", changeSectorFlow),
+    takeLatest("CHANGE_SECTOR_SCHOOL_FLOW", changeSectorFlow),
     takeLatest("CHANGE_SCHOOL_TYPE", changeSchoolType),
     takeLatest("SELECT_OPTION_FLOW", selectOptionFlow),
     takeLatest("SELECT_WALLET_OPTION", selectWalletOption),
