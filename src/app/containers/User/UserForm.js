@@ -278,11 +278,11 @@ class UserForm extends Component {
     showSuperior() {
         const { superiors, userSearch } = this.props.user;
         
-        let { superior_name } = userSearch;
+        // let { superior_name } = userSearch;
 
         const user_id = this.props.match.params.id;
 
-        if (user_id && userSearch && !superior_name) {
+        if (user_id && userSearch && !userSearch.superior_name) {
             return (
                 <div className="form-group">
                     <label>Superior</label>

@@ -14,7 +14,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import { getSchoolAndVisitValues } from './ToggleTable'; 
 import { loadColumnsFlow, onFetchDataFlow, onDeleteDataFlow, onActiveDataFlow, toggleDropdownFlow, 
-    selectColumnsFlow, selectAllFlow, loadFilterFlow, selectOptionFlow
+    selectColumnsFlow, selectAllFlow, loadFilterFlow, selectOptionFlow, setTableInfo
 } from '../../actions/gridApi';
 
 class GridApi extends Component {
@@ -29,6 +29,7 @@ class GridApi extends Component {
         selectAllFlow: PropTypes.func, 
         loadFilterFlow: PropTypes.func,
         selectOptionFlow: PropTypes.func,
+        setTableInfo: PropTypes.func,
         gridApi: PropTypes.shape({
             columnsGrid: PropTypes.array,
             data: PropTypes.array,
@@ -76,6 +77,7 @@ class GridApi extends Component {
         }
 
         this.props.loadColumnsFlow(columns, hideButtons, urlLink, apiSpartan, tableInfo);
+        this.props.setTableInfo(tableInfo);
     }
 
     onChangeTextFilter(filter, accessor) {
@@ -84,7 +86,7 @@ class GridApi extends Component {
         const tableInfo = gridApi.tableInfo;
         const new_object = {id: accessor, value: filter};
 
-        this.props.loadFilterFlow(new_object, filtered, tableInfo);
+        this.props.loadFilterFlow(new_object, filtered, tableInfo, gridApi.apiFiltered);
     }
 
     toggle() {
@@ -191,6 +193,8 @@ class GridApi extends Component {
                                         }
                     
                                         updateData.active = true;
+
+                                        console.log(updateData);
                     
                                         // //específico para API de regras
                                         // if (this.props.apiSpartan == "rule") {
@@ -228,7 +232,7 @@ class GridApi extends Component {
 
     render() {        
         const { columnsGrid, data, pages ,pageSize, dropdownOpen, columnsSelected, selectAll, loading, 
-            dataAlternative, tableInfo, filtered 
+            dataAlternative, tableInfo, filtered, apiFiltered 
         } = this.props.gridApi;
         const { apiSpartan, defaultOrder } = this.props;
 
@@ -304,6 +308,7 @@ class GridApi extends Component {
                     manual
                     onFetchData={this.props.onFetchDataFlow}
                     data_api={apiSpartan}
+                    api_filtered={apiFiltered}
                     defaultOrder={defaultOrder}
                     customFiltered={filtered}
                     onExpandedChange={(expanded, index, event) => {
@@ -337,7 +342,8 @@ const functions_object = {
     selectColumnsFlow,
     selectAllFlow,
     loadFilterFlow,
-    selectOptionFlow
+    selectOptionFlow,
+    setTableInfo
 }
 
 export default connect(mapStateToProps, functions_object )(GridApi);

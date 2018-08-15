@@ -114,12 +114,13 @@ export function setLoader(loading) {
     }
 }
 
-export function loadFilterFlow(filter, filtered, tableInfo) {
+export function loadFilterFlow(filter, filtered, tableInfo, apiFiltered) {
     return {
         type: LOAD_FILTER_FLOW,
         filter,
         filtered,
-        tableInfo
+        tableInfo,
+        apiFiltered
     }
 }
 
@@ -130,10 +131,11 @@ export function setTableInfo(tableInfo) {
     }
 }
 
-export function setFilters(filtered) {
+export function setFilters(filtered, apiFiltered) {
     return {
         type: SET_FILTERS,
-        filtered
+        filtered,
+        apiFiltered
     }
 }
 

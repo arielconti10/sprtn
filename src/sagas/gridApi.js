@@ -367,10 +367,18 @@ function searchData(baseURL) {
  * @param {Array} filtered lista com parâmetros utilizados na busca
  * @param {Object} filter novo filtro utilizado
  */
-function concatFilter(filtered, filter) {
-    let concat_filter = filtered.filter(item => item.id !== filter.id);
-    if (filter.value !== "") {
-        concat_filter = concat_filter.concat(filter);
+function concatFilter(filtered, filter, sameApi) {
+    let concat_filter = [];
+
+    if (!sameApi) {
+        filtered = [];
+    }
+
+    if (filter.hasOwnProperty('id')) {
+        concat_filter = filtered.filter(item => item.id !== filter.id);
+        if (filter.value !== "") {
+            concat_filter = concat_filter.concat(filter);
+        }
     }
 
     return concat_filter;
@@ -395,6 +403,7 @@ function* loadColumnsFlow(action) {
     }
 
     yield put(setColumns(columns_filter));
+    yield put(setFilters([], action.tableInfo))
 }
 
 function* fetchDataFlow(action) {
@@ -404,7 +413,6 @@ function* fetchDataFlow(action) {
     const url_filter = yield call(getUrlSearch, action.table_state);
     const result_data = yield call(searchData, url_filter);
 
-    
     yield put(setCreateTable(result_data));
     yield put(setLoader(false));
 }
@@ -413,6 +421,8 @@ function* deleteDataFlow(action) {
     const deleted = yield call(onClickDelete, action.apiSpartan, action.data.original);
 
     if (deleted) {
+        yield put(setTableInfo(action.table_state));
+
         const url_filter = yield call(getUrlSearch, action.table_state);
         const result_data = yield call(searchData, url_filter);
     
@@ -425,6 +435,8 @@ function* activeDataFlow(action) {
     const actived = yield call(onClickActive, action.apiSpartan, action.data.original);
 
     if (actived) {
+        yield put(setTableInfo(action.table_state));
+
         const url_filter = yield call(getUrlSearch, action.table_state);
         const result_data = yield call(searchData, url_filter);
     
@@ -476,18 +488,23 @@ function* selectAllFlow(action) {
 }
 
 function* loadFilterFlow(action) {
+    yield put(setLoader(true));
     const filtered = action.filtered;
     const filter = action.filter;
     const tableInfo = action.tableInfo;
 
-    let concat_filter = yield call(concatFilter, filtered, filter);
+    const sameApi = tableInfo.data_api === action.apiFiltered || !action.apiFiltered;
+
+    let concat_filter = yield call(concatFilter, filtered, filter, sameApi);
     tableInfo.filtered = concat_filter;
 
     const url_filter = yield call(getUrlSearch, tableInfo);
     const result_data = yield call(searchData, url_filter);
 
-    yield put(setFilters(concat_filter))
+    yield put(setFilters(concat_filter, tableInfo.data_api))
     yield put(setCreateTable(result_data));
+    yield put(setLoader(false));
+
 }
 
 // Our watcher (saga).  It will watch for many things.

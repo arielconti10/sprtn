@@ -110,8 +110,11 @@ const reducer = function gridApiReducer (state = initialState, action) {
         case SET_TABLE_INFO:
             const tableInfo = action.tableInfo;
 
-            if (state.filtered.length > 0 && (tableInfo.sorted.length > 0 || tableInfo.page >= 0)) {
+            if (state.filtered.length > 0 && (tableInfo.sorted.length > 0 || tableInfo.page >= 0)
+                && tableInfo.data_api === tableInfo.api_filtered) {
                 tableInfo.filtered = state.filtered;
+            } else {
+                tableInfo.filtered = [];
             }
             
             return {
@@ -120,9 +123,11 @@ const reducer = function gridApiReducer (state = initialState, action) {
             }
         case SET_FILTERS:
             const filtered = action.filtered;
+            const apiFiltered = action.apiFiltered;
             return {
                 ...state,
-                filtered
+                filtered,
+                apiFiltered
             }
         case SET_DATA_ALTERNATIVE:
             const dataAlternative = action.dataAlternative;
