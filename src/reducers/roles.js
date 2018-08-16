@@ -8,6 +8,7 @@ import {
     ROLE_LOADING,
     ROLE_REQUEST_ERROR,
     ROLE_UPDATE_SUCCESS,
+    UNLOAD_ROLE
   } from '../actionTypes/roles'
   
   const initialState = {
@@ -147,6 +148,12 @@ import {
             time: new Date(),
           }]),
         }
+
+        case UNLOAD_ROLE:
+            state.current_role = {};
+            return {
+                ...state
+            }
   
       default:
         return state

@@ -7,7 +7,7 @@ import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints'
 import { PropTypes } from 'prop-types'
 import { reduxForm, Field } from 'redux-form'
 import { connect } from 'react-redux'
-import { roleCreate, roleUpdate, roleLoad } from '../../../actions/role';
+import { roleCreate, roleUpdate, roleLoad, unloadRole } from '../../../actions/role';
 const apiPost = 'role';
 
 // Our validation function for `name` field.
@@ -36,6 +36,7 @@ class RoleForm extends Component {
         roleUpdate: PropTypes.func.isRequired,
         roleCreate: PropTypes.func.isRequired,
         roleLoad: PropTypes.func.isRequired,
+        unloadRole: PropTypes.func.isRequired,
         reset: PropTypes.func.isRequired,
         initialValues: PropTypes.object
     }
@@ -66,6 +67,7 @@ class RoleForm extends Component {
     componentWillMount() {
         const { roleLoad, user } = this.props
         this.checkPermission('role.insert');
+        this.props.unloadRole();
         if (this.props.match.params.id !== undefined) {
             this.checkPermission('role.update');
             roleLoad(user, this.props.match.params.id)
@@ -254,7 +256,7 @@ InitializeFromStateForm = connect(
         roles: state.roles,
         initialValues: state.roles.current_role
     }),
-    { roleLoad, roleUpdate, roleCreate }
+    { roleLoad, roleUpdate, roleCreate, unloadRole }
 )(InitializeFromStateForm)
 
 
