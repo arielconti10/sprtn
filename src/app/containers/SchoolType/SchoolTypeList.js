@@ -8,8 +8,6 @@ class SchoolTypeList extends Component {
         return (
             <div>
                 <div className="action-button">
-                    <NavLink to={this.props.match.url + "/novo"} exact><Button color='primary' ><i className="fa fa-plus-circle"></i> Adicionar</Button></NavLink>
-
                     <GridApi
                         apiSpartan="school-type"
                         columns={[
