@@ -21,12 +21,44 @@ const selectsValidade = [
     { name: 'sector_array' }
 ];
 
+import { PropTypes } from 'prop-types'
+import { reduxForm, Field } from 'redux-form'
+import { connect } from 'react-redux'
+import { subsidiaryCreate, subsidiaryUpdate, subsidiaryLoad, subsidiaryCurrentClear } from '../../../actions/subsidiary';
+
+const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório')
+
+
 class SubsidiaryForm extends Component {
+    static propTypes = {
+        handleSubmit: PropTypes.func.isRequired,
+        invalid: PropTypes.bool.isRequired,
+        user: PropTypes.shape({
+            username: PropTypes.string.isRequired,
+            access_token: PropTypes.string.isRequired,
+        }),
+        subsidiarys: PropTypes.shape({
+            list: PropTypes.array,
+            requesting: PropTypes.bool,
+            successful: PropTypes.bool,
+            messages: PropTypes.array,
+            errors: PropTypes.array,
+            current_subsidiary: PropTypes.shape({
+                active: PropTypes.bool,
+                name: PropTypes.string,
+                sectors: PropTypes.array,
+            })
+        }).isRequired,
+        subsidiaryUpdate: PropTypes.func.isRequired,
+        subsidiaryCreate: PropTypes.func.isRequired,
+        subsidiaryLoad: PropTypes.func.isRequired,
+        subsidiaryCurrentClear: PropTypes.func.isRequired,
+        reset: PropTypes.func.isRequired,
+        initialValues: PropTypes.object
+    }
     constructor(props) {
         super(props);
         this.state = {
-            code: '',
-            name: '',
             sector_array: [],
             sectors: [],
             active: true,
@@ -37,8 +69,8 @@ class SubsidiaryForm extends Component {
         };
 
         this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.submitForm = this.submitForm.bind(this);
+        // this.handleSubmit = this.handleSubmit.bind(this);
+        // this.submitForm = this.submitForm.bind(this);
         this.handleSelectChange = this.handleSelectChange.bind(this);
         this.findAll = this.findAll.bind(this);
         this.findSectors = this.findSectors.bind(this);
@@ -61,35 +93,49 @@ class SubsidiaryForm extends Component {
     }
 
     findSectors() {
+
+        if(this.props.subsidiarys.current_subsidiary){
+            if (this.props.match.params.id !== undefined) {
+                this.setState({
+                    sector_array: this.props.subsidiarys.current_subsidiary.sectors, //setores selecionados
+                });           
+            }
+
+        }
+    }
+    componentWillMount(){
+        this.props.subsidiarys.current_subsidiary = null;
+        
+    }
+    
+    componentDidMount() {
+        
+        this.checkPermission('subsidiary.insert');
+        const { subsidiaryLoad, user } = this.props
+        
+        this.props.subsidiarys.current_subsidiary = null;
+
         if (this.props.match.params.id !== undefined) {
-            axios.get(`${apiPost}/${this.props.match.params.id}`)
-                .then(response => {
-                    const dados = response.data.data;
-
-                    const sectors = dados.sectors.map(item => item.id);
-                    
-                    this.setState({
-                        code: dados.code,
-                        name: dados.name,
-                        // sectors: dados.sectors,
-                        sector_array: sectors, //setores selecionados
-                        active: dados.deleted_at === null ? true : false
-                    });
-
-                    console.log(this.state.sectors);
-
-                    // console.log(this.state);
-                })
-                .catch(err => console.log(err));
+            this.checkPermission('subsidiary.update')
+            subsidiaryLoad(user, this.props.match.params.id)
+            this.findAll();            
+        } else {
+            this.props.subsidiarys.current_subsidiary = null;       
+            this.findAll();
         }
     }
 
-    componentDidMount() {
+    componentDidUpdate(previousProps, previousState){
         if (this.props.match.params.id !== undefined) {
-            this.findAll();
-            this.findSectors();
+            if(previousProps.subsidiarys.current_subsidiary){
+                if(previousState.sector_array.length == 0){
+                    if(previousState.sector_array != previousProps.subsidiarys.current_subsidiary.sectors){
+                        this.findSectors()
+                    }
+                }
+            }
         } else {
-            this.findAll();
+            console.log(previousProps, previousState)
         }
     }
 
@@ -101,10 +147,21 @@ class SubsidiaryForm extends Component {
         }.bind(this));       
     }
 
-    componentWillMount() {
-        this.checkPermission('subsidiary.insert');
-        this.findSectors();
-    }
+    renderInput = ({ input, type, meta: { touched, error } }) => (
+        <div>
+            <input
+                className="form-control"
+                {...input}
+                type={type}
+            />
+            {touched && error && (
+                <div style={{ color: 'red'}}>
+                    {error}
+                </div>
+            )
+            }
+        </div>
+    )
 
     handleChange(e) {
         const target = e.currentTarget;
@@ -117,81 +174,18 @@ class SubsidiaryForm extends Component {
         });
     }
 
-    submitForm(event) {
-        event.preventDefault();
-        axios.post(`${apiPost}`, {
-            'code': this.state.code,
-            'name': this.state.name,
-            'sectors': this.state.sector_array,
-            'active': this.state.active
-        }).then(res => {
-            this.setState({
-                saved: true
-            })
-        }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error)[0].toString();
-            this.setState({ back_error: data_error[filterId] });
-        }.bind(this));
-    }
-
-    updateForm(event) {
-        event.preventDefault();
-        var id = this.props.match.params.id;
-
-        let data = {
-            'name': this.state.name,
-            'active': this.state.active
+    submit = (subsidiary) => {
+        const { user, subsidiaryCreate, subsidiaryUpdate, reset } = this.props
+        
+        subsidiary.sectors = this.state.sector_array; 
+        if (this.props.match.params.id !== undefined) { 
+            subsidiary.active = this.props.subsidiarys.current_subsidiary.active         
+            subsidiaryUpdate(user, subsidiary)
+        } else {
+            subsidiaryCreate(user, subsidiary)
         }
 
-        axios.put(`${apiPost}/${id}`, {
-            'code': this.state.code,
-            'name': this.state.name,
-            'sectors': this.state.sector_array,
-            'active': this.state.active
-        }).then(res => {
-            this.setState({
-                saved: true
-            })
-        }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error).toString();
-            this.setState({ back_error: data_error[filterId] });
-        })
-    }
-
-    handleSubmit(e) {
-        e.preventDefault();
-
-        this.form.validateFields();
-
-        this.setState({ submitButtonDisabled: !this.form.isValid() });
-
-        // Validate selects
-        let stopSubmit = false;
-        selectsValidade.map(select => {
-            let objState = `valid_select_${select.name}`;
-            let objSelect = this.state[select.name];
-            
-            if (objSelect === undefined || objSelect == 0) {
-                this.setState({ [objState]: 0, submit_button_disabled: true });
-                stopSubmit = true;
-            } else {
-                this.setState({ [objState]: 1 });
-            }
-        });
-
-        if(stopSubmit){
-            return;
-        }  
-
-        if (this.form.isValid()) {
-            if (this.props.match.params.id !== undefined) {
-                this.updateForm(event);
-            } else {
-                this.submitForm(event);
-            }
-        }
+        reset()
     }
 
     handleSelectChange = (selectedOption) => {
@@ -205,6 +199,19 @@ class SubsidiaryForm extends Component {
     }
 
     render() {
+        const {
+            handleSubmit,
+            invalid,
+            subsidiarys: {
+                subsidiary,
+                requesting,
+                successful,
+                messages,
+                errors,
+                current_subsidiary
+            },
+        } = this.props
+        
         let redirect = null;
         if (this.state.saved) {
             redirect = <Redirect to="/cadastro/filiais" />;
@@ -228,8 +235,11 @@ class SubsidiaryForm extends Component {
                     </div>
                 </div>
         }
-
-
+        let current_sector_array
+        if(current_subsidiary){
+           current_sector_array = current_subsidiary.sectors 
+        }
+        
         return (
             <Card>
                 {redirect}
@@ -238,66 +248,53 @@ class SubsidiaryForm extends Component {
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                     }
-                    <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
-                        onSubmit={this.handleSubmit} noValidate>
-                        <Row>
-                            <Col md="6">
-                                <div className="">
-                                    <FormGroup for="code">
-                                        <FormControlLabel htmlFor="code">Código da filial <span className="text-danger"><strong>*</strong></span></FormControlLabel>
-                                        <FormControlInput type="text" id="code" name="code"
-                                            value={this.state.code} onChange={this.handleChange}
-                                            readOnly={this.state.viewMode}
-                                            required />
-                                        <FieldFeedbacks for="code">
-                                            <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                        </FieldFeedbacks>
-                                    </FormGroup>
-                                </div>
-                            </Col>
-                            <Col md="6">
-                                <div className="">
-                                    <FormGroup for="name">
-                                        <FormControlLabel htmlFor="name">Nome da filial <span className="text-danger"><strong>*</strong></span></FormControlLabel>
-                                        <FormControlInput type="text" id="name" name="name"
-                                            value={this.state.name} onChange={this.handleChange}
-                                            readOnly={this.state.viewMode}
-                                            required />
-                                        <FieldFeedbacks for="name">
-                                            <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                        </FieldFeedbacks>
-                                    </FormGroup>
-                                </div>
-                            </Col>
-                        </Row>
-
-                        <Row>
-                            <Col md="12">
-                                <FormGroup for="sector_array">
-                                    <label>Setor (es) <span className="text-danger"><strong>*</strong></span></label>
-                                    <Select
-                                        name="sector_array"
-                                        id="sector_array"
-                                        disabled={this.state.viewMode}
-                                        value={this.state.sector_array}
-                                        labelKey="name"
-                                        valueKey="id"
-                                        multi={true}
-                                        onChange={this.handleSelectChange}
-                                        options={this.state.sectors}
-                                        placeholder="Selecione..."
-                                    />
-                                    {this.state.valid_select_sector_array == 0 &&
-                                        <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
-                                    }
-                                </FormGroup>
-                            </Col>
-                        </Row>
+                    <form onSubmit={handleSubmit(this.submit)}>
+                        <div className="row">
+                            <div className="form-group col-md-6">
+                                <label htmlFor="name">Código da filial</label>
+                                <Field
+                                    name="code"
+                                    id="code"
+                                    component={this.renderInput}
+                                    validate={fieldRequired}
+                                    placeholder="Código da filial"
+                                />
+                            </div>    
+                            <div className="form-group col-md-6">
+                                <label htmlFor="name">Nome do filial</label>
+                                <Field
+                                    name="name"
+                                    id="name"
+                                    component={this.renderInput}
+                                    validate={fieldRequired}
+                                    placeholder="Nome da filial"
+                                />
+                            </div> 
+                        </div>
+                         
+                        <div className="form-group col-md-12">
+                            <label>Setor (es) <span className="text-danger"><strong>*</strong></span></label>
+                            <Select
+                                name="sector_array"
+                                id="sector_array"
+                                disabled={this.state.viewMode}
+                                value={ this.state.sector_array }
+                                labelKey="name"
+                                valueKey="id"
+                                multi={true}
+                                onChange={this.handleSelectChange}
+                                options={this.state.sectors}
+                                placeholder="Selecione..."
+                            />
+                            {this.state.valid_select_sector_array == 0 &&
+                                <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
+                            }
+                        </div>
                         {statusField}
 
                         <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
                         <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
-                    </FormWithConstraints>
+                    </form>
 
                 </CardBody>
             </Card>
@@ -305,4 +302,18 @@ class SubsidiaryForm extends Component {
     }
 }
 
-export default SubsidiaryForm;
+let InitializeFromStateForm = reduxForm({
+    form: 'InitializeFromState',
+    enableReinitialize: true
+})(SubsidiaryForm)
+
+InitializeFromStateForm = connect(
+    state => ({
+        user: state.user,
+        subsidiarys: state.subsidiarys,
+        initialValues: state.subsidiarys.current_subsidiary
+    }),
+    { subsidiaryLoad, subsidiaryUpdate, subsidiaryCreate, subsidiaryCurrentClear }
+)(InitializeFromStateForm)
+
+export default InitializeFromStateForm

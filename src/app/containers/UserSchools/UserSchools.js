@@ -3,8 +3,8 @@ import {Row, Col } from 'reactstrap';
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { loadUserSchool, changeUserFlow, changeSubsidiaryFlow, changeSectorFlow, changeSchoolType,
-    selectOptionFlow, selectWalletOption, selectSchoolFlow, removeWalletOptionFlow
+import { loadUserSchool, changeUserFlow, changeSubsidiarySchoolFlow, changeSectorFlow, changeSchoolType,
+    selectOptionSchoolFlow, selectWalletOption, selectSchoolFlow, removeWalletOptionFlow
 } from '../../../actions/userSchool'
 
 import { FormWithConstraints } from 'react-form-with-constraints';
@@ -33,9 +33,9 @@ class UserSchools extends Component {
     static propTypes = {
         loadUserSchool: PropTypes.func,
         changeUserFlow: PropTypes.func,
-        changeSubsidiaryFlow: PropTypes.func,
+        changeSubsidiarySchoolFlow: PropTypes.func,
         changeSectorFlow: PropTypes.func,
-        selectOptionFlow: PropTypes.func,
+        selectOptionSchoolFlow: PropTypes.func,
         selectWalletOption: PropTypes.func,
         removeWalletOptionFlow: PropTypes.func,
         marketshare: PropTypes.shape({
@@ -77,7 +77,8 @@ class UserSchools extends Component {
     }
 
     handleChangeSubsidiary = (selectedOption) => {
-        this.props.changeSubsidiaryFlow(selectedOption.id, selectedOption.sectors);
+        console.log("change subsdiary flow", selectedOption.id, selectedOption.sectors);
+        this.props.changeSubsidiarySchoolFlow(selectedOption.id, selectedOption.sectors);
     }
 
     handleChangeSector = (selectedOption) => {
@@ -128,7 +129,7 @@ class UserSchools extends Component {
                 }
             }
 
-            this.props.selectOptionFlow(total);
+            this.props.selectOptionSchoolFlow(total);
         }.bind(this));
     }
 
@@ -327,7 +328,7 @@ const mapStateToProps =(state) => ({
 });
 
 const functions_object = {
-    loadUserSchool, changeUserFlow, changeSubsidiaryFlow, changeSectorFlow, changeSchoolType, selectOptionFlow,
+    loadUserSchool, changeUserFlow, changeSubsidiarySchoolFlow, changeSectorFlow, changeSchoolType, selectOptionSchoolFlow,
     selectWalletOption, selectSchoolFlow, removeWalletOptionFlow
 }
 

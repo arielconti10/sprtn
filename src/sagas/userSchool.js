@@ -401,8 +401,10 @@ function* callTransferSchool(user_id, available_schools, schools, schools_wallet
 }
 
 function* changeUserFlow(action) {
+    yield put(updateLoader(true));
     yield put(setUserId(action.user_id));
     yield call(callGetUserSchools,action.user_id);
+    yield put(updateLoader(false));
 }
 
 function* changeSubsidiaryFlow(action) {
@@ -450,10 +452,10 @@ function* userSchoolWatcher() {
   yield [
     takeLatest("LOAD_USER_SCHOOL", loadUserSchool),
     takeLatest("CHANGE_USER_FLOW", changeUserFlow),
-    takeLatest("CHANGE_SUBSIDIARY_FLOW", changeSubsidiaryFlow),
-    takeLatest("CHANGE_SECTOR_FLOW", changeSectorFlow),
+    takeLatest("CHANGE_SUBSIDIARY_SCHOOL_FLOW", changeSubsidiaryFlow),
+    takeLatest("CHANGE_SECTOR_SCHOOL_FLOW", changeSectorFlow),
     takeLatest("CHANGE_SCHOOL_TYPE", changeSchoolType),
-    takeLatest("SELECT_OPTION_FLOW", selectOptionFlow),
+    takeLatest("SELECT_OPTION_SCHOOL_FLOW", selectOptionFlow),
     takeLatest("SELECT_WALLET_OPTION", selectWalletOption),
     takeLatest("SELECT_SCHOOL_FLOW", selectSchoolFlow),
     takeLatest("REMOVE_WALLET_OPTION_FLOW", removeWalletOptionFlow)

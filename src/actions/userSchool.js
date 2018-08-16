@@ -1,7 +1,7 @@
 import { 
-    LOAD_USER_SCHOOL, SET_USERS, SET_MESSAGE_ERROR, CHANGE_USER_FLOW, SET_USER_ID, SET_SUBSIDIARIES, CHANGE_SUBSIDIARY_FLOW,
-    SET_SUBSIDIARY_ID, SET_SECTORS, CHANGE_SECTOR_FLOW, SET_SCHOOL_TYPE, CHANGE_SCHOOL_TYPE, SET_SCHOOL_TYPE_ID,
-    SET_SECTOR_ID, SET_SCHOOLS, UPDATE_LOADER, SELECT_OPTION_FLOW, UPDATE_TOTAL_SELECTED, SET_WALLET_SCHOOLS,
+    LOAD_USER_SCHOOL, SET_USERS, SET_MESSAGE_ERROR, CHANGE_USER_FLOW, SET_USER_ID, SET_SUBSIDIARIES, CHANGE_SUBSIDIARY_SCHOOL_FLOW,
+    SET_SUBSIDIARY_ID, SET_SECTORS, CHANGE_SECTOR_SCHOOL_FLOW, SET_SCHOOL_TYPE, CHANGE_SCHOOL_TYPE, SET_SCHOOL_TYPE_ID,
+    SET_SECTOR_ID, SET_SCHOOLS, UPDATE_LOADER, SELECT_OPTION_SCHOOL_FLOW, UPDATE_TOTAL_SELECTED, SET_WALLET_SCHOOLS,
     SELECT_WALLET_OPTION, UPDATE_WALLET_SELECTED, SELECT_SCHOOL_FLOW, REMOVE_WALLET_OPTION_FLOW
 } from '../actionTypes/userSchool';
 
@@ -46,9 +46,9 @@ export function setSubsidiaries(subsidiaries) {
     }
 }
 
-export function changeSubsidiaryFlow(subsidiary_id, sectors) {
+export function changeSubsidiarySchoolFlow(subsidiary_id, sectors) {
     return {
-        type: CHANGE_SUBSIDIARY_FLOW,
+        type: CHANGE_SUBSIDIARY_SCHOOL_FLOW,
         subsidiary_id,
         sectors
     }
@@ -70,7 +70,7 @@ export function setSectors(sectors) {
 
 export function changeSectorFlow(sector_id, subsidiary_id, school_type_id, schools, schools_wallet) {
     return {
-        type: CHANGE_SECTOR_FLOW,
+        type: CHANGE_SECTOR_SCHOOL_FLOW,
         sector_id,
         subsidiary_id, 
         school_type_id,
@@ -121,9 +121,9 @@ export function updateLoader(ringLoad) {
     }
 }
 
-export function selectOptionFlow(total_selected_available) {
+export function selectOptionSchoolFlow(total_selected_available) {
     return {
-        type: SELECT_OPTION_FLOW,
+        type: SELECT_OPTION_SCHOOL_FLOW,
         total_selected_available
     }
 
