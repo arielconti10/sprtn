@@ -68,7 +68,6 @@ class JobTitleForm extends Component {
         canUser(permission, this.props.history, "change", function(rules){
             if (rules.length == 0) {
                 this.setState({viewMode:true, submitButtonDisabled: true});
-                console.log(this.state.viewMode);
             }
         }.bind(this));       
     }
@@ -142,7 +141,6 @@ class JobTitleForm extends Component {
 
     submit = (job_title) => {
         const { user, job_titleCreate, job_titleUpdate, reset } = this.props
-        console.log(job_title)
         job_title.job_title_type_id = this.state.job_title_type_id; 
         if (this.props.match.params.id !== undefined) { 
             job_title.active = this.props.job_titles.current_job_title.active         

@@ -272,7 +272,7 @@ class SubsidiaryForm extends Component {
                             </div> 
                         </div>
                          
-                        <div className="form-group col-md-12">
+                        <div className="form-group">
                             <label>Setor (es) <span className="text-danger"><strong>*</strong></span></label>
                             <Select
                                 name="sector_array"
