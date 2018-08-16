@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { NavLink } from 'react-router-dom';
 import { Link, withRouter, Redirect } from 'react-router-dom'
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
@@ -193,14 +194,12 @@ class GridApi extends Component {
                                         }
                     
                                         updateData.active = true;
-
-                                        console.log(updateData);
                     
-                                        // //específico para API de regras
-                                        // if (this.props.apiSpartan == "rule") {
-                                        //     const object = {role_id:1};
-                                        //     updateData.roles.unshift(object);
-                                        // }
+                                        //específico para API de regras
+                                        if (this.props.apiSpartan == "rule") {
+                                            const object = {role_id:1};
+                                            updateData.roles.unshift(object);
+                                        }
 
                                         this.props.selectOptionFlow(updateData, apiSpartan, id, tableInfo);
                     
@@ -247,6 +246,12 @@ class GridApi extends Component {
 
             <div>
                 <div className="section-dropdown">
+                    {!this.props.hideButtons 
+                        && <NavLink to={this.props.urlLink + "/novo"} exact>
+                            <Button color='primary' ><i className="fa fa-plus-circle"></i> Adicionar</Button>
+                        </NavLink>
+                    }
+                    
                     <ButtonDropdown isOpen={dropdownOpen} 
                         toggle={this.toggle} 
                         className="dropdown-column"

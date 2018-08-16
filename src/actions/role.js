@@ -10,6 +10,7 @@ import {
     ROLE_REQUESTING,
     ROLE_REQUEST_SUCCESS,
     ROLE_REQUEST_ERROR,
+    UNLOAD_ROLE
   } from '../actionTypes/roles'
   
   export const roleCreate = function roleCreate (user, role) {
@@ -91,4 +92,10 @@ import {
       error,
     }
   }
+
+  export function unloadRole() {
+    return {
+        type: UNLOAD_ROLE
+    }
+}
   

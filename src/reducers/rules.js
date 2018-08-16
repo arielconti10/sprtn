@@ -8,6 +8,7 @@ import {
     RULE_LOADING,
     RULE_REQUEST_ERROR,
     RULE_UPDATE_SUCCESS,
+    UNLOAD_RULE
   } from '../actionTypes/rules'
   
   const initialState = {
@@ -147,6 +148,13 @@ import {
             body: action.error.toString(),
             time: new Date(),
           }]),
+        }
+
+      case UNLOAD_RULE:
+        state.current_rule = {};
+        
+        return {
+            ...state
         }
   
       default:

@@ -25,6 +25,7 @@
     "file-loader": "1.1.6",
     "html-loader": "0.5.5",
     "html-webpack-plugin": "2.30.1",
+    "jest": "^23.5.0",
     "namor": "^1.0.1",
     "gulp-sass": "^3.1.0",
     "react-form-with-constraints": "^0.7.0",
@@ -90,7 +91,8 @@
     "build": "webpack -p --progress --env.prod",
     "build_staging": "webpack -p --progress --env.staging",
     "clean": "rimraf ./build",
-    "clear:babel-cache": "rimraf -rf ./node_modules/.cache/babel-loader/*"
+    "clear:babel-cache": "rimraf -rf ./node_modules/.cache/babel-loader/*",
+    "test": "jest"
   },
   "engines": {
     "node": ">= 8.9.4",
