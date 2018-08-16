@@ -10,6 +10,7 @@ import {
     RULE_REQUESTING,
     RULE_REQUEST_SUCCESS,
     RULE_REQUEST_ERROR,
+    UNLOAD_RULE
   } from '../actionTypes/rules'
   
   export const ruleCreate = function ruleCreate (user, rule) {
@@ -90,5 +91,11 @@ import {
       type: RULE_REQUEST_ERROR,
       error,
     }
+  }
+
+  export function unloadRule() {
+      return {
+          type: UNLOAD_RULE
+      }
   }
   

@@ -14,7 +14,7 @@ import { canUser } from '../../common/Permissions';
 import { PropTypes } from 'prop-types'
 import { reduxForm, Field } from 'redux-form'
 import { connect } from 'react-redux'
-import { ruleCreate, ruleUpdate, ruleLoad, ruleCurrentClear } from '../../../actions/rule';
+import { ruleCreate, ruleUpdate, ruleLoad, unloadRule } from '../../../actions/rule';
 
 const apiPost = 'rule';
 const apis = [
@@ -45,6 +45,7 @@ class RuleForm extends Component {
         ruleUpdate: PropTypes.func.isRequired,
         ruleCreate: PropTypes.func.isRequired,
         ruleLoad: PropTypes.func.isRequired,
+        unloadRule: PropTypes.func.isRequired,
         reset: PropTypes.func.isRequired,
         initialValues: PropTypes.object
     }
@@ -100,7 +101,6 @@ class RuleForm extends Component {
     findRoles() {
 
         if(this.props.rules.current_rule){
-            console.log(this.props.rules.current_rule);
             if (this.props.match.params.id !== undefined) {
                 this.setState({
                     role_array: this.props.rules.current_rule.roles, //regras selecionadas
@@ -121,6 +121,7 @@ class RuleForm extends Component {
     componentWillMount() {
         const { ruleLoad, user } = this.props
         this.checkPermission('rule.insert');
+        this.props.unloadRule();
         if (this.props.match.params.id !== undefined) {
             this.checkPermission('rule.update');
             ruleLoad(user, this.props.match.params.id)
@@ -359,7 +360,7 @@ InitializeFromStateForm = connect(
         rules: state.rules,
         initialValues: state.rules.current_rule
     }),
-    { ruleLoad, ruleUpdate, ruleCreate }
+    { ruleLoad, ruleUpdate, ruleCreate, unloadRule }
 )(InitializeFromStateForm)
 
 

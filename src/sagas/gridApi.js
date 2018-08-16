@@ -497,6 +497,7 @@ function* loadFilterFlow(action) {
 
     let concat_filter = yield call(concatFilter, filtered, filter, sameApi);
     tableInfo.filtered = concat_filter;
+    tableInfo.sorted = [{id: filter.id, desc: false}];
 
     const url_filter = yield call(getUrlSearch, tableInfo);
     const result_data = yield call(searchData, url_filter);
