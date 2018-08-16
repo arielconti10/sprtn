@@ -1,5 +1,6 @@
 import {
   LOGIN_REQUESTING,
+  UPDATE_LOADER_LOGIN
 } from '../actionTypes/login'
 
 // In order to perform an action of type LOGIN_REQUESTING
@@ -10,6 +11,13 @@ const loginRequest = function loginRequest ({ username, password }) {
     username,
     password,
   }
+}
+
+export function updateLoader(ringLoad) {
+    return {
+        type: UPDATE_LOADER_LOGIN,
+        ringLoad
+    }
 }
 
 // Since it's the only one here

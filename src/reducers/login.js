@@ -2,6 +2,7 @@ import {
   LOGIN_REQUESTING,
   LOGIN_SUCCESS,
   LOGIN_ERROR,
+  UPDATE_LOADER_LOGIN
 } from '../actionTypes/login'
 
 const initialState = {
@@ -43,6 +44,13 @@ const reducer = function loginReducer (state = initialState, action) {
         messages: [],
         requesting: false,
         successful: false,
+      }
+
+    case UPDATE_LOADER_LOGIN:
+      const ringLoad = action.ringLoad;
+      return {
+          ...state,
+          ringLoad
       }
 
     default:

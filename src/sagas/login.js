@@ -19,7 +19,8 @@ import {
   setUser,
   setUserPicture,
   unsetUser,
-  permissionsRequest
+  permissionsRequest,
+  updateLoader
 } from '../actions/user'
 
 import { USER_UNSET } from '../actionTypes/user';
@@ -149,7 +150,6 @@ function* loginFlow(username, password) {
   let rules
   let nav_itens
   try {
-
     // try to call to our loginApi() function.  Redux Saga
     // will pause here until we either are successful or
     // receive an error

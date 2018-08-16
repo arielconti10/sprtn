@@ -29,7 +29,10 @@ class Login extends Component {
   // Remember, Redux Form passes the form values to our handler
   // In this case it will be an object with `username` and `password`
   submit = (values) => {
+    const { reset } = this.props
+
     this.props.loginRequest(values)
+    reset()
   }
 
   render() {
@@ -45,14 +48,24 @@ class Login extends Component {
 
     return (
       <div id="login-body">
+        {this.props.login && this.props.login.requesting && 
+            <div className="loader-marketshare">
+                <div className="backLoading">
+                    <div className="load"><img src="https://www.ipswitch.com/library/img/loading.gif" /></div>
+                </div>
+            </div>
+        }
+
         <div>
           <section className="login-form">
             <h1>
               <img src="./img/logo.png" // place your logo here
                 alt="Spartan" className="main-logo" />
             </h1>
+            {this.props.login && this.props.login.errors.length > 0 && 
+                <p className="alert alert-danger"> Usuário ou senha incorretos</p>
+            }
             <form className="widget-form" onSubmit={handleSubmit(this.submit)}>
-              <h1>LOGIN</h1>
               <div className="row">
                 <InputCustomize
                   className="form-control"
