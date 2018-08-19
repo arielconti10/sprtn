@@ -51,7 +51,6 @@ import {
   }
 
   export const schoolTypeLoadSuccess = function schoolTypeLoadSuccess(schoolType){
-    console.log(schoolType)
       return {
           type: SCHOOL_TYPES_LOAD_SUCCESS,
           schoolType
@@ -72,10 +71,10 @@ import {
     }
   }
   
-  export const schoolTypeRequest = function schoolTypeRequest (client) {
+  export const schoolTypeRequest = function schoolTypeRequest (user) {
     return {
       type: SCHOOL_TYPES_REQUESTING,
-      client,
+      user,
     }
   }
   

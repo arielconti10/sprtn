@@ -6,22 +6,36 @@ import {
 } from '../actionTypes/indicators'
 
 
-export const indicatorsRequest = function indicatorsRequest (client) {
+export const indicatorsRequest = function indicatorsRequest (user) {
   return {
     type: INDICATORS_REQUESTING,
-    client,
+    user,
   }
 }
 
-export const indicatorsRequestSuccess = function indicatorsRequestSuccess (indicators, schools) {
+export const indicatorsRequestSuccess = function indicatorsRequestSuccess (
+    indicators, 
+    schools, 
+    schoolTypes, 
+    studentTypes,
+    contacts,
+    actions,
+    coverage,
+){
   return {
     type: INDICATORS_REQUEST_SUCCESS,
     indicators,
-    schools
+    schools, 
+    schoolTypes,
+    studentTypes,
+    contacts,
+    actions,
+    coverage,
   }
 }
 
 export const indicatorsRequestError = function indicatorsRequestError (error) {
+  console.log(error)  
   return {
     type: INDICATORS_REQUEST_ERROR,
     error,
