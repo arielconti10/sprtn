@@ -4,12 +4,14 @@ import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem,
     FormGroup, Label, Input } from 'reactstrap';
 import { verifySelectChecked, createTable } from '../../common/ToggleTable'; 
 import GridApi from '../../common/GridApi';
+import '../../common/ToggleIcon.css'
+
 import { canUser } from '../../common/Permissions';
 
 class ActionList extends Component {
     render() {
         return (
-            <div>
+            <div className="table-without-expand">
                 <div className="action-button">
                     <GridApi
                         apiSpartan="action"

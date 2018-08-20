@@ -18,22 +18,25 @@ const gridUrl = `${process.env.API_URL}`;
  * @param {Array} columns lista com as colunas
  * @return {Array} status_column lista incluindo a coluna de status
  */
-function buildStatusColumn(columns) {
+function buildStatusColumn(columns, hideButtons) {
     let status_column = columns;
-    status_column.unshift({
-        Header: "Status",
-        accessor: "",
-        width: 100,
-        headerClassName: 'text-left',
+    if (!hideButtons) {
+        status_column.unshift({
+            Header: "Status",
+            accessor: "",
+            width: 100,
+            headerClassName: 'text-left',
+    
+            sortable: false,
+            Cell: (element) => (
+                !element.value.deleted_at ?
+                    <div><span className="alert-success grid-record-status">Ativo</span></div>
+                    :
+                    <div><span className="alert-danger grid-record-status">Inativo</span></div>
+            )
+        });
+    }
 
-        sortable: false,
-        Cell: (element) => (
-            !element.value.deleted_at ?
-                <div><span className="alert-success grid-record-status">Ativo</span></div>
-                :
-                <div><span className="alert-danger grid-record-status">Inativo</span></div>
-        )
-    });
 
     return status_column;
 }
@@ -233,7 +236,7 @@ function* buildColumns(columns, hideButtons, urlLink, apiSpartan) {
 
     yield put(setDataAlternative(finalAltColumn));
 
-    let status_column = buildStatusColumn(newColumns);
+    let status_column = buildStatusColumn(newColumns, hideButtons);
     let actions_column = yield call(buildActionColumn, status_column, hideButtons, urlLink, apiSpartan);
 
     return newColumns;
@@ -321,7 +324,7 @@ function getUrlSearch(action) {
         for (let i = 0; i < sorted.length; i++) {
             let order_by = sorted[i]['id'];
 
-            if (order_by !== "full_name") {
+            if (order_by !== "full_name" && order_by !== "school_type.name") {
                 baseURL += "&order[" + order_by + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
             } else {
                 baseURL += "&order[name]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
@@ -497,7 +500,13 @@ function* loadFilterFlow(action) {
 
     let concat_filter = yield call(concatFilter, filtered, filter, sameApi);
     tableInfo.filtered = concat_filter;
-    tableInfo.sorted = [{id: filter.id, desc: false}];
+
+    let compostSearch = action.filter.id.indexOf(".");
+
+    if (compostSearch === -1 && action.filter.id !== "status") {
+        tableInfo.sorted = [{id: filter.id, desc: false}];
+    }
+    
 
     const url_filter = yield call(getUrlSearch, tableInfo);
     const result_data = yield call(searchData, url_filter);
