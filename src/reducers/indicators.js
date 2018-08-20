@@ -7,6 +7,11 @@ import {
 const initialState = {
   contributors: {},
   schools: [],
+  contacts: null,
+  actions: null,
+  coverage: [],
+  schoolTypes: [],
+  studentTypes: [],
   requesting: false,
   successful: false,
   messages: [],
@@ -28,10 +33,16 @@ const reducer = function contributorsReducer(state = initialState, action) {
       }
 
     case INDICATORS_REQUEST_SUCCESS:
+    //   console.log(action.studentTypes)
       return {
         ...state,
         contributors: action.indicators.data, // replace with fresh list
         schools: action.schools,
+        schoolTypes: action.schoolTypes.data,
+        studentTypes: action.studentTypes.data.total,
+        contacts: action.contacts.data.total,
+        actions: action.actions.data,
+        coverage: action.coverage.data,
         requesting: false,
         successful: true,
         messages: [{
@@ -42,6 +53,7 @@ const reducer = function contributorsReducer(state = initialState, action) {
       }
 
     case INDICATORS_REQUEST_ERROR:
+      console.log(action)
       return {
         requesting: false,
         successful: false,
