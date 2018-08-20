@@ -9,8 +9,6 @@ import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem,
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-// import './GridApi.css'
-
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import { getSchoolAndVisitValues } from './ToggleTable'; 
@@ -60,7 +58,7 @@ class GridApi extends Component {
         const columnsAlt = this.props.columnsAlt;
 
         columns.map(item => {
-            item.filterable === true?
+            item.filterable === true && !item.customFilter?
             item.Filter = ({ filter, onChange }) => (
                 <input type="text" value={filter} style={{width:  "100%"}} 
                     onBlur={event => this.onChangeTextFilter(event.target.value, item.accessor)}
@@ -293,17 +291,45 @@ class GridApi extends Component {
                 <br />
                 <ReactTable
                     getTdProps={(state, rowInfo, column, instance) => {
-                        return {
-                            onClick: e => {
-                                if (!rowInfo.original.deleted_at && (e.target.className === "fa fa-ban" || e.target.tagName === "BUTTON")) {
-                                    this.props.onDeleteDataFlow(apiSpartan, rowInfo, state);
-                                }
-
-                                if (rowInfo.original.deleted_at && (e.target.className === "fa fa-check-circle" || e.target.tagName === "BUTTON")) {
-                                    this.props.onActiveDataFlow(apiSpartan, rowInfo, state);
+                        if (column.Header) {
+                            return {
+                                onClick: e => {
+    
+                                    if (!rowInfo.original.deleted_at && (e.target.className === "fa fa-ban" || e.target.tagName === "BUTTON")) {
+                                        this.props.onDeleteDataFlow(apiSpartan, rowInfo, state);
+                                    }
+    
+                                    if (rowInfo.original.deleted_at && (e.target.className === "fa fa-check-circle" || e.target.tagName === "BUTTON")) {
+                                        this.props.onActiveDataFlow(apiSpartan, rowInfo, state);
+                                    }
+    
                                 }
                             }
+                        } else {
+                            return {}
                         }
+
+                    }}
+                    SubComponent={row => {
+
+                        let school = row.original;
+
+                        return (
+                            <div style={{ padding: "20px" }}>
+                                <b style={{ marginLeft: '20px' }}>Endereço:</b> {school.address}
+                                <b style={{ marginLeft: '20px' }}>Bairro:</b> {school.neighborhood}
+                                <b style={{ marginLeft: '20px' }}>Cidade:</b> {school.city}
+                                <b style={{ marginLeft: '20px' }}>UF:</b> {school.state.abbrev}
+                                <b style={{ marginLeft: '20px' }}>CEP:</b> {school.zip_code} <br />
+                                <b style={{ marginLeft: '20px' }}>TOTVS:</b> {school.school_code_totvs}
+                                <b style={{ marginLeft: '20px' }}>Tipo:</b> {school.school_type.name}
+                                <b style={{ marginLeft: '20px' }}>Localização:</b> {school.localization_type ? school.localization_type.name : school.localization_type_id ? school.localization_type_id + ' Desativado' : 'Não há registro'}
+                                {/* <b style={{ marginLeft: '20px' }}>Alunos:</b> {school.total_students || 0} */}
+                                <b style={{ marginLeft: '20px' }}>Contatos:</b> {school.contacts.length}
+                                <b style={{ marginLeft: '20px' }}>Telefone:</b> {school.phone}
+                                <b style={{ marginLeft: '20px' }}>E-mail:</b> {school.email}
+                            </div>
+                        );
                     }}
                     columns={final_grid}
                     data={data}
