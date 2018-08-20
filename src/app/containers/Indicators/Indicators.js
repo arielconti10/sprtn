@@ -9,12 +9,34 @@ import PieChartComponent from './PieChartComponent';
 import { Async } from 'react-select';
 import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 
+import { connect } from 'react-redux'
+import { indicatorsRequest } from '../../../actions/indicators';
+import { PropTypes } from 'prop-types';
+
 import Select from 'react-select';
 
 class Indicators extends Component {
+    static propTypes = { 
+        indicatorsRequest: PropTypes.func,
+        indicators: PropTypes.shape({
+            contributors: PropTypes.array,
+            schoolTypes: PropTypes.array,
+            studentTypes: PropTypes.array,
+            contacts: PropTypes.number,
+            actions: PropTypes.number,
+            coverage: PropTypes.array
+        }),
+        user: PropTypes.shape({
+            username: PropTypes.string,
+            access_token: PropTypes.string
+        })
+    }
+
     constructor(props) {
         super(props);
+        const { indicatorsRequest, user } = this.props;
 
+        indicatorsRequest(user)
         this.state = {
             active_tab: 'chart_actions',
             total_schools: '00',
@@ -57,9 +79,7 @@ class Indicators extends Component {
         this.getActionsRealized = this.getActionsRealized.bind(this);
     }
 
-    //o "callback hell" será aprimorado após estudo de promises
-    //foi utilizado por ser assíncrono, e se chamado de modo síncrono, nāo produz os valores desejados
-    componentDidMount() {
+    componentWillMount(){
         this.setState( { ring_load : true });
 
         this.setState({school_type_id: [
@@ -67,23 +87,22 @@ class Indicators extends Component {
             { "value": "PUBLICO", "label": "Público" },
             { "value": "SECRETARIA", "label": "Secretaria" }
         ]});
+        this.setState({"total_contacts": this.props.indicators.contacts})     
+        this.setState({"total_action": this.props.indicators.actions}) 
 
-        let url_contact = "indicator/school/contact";
-        url_contact = this.getUrlSearch(url_contact);
-
-        this.requestTotal(url_contact, "total_contacts", function () {
-            this.requestTotal("indicator/action/total", "total_action", function () { 
-                this.getCoverage();
-            });
-        });
-
-        this.getActionsRealized();
         this.getSchoolTypes();
+    }
+    
+    //o "callback hell" será aprimorado após estudo de promises
+    //foi utilizado por ser assíncrono, e se chamado de modo síncrono, nāo produz os valores desejados
+    componentDidMount() {        
+        
+        this.getCoverage();
+        this.getActionsRealized();
         this.getStudentTypes();
         this.getActionTypes();
         this.getStudentLevel();    
         
-        // this.setState({ ring_load : false });
     }
 
     toggle(tab) {
@@ -98,44 +117,30 @@ class Indicators extends Component {
      * obtem a cobertura da carteira
      */
     getCoverage() {
-        let baseURL = "indicator/school/coverage";
-        baseURL = this.getUrlSearch(baseURL);
+        const data_coverage = mapPieChart("Tipos de Escola", "school_type", "total", this.props.indicators.coverage);
+        const total = this.groupBySchool(this.props.indicators.schools, data_coverage, "tmp_coverage", 'total_coverage');
+        
+        const total_coverage = this.state.total_coverage;
+        console.log(total, total_coverage)
 
-        axios.get(baseURL)
-            .then(res => {
-                const result = res.data.data;
-                const data_coverage = mapPieChart("Tipos de Escola", "school_type", "total", result);
+        let array_chart = []
 
-                this.groupBySchool(this.state.school_type_id, data_coverage, "tmp_coverage", 'total_coverage');
+        if (total > 0) {
+            const total_schools = this.state.total_schools.replace(/\./g,'');
+            console.log(total_schools)
+            const not_coverage = parseFloat(total_schools) - parseFloat(total);
 
-                const total_coverage = this.state.total_coverage;
+            array_chart = [
+                { "name": "Coberto", "total": parseFloat(total) },
+                { "name": "Nāo Coberto", "total": not_coverage },
+            ];
 
-                if (total_coverage.length > 0) {
-                    const total_schools = this.state.total_schools.replace(/\./g,'');
+        } else {
+            array_chart = [];
+        }
 
-                    const not_coverage = parseFloat(total_schools) - parseFloat(total_coverage);
-
-                    const array_chart = [
-                        { "name": "Coberto", "total": parseFloat(total_coverage) },
-                        { "name": "Nāo Coberto", "total": not_coverage },
-                    ];
-
-                    return array_chart;
-                } else {
-                    const array_chart = [];
-                    return array_chart;
-                }
-            })
-            .then(chart_return => {
-                const data_coverage = mapPieChart("Ações", "name", "total", chart_return);
-                this.setState({ data_coverage } );
-
-                
-            })
-            .catch(error => {
-                const response = error.response;
-                this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
-            })
+        const action_return = mapPieChart("Ações", "name", "total", array_chart);
+        this.setState({ data_coverage } );
     }
 
     /**
@@ -162,48 +167,18 @@ class Indicators extends Component {
      * obtem o total de tipos de escolas, separadas por público, privado e secretaria
      */
     getSchoolTypes() {
-        let baseURL = "indicator/school/type";
-        baseURL = this.getUrlSearch(baseURL);
-
-        axios.get(baseURL)
-            .then(res => {
-                const result = res.data.data;
-                const data_school_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
-
-                return data_school_type;
-            })
-            .then(data_school_type => {
-
-                this.groupBySchool(this.state.school_type_id, data_school_type, "data_school_type", "total_schools", "options_school_type");
-
-                this.getCoverage();
-            })
-            .catch(error => {
-                const response = error.response;
-                this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
-            })
+        const data_school_type = mapPieChart("Tipos de Escola", "school_type", "total", this.props.indicators.schoolTypes);
+        this.groupBySchool(this.props.indicators.schools, data_school_type, "data_school_type", "total_schools", "options_school_type");
+        this.getCoverage();
     }
 
     /**
      * obtem o total de alunos, separadas por tipos de escola: público, privado e secretaria
      */
     getStudentTypes() {
-        let baseURL = "indicator/student/school-type";
-        baseURL = this.getUrlSearch(baseURL);
-
-        axios.get(baseURL)
-            .then(res => {
-                const result = res.data.data.total;
-                const data_student_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
-
-                this.groupBySchool(this.state.school_type_id, data_student_type, "data_student_type", "total_students", "options_student_type");
-
-                this.setState ( { ring_load : false });
-            })
-            .catch(error => {
-                const response = error.response;
-                this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
-            })
+        const data_student_type = mapPieChart("Tipos de Escola", "school_type", "total", this.props.indicators.studentTypes);
+        this.groupBySchool(this.props.indicators.schools, data_student_type, "data_student_type", "total_students", "options_student_type");
+        this.setState ( { ring_load : false });
     }
 
     drawCustomOptions(chart_result, state_to) {
@@ -447,6 +422,7 @@ class Indicators extends Component {
      */
     groupBySchool(selected, types, selector, selector_total = "", selector_options = "") {
         const final_array = [];
+
         final_array[0] = ["LEGENDA", "%"];
         types.map(item => {
             selected.map(item_search => {
@@ -468,7 +444,7 @@ class Indicators extends Component {
             
         }
 
-        
+        return general_total
     }
 
     handleChangeSchoolType (selectedOption) {
@@ -497,10 +473,10 @@ class Indicators extends Component {
                 this.sumBySchool(values.school_type_id, "total_schools", "data_school_type");
                 this.sumBySchool(values.school_type_id, "total_students", "data_student_type");
                 this.getCoverage();
-                this.getSchoolTypes();
                 this.getStudentTypes();
                 // this.sumBySchool(values.school_type_id, "total_action", "data_action_type");
             });
+            this.getSchoolTypes();
         } else {
             this.setState( { ring_load_change: false });
         }
@@ -585,21 +561,18 @@ class Indicators extends Component {
     };
 
     getOptionsHierarchy = (input, callback) => {
-        axios.get('hierarchy/childrens')
-        .then(res => {
-            const data = res.data.data;
-            const select_array = this.mapSelect(data);
+        
+        const data = this.props.indicators.contributors;
+        const select_array = this.mapSelect(data);
 
-            this.setState({ search_options_hierarchy: select_array }, function(){
-                setTimeout(() => {
-                    callback(null, {
-                    options: this.state.search_options_hierarchy,
-                    complete: true
-                    });
-                }, 500);
-            });
-        });  
-
+        this.setState({ search_options_hierarchy: select_array }, function(){
+            setTimeout(() => {
+                callback(null, {
+                options: this.state.search_options_hierarchy,
+                complete: true
+                });
+            }, 500);
+        });
     };
 
     render() {
@@ -792,4 +765,9 @@ class Indicators extends Component {
     }
 }
 
-export default Indicators;
+const mapStateToProps = (state) => ({
+    indicators: state.indicators,
+    user: state.user
+})
+
+export default connect(mapStateToProps, {indicatorsRequest})(Indicators);

@@ -3,7 +3,7 @@ import { Route, Switch } from 'react-router-dom';
 import { Row, Col, Card, CardHeader, CardFooter, CardBody, Button } from 'reactstrap';
 
 import LocalizationTypeList from './LocalizationTypeList';
-import LocalizationTypeForm from './LocalizationTypeForm';
+import {LocalizationTypeForm} from './LocalizationTypeForm';
 import { canUser } from '../../common/Permissions';
 
 class LocalizationTypes extends Component {

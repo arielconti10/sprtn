@@ -11,7 +11,40 @@ import { canUser } from '../../common/Permissions';
 
 const apiPost = 'discipline';
 
+import { PropTypes } from 'prop-types'
+import { reduxForm, Field } from 'redux-form'
+import { connect } from 'react-redux'
+import { disciplineCreate, disciplineUpdate, disciplineLoad, disciplineCurrentClear } from '../../../actions/discipline';
+
+const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório')
+
 class DisciplineForm extends Component {
+    static propTypes = {
+        handleSubmit: PropTypes.func.isRequired,
+        invalid: PropTypes.bool.isRequired,
+        user: PropTypes.shape({
+            username: PropTypes.string.isRequired,
+            access_token: PropTypes.string.isRequired,
+        }),
+        disciplines: PropTypes.shape({
+            list: PropTypes.array,
+            requesting: PropTypes.bool,
+            successful: PropTypes.bool,
+            messages: PropTypes.array,
+            errors: PropTypes.array,
+            current_discipline: PropTypes.shape({
+                active: PropTypes.bool,
+                name: PropTypes.string,
+                code: PropTypes.string,
+            })
+        }).isRequired,
+        disciplineUpdate: PropTypes.func.isRequired,
+        disciplineCreate: PropTypes.func.isRequired,
+        disciplineLoad: PropTypes.func.isRequired,
+        disciplineCurrentClear: PropTypes.func.isRequired,
+        reset: PropTypes.func.isRequired,
+        initialValues: PropTypes.object
+    }
     constructor(props) {
         super(props);
         this.state = {
@@ -24,8 +57,6 @@ class DisciplineForm extends Component {
         };
 
         this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.submitForm = this.submitForm.bind(this);
     }
 
     checkPermission(permission) {
@@ -38,21 +69,30 @@ class DisciplineForm extends Component {
 
     componentWillMount() {
         this.checkPermission('discipline.insert');
+        const { disciplineLoad, user } = this.props
+        
+        this.props.disciplines.current_discipline = null;
         if (this.props.match.params.id !== undefined) {
-            this.checkPermission('discipline.update');
-            axios.get(`${apiPost}/${this.props.match.params.id}`)
-                .then(response => {
-                    const dados = response.data.data;
-
-                    this.setState({ 
-                        name: dados.name,
-                        code: dados.code,
-                        active: dados.deleted_at === null ? true: false
-                    });
-                })
-                .catch(err => console.log(err));
+            this.checkPermission('discipline.update')
+            disciplineLoad(user, this.props.match.params.id)
         }
     }
+
+    renderInput = ({ input, type, meta: { touched, error } }) => (
+        <div>
+            <input
+                className="form-control"
+                {...input}
+                type={type}
+            />
+            {touched && error && (
+                <div style={{ color: 'red'}}>
+                    {error}
+                </div>
+            )
+            }
+        </div>
+    )
 
     handleChange(e) {
         const target = e.currentTarget;
@@ -65,65 +105,34 @@ class DisciplineForm extends Component {
         });
     }
 
-    submitForm(event) {
-        event.preventDefault();
-        axios.post(`${apiPost}`, {
-            'name': this.state.name,
-            'code': this.state.code,
-            'active': this.state.active
-        }).then(res => {
-            this.setState({
-                saved: true                   
-            })
-        }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error)[0].toString();
-            this.setState({ back_error: data_error[filterId] });
-        }.bind(this));
-    }
-
-    updateForm(event) {
-        event.preventDefault();
-        var id = this.props.match.params.id;
-
-        let data = {
-            'name': this.state.name,
-            'code': this.state.code,
-            'active': this.state.active
-        }
-
-        axios.put(`${apiPost}/${id}`, {
-            'name': this.state.name,
-            'code': this.state.code,
-            'active': this.state.active
-        }).then(res => {
-            this.setState({
-                saved: true                   
-            })
-        }).catch(function (error) {
-            let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error).toString();
-            this.setState({ back_error: data_error[filterId] });
-        })
-    }
-
-    handleSubmit(e) {
-        e.preventDefault();
-
-        this.form.validateFields();
+    submit = (discipline) => {
+        const { user, disciplineCreate, disciplineUpdate, reset } = this.props
         
-        this.setState({ submitButtonDisabled: !this.form.isValid() });
-
-        if (this.form.isValid()) {
-            if (this.props.match.params.id !== undefined) {
-                this.updateForm(event);
-            } else {
-                this.submitForm(event);
-            }
+        if (this.props.match.params.id !== undefined) {  
+            discipline.active = this.props.disciplines.current_discipline.active         
+            disciplineUpdate(user, discipline, this.props.disciplines.current_discipline.active)
+        } else {
+            disciplineCreate(user, discipline)
         }
+
+        reset()
     }
+
 
     render() {
+        const {
+            handleSubmit,
+            invalid,
+            disciplines: {
+                discipline,
+                requesting,
+                successful,
+                messages,
+                errors,
+                current_discipline
+            },
+        } = this.props
+
         let redirect = null;
         if (this.state.saved) {
             redirect = <Redirect to="/cadastro/disciplinas" />;
@@ -155,46 +164,49 @@ class DisciplineForm extends Component {
                 <CardBody>
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
-                    }
-                    <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
-                        onSubmit={this.handleSubmit} noValidate>
-                        
-                        <div className="">
-                            <FormGroup for="code">
-                                <FormControlLabel htmlFor="code">Código da disciplina</FormControlLabel>
-                                <FormControlInput type="text" id="code" name="code"
-                                    value={this.state.code} onChange={this.handleChange}
-                                    readOnly={this.state.viewMode}
-                                    required />
-                                <FieldFeedbacks for="code">
-                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
-                            </FormGroup>
+                    }                
+                    <form onSubmit={handleSubmit(this.submit)}>
+                        <div className="form-group">
+                            <label htmlFor="name">Código da disciplina</label>
+                            <Field
+                                name="code"
+                                id="code"
+                                component={this.renderInput}
+                                validate={fieldRequired}
+                                placeholder="Código da disciplina"
+                            />
                         </div>
-
-                        <div className="">
-                            <FormGroup for="name">
-                                <FormControlLabel htmlFor="name">Nome da disciplina</FormControlLabel>
-                                <FormControlInput type="text" id="name" name="name"
-                                    value={this.state.name} onChange={this.handleChange}
-                                    readOnly={this.state.viewMode}
-                                    required />
-                                <FieldFeedbacks for="name">
-                                    <FieldFeedback when="*">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                </FieldFeedbacks>
-                            </FormGroup>
-                        </div>                       
-                        
-                        {statusField}     
-
-                        <button className="btn btn-primary" disabled={this.state.submitButtonDisabled}>Salvar</button>
-                        <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
-                    </FormWithConstraints>
-                    
+                        <div className="form-group">
+                            <label htmlFor="name">Nome da disciplina</label>
+                            <Field
+                                name="name"
+                                id="name"
+                                component={this.renderInput}
+                                validate={fieldRequired}
+                                placeholder="Nome da disciplina"
+                            />
+                        </div>                        
+                    {statusField}     
+                    <button className="btn btn-primary" action="submit" disabled={this.state.submitButtonDisabled}>Salvar</button>
+                    <button type="button" className="btn btn-danger" onClick={this.props.history.goBack}>Cancelar</button>
+                </form>
                 </CardBody>
             </Card>
         )
     }
 }
+let InitializeFromStateForm = reduxForm({
+    form: 'InitializeFromState',
+    enableReinitialize: true
+})(DisciplineForm)
 
-export default DisciplineForm;
+InitializeFromStateForm = connect(
+    state => ({
+        user: state.user,
+        disciplines: state.disciplines,
+        initialValues: state.disciplines.current_discipline
+    }),
+    { disciplineLoad, disciplineUpdate, disciplineCreate, disciplineCurrentClear }
+)(InitializeFromStateForm)
+
+export default InitializeFromStateForm

@@ -1,150 +1,117 @@
 import React, { Component } from 'react'
-import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
-
+import { reduxForm, Field } from 'redux-form'
+import { connect } from 'react-redux'
+import { PropTypes } from 'prop-types'
 import './Login.css';
 import InputCustomize from '../../common/InputCustomize';
-import axios from '../../common/axios';
-
-import PropTypes from 'prop-types';
+import loginRequest from '../../../actions/login'
+import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 
 import Full from '../../../../src/template/containers/Full/Full'
 import Dashboard from '../../../template/views/Dashboard/Dashboard';
 
-class LoginError extends Component {
-    render() {
-        return (
-            <div className="alert alert-danger" role="alert">
-                Usuário ou senha inválido
+// If you were testing, you'd want to export this component
+// so that you can test your custom made component and not
+// test whether or not Redux and Redux Form are doing their jobs
+class Login extends Component { 
+  // Pass the correct proptypes in for validation
+  static propTypes = {
+    handleSubmit: PropTypes.func,
+    loginRequest: PropTypes.func,
+    login: PropTypes.shape({
+      requesting: PropTypes.bool,
+      successful: PropTypes.bool,
+      messages: PropTypes.array,
+      errors: PropTypes.array,
+    }),
+  }
+
+  // Remember, Redux Form passes the form values to our handler
+  // In this case it will be an object with `username` and `password`
+  submit = (values) => {
+    const { reset } = this.props
+
+    this.props.loginRequest(values)
+    reset()
+  }
+
+  render() {
+    const {
+      handleSubmit, // remember, Redux Form injects this into our props
+      login: {
+        requesting,
+        successful,
+        messages,
+        errors,
+      },
+    } = this.props
+
+    return (
+      <div id="login-body">
+        {this.props.login && this.props.login.requesting && 
+            <div className="loader-marketshare">
+                <div className="backLoading">
+                    <div className="load"><img src="https://www.ipswitch.com/library/img/loading.gif" /></div>
+                </div>
             </div>
-        )
-    }
-}
-
-class LoginForm extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            login: '',
-            password: '',
-            valid_login: null,       
-            back_error: '',
-            ringLoad: false  
-        };
-    }
-
-    changeField = (input) => {
-        var new_value = {};
-        var input_name = input.target.id;
-        new_value[input_name] = input.target.value;
-        this.setState(new_value);
-    }
-
-    saveStorage = (res) => {
-        if (res.data.access_token !== undefined) {
-            sessionStorage.setItem('password', this.state.password);
-            sessionStorage.setItem('token_type', res.data.token_type);
-            sessionStorage.setItem('access_token', res.data.access_token);
-            sessionStorage.setItem('refresh_token', res.data.refresh_token);
-            sessionStorage.setItem('expires_in', res.data.expires_in);
-            sessionStorage.setItem('user_id', res.data.user.id);
-            sessionStorage.setItem('user_name', res.data.user.name);
-            sessionStorage.setItem('user_email', res.data.user.email);
-            sessionStorage.setItem('user_userName', res.data.user.username);
-            sessionStorage.setItem('user_fullName', res.data.user.full_name);
-            sessionStorage.setItem('superior', res.data.user.superior_name);
-            sessionStorage.setItem('sso_token', res.data.sso_token);
-            sessionStorage.setItem('role_name', res.data.user.role.name);
-            
-            this.setState({ 'valid_login': true });
-        } else {
-            this.setState({ 'valid_login': false, password: '' });
         }
 
-    }
-
-    submitForm = (event) => {
-        event.preventDefault();
-        this.setState({back_error:'', ringLoad: true});
-
-        axios.post('/login', {
-            'grant_type': 'password',
-            'client_id': '2',
-            'client_secret': 'X2zabNZ1I8xThjTgfXXIfMZfWm84pLD4ITrE70Yx',
-            'username': this.state.login,
-            'password': this.state.password,
-            //'scope: '' 
-        }).then(res => {
-            this.setState({ringLoad: false}, function(){
-                this.saveStorage(res);            
-            });
-        })
-        .catch(error => {
-            let msg_error = error.response.statusText;
-            if (error.response.status == 403 || error.response.status == 401) {
-                 msg_error = "Usuário ou senha incorretos"; 
+        <div>
+          <section className="login-form">
+            <h1>
+              <img src="./img/logo.png" // place your logo here
+                alt="Spartan" className="main-logo" />
+            </h1>
+            {this.props.login && this.props.login.errors.length > 0 && 
+                <p className="alert alert-danger"> Usuário ou senha incorretos</p>
             }
-            this.setState({back_error:msg_error, ringLoad: false, login: '', password: ''});
-        });
-    }
-
-    render() {
-
-        if (this.state.valid_login) {
-            return (
-                <Redirect to="/dashboard/indicadores" />
-            );
-            window.reload();
-        }
-        return (
-            <div>
-                {this.state.ringLoad == true &&
-                    <div className="loader">
-                        <div className="backLoading">
-                            <div className="load"></div>
-                        </div>
-                    </div>
-                }
-                <section className="login-form">
-                    <h1>
-                        <img src="./img/logo.png" // place your logo here
-                            alt="Spartan" className="main-logo" />
-                    </h1>
-                    {this.state.back_error !== '' &&
-                        <p className="alert alert-danger"> {this.state.back_error} </p>
-                    }
-                    <form onSubmit={this.submitForm} method="POST">
-                        <div className="row">
-                            <InputCustomize type="text" id="login" name="login" className="form-control" placeholder="Seu Login"
-                                helptext="" cols="col-lg-12 col-md-12 col-sm-12" value={this.state.login} onChange={this.changeField.bind(this)}
-                            />
-
-                            <InputCustomize type="password" id="password" name="password" className="form-control" placeholder="Sua Senha"
-                                helptext="Você deve informar as suas credenciais de rede" cols="col-lg-12 col-md-12 col-sm-12"
-                                value={this.state.password} onChange={this.changeField.bind(this)}
-                            />
-                        </div>
-
-                        <button onClick={() => this.submitForm()} className="btn btn-primary btn-block">Acessar</button>
-                    </form>
-                </section>
-            </div>
-        )
-    }
+            <form className="widget-form" onSubmit={handleSubmit(this.submit)}>
+              <div className="row">
+                <InputCustomize
+                  className="form-control"
+                  placeholder="Seu Login"
+                  helptext=""
+                  cols="col-lg-12 col-md-12 col-sm-12"
+                  name="username"
+                  type="text"
+                  id="username"
+                  component="input"
+                />
+              </div>
+              <div className="row">
+                <InputCustomize
+                  className="form-control"
+                  placeholder="Sua Senha"
+                  helptext="Você deve informar as suas credenciais de rede"
+                  cols="col-lg-12 col-md-12 col-sm-12"
+                  name="password"
+                  type="password"
+                  id="password"
+                  component="input"
+                />
+              </div>
+              <button action="submit" className="btn btn-primary btn-block">Acessar</button>
+            </form>
+          </section>
+        </div>
+      </div>
+    )
+  }
 }
 
-class Login extends Component {
-    componentWillMount() {
-        if (sessionStorage.getItem("access_token") !== null) {
-            window.location.href='#/dashboard';
-        }
-    }
-    render() {
-        return (
-            <div id="login-body">
-                <LoginForm />
-            </div>
-        )
-    }
-}
+// Grab only the piece of state we need
+const mapStateToProps = state => ({
+  login: state.login,
+})
 
-export default Login;
+// make Redux state piece of `login` and our action `loginRequest`
+// available in this.props within our component
+const connected = connect(mapStateToProps, { loginRequest })(Login)
+
+// in our Redux's state, this form will be available in 'form.login'
+const formed = reduxForm({
+  form: 'login',
+})(connected)
+
+// Export our well formed login component
+export default formed
