@@ -1,0 +1,3 @@
+export const LOAD_SCHOOL_FLOW = 'LOAD_SCHOOL_FLOW'
+export const SET_SCHOOL = 'SET_SCHOOL'
+export const UPDATE_LOADER = 'UPDATE_LOADER'

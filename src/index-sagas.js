@@ -19,6 +19,8 @@ import GridApiSaga from './sagas/gridApi';
 import UserSaga from './sagas/user';
 import RoleSaga from './sagas/roles';
 import RuleSaga from './sagas/rules';
+import SchoolSaga from './sagas/schools';
+import SchoolDashSaga from './sagas/schoolsDash';
 
 export default function* IndexSaga () {
   yield [
@@ -41,6 +43,8 @@ export default function* IndexSaga () {
     UserSaga(),
     RoleSaga(),
     JobTitleSaga(),
-    RuleSaga()
+    RuleSaga(),
+    SchoolSaga(),
+    SchoolDashSaga()
   ]
 }
