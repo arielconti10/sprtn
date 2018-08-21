@@ -1,7 +1,8 @@
 import { LOAD_COLUMNS_FLOW, SET_COLUMNS, ON_FETCH_DATA_FLOW, SET_CREATE_TABLE, ON_DELETE_DATA_FLOW, ON_ACTIVE_DATA_FLOW, 
     TOGGLE_DROPDOWN_FLOW, SET_DROPDOWN_STATUS, SELECT_COLUMNS_FLOW, SET_COLUMNS_SELECTED, SET_INITIAL_COLUMNS,
     SELECT_ALL, SELECT_ALL_FLOW, SET_LOADER, LOAD_FILTER_FLOW, SET_TABLE_INFO, SET_FILTERS, SET_DATA_ALTERNATIVE,
-    SELECT_OPTION_FLOW, SET_CUSTOM_FILTER
+    SELECT_OPTION_FLOW, SET_CUSTOM_FILTER, TOGGLE_DROPDOWN_ACTION_FLOW, SET_DROPDOWN_ACTION_STATUS,
+    EXPORT_TABLE_FLOW, SET_EXPORT_DATA
 } from "../actionTypes/gridApi";
 
 const initialState = {
@@ -13,6 +14,7 @@ const initialState = {
     sorted: [],
     loading: false,
     dropdownOpen: false,
+    dropdownActionsOpen: false,
     columnsSelected: [],
     columnsAlt: [],
     dataAlternative:[]
@@ -69,6 +71,12 @@ const reducer = function gridApiReducer (state = initialState, action) {
             return {
                 ...state,
                 dropdownOpen    
+            }
+        case SET_DROPDOWN_ACTION_STATUS:
+            const dropdownActionsOpen = action.dropdownActionsOpen;
+            return {
+                ...state,
+                dropdownActionsOpen
             }
         case SELECT_COLUMNS_FLOW:
             return {
@@ -144,6 +152,21 @@ const reducer = function gridApiReducer (state = initialState, action) {
             return {
                 ...state,
                 customFilter
+            }
+        case TOGGLE_DROPDOWN_ACTION_FLOW:
+            return {
+                ...state
+            }
+        case EXPORT_TABLE_FLOW:
+            return {
+                ...state
+            }
+        case SET_EXPORT_DATA:
+            const exportData = action.exportData;
+
+            return {
+                ...state,
+                exportData
             }
         default:
             return state

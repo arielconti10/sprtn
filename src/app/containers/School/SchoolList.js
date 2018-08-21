@@ -1,24 +1,12 @@
 import React, { Component, createRef } from 'react';
-import { Router, hashHistory, Link, browserHistory, withRouter, NavLink, Redirect } from 'react-router-dom'
-
-import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, 
-    FormGroup, Label, Input, Row, Col } from 'reactstrap';
-
-import ReactTable from 'react-table';
-import Slider from 'rc-slider';
+import { Link } from 'react-router-dom'
 
 import 'rc-slider/assets/index.css';
 import 'react-table/react-table.css'
 
-import axios from '../../common/axios';
-import { verifyToken } from '../../common/AuthorizeHelper';
 import { canUser } from '../../common/Permissions';
 import GridApi from '../../common/GridApi';
-import { generateTermOfAccept } from '../../common/GenerateTermOfAccept'
-import { convertArrayOfObjectsToCSV } from '../../common/GenerateCSV'
-import { verifySelectChecked, createTable, savePreferences, verifyPreferences } from '../../common/ToggleTable'; 
 
-// import { getSchoolAndVisitValues } from './ToggleTable'; 
 import { connect } from 'react-redux'
 import { loadColumnsFlow, onFetchDataFlow, onDeleteDataFlow, onActiveDataFlow, toggleDropdownFlow, 
     selectColumnsFlow, selectAllFlow, loadFilterFlow, selectOptionFlow, setTableInfo
@@ -28,26 +16,7 @@ class SchoolList extends Component {
 
     constructor(props) {
         super(props);
-
-        this.state = {
-        };
-
-        this.onChangeFilter = this.onChangeFilter.bind(this);
         this.showMarketShare = this.showMarketShare.bind(this);
-        this.toggle = this.toggle.bind(this);
-        this.exportTermOfAccept = this.exportTermOfAccept.bind(this);
-        this.exportCSV = this.exportCSV.bind(this);
-        this.toggleDrop = this.toggleDrop.bind(this);
-        this.handleChangeDrop = this.handleChangeDrop.bind(this);
-        this.handleSelectAll = this.handleSelectAll.bind(this);
-    }
-
-    toggleDrop() {
-
-    }
-
-    handleChangeDrop(e) {
-
     }
 
     checkPermission(permission) {
@@ -56,22 +25,6 @@ class SchoolList extends Component {
                 this.setState({ viewMode: true });
             }
         }.bind(this));       
-    }
-
-    exportCSV() {
-
-    }
-
-    exportTermOfAccept() {
-
-    }
-
-    toggle() {
-
-    }
-
-    onChangeFilter(target, empty) {
-      
     }
 
     onChangeTextFilter(filter, accessor) {
@@ -94,31 +47,6 @@ class SchoolList extends Component {
         }
 
         return value;
-    }
-
-    getColumns() {
-
-    }
-
-    componentWillMount(){
-
-    }
-
-    componentDidMount() {
-
-    }
-
-    onFetchData = (state, instance) => {
-
-
-    }
-
-    searchData(baseURL, sorted, filtered) {
-
-    }
-
-    handleSelectAll(event) {
-
     }
 
     render() {
@@ -220,10 +148,8 @@ class SchoolList extends Component {
                             { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left',is_checked: true }
                         ]}
                         hideButtons={true}
+                        hasActions={true}
                         urlLink={this.props.match.url}
-
-                        // onBlur={event => this.onChangeTextFilter(event.target.value, item.accessor)}
-                    // onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter(event.target.value, item.accessor):''}
                     />
                 </div>  
 
