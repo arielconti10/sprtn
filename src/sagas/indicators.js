@@ -2,6 +2,8 @@ import { call, put, takeLatest } from 'redux-saga/effects'
 
 // import { handleApiErrors } from '../lib/api-errors'
 
+import { mapPieChart } from '../app/common/ChartHelper'
+import axios from '../app/common/axios';
 import {
   // INDICATORS_CREATING, 
   INDICATORS_REQUESTING,
@@ -58,15 +60,44 @@ function getSchoolTypes() {
     let baseURL = `${apiUrl}/indicator/school/type`;
         // baseURL = this.getUrlSearch(baseURL);
 
-    const request = fetch(baseURL, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + sessionStorage.getItem('access_token') || undefined,
-        }
-    })    
+    // const request = fetch(baseURL, {
+    //     method: 'GET',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         Authorization: 'Bearer ' + sessionStorage.getItem('access_token') || undefined,
+    //     }
+    // })    
 
-    return handleRequest(request)
+    // return handleRequest(request)
+
+    return axios.get(baseURL).then(result => {
+        console.log(result)
+
+        const final_array = [];
+
+        final_array[0] = ["LEGENDA", "%"];
+        types.map(item => {
+            selected.map(item_search => {
+                if (item_search.value.indexOf(item[0]) !== -1) {
+                    final_array.push(item);
+                }
+            })
+        })
+
+        const general_total = final_array.reduce( (accum, curr) => curr[1] !== '%'?accum + curr[1]:0, 0 );
+        this.setState( { [ selector_total ]: formatNumber(general_total) } );
+
+
+        if (final_array.length >= 1) {
+            this.setState( { [selector] : final_array }, () => {
+                this.drawCustomOptions(final_array, selector_options);
+                // this.drawCustomOptions(final_array, selector);
+            });
+            
+        }
+
+        return general_total
+    })
 }
 
 function getStudentTypes() {
@@ -117,23 +148,37 @@ function getActions() {
 function getCoverage() {
     let baseURL = `${apiUrl}/indicator/school/coverage`;
         // baseURL = this.getUrlSearch(baseURL);
-
-    const request = fetch(baseURL, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + sessionStorage.getItem('access_token') || undefined,
+        
+    return axios.get(baseURL).then(response => {
+        let coverage = response.data.data
+        let array_chart = [];
+    
+        if (coverage && coverage.length > 0) {
+            coverage.map(item => {
+                console.log(item)
+                if (item.school_type.length > 0) {
+                    const array_tmp = [item.school_type, parseFloat(item.total)];
+                    array_chart.push(array_tmp);
+                }
+            });
         }
-    })    
+    
+        array_chart.sort(function (a, b) {
+            if(a[0] < b[0]) return -1;
+            if(a[0] > b[0]) return 1;
+            return 0;
+        });
+    
+        array_chart.unshift(["Tipos de Escola", "%"]);
 
-    return handleRequest(request)
+        return array_chart
+    })
 }
 
 
 
 function* indicatorsRequestFlow (action) {
   try {
-
     const contributors = yield call(contributorsRequestApi)    
     const schoolTypes = yield call(getSchoolTypes)
     const studentTypes = yield call(getStudentTypes)

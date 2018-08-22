@@ -80,6 +80,13 @@ class Indicators extends Component {
     }
 
     componentWillMount(){
+       
+        
+    }
+    
+    //o "callback hell" será aprimorado após estudo de promises
+    //foi utilizado por ser assíncrono, e se chamado de modo síncrono, nāo produz os valores desejados
+    componentDidMount() {        
         this.setState( { ring_load : true });
 
         this.setState({school_type_id: [
@@ -91,18 +98,12 @@ class Indicators extends Component {
         this.setState({"total_action": this.props.indicators.actions}) 
 
         this.getSchoolTypes();
-    }
-    
-    //o "callback hell" será aprimorado após estudo de promises
-    //foi utilizado por ser assíncrono, e se chamado de modo síncrono, nāo produz os valores desejados
-    componentDidMount() {        
-        
-        this.getCoverage();
         this.getActionsRealized();
         this.getStudentTypes();
         this.getActionTypes();
         this.getStudentLevel();    
-        
+
+        this.getCoverage();
     }
 
     toggle(tab) {
@@ -117,19 +118,18 @@ class Indicators extends Component {
      * obtem a cobertura da carteira
      */
     getCoverage() {
-        const data_coverage = mapPieChart("Tipos de Escola", "school_type", "total", this.props.indicators.coverage);
+        const data_coverage = this.props.indicators.coverage;
+
         const total = this.groupBySchool(this.props.indicators.schools, data_coverage, "tmp_coverage", 'total_coverage');
-        
-        const total_coverage = this.state.total_coverage;
-        console.log(total, total_coverage)
+        console.log(total)
 
         let array_chart = []
 
         if (total > 0) {
             const total_schools = this.state.total_schools.replace(/\./g,'');
-            console.log(total_schools)
-            const not_coverage = parseFloat(total_schools) - parseFloat(total);
 
+            const not_coverage = parseFloat(total_schools) - parseFloat(total);
+            console.log(not_coverage)
             array_chart = [
                 { "name": "Coberto", "total": parseFloat(total) },
                 { "name": "Nāo Coberto", "total": not_coverage },
@@ -140,7 +140,8 @@ class Indicators extends Component {
         }
 
         const action_return = mapPieChart("Ações", "name", "total", array_chart);
-        this.setState({ data_coverage } );
+
+        this.setState({ action_return } );
     }
 
     /**

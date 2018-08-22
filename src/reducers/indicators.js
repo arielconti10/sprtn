@@ -42,7 +42,7 @@ const reducer = function contributorsReducer(state = initialState, action) {
         studentTypes: action.studentTypes.data.total,
         contacts: action.contacts.data.total,
         actions: action.actions.data,
-        coverage: action.coverage.data,
+        coverage: action.coverage,
         requesting: false,
         successful: true,
         messages: [{
