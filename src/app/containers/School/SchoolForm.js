@@ -65,7 +65,6 @@ class SchoolForm extends Component {
             total_students, school_type, contacts, school_code_totvs, sector_id, subsidiary_id
         } = this.props.school.schoolInfo;
 
-
         return (
             <div>
                 {ringLoad == true &&

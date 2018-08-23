@@ -22,6 +22,7 @@ import roles from './reducers/roles'
 import rules from './reducers/rules'
 import schools from './reducers/school';
 import schoolDash from './reducers/schoolDash';
+import contact from './reducers/contact';
 
 const IndexReducer = combineReducers({
   user,
@@ -46,7 +47,8 @@ const IndexReducer = combineReducers({
   roles,
   rules,
   schools,
-  schoolDash
+  schoolDash,
+  contact
 })
 
 export default IndexReducer  
