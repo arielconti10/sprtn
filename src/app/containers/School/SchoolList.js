@@ -74,6 +74,7 @@ class SchoolList extends Component {
                             {
                                 Header: "Market share", accessor: "marketshare", width: 100, headerClassName: 'text-left',
                                 is_checked: true,
+                                sortable: false,
                                 Cell: props => <span>{this.showMarketShare(props.value) + '%'}</span>
                             },
                             { Header: "Nome", accessor: "name", filterable: true, width: 400, headerClassName: 'text-left', is_checked: true },
