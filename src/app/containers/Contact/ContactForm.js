@@ -16,7 +16,7 @@ import '../../custom.css';
 import MaskedInput from 'react-maskedinput';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
-import Editable from 'react-x-editable';
+
 
 import { canUser } from '../../common/Permissions';
 
