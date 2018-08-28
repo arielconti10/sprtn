@@ -9,10 +9,6 @@ import '../../custom.css';
 
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
-<<<<<<< HEAD
-
-=======
->>>>>>> 4e4dc8b920c93ba7d4116692ea2571fb2d98dfd8
 
 import { PropTypes } from 'prop-types'
 import { reduxForm, Field } from 'redux-form'
