@@ -128,6 +128,9 @@ class ContactForm extends Component {
             this.resetForm();
         }
 
+        this.resetForm();
+        this.props.updatePhoneFlow([]);  
+
     }
 
     handleChangeSelect(selectedOption) {

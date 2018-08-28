@@ -283,7 +283,7 @@ function formatFindContact(contact) {
  */
 function filterPhones(phones, phoneId) {
     let phonesFilter = phones.filter(function(item){
-        return item.id !== phoneId 
+        return item.phone_number !== phoneId 
     });
 
     return phonesFilter;

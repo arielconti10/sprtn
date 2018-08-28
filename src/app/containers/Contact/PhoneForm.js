@@ -61,10 +61,10 @@ class PhoneForm extends Component {
     }
 
     onClickDeletePhone(element) {
-        const { id } = element.value;
+        const { phone_number } = element.value;
         const { phoneData } = this.props.contact;
 
-        this.props.deletePhoneFlow(phoneData, id);
+        this.props.deletePhoneFlow(phoneData, phone_number);
     }
 
     createPhoneTable() {
