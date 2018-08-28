@@ -11,9 +11,12 @@ import {
 
   import {
     setContactsList, setContactsColumns, setContactCollapse, setContactJobTitles,
-    setContactJobTitle, setContactStates, setContactStateId, setContactInfo,
-    setContactError, setAuthorizeEmail, setFavorite
+    setContactJobTitle, setContactStates, setContactStateId, setAdressInfo,
+    setContactError, setAuthorizeEmail, setFavorite, setContactInfo,
+    setPhoneType, setPhoneData
   } from '../actions/contact'
+
+  import { formatDateToBrazilian } from '../app/common/DateHelper'
     
   const apiUrl = `${process.env.API_URL}/contact`
   const apiFind = `${process.env.API_URL}/school`
@@ -27,101 +30,15 @@ import {
   } from 'history'
 
 
-  // Nice little helper to deal with the response
-  // converting it to json, and handling errors
-  function handleRequest(request) {
+// Nice little helper to deal with the response
+// converting it to json, and handling errors
+function handleRequest(request) {
     return request
-      .then(response => response.json())
-      .then(json => json)
-      .catch((error) => {
-        throw error
-      })
-  }
-
-/**
- * realiza a construçāo do array de colunas para um contato
- * @param {Bool} collapse flag indicando com status
- * @return {Array} columns colunas construidas
- */
-function buildColumns(collapse) {
-    const columns = [
-        { Header: "Nome", accessor: "name", headerClassName: 'text-left'},
-        { Header: "Cargo", accessor: "job_title.name", headerClassName: 'text-left' },
-        { Header: "E-mail", accessor: "email", headerClassName: 'text-left' },
-        {
-            Header: "Telefone",
-            id: "phone",
-            width: 380,
-            accessor: d => {
-                let phones = "";
-                if (d.phones !== undefined) {
-                    d.phones.forEach(element => {
-                        let type_text = "";
-                        if (element.phone_type == "work") {
-                            type_text = "Trabalho";
-                        } else if (element.phone_type == "home") {
-                            type_text = "Casa";
-                        } else if (element.phone_type == "mobile") {
-                            type_text = "Celular";
-                        } else {
-                            type_text = "Fax";
-                        }
-                        let item_phone = `${element.phone_number} (${type_text})`;
-                        phones = phones + item_phone + ", ";
-                    });
-                    phones = phones.trim();
-                    phones = phones.substring(0, phones.length - 1);
-                }
-                
-                return phones;
-            }
-        }
-    ];
-
-    columns.unshift(
-        {
-            Header: "Status",
-            accessor: "",
-            width: 80, 
-            headerClassName: 'text-center',
-            sortable: false,
-            Cell: (element) => (
-                !element.value.deleted_at ?
-                <div><span className="alert-success grid-record-status">Ativo</span></div>
-                :
-                <div><span className="alert-danger grid-record-status">Inativo</span></div>
-            )
-        }
-    )
-
-    columns.unshift(
-        {
-            Header: "Ações", accessor: "", sortable: false, width: 80, headerClassName: 'text-center', Cell: (element) => (
-                !element.value.deleted_at ?
-                    <div className="acoes">
-                        <button className='btn btn-primary btn-sm' disabled={collapse}>
-                            <i className='fa fa-pencil'></i>
-                        </button>
-                        <button className='btn btn-danger btn-sm' 
-                            disabled={collapse}
-                            onClick={() => {
-                                }
-                            }>
-                            <i className='fa fa-ban'></i>
-                        </button>
-                    </div>
-                    :
-                    <div>
-                        <button className='btn btn-success btn-sm' disabled={collapse}>
-                            <i className='fa fa-check-circle'></i>
-                        </button>
-                    </div>
-
-            )
-        }
-    )
-
-    return columns;
+        .then(response => response.json())
+        .then(json => json)
+        .catch((error) => {
+            throw error
+        })
 }
 
 /**
@@ -151,15 +68,21 @@ function deleteContact(user, contactId) {
  * @param {Object} dados a serem atualizados
  * @return {Object} handleRequest retorno da request
  */
-function updateContact(user, contactId, dataUpdate) {  
-    dataUpdate.phones.map(item => {
-        if (item.phone_extension == "") {
-            delete item.phone_extension;
-        }
-    });
+function updateContact(user, contactId, dataUpdate, phones) {
+    dataUpdate.phones = phones;
+     
+    if (dataUpdate.phones) {
+        dataUpdate.phones.map(item => {
+            if (item.phone_extension == "") {
+                delete item.phone_extension;
+            }
+        });
+    }
 
-    dataUpdate.school_id = dataUpdate.pivot.school_id;
-
+    if (dataUpdate.pivot) {
+        dataUpdate.school_id = dataUpdate.pivot.school_id;
+    } 
+    
     const url = `${apiUrl}/${contactId}`
     const request = fetch(url, {
         method: 'PUT',
@@ -182,6 +105,26 @@ function updateContact(user, contactId, dataUpdate) {
  */
 function findSchool(user, school_id) {
     const url = `${apiFind}/${school_id}`
+    const request = fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            // passe our token as an "Authorization" header
+            Authorization: 'Bearer ' + user.access_token || undefined,
+        },
+    })
+
+    return handleRequest(request)
+}
+
+/**
+ * realiza a consulta de um contato, de acordo com o ID
+ * @param {Object} user usuário corrent
+ * @param {Integer} contactId ID do contato a ser procurado
+ * @return {Object} handleRequest contato encontrado
+ */
+function findContact(user, contactId) {
+    const url = `${apiUrl}/${contactId}`
     const request = fetch(url, {
         method: 'GET',
         headers: {
@@ -293,8 +236,10 @@ function transformeAdress(adressInfo) {
     return newAdress;
 }
 
-function createContact(user, contact) {
+function createContact(user, contact, phones) {
     contact.active = true;
+    contact.phones = phones;
+
     const url = `${apiUrl}`
     const request = fetch(url, {
       method: 'POST',
@@ -308,10 +253,44 @@ function createContact(user, contact) {
     return handleRequest(request)
   }
 
+/**
+ * realiza a formataçāo de campos do contato
+ * por exemplo: data de nascimento, cpf entre outros
+ * @param {Object} contact contato sem os dados formatados
+ * @return {Object} newContact contato com os dados formatados
+ */
+function formatFindContact(contact) {
+    let newContact = contact;
+
+    if (contact.data.cpf) {
+        let newCpf = newContact.data.cpf.replace(new RegExp(/\./, 'g'), '');
+        newCpf = newCpf.replace('-', '');
+        newContact.data.cpf = newCpf;
+    }
+
+    newContact.data.birthday = formatDateToBrazilian(newContact.data.birthday);
+    newContact.data.jobTitleId = newContact.data.job_title_id;
+
+    return newContact.data;
+}
+
+/**
+ * retorna uma filtragem de telefones
+ * usado, por exemplo, na exclusāo de lista de telefones
+ * @param {Array} phones lista com os telefones disponíveis
+ * @param {Integer} phoneId identificador do telefone
+ * @return {Array} phonesFilter listagem com os telefones filtrados
+ */
+function filterPhones(phones, phoneId) {
+    let phonesFilter = phones.filter(function(item){
+        return item.phone_number !== phoneId 
+    });
+
+    return phonesFilter;
+}
+
 function* loadContactsFlow(action) {
-    const columns = yield call(buildColumns, action.collapse);
     yield put(setContactsList(action.contacts));
-    yield put(setContactsColumns(columns));
 }
 
 function* deleteContactFlow(action) {
@@ -334,8 +313,14 @@ function* activeContactFlow(action) {
     const { id } = data;
 
     try {
-        data.active = true;
-        const activedContact = yield call(updateContact, action.user, id, data);
+        const contactObject = yield call(findContact, action.user, id);
+        const contactFormat = contactObject.data;
+        const phones = contactFormat.phones;
+        contactFormat.active = true;
+        contactFormat.school_id = action.school_id;
+
+        const activedContact = yield call(updateContact, action.user, id, contactFormat, phones);
+        
         if (activedContact) {
             const school = yield call(findSchool, action.user, action.school_id);
             const contacts = school.data.contacts;
@@ -376,15 +361,13 @@ function* searchCepFlow(action) {
 
     if (fullAdress.errors || fullAdress.data.erro) {
         const message = "CEP nāo encontrado. Verifique!";
-        yield put(setContactInfo({}));
+        yield put(setAdressInfo({}));
         yield put(setContactError(message));
     } else {
         const transformedAdress = yield call(transformeAdress, fullAdress.data);
-        yield put(setContactInfo(transformedAdress));
+        yield put(setAdressInfo(transformedAdress));
         yield put(setContactError(""));
     }
-
-
 }
 
 function* updateAuthEmailFlow(action) {
@@ -402,11 +385,10 @@ function* contactCreateFlow(action) {
         const {
           user,
           contact,
+          phoneData
         } = action
         
-        const createdContact = yield call(createContact, user, contact);
-
-        console.log(createContact);
+        const createdContact = yield call(createContact, user, contact, phoneData);
 
         if (createdContact) {
             const school = yield call(findSchool, action.user, contact.school_id);
@@ -423,6 +405,76 @@ function* contactCreateFlow(action) {
       }
 }
 
+function* contactUpdateFlow(action) {
+    try {
+        const {
+          user,
+          contact,
+          contactId,
+          phoneData
+        } = action
+        
+        const updatedContact = yield call(updateContact, user, contactId, contact, phoneData);
+
+        if (updatedContact) {
+            const school = yield call(findSchool, action.user, contact.school_id);
+            
+            const contacts = school.data.contacts;
+
+            yield put(setContactsList(contacts));
+            yield put(setContactCollapse(false));
+        }
+    
+      } catch (error) {
+          console.log(error);
+          console.log(error.status);
+        //   yield put(setContactError(error));
+      }
+}
+
+function* findContactFlow(action) {
+    const contactObject = yield call(findContact, action.user, action.contactId);
+    const contactFormat = yield call(formatFindContact, contactObject);
+
+    yield put(setContactCollapse(true));
+    yield put(setContactInfo(contactFormat));
+    yield put(setAdressInfo(contactObject.data));
+    yield put(setContactJobTitle(contactObject.data.jobTitleId));
+    yield put(setContactStateId(contactObject.data.state_id));
+}
+
+function* addPhoneFlow(action) {
+    const phoneData = action.phoneData;
+    const phone = action.phone;
+
+    let phoneFormat = phone;
+
+    if (phoneFormat.phone_number && phoneFormat.phone_number.indexOf("_") !== -1) {
+        phoneFormat.phone_number = phone.phone_number.replace("_","");
+    }
+    
+    const concatPhone = phoneData.concat(phoneFormat);
+    yield put(setPhoneData(concatPhone));
+}
+
+function* deletePhoneFlow(action) {
+    const phones = yield call(filterPhones, action.phoneData, action.phoneId);
+    yield put(setPhoneData(phones));
+}
+
+function* changePhoneFlow(action) {
+    const phoneTypeId = action.phoneTypeId;
+    yield put(setPhoneType(phoneTypeId));
+}
+
+function* loadPhoneDataFlow(action) {
+    yield put(setPhoneData(action.phones));
+}
+
+function* updatePhoneFlow(action) {
+    yield put(setPhoneData(action.phoneData));
+}
+
 function* contactWatcher() {
     yield [
         takeLatest("LOAD_CONTACTS_FLOW", loadContactsFlow),
@@ -435,7 +487,14 @@ function* contactWatcher() {
         takeLatest("SEARCH_CEP_FLOW", searchCepFlow),
         takeLatest("UPDATE_AUTH_EMAIL_FLOW", updateAuthEmailFlow),
         takeLatest("UPDATE_FAVORITE_FLOW", updateFavoriteFlow),
-        takeLatest("CONTACT_CREATE_FLOW", contactCreateFlow)
+        takeLatest("CONTACT_CREATE_FLOW", contactCreateFlow),
+        takeLatest("FIND_CONTACT_FLOW", findContactFlow),
+        takeLatest("CONTACT_UPDATE_FLOW", contactUpdateFlow),
+        takeLatest("CHANGE_PHONE_FLOW", changePhoneFlow),
+        takeLatest("LOAD_PHONE_DATA_FLOW", loadPhoneDataFlow),
+        takeLatest("ADD_PHONE_FLOW", addPhoneFlow),
+        takeLatest("UPDATE_PHONE_FLOW", updatePhoneFlow),
+        takeLatest("DELETE_PHONE_FLOW", deletePhoneFlow)
     ]
 }
   
