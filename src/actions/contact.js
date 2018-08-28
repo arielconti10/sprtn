@@ -2,9 +2,12 @@ import {
     LOAD_CONTACTS_FLOW, SET_CONTACTS_LIST, SET_CONTACTS_COLUMNS, ON_DELETE_CONTACT_FLOW,
     ON_ACTIVE_CONTACT_FLOW, ADD_CONTACT_FLOW, SET_CONTACT_COLLAPSE, LOAD_CONTACT_INITIAL_FLOW,
     SET_CONTACT_JOB_TITLES, SELECT_JOB_FLOW, SET_CONTACT_JOB_TITLE, SET_CONTACT_STATES,
-    SELECT_STATE_FLOW, SET_CONTACT_STATE_ID, SEARCH_CEP_FLOW, SET_CONTACT_INFO,
+    SELECT_STATE_FLOW, SET_CONTACT_STATE_ID, SEARCH_CEP_FLOW, SET_ADRESS_INFO,
     SET_CONTACT_ERROR, UPDATE_AUTH_EMAIL_FLOW, SET_AUTHORIZE_EMAIL,
-    UPDATE_FAVORITE_FLOW, SET_FAVORITE, UNLOAD_CONTACT, CONTACT_CREATE_FLOW
+    UPDATE_FAVORITE_FLOW, SET_FAVORITE, UNLOAD_CONTACT, CONTACT_CREATE_FLOW,
+    FIND_CONTACT_FLOW, SET_CONTACT_INFO, CONTACT_UPDATE_FLOW, CHANGE_PHONE_FLOW,
+    SET_PHONE_TYPE, LOAD_PHONE_DATA_FLOW, SET_PHONE_DATA, ADD_PHONE_FLOW,
+    UPDATE_PHONE_FLOW, DELETE_PHONE_FLOW
 } from '../actionTypes/contact';
 
 export function loadContactsFlow(user, contacts, collapse) {
@@ -122,10 +125,10 @@ export function searchCepFlow(user, cep) {
     }
 }
 
-export function setContactInfo(contactInfo) {
+export function setAdressInfo(adressInfo) {
     return {
-        type: SET_CONTACT_INFO,
-        contactInfo
+        type: SET_ADRESS_INFO,
+        adressInfo
     }
 }
 
@@ -170,11 +173,89 @@ export function unloadContact() {
     }
 }
 
-export function contactCreateFlow (user, contact, contactList) {
+export function contactCreateFlow (user, contact, contactList, phoneData) {
     return {
       type: CONTACT_CREATE_FLOW,
       user,
       contact,
-      contactList
+      contactList,
+      phoneData
     }
-  }
+}
+
+export function findContactFlow(user, contactId) {
+    return {
+        type: FIND_CONTACT_FLOW,
+        user,
+        contactId
+    }
+}
+
+export function setContactInfo(contactInfo) {
+    return {
+        type: SET_CONTACT_INFO,
+        contactInfo
+    }
+}
+
+export function contactUpdateFlow(user, contact, contactList, contactId, phoneData) {
+    return {
+        type: CONTACT_UPDATE_FLOW,
+        user, 
+        contact, 
+        contactList, 
+        contactId,
+        phoneData
+    }
+}
+
+export function changePhoneFlow(phoneTypeId) {
+    return {
+        type: CHANGE_PHONE_FLOW,
+        phoneTypeId
+    }
+}
+
+export function setPhoneType(phoneTypeId) {
+    return {
+        type: SET_PHONE_TYPE,
+        phoneTypeId
+    }
+}
+
+export function loadPhoneDataFlow(phones) {
+    return {
+        type: LOAD_PHONE_DATA_FLOW,
+        phones
+    }
+}
+
+export function setPhoneData(phoneData) {
+    return {
+        type: SET_PHONE_DATA,
+        phoneData
+    }
+}
+
+export function addPhoneFlow(phone, phoneData) {
+    return {
+        type: ADD_PHONE_FLOW,
+        phone,
+        phoneData
+    }
+}
+
+export function updatePhoneFlow(phoneData) {
+    return {
+        type: UPDATE_PHONE_FLOW,
+        phoneData
+    }
+}
+
+export function deletePhoneFlow(phoneData, phoneId) {
+    return {
+        type: DELETE_PHONE_FLOW,
+        phoneData,
+        phoneId
+    }
+}

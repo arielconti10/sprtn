@@ -1,17 +1,12 @@
 import React, { Component } from 'react';
-import { Link, Redirect } from 'react-router-dom';
 
-import axios from '../../../app/common/axios';
 import { formatDateToAmerican, formatDateToBrazilian } from '../../../app/common/DateHelper';
 
-import { Card, CardHeader, CardFooter, CardBody, Button, Label, Input, Row, Col } from 'reactstrap';
-import ReactTable from 'react-table';
-import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
-import { FieldFeedbacks, FormGroup, FormControlLabel, FormControlInput } from 'react-form-with-constraints-bootstrap4';
+import { Label, Input } from 'reactstrap';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import '../../custom.css';
-import MaskedInput from 'react-maskedinput';
+
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
@@ -21,12 +16,13 @@ import { connect } from 'react-redux'
 import { 
     addContactFlow, loadContactInitialFlow, selectJobFlow, selectStateFlow,
     searchCepFlow, updateAuthEmailFlow, updateFavoriteFlow,
-    unloadContact, contactCreateFlow
+    unloadContact, contactCreateFlow, contactUpdateFlow
 } from '../../../actions/contact'
 
 import { createTextMask } from 'redux-form-input-masks';
 
 import { canUser } from '../../common/Permissions';
+import PhoneForm from './PhoneForm';
 
 // Our validation function for `name` field.
 const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório');
@@ -39,14 +35,16 @@ const validate = values => {
 
 const cepMask = createTextMask({
     pattern: '99999-999',
+    stripMask: false
 });
 
 const cpfMask = createTextMask({
-    pattern: '999.999.999-99',
+    pattern: '999.999.999-99'
 });
 
 const birthdayMask = createTextMask({
     pattern: '99/99/9999',
+    stripMask: false
 });
 
 class ContactForm extends Component {
@@ -60,6 +58,7 @@ class ContactForm extends Component {
         updateFavoriteFlow: PropTypes.func.isRequired,
         unloadContact: PropTypes.func.isRequired,
         contactCreateFlow: PropTypes.func.isRequired,
+        contactUpdateFlow: PropTypes.func.isRequired,
         invalid: PropTypes.bool.isRequired,
         user: PropTypes.shape({
             username: PropTypes.string.isRequired,
@@ -103,6 +102,7 @@ class ContactForm extends Component {
         const jobTitleId = contactObject.jobTitleId;
         const contactList = contactObject.contactsList;
         const schoolId = this.props.schoolId;
+        const phoneData = contactObject.phoneData;
 
         if (!jobTitleId) {
             this.setState({invalid_job: true});
@@ -112,19 +112,22 @@ class ContactForm extends Component {
         contact.job_title_id = jobTitleId.value;
         contact.favorite = contactObject.favorite;
         contact.authorize_email = contactObject.authorizeEmail;
-        contact.state_id = contactObject.stateId.value;
+        if (contactObject.stateId) {
+            contact.state_id = contactObject.stateId.value;
+        }
+        
         contact.school_id = schoolId;
+        contact.birthday = formatDateToAmerican(contact.birthday);
 
         if (contactObject.contactInfo.id) { 
-            // job_title.active = this.props.job_titles.current_job_title.active         
-            // job_titleUpdate(user, job_title)
+            const contactId = contactObject.contactInfo.id;
+            contact.active = 1;
+            this.props.contactUpdateFlow(user, contact, contactList, contactId, phoneData);
         } else {
-            console.log(contact);
-            // this.props.contactCreateFlow(user, contact, contactList)
+            this.props.contactCreateFlow(user, contact, contactList, phoneData);
+            this.resetForm();
         }
 
-        this.resetForm();
-        // console.log(contact);
     }
 
     handleChangeSelect(selectedOption) {
@@ -223,6 +226,7 @@ class ContactForm extends Component {
     )
 
     addContact() {
+        this.props.unloadContact();
         const contact = this.props.contact;
         const collapse = contact.collapse;
         this.props.addContactFlow(collapse);
@@ -234,7 +238,7 @@ class ContactForm extends Component {
         } = this.props;
 
         const { jobTitles, jobTitleId, states, stateId, contactError, authorizeEmail,
-            favorite, contactAddress 
+            favorite, contactAddress, contactInfo 
         } = this.props.contact;
 
         return (
@@ -450,11 +454,17 @@ class ContactForm extends Component {
                         </div>                           
                     </div>
 
+                    <PhoneForm phonesData={contactInfo.phones}/>
+                    
                     <button className="btn btn-primary">Salvar</button>
                     <button type="button" className='btn btn-danger' onClick={this.addContact}>
                         Cancelar
                     </button>
                 </form>
+
+                    
+
+
             </div>
         )
     }
@@ -475,7 +485,8 @@ const functions_object = {
     updateAuthEmailFlow,
     updateFavoriteFlow,
     unloadContact,
-    contactCreateFlow
+    contactCreateFlow,
+    contactUpdateFlow
 };
 
 InitializeFromStateForm = connect(
