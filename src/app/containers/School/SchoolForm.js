@@ -171,7 +171,7 @@ class SchoolForm extends Component {
                     <TabPane tabId="actions">
                         <Row>
                             <Col sm="12">
-                                <SchoolEventList schoolId={id} />
+                                <SchoolEventList school={this.props.school.schoolInfo} schoolType={school_type} />
                             </Col>
                         </Row>
                     </TabPane>

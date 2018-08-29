@@ -465,9 +465,6 @@ class ContactForm extends Component {
                     </button>
                 </form>
 
-                    
-
-
             </div>
         )
     }
