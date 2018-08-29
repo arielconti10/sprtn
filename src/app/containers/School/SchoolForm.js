@@ -178,7 +178,7 @@ class SchoolForm extends Component {
                     <TabPane tabId="distribution">
                         <Row>
                             <Col sm="12">
-                                <SchoolDistributionList />
+                                <SchoolDistributionList school={this.props.school.schoolInfo} />
                             </Col>
                         </Row>
                     </TabPane>
