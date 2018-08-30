@@ -19,7 +19,7 @@ const composeSetup = process.env.NODE_ENV !== 'production' && typeof window === 
 const persistConfig = { 
   key: 'root',
   storage,
-  blacklist: ['marketshare', 'userSchool', 'gridApi', 'login', 'schools' ,'schoolDash'] // navigation will not be persisted
+  blacklist: ['marketshare', 'userSchool', 'gridApi', 'login', 'schools' ,'schoolDash', 'contact', 'event', 'distribution', 'meeting'] // navigation will not be persisted
 }
 
 const persistedReducer = persistReducer(persistConfig, IndexReducer)

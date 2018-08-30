@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { Card, CardBody, Button, Collapse, Row, Col } from 'reactstrap';
-import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
-import { FieldFeedbacks, FormGroup, FormControlLabel } from 'react-form-with-constraints-bootstrap4';
 import ReactTable from 'react-table'
 import Select from 'react-select';
 import moment from 'moment';
 import Flatpickr from 'react-flatpickr'
+import { formatDateToBrazilian } from '../../../app/common/DateHelper';
 
 import 'flatpickr/dist/themes/material_blue.css'
 import 'react-select/dist/react-select.css';
@@ -13,385 +12,54 @@ import 'react-table/react-table.css'
 
 import { canUser } from '../../common/Permissions';
 
-import axios from '../../common/axios';
-const apiSpartan = 'event';
-
-const apis = [
-    { stateArray: 'visit_types', api: 'visit-type' },
-    { stateArray: 'actions', api: 'action' }
-];
-
-const selectsValidade = [
-    { name: 'form_start_date' },
-    { name: 'form_start_time' },
-    { name: 'form_visit_type_id'},
-    { name: 'form_action_id'}
-];
+import { PropTypes } from 'prop-types'
+import { reduxForm, Field } from 'redux-form'
+import { connect } from 'react-redux'
+import { 
+    addEventFlow, changeEventDateFlow, openStartTimeFlow, changeTimeFlow,
+    getEventActionsFlow, changeEventActionFlow, loadEventsFlow,
+    deleteSchoolEventFlow, activeSchoolEventFlow, findSchoolEventFlow,
+    updateSchoolEventFlow, insertSchoolEventFlow, unloadSchoolEvent
+} from '../../../actions/event'
 
 moment.locale('pt-BR');
 
+// Our validation function for `name` field.
+const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório');
+
+const validate = values => {
+    const errors = {};
+    return errors;
+}
+
 class SchoolEventList extends Component {
+    static propTypes = {
+        handleSubmit: PropTypes.func.isRequired,
+        addEventFlow: PropTypes.func.isRequired,
+        changeEventDateFlow: PropTypes.func.isRequired,
+        changeTimeFlow: PropTypes.func.isRequired,
+        getEventActionsFlow: PropTypes.func.isRequired,
+        changeEventActionFlow: PropTypes.func.isRequired,
+        loadEventsFlow: PropTypes.func.isRequired,
+        deleteSchoolEventFlow: PropTypes.func.isRequired,
+        activeSchoolEventFlow: PropTypes.func.isRequired,
+        findSchoolEventFlow: PropTypes.func.isRequired,
+        insertSchoolEventFlow: PropTypes.func.isRequired
+    }
 
     constructor(props) {
         super(props);
-
-        this.state = {
-            view_mode: false,
-            page: 1,
-            page_size: 10,
-            data: [],
-            filtered: [],
-            sorted: [],
-            columns: [],
-
-            collapse: false,
-            block_button: false,
-            back_error: '',
-            submit_button_disabled: false,
-            new: true,
-
-            visit_types: [],
-            actions: [],
-
-            id: null,
-            form_name: '',
-            form_start_date: '',
-            form_start_time: '',
-            form_duration: '00:00:00',
-            form_visit_type_id: 1,
-            form_action_id: 0,
-            form_school_id: this.props.schoolId,
-            form_observations: '',
-
-            validate_form_start_date: 1,
-            validate_form_start_time: 1,
-            validate_form_visit_type_id: 1,
-            validate_form_action_id: 1
-        };
-
-        this.submitForm = this.submitForm.bind(this);
-        this.clearForm = this.clearForm.bind(this);
-        this.closeColapse = this.closeColapse.bind(this);
-        this.showButtonAction = this.showButtonAction.bind(this);
-
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleChangeVisitType = this.handleChangeVisitType.bind(this);
-        this.handleChangeAction = this.handleChangeAction.bind(this);
+        this.onClickAdd = this.onClickAdd.bind(this);
         this.handleChangeStartDate = this.handleChangeStartDate.bind(this);
         this.handleChangeStartTime = this.handleChangeStartTime.bind(this);
         this.handleOpenStartTime = this.handleOpenStartTime.bind(this);
-
+        this.handleChangeAction = this.handleChangeAction.bind(this);
         this.formatedHour = this.formatedHour.bind(this);
-    }
-
-    handleChangeVisitType = (selectedOption) => {
-        this.setState({ validate_form_visit_type_id: 1, submit_button_disabled: false });
-
-        const values = this.state;
-        values.form_visit_type_id = selectedOption.value;
-        this.setState({ values });
-    }
-
-    handleChangeAction = (selectedOption) => {
-        this.setState({ validate_form_action_id: 1, submit_button_disabled: false });
-
-        const values = this.state;
-        values.form_action_id = selectedOption.value;
-        this.setState({ values });
-    }
-
-    handleChangeStartDate(selectedDates, dateStr, instance) {
-        this.setState({ validate_form_start_date: 1, submit_button_disabled: false });
-
-        this.setState({ form_start_date: dateStr });
-    }
-
-    handleChangeStartTime(selectedDates, dateStr, instance) {
-        this.setState({ validate_form_start_time: 1, submit_button_disabled: false });
-
-        this.setState({ form_start_time: dateStr + ':00' });
-    }
-
-    handleOpenStartTime(selectedDates, dateStr, instance) {
-        if (this.state.new) {
-            this.setState({ validate_form_start_time: 1, submit_button_disabled: false });
-
-            this.setState({ form_start_time: this.formatedHour(new Date()) });
-        }
-    }
-
-    clearForm() {
-        this.setState({
-            form_start_date: '',
-            form_start_time: '',
-            form_action_id: 0,
-            form_observations: ''
-        });
-    }
-
-    closeColapse() {
-        this.clearForm();
-        this.setState({
-            block_button: false,
-            collapse: false
-        });
-    }
-
-    onClickDelete(element) {
-        const { id } = element.value;
-
-        axios.delete(`${apiSpartan}/${id}`).
-            then(res => {
-                this.onFetchData();
-            }).catch(function (error) {
-                console.log(error)
-            }.bind(this));
-    }
-
-    onClickEdit(element) {
-        const { id, name, start_date, start_time, duration, visit_type_id, action_id, observations } = element.value;
-        const values = this.state;
-
-        values.id = id;
-        values.form_name = name;
-        values.form_start_date = start_date;
-        values.form_start_time = start_time;
-        values.form_action_id = action_id;
-        values.form_observations = observations;
-        values.block_button = true;
-        values.collapse = true;
-        values.new = false;
-
-        this.setState({ values });
-
-    }
-
-    onClickAdd() {
-        this.setState({
-            block_button: true,
-            collapse: true,
-            new: true
-        });
-    }
-
-    onClickSave() {
-        this.handleSubmit();
-    }
-
-    onClickCancel() {
-        this.closeColapse();
-    }
-
-    onClickActive(element) {
-        const { id, name, start_date, start_time, duration, visit_type_id, user_id, action_id, observations } = element.value;
-
-        axios.put(`${apiSpartan}/${id}`, {
-            'name': name,
-            'start_date': start_date,
-            'start_time': start_time,
-            'duration': duration,
-            'visit_type_id': visit_type_id,
-            'user_id': user_id,
-            'action_id': action_id,
-            'school_id': this.state.form_school_id,
-            'observations': observations,
-            'active': true
-        }).then(res => {
-            this.onFetchData();
-        }).catch(function (error) {
-            console.log(error)
-        }.bind(this));
-    }
-
-    handleChange(e) {
-        const target = e.currentTarget;
-
-        this.form.validateFields(target);
-
-        this.setState({
-            [target.name]: (target.type == 'checkbox') ? target.checked : target.value,
-            submit_button_disabled: !this.form.isValid()
-        });
-    }
-
-    submitForm(event) {
-        event.preventDefault();
-
-        const { form_name, form_start_date, form_start_time, form_duration, form_visit_type_id, form_action_id, form_school_id, form_observations } = this.state;
-
-        axios.post(`${apiSpartan}`, {
-            'name': form_name,
-            'start_date': form_start_date,
-            'start_time': form_start_time,
-            'duration': form_duration,
-            'visit_type_id': form_visit_type_id,
-            'action_id': form_action_id,
-            'school_id': form_school_id,
-            'observations': form_observations,
-            'active': true
-        }).then(res => {
-            this.closeColapse();
-            this.onFetchData();
-        }).catch(function (error) {
-            alert(error);
-            this.setState({ back_error: error || '' });
-        }.bind(this));
-    }
-
-    updateForm(event) {
-
-        event.preventDefault();
-        const { id, form_name, form_start_date, form_start_time, form_duration, form_visit_type_id, form_action_id, form_school_id, form_observations } = this.state;
-
-        axios.put(`${apiSpartan}/${id}`, {
-            'name': form_name,
-            'start_date': form_start_date,
-            'start_time': form_start_time,
-            'duration': form_duration,
-            'visit_type_id': form_visit_type_id,
-            'action_id': form_action_id,
-            'school_id': form_school_id,
-            'observations': form_observations,
-            'active': true
-        }).then(res => {
-            this.closeColapse();
-            this.onFetchData();
-        }).catch(function (error) {
-            alert(error);
-            this.setState({ back_error: error || '' });
-        });
-    }
-
-    handleSubmit() {
-        this.form.validateFields();
-
-        this.setState({ submit_button_disabled: !this.form.isValid() });
-
-        // Validate selects
-        let stopSubmit = false;
-        selectsValidade.map(select => {
-            let objState = `validate_${select.name}`;
-            let objSelect = this.state[select.name];
-            
-            if (objSelect === undefined || objSelect == 0) {
-                this.setState({ [objState]: 0, submit_button_disabled: true });
-                stopSubmit = true;
-            } else {
-                this.setState({ [objState]: 1 });
-            }
-        });
-
-        if(stopSubmit){
-            return;
-        } 
-
-        if (this.form.isValid()) {
-            if (!this.state.new) {
-                this.updateForm(event);
-            } else {
-                this.submitForm(event);
-            }
-        }
-    }
-
-    checkPermission() {
-        canUser('school.update', this.props.history, "change", function(rules){
-            if (rules.length == 0) {
-                this.setState({ view_mode: true, submit_button_disabled: true });
-            }
-        }.bind(this));
-    }
-
-    componentDidMount() {
-        this.checkPermission();
-        let col = [
-            { Header: "Data início", accessor: "start_date", headerClassName: 'text-left', Cell: (element) => (<span>{this.convertDate(element)}</span>) },
-            { Header: "Hora início", accessor: "start_time", headerClassName: 'text-left' },
-            { Header: "Tipo visita", accessor: "visit_type.name", headerClassName: 'text-left' },
-            { Header: "Usuário", accessor: "user.name", headerClassName: 'text-left' },
-            { Header: "Ação", accessor: "action.name", headerClassName: 'text-left' },
-            { Header: "Observação", accessor: "observations", headerClassName: 'text-left' }
-        ];
-
-        col.push(
-            {
-                Header: "Status",
-                accessor: "",
-                width: 80,
-                headerClassName: 'text-left',
-                sortable: false,
-                Cell: (element) => (
-                    !element.value.deleted_at ?
-                    <div><span className="alert-success grid-record-status">Ativo</span></div>
-                    :
-                    <div><span className="alert-danger grid-record-status">Inativo</span></div>
-                )/*,                
-                    filterable: true, 
-                    Filter: ({ filter, onChange }) => (
-                    
-                        <select
-                            onChange={event => this.onFetchData(null, null, event.target.value, { filter, onChange })}
-                            style={{ width: "100%" }}
-                        >
-                            <option value="all">Todos</option>
-                            <option value="false">Ativo</option>
-                            <option value="true">Inativo</option>
-                        </select>
-                    )*/
-            }, {
-                Header: "Ações", accessor: "", sortable: false, width: 90, headerClassName: 'text-left', Cell: (element) =>
-                    (
-                        !element.value.deleted_at ?
-                            <div className={this.showButtonAction(element)}>
-                                <button className='btn btn-primary btn-sm' disabled={this.state.block_button} onClick={() => this.onClickEdit(element)}>
-                                    <i className='fa fa-pencil'></i>
-                                </button>
-
-                                <button className='btn btn-danger btn-sm' disabled={this.state.block_button} onClick={() => this.onClickDelete(element)}>
-                                    <i className='fa fa-ban'></i>
-                                </button>
-                            </div>
-                            :
-                            <div className={this.showButtonAction(element)}>
-                                <button className='btn btn-success btn-sm' disabled={this.state.block_button} onClick={() => this.onClickActive(element)}>
-                                    <i className='fa fa-check-circle'></i>
-                                </button>
-                            </div>
-                    )
-            }
-        )
-
-        this.setState({ columns: col });
-
-        let baseURL = `/school/${this.state.form_school_id}`;
-
-        axios.get(baseURL)
-            .then((response) => {
-                const identify = response.data.data.school_type.identify
-
-                apis.map(item => {
-                    axios.get(`${item.api}${item.api == 'action' ? `?filter[visit_type_school_type.school_type.identify]=${identify}` : ''}`)
-                        .then(response => {
-                            let dados = response.data.data;
-                            dados.map(item => {
-                                item['value'] = item.id,
-                                    item['label'] = item.name
-                            });
-                            this.setState({ [item.stateArray]: dados });
-                        })
-                        .catch(err => console.log(err));
-                });
-            })
-            .catch(err => console.log(err));
-
-    }
-
-    convertDate(element) {
-        let row = element.original;
-
-        let arr = row.start_date.split('-');
-        return `${arr[2]}/${arr[1]}/${arr[0]}`;
+        this.showButtonAction = this.showButtonAction.bind(this);
+        this.onClickDelete = this.onClickDelete.bind(this);
+        this.onClickActive = this.onClickActive.bind(this);
+        this.onClickEdit = this.onClickEdit.bind(this);
+        this.submit = this.submit.bind(this);
     }
 
     showButtonAction(element) {
@@ -405,6 +73,57 @@ class SchoolEventList extends Component {
         return divClass;
     }
 
+    onClickDelete(element) {
+        const { id } = element.value;
+        const user = this.props.user;
+        const schoolInfo = this.props.school;
+        const schoolId = schoolInfo.id;
+
+        this.props.deleteSchoolEventFlow(user, id, schoolId);
+    }
+
+    onClickEdit(element) {
+        const { id } = element.value;
+        const eventInfo = element.value;
+
+        this.props.findSchoolEventFlow(eventInfo);
+    }
+
+    onClickActive(element) {
+        const { id } = element.value;
+        const user = this.props.user;
+        const schoolInfo = this.props.school;
+        const schoolId = schoolInfo.id;
+
+        this.props.activeSchoolEventFlow(user, element, id, schoolId);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const schoolType = this.props.schoolType;
+        const schoolInfo = this.props.schoolInfo;
+        const user = nextProps.user;
+
+        if (schoolType !== nextProps.schoolType) {
+            const identify = nextProps.schoolType.identify;
+            this.props.reset(); 
+            this.props.getEventActionsFlow(user, identify);
+        }
+
+        if (schoolInfo !== nextProps.school && !this.props.school.events) {
+            const events = nextProps.school.events;
+            this.props.loadEventsFlow(user, events);
+        }
+        
+    }
+
+    onClickAdd() {
+        const event = this.props.eventSchool;
+        const collapse = event.collapse;
+        this.props.reset();
+        this.props.unloadSchoolEvent();
+        this.props.addEventFlow(collapse);
+    }
+
     formatedHour(hour) {
         let h = new Date(hour);
         function pad(h) { return h < 10 ? '0' + h : h }
@@ -412,182 +131,370 @@ class SchoolEventList extends Component {
             + pad(h.getMinutes()) + ':00';
     }
 
-    onFetchData = (state, instance, deleted_at) => {
-        let baseURL = `/school/${this.state.form_school_id}`;
+    renderTextAreaInput = ({ input, type, disabled, valueOption ,meta: { touched, error } }) => (
+        <div>
+            {/* Spread RF's input properties onto our input */}
+            <textarea
+                className="form-control"
+                {...input}
+                rows={5}
+                disabled={disabled}
+                // value={valueOption}
+            >
+            </textarea>
+            {touched && error && (
+                <div style={{ color: 'red'}}>
+                    {error}
+                </div>
+            )
+            }
+        </div>
 
-        axios.get(baseURL)
-            .then((response) => {
-                const dados = response.data.data.events
+    )
 
-                this.setState({
-                    form_name: response.data.data.name,
-                    data: dados
-                });
-            })
-            .catch(err => console.log(err));
+    renderDateInput = ({ input, type, disabled, valueOption, onChangeFunction ,meta: { touched, error } }) => (
+        <div>
+            <Flatpickr
+                className="form-control"
+                options={{ minDate: 'today' }}
+                value={valueOption}
+                onChange={onChangeFunction}      
+            />
+
+            {touched && error && (
+                <div style={{ color: 'red'}}>
+                    {error}
+                </div>
+            )
+            }
+        </div>
+    )
+
+    renderTimeInput = ({ input, type, disabled, valueOption, onChangeFunction , onOpenFunction,meta: { touched, error } }) => (
+        <div>
+            <Flatpickr
+                className="form-control"
+                data-enable-time
+                options={{ noCalendar: true, time_24hr: true }}
+                value={valueOption}
+                onChange={onChangeFunction}     
+                onOpen={onOpenFunction} 
+            />
+
+            {touched && error && (
+                <div style={{ color: 'red'}}>
+                    {error}
+                </div>
+            )
+            }
+        </div>
+    )
+
+    renderSelectInput = ({ input, name, valueOption, options, labelKey, valueKey, disabled, onChangeFunction ,meta: { touched, error } }) => (
+        <div className="form-group group-select">
+            <Select
+                {...input}
+                name={name}
+                id={name}
+                disabled={disabled}
+                value={valueOption}
+                onChange={onChangeFunction}
+                options={options}
+                placeholder="Selecione..."
+                labelKey={labelKey}
+                valueKey={valueKey}
+                onBlur={() => input.onBlur(input.value)}
+            />
+
+            {touched && error && (
+                <div style={{ color: 'red'}}>
+                    {error}
+                </div>
+            )
+            }
+        </div>
+    )
+
+    handleChangeStartDate(selectedDates, dateStr, instance) {
+        this.props.changeEventDateFlow(dateStr);
+    }
+
+    handleChangeStartTime(selectedDates, dateStr, instance) {
+        const formStartTime = dateStr + ':00';
+        this.props.changeTimeFlow(formStartTime);
+    }
+
+    handleOpenStartTime() {
+        const actualTime = this.formatedHour(new Date());
+        this.props.openStartTimeFlow(actualTime);
+    }
+
+    handleChangeAction(selectedOption) {
+        this.props.changeEventActionFlow(selectedOption);
+    }
+
+    submit(eventObject) {
+        const { user, reset } = this.props
+        const { id, name } = this.props.school;
+        const eventSchool = this.props.eventSchool;
+        const { collapse, dateStr, formStartTime, actions, actionId, schoolEvents } = this.props.eventSchool;
+        const eventInfo = eventSchool.eventInfo;
+
+        if (dateStr && formStartTime && actionId) {
+            const savedObject = {
+                action_id: actionId.value,
+                active: true,
+                duration: "00:00:00",
+                name: name,
+                observations: eventObject.observations,
+                school_id: id,
+                start_date: dateStr,
+                start_time: formStartTime,
+                visit_type_id: 1
+            };
+
+            if (eventInfo.id) {
+                this.props.updateSchoolEventFlow(user, savedObject, eventInfo.id, id);
+            } else {
+                this.props.insertSchoolEventFlow(user, savedObject, id);
+            }
+        }
+
     }
 
     render() {
-        const { 
-            view_mode, collapse, back_error, submit_button_disabled, data, page_size, 
-            columns, actions, visit_types, form_start_date, form_start_time,
-            validate_form_start_date, validate_form_start_time, validate_form_visit_type_id, 
-            form_visit_type_id, form_action_id, validate_form_action_id, form_observations 
-        } = this.state;
+        const { collapse, dateStr, formStartTime, actions, actionId, schoolEvents
+        
+        } = this.props.eventSchool;
+
+        const {
+            handleSubmit,
+        } = this.props;
 
         return (
             <div>
-                <Collapse isOpen={collapse}>
-                    <Card>
-                        <CardBody>
-                            <div>
-                                {back_error !== '' &&
-                                    <h4 className="alert alert-danger"> {back_error} </h4>
-                                }
-                                <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
-                                    onSubmit={this.handleSubmit} noValidate>
-
+                <div>
+                    <Collapse isOpen={collapse}>
+                    
+                        <Card>
+                            <CardBody>
+                            <form onSubmit={handleSubmit(this.submit)}>
                                     <Row>
                                         <Col md="3">
-                                            <FormGroup for="form_start_date">
-                                                <FormControlLabel htmlFor="form_start_date">Data início <span className="text-danger"><strong>*</strong></span></FormControlLabel>
-                                                <Flatpickr
-                                                    className="form-control"
-                                                    options={{ minDate: 'today' }}
-                                                    value={form_start_date}
-                                                    onChange={this.handleChangeStartDate}                                                    
+                                            <div className="form-group">
+                                                <label htmlFor="form_start_date">
+                                                    Data de Início 
+                                                    <span className="text-danger"><strong>*</strong></span>
+                                                </label>
+                                                <Field
+                                                    name="form_start_date"
+                                                    disabled={true}
+                                                    valueOption={dateStr}
+                                                    onChangeFunction={this.handleChangeStartDate}      
+                                                    component={this.renderDateInput}
                                                 />
-                                               {validate_form_start_date == 0 &&
+                                                {!dateStr &&
                                                     <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
                                                 }
-                                            </FormGroup>
+                                            </div>
                                         </Col>
-
                                         <Col md="3">
-                                            <FormGroup for="form_start_time">
-                                                <FormControlLabel htmlFor="form_start_time">Hora início <span className="text-danger"><strong>*</strong></span></FormControlLabel>
-                                                <Flatpickr
-                                                    className="form-control"
-                                                    data-enable-time
-                                                    options={{ noCalendar: true, time_24hr: true }}
-                                                    value={form_start_time}
-                                                    onChange={this.handleChangeStartTime}
-                                                    onOpen={this.handleOpenStartTime}
-                                                    required
+                                            <div className="form-group">
+                                                <label htmlFor="form_start_time">
+                                                    Horário de Início 
+                                                    <span className="text-danger"><strong>*</strong></span>
+                                                </label>
+                                                <Field
+                                                    name="form_start_time"
+                                                    disabled={true}
+                                                    valueOption={formStartTime}
+                                                    onChangeFunction={this.handleChangeStartTime}      
+                                                    onOpenFunction={this.handleOpenStartTime}
+                                                    component={this.renderTimeInput}
+                                                    // validate={fieldRequired}
                                                 />
-                                                {validate_form_start_time == 0 &&
+                                                {!formStartTime &&
                                                     <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
                                                 }
-                                            </FormGroup>
+                                            </div>
                                         </Col>
-
                                         <Col md="3">
-                                            <FormGroup for="form_visit_type_id">
-                                                <FormControlLabel htmlFor="form_visit_type_id">Tipo de visita <span className="text-danger"><strong>*</strong></span></FormControlLabel>
-                                                <Select
-                                                    name="form_visit_type_id"
-                                                    id="form_visit_type_id"
-                                                    disabled={view_mode}
-                                                    value={form_visit_type_id}
-                                                    onChange={this.handleChangeVisitType}
-                                                    options={visit_types}
-                                                    placeholder="Selecione..."
-                                                    required
-                                                    disabled
-                                                />
-                                                {validate_form_visit_type_id == 0 &&
-                                                    <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
-                                                }
-                                            </FormGroup>
+                                            <label htmlFor="form_visit_type_id">
+                                                Tipo de visita <span className="text-danger"><strong>*</strong></span>
+                                            </label>
+                                            <Field
+                                                name="form_visit_type_id"
+                                                options={[
+                                                    {value: 1, label: "Comercial"}
+                                                ]}
+                                                disabled={true}
+                                                placeholder="Selecione..."
+                                                valueOption={1}
+                                                component={this.renderSelectInput}
+                                            />
                                         </Col>
-
                                         <Col md="3">
-                                            <FormGroup for="form_action_id">
-                                                <FormControlLabel htmlFor="form_action_id">Ação <span className="text-danger"><strong>*</strong></span></FormControlLabel>
-                                                <Select
-                                                    name="form_action_id"
-                                                    id="form_action_id"
-                                                    disabled={view_mode}
-                                                    value={form_action_id}
-                                                    onChange={this.handleChangeAction}
-                                                    options={actions}
-                                                    placeholder="Selecione..."
-                                                    required
-                                                />
-                                                {validate_form_action_id == 0 &&
-                                                    <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
-                                                }
-                                            </FormGroup>
+                                            <label htmlFor="form_action_id">
+                                                Ação <span className="text-danger"><strong>*</strong></span>
+                                            </label>
+                                            <Field
+                                                name="form_action_id"
+                                                options={actions}
+                                                onChangeFunction={this.handleChangeAction}
+                                                placeholder="Selecione..."
+                                                valueOption={actionId}
+                                                component={this.renderSelectInput}
+                                                // validate={actionRequired}
+                                            />
+                                            {!actionId &&
+                                                <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
+                                            }
                                         </Col>
                                     </Row>
 
                                     <Row>
                                         <Col md="12">
-                                            <FormGroup for="form_observations">
-                                                <FormControlLabel htmlFor="form_observations">Observações <span className="text-danger"><strong>*</strong></span></FormControlLabel>
-                                                <textarea
-                                                    className="form-control"
-                                                    rows="5"
-                                                    id="form_observations"
-                                                    name="form_observations"
-                                                    disabled={view_mode}
-                                                    value={form_observations}
-                                                    onChange={this.handleChange}
-                                                    required
+                                                <label htmlFor="observations">
+                                                    Observações 
+                                                    <span className="text-danger"><strong>*</strong></span>
+                                                </label>
+                                                <Field
+                                                    name="observations"
+                                                    id="observations"
+                                                    validate={fieldRequired}
+                                                    component={this.renderTextAreaInput}
                                                 />
-                                                <FieldFeedbacks for="form_observations">
-                                                    <FieldFeedback when="valueMissing">Este campo é de preenchimento obrigatório</FieldFeedback>
-                                                </FieldFeedbacks>
-                                            </FormGroup>
                                         </Col>
-                                    </Row>
-                                </FormWithConstraints>
-                            </div>
-
-                            <div>
-                                <Row>
-                                    <Col md="1">
-                                        <Button color='primary' onClick={() => this.onClickSave()} disabled={submit_button_disabled}><i className="fa fa-plus-circle"></i> Salvar</Button>
-                                    </Col>
-                                    <Col md="1">
-                                        <Button color='danger' onClick={() => this.onClickCancel()}><i className="fa fa-plus-circle"></i> Cancelar</Button>
-                                    </Col>
-                                </Row>
-                            </div>
-                        </CardBody>
-                    </Card>
-                </Collapse>
-                <div>
+                                    </Row>                            
+                                    <br />
+                                    <div>
+                                        <Row>
+                                            <Col md="1">
+                                                <button className="btn btn-primary">
+                                                <i className="fa fa-plus-circle"></i> 
+                                                    Salvar
+                                                </button>
+                                            </Col>
+                                            <Col md="1">
+                                                <Button color='danger' onClick={() => this.onClickAdd()}><i className="fa fa-plus-circle"></i> Cancelar</Button>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                </form>
+                                
+                            </CardBody>
+                        </Card>
+                       
+                    </Collapse>
                     <Row>
                         <Col md="2">
-                            <Button color='primary' disabled={view_mode} onClick={() => this.onClickAdd()}><i className="fa fa-plus-circle"></i> Adicionar</Button>
+                            <Button type="button" color='primary' onClick={() => this.onClickAdd()}
+                                disabled={collapse?true:false}
+                                >
+                                <i className="fa fa-plus-circle"></i> 
+                                Adicionar
+                            </Button>
                         </Col>
                     </Row>
                     <br />
-                </div>
-                <div>
                     <Row>
                         <Col md="12">
-                            <ReactTable
-                                columns={columns}
-                                data={data}
-                                defaultPageSize={page_size}
-                                onFetchData={this.onFetchData}
-                                previousText='Anterior'
-                                nextText='Próximo'
-                                loadingText='Carregando...'
-                                noDataText='Sem registros'
-                                pageText='Página'
-                                ofText='de'
-                                rowsText=''
-                                className='-striped -highlight'
-                            />
+                            <div className="event-grid">
+                                <ReactTable
+                                    columns={
+                                        [
+                                            { Header: "Data início", accessor: "start_date", headerClassName: 'text-left', 
+                                                Cell: (element) => (<span>{formatDateToBrazilian(element.original.start_date)}</span>) 
+                                            },
+                                            { Header: "Hora início", accessor: "start_time", headerClassName: 'text-left' },
+                                            { Header: "Tipo visita", accessor: "visit_type.name", headerClassName: 'text-left' },
+                                            { Header: "Usuário", accessor: "user.name", headerClassName: 'text-left' },
+                                            { Header: "Ação", accessor: "action.name", headerClassName: 'text-left' },
+                                            { Header: "Observação", accessor: "observations", headerClassName: 'text-left' },
+                                            {
+                                                Header: "Status",
+                                                accessor: "",
+                                                width: 80,
+                                                headerClassName: 'text-left',
+                                                sortable: false,
+                                                Cell: (element) => (
+                                                    !element.value.deleted_at ?
+                                                    <div><span className="alert-success grid-record-status">Ativo</span></div>
+                                                    :
+                                                    <div><span className="alert-danger grid-record-status">Inativo</span></div>
+                                                )
+                                            },
+                                            {
+                                                Header: "Ações", accessor: "", sortable: false, width: 90, headerClassName: 'text-left', Cell: (element) =>
+                                                    (
+                                                        !element.value.deleted_at ?
+                                                            <div className={this.showButtonAction(element)}>
+                                                                <button className='btn btn-primary btn-sm' onClick={() => this.onClickEdit(element)}>
+                                                                    <i className='fa fa-pencil'></i>
+                                                                </button>
+                                
+                                                                <button className='btn btn-danger btn-sm' onClick={() => this.onClickDelete(element)}>
+                                                                    <i className='fa fa-ban'></i>
+                                                                </button>
+                                                            </div>
+                                                            :
+                                                            <div className={this.showButtonAction(element)}>
+                                                                <button className='btn btn-success btn-sm' onClick={() => this.onClickActive(element)}>
+                                                                    <i className='fa fa-check-circle'></i>
+                                                                </button>
+                                                            </div>
+                                                    )
+                                            }
+                                        ]
+                                    }
+                                    data={schoolEvents}
+                                    defaultPageSize={10}
+                                    loadingText='Carregando...'
+                                    noDataText='Sem registros'
+                                    ofText='de'
+                                    rowsText=''
+                                    className='-striped -highlight'
+                                />
+                            </div>
                         </Col>
                     </Row>
+                    <br />
                 </div>
             </div>
         )
     }
 }
 
-export default SchoolEventList;
+let SchoolEventForm = reduxForm({
+    form: 'SchoolEventForm',
+    enableReinitialize: true,
+    validate
+})(SchoolEventList)
+
+const functions_object = {
+    addEventFlow,
+    changeEventDateFlow,
+    openStartTimeFlow,
+    changeTimeFlow,
+    getEventActionsFlow,
+    changeEventActionFlow,
+    loadEventsFlow,
+    deleteSchoolEventFlow,
+    activeSchoolEventFlow,
+    findSchoolEventFlow,
+    updateSchoolEventFlow,
+    insertSchoolEventFlow,
+    unloadSchoolEvent
+};
+
+SchoolEventForm = connect(
+    state => ({
+        user: state.user,
+        eventSchool: state.event,
+        initialValues: state.event.eventInfo
+    }),
+    functions_object
+)(SchoolEventForm)
+
+
+export default SchoolEventForm

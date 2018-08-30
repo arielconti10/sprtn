@@ -6,7 +6,7 @@
  */
 export const formatDateToAmerican=(date_brazilian)=>{
     let date_american = "";
-    if (date_brazilian.indexOf("/") !== -1) {
+    if (date_brazilian && date_brazilian.indexOf("/") !== -1) {
         let date_explode = date_brazilian.split("/");
         date_american = `${date_explode[2]}-${date_explode[1]}-${date_explode[0]}`;
     }

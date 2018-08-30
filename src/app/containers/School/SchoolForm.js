@@ -65,7 +65,6 @@ class SchoolForm extends Component {
             total_students, school_type, contacts, school_code_totvs, sector_id, subsidiary_id
         } = this.props.school.schoolInfo;
 
-
         return (
             <div>
                 {ringLoad == true &&
@@ -172,14 +171,14 @@ class SchoolForm extends Component {
                     <TabPane tabId="actions">
                         <Row>
                             <Col sm="12">
-                                <SchoolEventList schoolId={id} />
+                                <SchoolEventList school={this.props.school.schoolInfo} schoolType={school_type} />
                             </Col>
                         </Row>
                     </TabPane>
                     <TabPane tabId="distribution">
                         <Row>
                             <Col sm="12">
-                                <SchoolDistributionList />
+                                <SchoolDistributionList school={this.props.school.schoolInfo} />
                             </Col>
                         </Row>
                     </TabPane>

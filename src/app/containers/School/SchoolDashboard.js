@@ -44,7 +44,6 @@ class SchoolDashboard extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        
         const user = this.props.user;
         const school = this.props.school;
         const marketshare = school.marketshare;
@@ -54,17 +53,6 @@ class SchoolDashboard extends Component {
             this.props.loadDashFlow(user, nextMarketshare);
         }
     }
-
-    // componentWillMount() {
-    //     console.log("WILL MOUNT!");
-    //     const user = this.props.user;
-    //     const school = this.props.school;
-    //     const marketshare = school.marketshare;
-
-    //     console.log(marketshare);
-
-    //     this.props.loadDashFlow(user, marketshare);
-    // }
 
     handleChangeYear = (selectedOption) => {
         const school = this.props.school;

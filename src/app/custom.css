@@ -2,6 +2,10 @@
     width: 100%;
 }
 
+.group-select {
+    margin-bottom: 0 !important;
+}
+
 .loader{
     background: rgba( 255, 255, 255, .8 ) 
         url('https://www.ipswitch.com/library/img/loading.gif')
