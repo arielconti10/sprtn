@@ -13,6 +13,7 @@ import {
 import {
   STUDENTS_CREATING,
   STUDENTS_REQUESTING,
+  STUDENTS_SELECT_LEVEL,
 } from '../actionTypes/students';
 
 import {
@@ -20,6 +21,7 @@ import {
   studentsCreateError,
   studentsRequestSuccess,
   studentsRequestError,
+  setStudentLevelId,
 } from '../actions/students';
 
 const studentsUrl = `${process.env.API_URL}`;
@@ -35,36 +37,47 @@ function handleRequest(request) {
     });
 }
 
-function studentsCreate(user, students) {
+function* studentsSelectLevel(action){
+  console.log(action)
+  const levelId = action.levelId;
+  yield put(setStudentLevelId(levelId))
+}
+
+function studentsCreate(user, students, school_id) {
   const dataStudents = students;
   dataStudents.active = true;
-  const url = `${studentsUrl}/students`;
-  const request = fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // passes our token as an "Authorization" header in
-      // every POST request.
-      Authorization: `Bearer ${user.access_token}` || undefined, // will throw an error if no login
-    },
-    body: JSON.stringify(dataStudents),
-  });
 
-  return handleRequest(request);
+  console.log(dataStudents)
+
+  // const url = `${studentsUrl}/students`;
+  // const request = fetch(url, {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //     // passes our token as an "Authorization" header in
+  //     // every POST request.
+  //     Authorization: `Bearer ${user.access_token}` || undefined, // will throw an error if no login
+  //   },
+  //   body: JSON.stringify(dataStudents),
+  // });
+
+  // return handleRequest(request);
 }
 
 function* studentsCreateFlow(action) {
   try {
     const {
       user,
-      student,
+      students,
+      school_id,
     } = action;
+
 
     // if (student.id !== undefined) {
     //   const updatedShift = yield call(shiftUpdate, user, shift)
     //   yield put(shiftUpdateSuccess(updatedShift))
     // } else {
-    const createdStudent = yield call(studentsCreate, user, student);
+    const createdStudent = yield call(studentsCreate, user, students, school_id);
     yield put(studentsCreateSuccess(createdStudent));
 
     // history.push('/cadastro/turnos');
@@ -91,7 +104,7 @@ function* shiftRequestFlow(action) {
   try {
     // grab the user from our action
     const {
-      user,
+      user, 
       // students,
     } = action;
 
@@ -107,6 +120,7 @@ function* studentsWatcher() {
   yield [
     takeLatest(STUDENTS_CREATING, studentsCreateFlow),
     takeLatest(STUDENTS_REQUESTING, shiftRequestFlow),
+    takeLatest(STUDENTS_SELECT_LEVEL, studentsSelectLevel)
   ];
 }
 

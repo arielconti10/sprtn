@@ -157,7 +157,7 @@ class SchoolForm extends Component {
                     <TabPane tabId="students">
                         <Row>
                             <Col sm="12">
-                                <SchoolStudentList viewMode={view_mode} schoolId={id} url={this.props.match.url} />
+                                <SchoolStudentList viewMode={view_mode} school={this.props.school.schoolInfo} schoolId={id} url={this.props.match.url} />
                             </Col>
                         </Row>
                     </TabPane>

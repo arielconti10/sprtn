@@ -23,6 +23,7 @@ import rules from './reducers/rules'
 import schools from './reducers/school';
 import schoolDash from './reducers/schoolDash';
 import contact from './reducers/contact';
+import students from './reducers/students';
 
 const IndexReducer = combineReducers({
   user,
@@ -48,7 +49,8 @@ const IndexReducer = combineReducers({
   rules,
   schools,
   schoolDash,
-  contact
+  contact,
+  students,
 })
 
 export default IndexReducer  

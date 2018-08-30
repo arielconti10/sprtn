@@ -5,6 +5,8 @@ import {
   STUDENTS_REQUESTING,
   STUDENTS_REQUEST_SUCCESS,
   STUDENTS_REQUEST_ERROR,
+  STUDENTS_SELECT_LEVEL,
+  STUDENTS_SET_LEVEL,
 } from '../actionTypes/students';
 
 const initialState = {
@@ -29,7 +31,7 @@ const reducer = function studentsReducer(state = initialState, action) {
         errors: [],
       };
 
-      // On success include the new shift into our list
+    // On success include the new shift into our list
     case STUDENTS_CREATE_SUCCESS:
       return {
         list: state.list.concat([action.shift]),
@@ -88,6 +90,18 @@ const reducer = function studentsReducer(state = initialState, action) {
           time: new Date(),
         }]),
       };
+
+    case STUDENTS_SELECT_LEVEL:
+      return {
+        ...state
+      }
+      
+    case STUDENTS_SET_LEVEL:
+      const levelId = action.levelId;
+      return {
+        ...state,
+        levelId
+      }
 
     default:
       return state;
