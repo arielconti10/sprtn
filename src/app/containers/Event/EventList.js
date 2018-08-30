@@ -29,6 +29,7 @@ class EventList extends Component {
                             { Header: "Duraçāo", accessor: "duration", id: "duration" ,filterable: true, headerClassName: 'text-left', is_checked: true }
                         ]}
                         urlLink={this.props.match.url}
+                        hideFirstButton={true}
                     />
                 </div>  
             </div>

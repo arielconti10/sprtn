@@ -8,6 +8,7 @@ import {
   SHIFT_LOADING,
   SHIFT_REQUEST_ERROR,
   SHIFT_UPDATE_SUCCESS,
+  SHIFT_UNLOAD
 } from '../actionTypes/shifts'
 
 const initialState = {
@@ -146,6 +147,12 @@ const reducer = function shiftReducer(state = initialState, action) {
           body: action.error.toString(),
           time: new Date(),
         }]),
+      }
+    
+    case SHIFT_UNLOAD:
+      state.current_shift = {};
+      return {
+          ...state
       }
 
     default:

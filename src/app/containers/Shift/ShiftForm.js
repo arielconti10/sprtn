@@ -12,7 +12,7 @@ import { canUser } from '../../common/Permissions';
 import { PropTypes } from 'prop-types'
 import { reduxForm, Field } from 'redux-form'
 import { connect } from 'react-redux'
-import { shiftCreate, shiftUpdate, shiftLoad } from '../../../actions/shifts';
+import { shiftCreate, shiftUpdate, shiftLoad, shiftUnload } from '../../../actions/shifts';
 
 // Our validation function for `name` field.
 const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório')
@@ -40,6 +40,7 @@ class ShiftForm extends Component {
         shiftUpdate: PropTypes.func.isRequired,
         shiftCreate: PropTypes.func.isRequired,
         shiftLoad: PropTypes.func.isRequired,
+        shiftUnload: PropTypes.func.isRequired,
         reset: PropTypes.func.isRequired,
         initialValues: PropTypes.object
     }
@@ -72,6 +73,9 @@ class ShiftForm extends Component {
     componentWillMount() {
         const { shiftLoad, user } = this.props
         this.checkPermission('shift.insert');
+        this.props.reset();
+        this.props.shiftUnload();
+
         if (this.props.match.params.id !== undefined) {
             this.checkPermission('shift.update');
             shiftLoad(user, this.props.match.params.id)
@@ -261,7 +265,7 @@ InitializeFromStateForm = connect(
         shifts: state.shifts,
         initialValues: state.shifts.current_shift
     }),
-    { shiftLoad, shiftUpdate, shiftCreate }
+    { shiftLoad, shiftUpdate, shiftCreate, shiftUnload }
 )(InitializeFromStateForm)
 
 
