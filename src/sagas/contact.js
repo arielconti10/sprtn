@@ -239,6 +239,14 @@ function transformeAdress(adressInfo) {
 function createContact(user, contact, phones) {
     contact.active = true;
     contact.phones = phones;
+     
+    if (contact.phones) {
+        contact.phones.map(item => {
+            if (item.phone_extension == "") {
+                delete item.phone_extension;
+            }
+        });
+    }
 
     const url = `${apiUrl}`
     const request = fetch(url, {
