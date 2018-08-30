@@ -22,6 +22,7 @@ import {
 import { createTextMask } from 'redux-form-input-masks';
 
 import { canUser } from '../../common/Permissions';
+import { validateCPF, validateEmail, validateDate, validateZipCode } from '../../common/ValidatorHelper';
 import PhoneForm from './PhoneForm';
 
 // Our validation function for `name` field.
@@ -29,7 +30,35 @@ const fieldRequired = value => (value ? undefined : 'Este campo é de preenchime
 
 const validate = values => {
     const errors = {};
+    
+    if (values.email) {
+        if (validateEmail(values.email)) {
+            errors.email = 'E-mail inválido';
+        }
+    }
 
+    if (values.cpf) {
+        if (!validateCPF(values.cpf)) {
+            errors.cpf = "CPF inválido";
+        }
+    }
+
+    if (values.birthday) {
+        if (!validateDate(values.birthday)) {
+            errors.birthday = "Data inválida";
+        }
+    }
+
+    if (values.zip_code) {
+        if (!validateZipCode(values.zip_code)) {
+            errors.zip_code = "Deve ter 8 caracteres";
+        } else {
+            if (!values.number) {
+                errors.number = "Este campo é de preenchimento obrigatório";
+            }
+        }
+    }
+    
     return errors;
 }
 
@@ -129,8 +158,6 @@ class ContactForm extends Component {
         }
 
         this.resetForm();
-        this.props.updatePhoneFlow([]);  
-
     }
 
     handleChangeSelect(selectedOption) {
@@ -415,6 +442,7 @@ class ContactForm extends Component {
                             <label>Estado</label>
                             <Field
                                 name="state_id"
+                                id="state_id"
                                 options={states}
                                 onChangeFunction={this.handleChangeSelectState}
                                 placeholder="Selecione..."
