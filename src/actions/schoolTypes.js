@@ -10,6 +10,7 @@ import {
     SCHOOL_TYPES_REQUESTING,
     SCHOOL_TYPES_REQUEST_SUCCESS,
     SCHOOL_TYPES_REQUEST_ERROR,
+    UNLOAD_SCHOOL_TYPE
   } from '../actionTypes/schoolTypes'
   
   export const schoolTypeCreate = function schoolTypeCreate (user, schoolType) {
@@ -90,5 +91,11 @@ import {
       type: SCHOOL_TYPES_REQUEST_ERROR,
       error,
     }
+  }
+
+  export const unloadSchoolType = function unloadSchoolType() {
+      return {
+          type: UNLOAD_SCHOOL_TYPE
+      }
   }
   

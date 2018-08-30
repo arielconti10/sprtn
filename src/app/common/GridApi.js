@@ -284,7 +284,7 @@ class GridApi extends Component {
 
             <div>
                 <div className="section-dropdown">
-                    {!this.props.hideButtons 
+                    {(!this.props.hideButtons && !this.props.hideFirstButton) 
                         && <NavLink to={this.props.urlLink + "/novo"} exact>
                             <Button color='primary' ><i className="fa fa-plus-circle"></i> Adicionar</Button>
                         </NavLink>

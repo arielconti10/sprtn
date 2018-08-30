@@ -11,6 +11,7 @@ import {
     JOB_TITLE_REQUEST_SUCCESS,
     JOB_TITLE_REQUEST_ERROR,
     JOB_TITLE_CURRENT_CLEAR,
+    UNLOAD_JOB_TITLE
   } from '../actionTypes/job_title'
   
   export const job_titleCreate = function job_titleCreate (user, job_title) {
@@ -97,6 +98,12 @@ import {
       return {
           type: JOB_TITLE_CURRENT_CLEAR,
           user
+      }
+  }
+
+  export function unloadJobTitle() {
+      return {
+          type: UNLOAD_JOB_TITLE
       }
   }
   

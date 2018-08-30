@@ -8,6 +8,7 @@ import {
   SCHOOL_TYPES_LOADING,
   SCHOOL_TYPES_REQUEST_ERROR,
   SCHOOL_TYPES_UPDATE_SUCCESS,
+  UNLOAD_SCHOOL_TYPE
 } from '../actionTypes/schoolTypes'
 
 const initialState = {
@@ -146,6 +147,12 @@ const reducer = function schoolTypeReducer(state = initialState, action) {
           body: action.error.toString(),
           time: new Date(),
         }]),
+      }
+    
+    case UNLOAD_SCHOOL_TYPE:
+       state.current_schoolType = {};
+       return {
+          ...state
       }
 
     default:
