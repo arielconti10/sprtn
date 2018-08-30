@@ -25,6 +25,7 @@ import schoolDash from './reducers/schoolDash';
 import contact from './reducers/contact';
 import event from './reducers/events';
 import distribution from './reducers/distribution'
+import meeting from './reducers/meeting'
 
 const IndexReducer = combineReducers({
   user,
@@ -52,7 +53,8 @@ const IndexReducer = combineReducers({
   schoolDash,
   contact,
   event,
-  distribution
+  distribution,
+  meeting
 })
 
 export default IndexReducer  
