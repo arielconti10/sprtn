@@ -10,7 +10,13 @@ import { PropTypes } from 'prop-types'
 import { reduxForm, Field } from 'redux-form'
 import { connect } from 'react-redux'
 
-import { studentsRequest, studentsCreate, studentsSelectLevel } from '../../../actions/students'
+import { 
+    studentsRequest, 
+    studentsCreate, 
+    studentsSelectLevel, 
+    studentsSelectShift,
+    unloadStudents,
+} from '../../../actions/students'
 
 import 'react-select/dist/react-select.css';
 import 'react-table/react-table.css'
@@ -28,17 +34,38 @@ const apis = [
 
 const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório')
 
+const validate = values => {
+    const errors = {}
+
+    switch(values.form_shift_id){
+        case 1 : 
+            if( !values.first_grade 
+                && !values.form_second_grade
+                && !values.form_third_grade 
+                && !values.form_forth_grade
+            ) {
+                errors.form_first_grade  = 'Required'
+                errors.form_second_grade = 'Required'
+                errors.form_third_grade  = 'Required'
+                errors.form_forth_grade  = 'Required'
+            }
+    }
+    return errors;
+    
+  }
+
 class SchoolStudentList extends Component {
     static propTypes = {
         user: PropTypes.object,
         studentsCreate: PropTypes.func,
         studentsSelectLevel: PropTypes.func,
+        studentsSelectShift: PropTypes.func,
+        unloadStudents: PropTypes.func,
         handleSubmit: PropTypes.func,
         students: PropTypes.shape({
 
         })
     }
-
 
     constructor(props) {
         super(props);
@@ -161,11 +188,12 @@ class SchoolStudentList extends Component {
     }
 
     handleChangeShift = (selectedOption) => {
-        console.log(selectedOption)
-
-        const values = this.state;
-        values.form_shift_id = selectedOption.value;
-        this.setState({ values });
+        // console.log(selectedOption)
+        this.props.studentsSelectShift( selectedOption.value )
+        
+        // const values = this.state;
+        // values.form_shift_id = selectedOption.value;
+        // this.setState({ values });
     }
 
     clearForm() {
@@ -367,26 +395,28 @@ class SchoolStudentList extends Component {
         });
     }
 
-    submit = (students) => {
+    submit = (e) => {
         const { user, studentsCreate, reset } = this.props
 
-        console.log(students)
-        
+        console.log(this.props.students.shiftId, this.props.students.levelId)
+
         const dataStudents = { 
-            form_fifth_grade: "11",
-            form_first_grade: "10",
-            form_forth_grade: "10",
-            form_second_grade: "20",
-            form_third_grade: "10",
-            form_year: "2018",
+            form_fifth_grade: e.form_fifth_grade,
+            form_first_grade: e.form_first_grade,
+            form_forth_grade: e.form_forth_grade,
+            form_second_grade: e.form_second_grade,
+            form_third_grade: e.form_third_grade,
+            form_year: e.form_year,
+            form_level_id: this.props.students.levelId,
+            form_shift_id: this.props.students.shiftId,
+            school_id: this.props.school_id
         }
 
-        // call to our shiftCreate action.
 
         // if (this.props.match.params.id !== undefined) {
         //     shiftUpdate(user, shift)
         // } else {
-        //     shiftCreate(user, shift)
+            studentsCreate(user, dataStudents)
         // }
 
         // studentsCreate(user, students, this.props.school_id)
@@ -472,6 +502,10 @@ class SchoolStudentList extends Component {
     //     }
     // }
 
+    componentWillMount() {
+        // console.log(this.props)
+        this.props.unloadStudents()
+    }
     componentDidMount() {
         this.checkPermission();
 
@@ -487,6 +521,7 @@ class SchoolStudentList extends Component {
                 })
                 .catch(err => console.log(err));
         });
+
     }
 
     checkPermission() {
@@ -496,47 +531,6 @@ class SchoolStudentList extends Component {
             }
         }.bind(this));
     }
-
-    // onFetchData = (state, instance, deleted_at) => {
-
-    //     let pageSize = state ? state.pageSize : this.state.pageSize;
-    //     let page = state ? state.page + 1 : this.state.page;
-
-    //     let sorted = state ? state.sorted : this.state.sorted
-    //     let filtered = state ? state.filtered : this.state.filtered
-
-    //     let baseURL = `/${apiSpartan}?paginate=${pageSize}&page=${page}&filter[school_id]=${this.state.school_id}`;
-
-    //     //To do: make filter to deleted_at
-    //     /*console.log('onFetchData:', deleted_at);
-    //     if(deleted_at != 'all')
-    //         console.log("deleted_at != 'all'", deleted_at);*/
-
-    //     filtered.map(function (item) {
-    //         baseURL += `&filter[${item.id}]=${item.value}`;
-    //     })
-
-    //     for (let i = 0; i < sorted.length; i++) {
-    //         baseURL += "&order[" + sorted[i]['id'] + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
-    //     }
-
-    //     axios.get(baseURL)
-    //         .then((response) => {
-    //             const dados = response.data.data
-
-    //             this.setState({
-    //                 data: dados,
-    //                 totalSize: response.data.meta.pagination.total,
-    //                 pages: response.data.meta.pagination.last_page,
-    //                 page: response.data.meta.pagination.current_page,
-    //                 pageSize: parseInt(response.data.meta.pagination.per_page),
-    //                 sorted: sorted,
-    //                 filtered: filtered,
-    //                 loading: false
-    //             });
-    //         })
-    //         .catch(err => console.log(err));
-    // }
 
     footerData(data, column) {
         let result = data.reduce((total, element, index, array) => {
@@ -558,7 +552,7 @@ class SchoolStudentList extends Component {
             handleSubmit,
         } = this.props;
 
-        const { levelId } = this.props.students;
+        const { levelId, shiftId } = this.props.students;
         return (
             <div>
                 <Collapse isOpen={this.state.collapse}>
@@ -581,7 +575,7 @@ class SchoolStudentList extends Component {
                                                     readOnly={this.state.viewMode}
                                                     valueOption={this.state.form_year}
                                                     component={this.renderInput}
-                                                    validate={fieldRequired} />
+                                                     />
 
                                             </div>
                                         </div>
@@ -597,7 +591,7 @@ class SchoolStudentList extends Component {
                                                     onChangeFunction={this.handleChangeLevel}
                                                     options={levels}
                                                     component={this.renderSelectInput}
-                                                    />
+                                                />
                                                 
                                                 
                                             </div>
@@ -610,7 +604,7 @@ class SchoolStudentList extends Component {
                                                     name="form_shift_id"
                                                     id="form_shift_id"
                                                     disabled={this.state.viewMode}
-                                                    value={form_shift_id}
+                                                    valueOption={shiftId}
                                                     onChangeFunction={this.handleChangeShift}
                                                     options={shifts}
                                                     component={this.renderSelectInput}
@@ -619,7 +613,7 @@ class SchoolStudentList extends Component {
                                         </div>
                                     </div>
                                     <div className="row">
-                                        <div className="col-md-2" className={this.state.class_form_first_grade}>
+                                        <div className={this.state.class_form_first_grade + " col-md-2"}>
                                             <div className="form-group" htmlFor="form_first_grade">
                                                 <label htmlFor="form_first_grade">{this.state.label_first_grade} <span className="text-danger"><strong>*</strong></span></label>
                                                 <Field
@@ -629,13 +623,13 @@ class SchoolStudentList extends Component {
                                                     readOnly={false}
                                                     value={this.state.form_first_grade}
                                                     component={this.renderInput}
-                                                    validate={fieldRequired}
+                                                    
                                                 />
 
                                             </div>
                                         </div>
 
-                                        <div className="col-md-2" className={this.state.class_form_second_grade}>
+                                        <div className="" className={this.state.class_form_second_grade + " col-md-2" } >
                                             <div className="form-group" htmlFor="form_second_grade">
                                                 <label htmlFor="form_second_grade">{this.state.label_second_grade} <span className="text-danger"><strong>*</strong></span></label>
                                                 <Field
@@ -644,13 +638,13 @@ class SchoolStudentList extends Component {
                                                     name="form_second_grade"
                                                     readOnly={false}
                                                     value={this.state.form_second_grade}
-                                                    validate={fieldRequired}
+                                                    
                                                     component={this.renderInput} />
 
                                             </div>
                                         </div>
 
-                                        <div className="col-md-2" className={this.state.class_form_thirth_grade}>
+                                        <div className={this.state.class_form_thirth_grade + " col-md-2"}>
                                             <div className="form-group" htmlFor="form_third_grade">
                                                 <label htmlFor="form_third_grade">{this.state.label_third_grade} <span className="text-danger"><strong>*</strong></span></label>
                                                 <Field
@@ -659,13 +653,13 @@ class SchoolStudentList extends Component {
                                                     name="form_third_grade"
                                                     readOnly={false}
                                                     value={this.state.form_third_grade}
-                                                    validate={fieldRequired}
+                                                    
                                                     component={this.renderInput} />
 
                                             </div>
                                         </div>
 
-                                        <div className="col-md-2" className={this.state.class_form_forth_grade}>
+                                        <div className={this.state.class_form_forth_grade + " col-md-2"}>
                                             <div className="form-group" htmlFor="form_forth_grade">
                                                 <label htmlFor="form_forth_grade">{this.state.label_forth_grade} <span className="text-danger"><strong>*</strong></span></label>
                                                 <Field
@@ -675,13 +669,13 @@ class SchoolStudentList extends Component {
                                                     readOnly={false}
                                                     value={this.state.form_forth_grade}
                                                     component={this.renderInput}
-                                                    validate={fieldRequired}
+                                                    
                                                 />
 
                                             </div>
                                         </div>
 
-                                        <div className="col-md-2" className={this.state.class_form_fifth_grade}>
+                                        <div className={this.state.class_form_fifth_grade + " col-md-2"}>
                                             <div className="form-group" htmlFor="form_fifth_grade">
                                                 <label htmlFor="form_fifth_grade">{this.state.label_fifth_grade} <span className="text-danger"><strong>*</strong></span></label>
                                                 <Field
@@ -691,7 +685,7 @@ class SchoolStudentList extends Component {
                                                     readOnly={false}
                                                     value={this.state.form_fifth_grade}
                                                     component={this.renderInput}
-                                                    validate={fieldRequired}
+                                                    
                                                 />
                                             </div>
                                         </div>
@@ -854,6 +848,7 @@ class SchoolStudentList extends Component {
 }
 let InitializeFromStateForm = reduxForm({
     form: 'SchoolStudentForm',
+    validate,
     // enableReinitialize: true
 })(SchoolStudentList)
 
@@ -863,7 +858,7 @@ InitializeFromStateForm = connect(
         students: state.students,
         // initialValues: state.shifts.current_shift
     }),
-    { studentsCreate, studentsSelectLevel }
+    { studentsCreate, studentsSelectLevel,studentsSelectShift, unloadStudents }
 )(InitializeFromStateForm)
 
 export default InitializeFromStateForm

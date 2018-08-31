@@ -7,6 +7,9 @@ import {
   STUDENTS_REQUEST_ERROR,
   STUDENTS_SELECT_LEVEL,
   STUDENTS_SET_LEVEL,
+  STUDENTS_SET_SHIFT,
+  STUDENTS_SELECT_SHIFT,
+  UNLOAD_STUDENTS,
 } from '../actionTypes/students';
 
 const initialState = {
@@ -25,7 +28,7 @@ const reducer = function studentsReducer(state = initialState, action) {
         requesting: true,
         successful: false,
         messages: [{
-          body: `students: ${action.shift.name} being created...`,
+          body: `students: being created...`,
           time: new Date(),
         }],
         errors: [],
@@ -34,11 +37,11 @@ const reducer = function studentsReducer(state = initialState, action) {
     // On success include the new shift into our list
     case STUDENTS_CREATE_SUCCESS:
       return {
-        list: state.list.concat([action.shift]),
+        list: state.list.concat([action.students]),
         requesting: false,
         successful: true,
         messages: [{
-          body: `shift: ${action.shift.name} awesomely created!`,
+          body: `students:  awesomely created!`,
           time: new Date(),
         }],
         errors: [],
@@ -95,7 +98,7 @@ const reducer = function studentsReducer(state = initialState, action) {
       return {
         ...state
       }
-      
+
     case STUDENTS_SET_LEVEL:
       const levelId = action.levelId;
       return {
@@ -103,6 +106,25 @@ const reducer = function studentsReducer(state = initialState, action) {
         levelId
       }
 
+    case STUDENTS_SELECT_SHIFT:
+      return {
+        ...state
+      }
+
+    case STUDENTS_SET_SHIFT:
+      const shiftId = action.shiftId;
+      return {
+        ...state,
+        shiftId
+      }
+
+    case UNLOAD_STUDENTS:
+      state.students = {}
+      state.levelId = ''
+      state.shiftId = ''
+      return {
+        ...state
+      }
     default:
       return state;
   }

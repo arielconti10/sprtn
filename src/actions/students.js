@@ -7,15 +7,17 @@ import {
   STUDENTS_REQUEST_ERROR,
   STUDENTS_SELECT_LEVEL,
   STUDENTS_SET_LEVEL,
+  STUDENTS_SELECT_SHIFT,
+  STUDENTS_SET_SHIFT,
+  UNLOAD_STUDENTS
 } from '../actionTypes/students';
 
-export const studentsCreate = function studentsCreate(user, students, school_id) {
-  console.log(students, school_id)
+export const studentsCreate = function studentsCreate(user, students) {
+
   return {
     type: STUDENTS_CREATING,
     user,
     students,
-    school_id,
   };
 };
 
@@ -66,4 +68,25 @@ export function setStudentLevelId(levelId) {
     type: STUDENTS_SET_LEVEL,
     levelId
   }
+}
+
+export function studentsSelectShift (shiftId) {
+  return {
+    type: STUDENTS_SELECT_SHIFT,
+    shiftId,
+  }
+}
+
+export function setStudentShiftId(shiftId) {
+  return {
+    type: STUDENTS_SET_SHIFT,
+    shiftId
+  }
+}
+
+export function unloadStudents() {
+  return {
+    type: UNLOAD_STUDENTS,
+  };
+  
 }
