@@ -23,13 +23,10 @@ import rules from './reducers/rules'
 import schools from './reducers/school';
 import schoolDash from './reducers/schoolDash';
 import contact from './reducers/contact';
-<<<<<<< HEAD
 import students from './reducers/students';
-=======
 import event from './reducers/events';
 import distribution from './reducers/distribution'
 import meeting from './reducers/meeting'
->>>>>>> fe31be7b851d62e45101ec9c57a1d9e22f8f9462
 
 const IndexReducer = combineReducers({
   user,
@@ -56,13 +53,10 @@ const IndexReducer = combineReducers({
   schools,
   schoolDash,
   contact,
-<<<<<<< HEAD
   students,
-=======
   event,
   distribution,
   meeting
->>>>>>> fe31be7b851d62e45101ec9c57a1d9e22f8f9462
 })
 
 export default IndexReducer  

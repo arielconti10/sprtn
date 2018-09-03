@@ -412,16 +412,7 @@ class SchoolStudentList extends Component {
             school_id: this.props.schoolId
         }
 
-
-        // if (this.props.match.params.id !== undefined) {
-        //     shiftUpdate(user, shift)
-        // } else {
             studentsCreate(user, dataStudents)
-        // }
-
-        // studentsCreate(user, students, this.props.school_id)
-
-        // reset the form upon submit.
         reset()
 
     }
