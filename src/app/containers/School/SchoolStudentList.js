@@ -398,18 +398,18 @@ class SchoolStudentList extends Component {
     submit = (e) => {
         const { user, studentsCreate, reset } = this.props
 
-        console.log(this.props.students.shiftId, this.props.students.levelId)
+        console.log(this.props.schoolId)
 
         const dataStudents = { 
-            form_fifth_grade: e.form_fifth_grade,
-            form_first_grade: e.form_first_grade,
-            form_forth_grade: e.form_forth_grade,
-            form_second_grade: e.form_second_grade,
-            form_third_grade: e.form_third_grade,
-            form_year: e.form_year,
-            form_level_id: this.props.students.levelId,
-            form_shift_id: this.props.students.shiftId,
-            school_id: this.props.school_id
+            fifth_grade: e.form_fifth_grade,
+            first_grade: e.form_first_grade,
+            forth_grade: e.form_forth_grade,
+            second_grade: e.form_second_grade,
+            third_grade: e.form_third_grade,
+            year: e.form_year,
+            level_id: this.props.students.levelId,
+            shift_id: this.props.students.shiftId,
+            school_id: this.props.schoolId
         }
 
 

@@ -1,8 +1,11 @@
+import axios from '../app/common/axios';
+
 import {
   call,
   put,
   takeLatest,
 } from 'redux-saga/effects';
+
 
 // We'll use this function to redirect to different routes based on cases
 import {
@@ -55,17 +58,22 @@ function studentsCreate(user, students) {
 
   console.log(dataStudents)
 
-  const url = `${studentsUrl}/students`;
+  const url = `${studentsUrl}/student`;
   const request = fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',      
       // passes our token as an "Authorization" header in
       // every POST request.
       Authorization: `Bearer ${user.access_token}` || undefined, // will throw an error if no login
     },
     body: JSON.stringify(dataStudents),
   });
+
+  axios.post(url, dataStudents).then(res, function(){
+      console.log(res)
+  })  
 
   return handleRequest(request);
 }
@@ -97,7 +105,8 @@ function studentsRequest(user) {
   const request = fetch(url, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
       // passe our token as an "Authorization" header
       Authorization: `Bearer ${user.access_token}` || undefined,
     },
