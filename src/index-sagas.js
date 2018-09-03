@@ -21,6 +21,8 @@ import RoleSaga from './sagas/roles';
 import RuleSaga from './sagas/rules';
 import SchoolSaga from './sagas/schools';
 import SchoolDashSaga from './sagas/schoolsDash';
+import ContactSaga from './sagas/contact';
+import StudentsSaga from './sagas/students';
 
 export default function* IndexSaga () {
   yield [
@@ -45,6 +47,8 @@ export default function* IndexSaga () {
     JobTitleSaga(),
     RuleSaga(),
     SchoolSaga(),
-    SchoolDashSaga()
+    SchoolDashSaga(),
+    ContactSaga(),
+    StudentsSaga(),
   ]
 }
