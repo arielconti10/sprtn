@@ -11,7 +11,7 @@ import { canUser } from '../../common/Permissions';
 import { PropTypes } from 'prop-types'
 import { reduxForm, Field } from 'redux-form'
 import { connect } from 'react-redux'
-import { schoolTypeCreate, schoolTypeUpdate, schoolTypeLoad } from '../../../actions/schoolTypes';
+import { schoolTypeCreate, schoolTypeUpdate, schoolTypeLoad, unloadSchoolType } from '../../../actions/schoolTypes';
 
 const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório')
 
@@ -37,6 +37,7 @@ class SchoolTypeForm extends Component {
         schoolTypeUpdate: PropTypes.func.isRequired,
         schoolTypeCreate: PropTypes.func.isRequired,
         schoolTypeLoad: PropTypes.func.isRequired,
+        unloadSchoolType: PropTypes.func.isRequired,
         reset: PropTypes.func.isRequired,
         initialValues: PropTypes.object
     }
@@ -59,6 +60,8 @@ class SchoolTypeForm extends Component {
         const { schoolTypeLoad, user } = this.props
 
         this.checkPermission('school-type.insert');
+        this.props.reset();
+
         if (this.props.match.params.id !== undefined) {
             this.checkPermission('school-type.update');
             schoolTypeLoad(user, this.props.match.params.id)
@@ -252,7 +255,7 @@ InitializeFromStateForm = connect(
         schoolTypes: state.schoolTypes,
         initialValues: state.schoolTypes.current_schoolType
     }),
-    { schoolTypeLoad, schoolTypeUpdate, schoolTypeCreate }
+    { schoolTypeLoad, schoolTypeUpdate, schoolTypeCreate, unloadSchoolType }
 )(InitializeFromStateForm)
 
 

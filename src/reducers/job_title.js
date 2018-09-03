@@ -9,7 +9,8 @@ import {
   JOB_TITLE_REQUEST_ERROR,
   JOB_TITLE_UPDATING,
   JOB_TITLE_UPDATE_SUCCESS,
-  JOB_TITLE_CURRENT_CLEAR
+  JOB_TITLE_CURRENT_CLEAR,
+  UNLOAD_JOB_TITLE
 } from '../actionTypes/job_title'
 
 const initialState = {
@@ -157,6 +158,12 @@ const reducer = function job_titleReducer(state = initialState, action) {
       case JOB_TITLE_CURRENT_CLEAR:
         return {
             current_job_title: null,
+        }
+        
+    case UNLOAD_JOB_TITLE:
+        state.current_job_title = {};
+        return {
+            ...state
         }
 
     default:

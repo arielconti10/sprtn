@@ -19,7 +19,10 @@ const composeSetup = process.env.NODE_ENV !== 'production' && typeof window === 
 const persistConfig = { 
   key: 'root',
   storage,
-  blacklist: ['marketshare', 'userSchool', 'gridApi', 'login', 'schools' ,'schoolDash', 'contact'] // navigation will not be persisted
+  blacklist: ['marketshare', 'userSchool', 'gridApi', 'login', 'schools' ,
+    'schoolDash', 'contact', 'event', 'distribution', 'meeting', 'job_title',
+    'schoolTypes', 'shifts'
+  ] // navigation will not be persisted
 }
 
 const persistedReducer = persistReducer(persistConfig, IndexReducer)
@@ -33,16 +36,3 @@ const persistor = persistStore(store);
 sagaMiddleware.run(IndexSagas)
 
 export {store, persistor}
-
-/*
-const persistConfig = {
-  key: 'root',
-  storage: storage,
-  blacklist: ['navigation']
-};
-
-const pReducer = persistReducer(persistConfig, rootReducer);
-
-export const store = createStore(pReducer);
-export const persistor = persistStore(store);
-*/

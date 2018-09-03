@@ -239,6 +239,14 @@ function transformeAdress(adressInfo) {
 function createContact(user, contact, phones) {
     contact.active = true;
     contact.phones = phones;
+     
+    if (contact.phones) {
+        contact.phones.map(item => {
+            if (item.phone_extension == "") {
+                delete item.phone_extension;
+            }
+        });
+    }
 
     const url = `${apiUrl}`
     const request = fetch(url, {
@@ -357,17 +365,24 @@ function* selectStateFlow(action) {
 }
 
 function* searchCepFlow(action) {
-    const fullAdress = yield call(searchCep, action.user, action.cep);
+    let totalChars = action.cep.match(/\d/g);
 
-    if (fullAdress.errors || fullAdress.data.erro) {
-        const message = "CEP nāo encontrado. Verifique!";
-        yield put(setAdressInfo({}));
-        yield put(setContactError(message));
+    if (totalChars && totalChars.length === 8) {
+        const fullAdress = yield call(searchCep, action.user, action.cep);
+
+        if (fullAdress.errors || fullAdress.data.erro) {
+            const message = "CEP nāo encontrado. Verifique!";
+            yield put(setAdressInfo({}));
+            yield put(setContactError(message));
+        } else {
+            const transformedAdress = yield call(transformeAdress, fullAdress.data);
+            yield put(setAdressInfo(transformedAdress));
+            yield put(setContactError(""));
+        }
     } else {
-        const transformedAdress = yield call(transformeAdress, fullAdress.data);
-        yield put(setAdressInfo(transformedAdress));
-        yield put(setContactError(""));
+        yield put(setAdressInfo({}));
     }
+
 }
 
 function* updateAuthEmailFlow(action) {

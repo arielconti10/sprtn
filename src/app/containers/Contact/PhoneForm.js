@@ -91,7 +91,10 @@ class PhoneForm extends Component {
                 id: "phone_type",
                 width: 380,
                 accessor: (element) => {
-                    return (<select name="phone_type" className="form-control" id={element.id} value={element.phone_type} onChange={this.renderEditableSelect}>
+                    return (<select name="phone_type" className="form-control" 
+                        
+                        id={element.id?element.id:element.phone_number} value={element.phone_type} 
+                        onChange={this.renderEditableSelect}>
                         <option value="home">Casa</option>
                         <option value="mobile">Celular</option>
                         <option value="fax">Fax</option>
@@ -121,7 +124,13 @@ class PhoneForm extends Component {
     addPhone() {
         const { phone_number, phone_extension } = this.props;
         const { phoneTypeId, phoneData } = this.props.contact;
-        const phone_type = phoneTypeId.value;
+        let phone_type = phoneTypeId.value;
+
+        let phoneHasNumber;
+
+        if (phone_number) {
+            phoneHasNumber = phone_number.match(/\d/g);
+        }
         
         const phoneObject = {
             phone_number,
@@ -133,19 +142,19 @@ class PhoneForm extends Component {
         this.setState( { invalid_phone_number: false });
 
         if (!phone_type) {
-            this.setState({ invalid_phone : true });
+            phone_type = 'home';
         }
 
-        if (!phone_number) {
+        if (!phoneHasNumber) {
             this.setState({ invalid_phone_number : true });
         }
 
-        if (!this.state.invalid_phone && !this.state.invalid_phone_number) {
+        if (phone_type && phoneHasNumber) {
             this.createPhoneTable();
-            this.props.addPhoneFlow(phoneObject, phoneData);
+            this.props.addPhoneFlow(phoneObject, phoneData, this.props);
+            this.props.reset();
         }
 
-        this.props.reset();
     }
 
 
@@ -180,7 +189,12 @@ class PhoneForm extends Component {
             let phoneData = this.props.contact.phoneData;
 
             let index = phoneData.findIndex(function(item){
-                return cellInfo.target.id == item.id;
+                if (item.id) {
+                    return cellInfo.target.id == item.id;
+                } else {
+                    return cellInfo.target.id == item.phone_number;
+                }
+                
             });
             let column_id = cellInfo.target.name;
 

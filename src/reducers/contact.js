@@ -18,7 +18,7 @@ const initialState = {
     jobTitles: [],
     authorizeEmail: true,
     favorite: true,
-    phoneTypeId: '',
+    phoneTypeId: {label: 'Casa', value: 'home'},
     phoneData: []
 }
 
@@ -137,6 +137,7 @@ const reducer = function contactReducer(state = initialState, action) {
         state.jobTitleId = '';
         state.stateId = '';
         state.phone_number = '';
+        state.phoneTypeId = 'home';
         
         return {
             ...state

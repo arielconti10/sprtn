@@ -22,7 +22,13 @@ import RuleSaga from './sagas/rules';
 import SchoolSaga from './sagas/schools';
 import SchoolDashSaga from './sagas/schoolsDash';
 import ContactSaga from './sagas/contact';
+<<<<<<< HEAD
 import StudentsSaga from './sagas/students';
+=======
+import EventSaga from './sagas/event';
+import DistributionSaga from './sagas/distribution'
+import MeetingSaga from './sagas/meeting'
+>>>>>>> fe31be7b851d62e45101ec9c57a1d9e22f8f9462
 
 export default function* IndexSaga () {
   yield [
@@ -49,6 +55,12 @@ export default function* IndexSaga () {
     SchoolSaga(),
     SchoolDashSaga(),
     ContactSaga(),
+<<<<<<< HEAD
     StudentsSaga(),
+=======
+    EventSaga(),
+    DistributionSaga(),
+    MeetingSaga()
+>>>>>>> fe31be7b851d62e45101ec9c57a1d9e22f8f9462
   ]
 }

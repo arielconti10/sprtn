@@ -82,7 +82,7 @@ class SchoolConctactList extends Component {
                         </Card>
                     </Collapse>
 
-                    <button className='btn btn-primary' onClick={this.addContact}>
+                    <button className='btn btn-primary' onClick={this.addContact} disabled={collapse}>
                         Adicionar
                     </button>
                 </div>
