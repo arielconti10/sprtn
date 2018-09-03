@@ -78,8 +78,12 @@ class Indicators extends Component {
     }
 
     componentWillMount(){
-       
-        
+        this.getCoverage();
+        this.getSchoolTypes();
+        this.getActionsRealized();
+        this.getStudentTypes();
+        this.getActionTypes();
+        this.getStudentLevel();    
     }
     
     //o "callback hell" será aprimorado após estudo de promises
@@ -91,20 +95,14 @@ class Indicators extends Component {
               
         // this.setState( { ring_load : true });
 
-        // this.setState({school_type_id: [
-        //     { "value": "PARTICULAR", "label": "Particular" },
-        //     { "value": "PUBLICO", "label": "Público" },
-        //     { "value": "SECRETARIA", "label": "Secretaria" }
-        // ]});
+        this.setState({school_type_id: [
+            { "value": "PARTICULAR", "label": "Particular" },
+            { "value": "PUBLICO", "label": "Público" },
+            { "value": "SECRETARIA", "label": "Secretaria" }
+        ]});
         this.setState({"total_contacts": this.props.indicators.contacts})     
         this.setState({"total_action": this.props.indicators.actions}) 
 
-        this.getSchoolTypes();
-        this.getActionsRealized();
-        this.getStudentTypes();
-        this.getActionTypes();
-        this.getStudentLevel();    
-        this.getCoverage();
     }
 
     toggle(tab) {
@@ -119,15 +117,23 @@ class Indicators extends Component {
      * obtem a cobertura da carteira
      */
     getCoverage() {
-        const data_coverage = this.props.indicators.coverage;
+        let data_coverage = [];
+        this.props.indicators.coverage.map(item => {
+            data_coverage.push(Object.values(item))
+        })
+
+        // console.log(this.props.indicators.coverage, data_coverage)
+        // const data_coverage = this.props.indicators.coverage;
+        // console.log(data_coverage)
 
         const total = this.groupBySchool(this.props.indicators.schools, data_coverage, "tmp_coverage", 'total_coverage');
 
         let array_chart = []
 
         if (total > 0) {
-            const total_schools = this.state.total_schools.replace(/\./g,'');
-
+            const total_schools = this.props.schoolTypes;
+            console.log(total_schools)
+            // const general_total = array_final.reduce( (accum, curr) => curr[1] !== '%'?accum + curr[1]:0, 0 );
             const not_coverage = parseFloat(total_schools) - parseFloat(total);
             console.log(not_coverage)
             array_chart = [
@@ -140,8 +146,9 @@ class Indicators extends Component {
         }
 
         const action_return = mapPieChart("Ações", "name", "total", array_chart);
-
+        console.log(action_return)
         this.setState({ action_return } );
+        console.log(this.state)
     }
 
     /**
@@ -426,26 +433,19 @@ class Indicators extends Component {
         final_array[0] = ["LEGENDA", "%"];
 
         types.map(item => { 
+
             selected.map(item_search => {
                 if(item_search.value.indexOf(item[0])){
-                    console.log(item_search, item)
                     final_array.push(item);
-
                 }
             })
         })
 
-        // types.map(item => {
-        //     selected.map(item_search => {
-        //         if (item_search.value.indexOf(item[0]) !== -1) {
-        //         }
-        //     })
-        // })
+        let array_final = [...(new Set(final_array))];
+        
+        const general_total = array_final.reduce( (accum, curr) => curr[1] !== '%'?accum + curr[1]:0, 0 );
 
-        const general_total = final_array.reduce( (accum, curr) => curr[1] !== '%'?accum + curr[1]:0, 0 );
         this.setState( { [ selector_total ]: formatNumber(general_total) } );
-        // console.log
-
 
         if (final_array.length >= 1) {
             this.setState( { [selector] : final_array }, () => {
@@ -454,7 +454,6 @@ class Indicators extends Component {
             });
             
         }
-
         return general_total
     }
 
