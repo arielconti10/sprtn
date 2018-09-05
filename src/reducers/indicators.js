@@ -12,6 +12,9 @@ const initialState = {
   coverage: [],
   schoolTypes: [],
   studentTypes: [],
+  total_schools: 0,
+  total_students: 0,
+  dataSchoolTypes: [],
   requesting: false,
   successful: false,
   messages: [],
@@ -33,7 +36,6 @@ const reducer = function contributorsReducer(state = initialState, action) {
       }
 
     case INDICATORS_REQUEST_SUCCESS:
-    //   console.log(action.studentTypes)
       return {
         ...state,
         contributors: action.indicators.data, // replace with fresh list
@@ -43,6 +45,10 @@ const reducer = function contributorsReducer(state = initialState, action) {
         contacts: action.contacts.data.total,
         actions: action.actions.data,
         coverage: action.coverage.data,
+        total_schools: action.total_schools,
+        total_students: action.total_students,
+        dataSchoolTypes: action.dataSchoolTypes,
+        dataCoverage: action.dataCoverage,
         requesting: false,
         successful: true,
         messages: [{

@@ -21,6 +21,10 @@ export const indicatorsRequestSuccess = function indicatorsRequestSuccess (
     contacts,
     actions,
     coverage,
+    total_schools,
+    total_students,
+    dataSchoolTypes,
+    dataCoverage,
 ){
   return {
     type: INDICATORS_REQUEST_SUCCESS,
@@ -31,11 +35,15 @@ export const indicatorsRequestSuccess = function indicatorsRequestSuccess (
     contacts,
     actions,
     coverage,
+    total_schools,
+    total_students,
+    dataSchoolTypes,
+    dataCoverage,
   }
 }
 
 export const indicatorsRequestError = function indicatorsRequestError (error) {
-  console.log(error)  
+
   return {
     type: INDICATORS_REQUEST_ERROR,
     error,

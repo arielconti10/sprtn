@@ -1,9 +1,7 @@
 import { call, put, takeLatest } from 'redux-saga/effects'
-
 // import { handleApiErrors } from '../lib/api-errors'
-
 import { mapPieChart } from '../app/common/ChartHelper'
-import axios from '../app/common/axios';
+
 import {
   // INDICATORS_CREATING, 
   INDICATORS_REQUESTING,
@@ -158,33 +156,39 @@ function getCoverage() {
     })    
 
     return handleRequest(request)
-    // return axios.get(baseURL).then(response => {
-    //     let coverage = response.data.data
-    //     let array_chart = [];
-    
-    //     if (coverage && coverage.length > 0) {
-    //         coverage.map(item => {
-    //             console.log(item)
-    //             if (item.school_type.length > 0) {
-    //                 const array_tmp = [item.school_type, parseFloat(item.total)];
-    //                 array_chart.push(array_tmp);
-    //             }
-    //         });
-    //     }
-    
-    //     array_chart.sort(function (a, b) {
-    //         if(a[0] < b[0]) return -1;
-    //         if(a[0] > b[0]) return 1;
-    //         return 0;
-    //     });
-    
-    //     array_chart.unshift(["Tipos de Escola", "%"]);
-
-    //     return array_chart
-    // })
+   
 }
 
+function getTotalSchools(schools) {
+    let total = 0;
+    
+    Object.keys(schools.data).map(function(key, index) {
+        total += schools.data[key].total;
+     });
 
+     return total;
+}
+
+function getTotalStudents(students) {
+    let total = 0;
+    Object.keys(students.data.total).map(function(key, index) {
+        total += students.data.total[key].total;
+     });
+
+     return total;
+}
+
+function getDataSchoolType(schoolTypes){
+    const data_school_type = mapPieChart("Tipos de Escola", "school_type", "total", schoolTypes.data);
+
+    return data_school_type
+}
+
+function getDataCoverage(coverage){
+    const data_coverage = mapPieChart("Tipos de Escola", "school_type", "total", coverage.data);
+
+    return data_coverage
+}
 
 function* indicatorsRequestFlow (action) {
   try {
@@ -194,9 +198,12 @@ function* indicatorsRequestFlow (action) {
     const contacts = yield call(getContacts)
     const actions = yield call(getActions)
     const coverage = yield call(getCoverage)
-
+    const totalSchools = yield call(getTotalSchools, schoolTypes)
+    const totalStudents = yield call(getTotalStudents, studentTypes)
+    const dataSchoolTypes = yield call(getDataSchoolType, schoolTypes)
+    const dataCoverage = yield call(getDataCoverage, coverage)
     // dispatch the action with our indicators!
-    yield put(indicatorsRequestSuccess(contributors, schools, schoolTypes, studentTypes, contacts, actions, coverage))
+    yield put(indicatorsRequestSuccess(contributors, schools, schoolTypes, studentTypes, contacts, actions, coverage, totalSchools, totalStudents, dataSchoolTypes, dataCoverage))
 
   } catch (error) {
     yield put(indicatorsRequestError(error))

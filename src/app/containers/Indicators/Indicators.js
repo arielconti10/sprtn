@@ -24,7 +24,8 @@ class Indicators extends Component {
             studentTypes: PropTypes.array,
             contacts: PropTypes.number,
             actions: PropTypes.number,
-            coverage: PropTypes.array
+            coverage: PropTypes.array,
+            total_schools: PropTypes.number,
         }),
         user: PropTypes.shape({
             username: PropTypes.string,
@@ -78,21 +79,22 @@ class Indicators extends Component {
     }
 
     componentWillMount(){
-        this.getCoverage();
-        this.getSchoolTypes();
-        this.getActionsRealized();
-        this.getStudentTypes();
-        this.getActionTypes();
-        this.getStudentLevel();    
+         
     }
     
     //o "callback hell" será aprimorado após estudo de promises
     //foi utilizado por ser assíncrono, e se chamado de modo síncrono, nāo produz os valores desejados
     componentDidMount() {  
         const { indicatorsRequest, user } = this.props;
-
         indicatorsRequest(user)
+
               
+        this.getSchoolTypes();
+        this.getActionsRealized();
+        this.getStudentTypes();
+        this.getActionTypes();
+        this.getStudentLevel();   
+
         // this.setState( { ring_load : true });
 
         this.setState({school_type_id: [
@@ -118,24 +120,21 @@ class Indicators extends Component {
      */
     getCoverage() {
         let data_coverage = [];
+
         this.props.indicators.coverage.map(item => {
             data_coverage.push(Object.values(item))
         })
-
-        // console.log(this.props.indicators.coverage, data_coverage)
-        // const data_coverage = this.props.indicators.coverage;
-        // console.log(data_coverage)
 
         const total = this.groupBySchool(this.props.indicators.schools, data_coverage, "tmp_coverage", 'total_coverage');
 
         let array_chart = []
 
         if (total > 0) {
-            const total_schools = this.props.schoolTypes;
-            console.log(total_schools)
+            const total_schools = this.props.indicators.total_schools;
+
             // const general_total = array_final.reduce( (accum, curr) => curr[1] !== '%'?accum + curr[1]:0, 0 );
             const not_coverage = parseFloat(total_schools) - parseFloat(total);
-            console.log(not_coverage)
+
             array_chart = [
                 { "name": "Coberto", "total": parseFloat(total) },
                 { "name": "Nāo Coberto", "total": not_coverage },
@@ -144,11 +143,10 @@ class Indicators extends Component {
         } else {
             array_chart = [];
         }
-
         const action_return = mapPieChart("Ações", "name", "total", array_chart);
-        console.log(action_return)
-        this.setState({ action_return } );
-        console.log(this.state)
+
+        this.setState({ data_coverage: action_return } );
+
     }
 
     /**
@@ -175,9 +173,10 @@ class Indicators extends Component {
      * obtem o total de tipos de escolas, separadas por público, privado e secretaria
      */
     getSchoolTypes() {
-        const data_school_type = mapPieChart("Tipos de Escola", "school_type", "total", this.props.indicators.schoolTypes);
-        this.groupBySchool(this.props.indicators.schools, data_school_type, "data_school_type", "total_schools", "options_school_type");
+        // const data_school_type = mapPieChart("Tipos de Escola", "school_type", "total", this.props.indicators.schoolTypes);
+        this.groupBySchool(this.props.indicators.schools, this.props.indicators.dataSchoolTypes, "data_school_type", "total_schools", "options_school_type");
         this.getCoverage();
+
     }
 
     /**
@@ -446,11 +445,10 @@ class Indicators extends Component {
         const general_total = array_final.reduce( (accum, curr) => curr[1] !== '%'?accum + curr[1]:0, 0 );
 
         this.setState( { [ selector_total ]: formatNumber(general_total) } );
-
         if (final_array.length >= 1) {
             this.setState( { [selector] : final_array }, () => {
                 this.drawCustomOptions(final_array, selector_options);
-                this.drawCustomOptions(final_array, selector);
+                // this.drawCustomOptions(final_array, selector);
             });
             
         }
@@ -586,7 +584,7 @@ class Indicators extends Component {
     };
 
     render() {
-        const { total_schools, total_students, total_contacts, total_action,
+        const { 
             data_actions, data_school_type, data_student_type, data_action_type, data_student_level,
             data_coverage,
             options_publisher, options_school_type, options_action_school, options_student_type,
@@ -650,7 +648,7 @@ class Indicators extends Component {
                         backgroundColor="bg-info"
                         shadowClass="school shadow"
                         icon="fa fa-building-o"
-                        total={total_schools}
+                        total={this.props.indicators.total_schools}
                         label="Escolas"
                     />
 
@@ -659,7 +657,7 @@ class Indicators extends Component {
                         backgroundColor="bg-success"
                         shadowClass="students shadow"
                         icon="fa fa-users"
-                        total={total_students}
+                        total={this.props.indicators.total_students}
                         label="Alunos"
                     />
 
@@ -668,7 +666,7 @@ class Indicators extends Component {
                         backgroundColor="bg-primary"
                         shadowClass="contacts shadow"
                         icon="fa fa-book"
-                        total={total_contacts}
+                        total={this.props.indicators.contacts}
                         label="Contatos"
                     />
 
@@ -677,7 +675,7 @@ class Indicators extends Component {
                         backgroundColor="bg-warning"
                         shadowClass="actions shadow"
                         icon="fa fa-bullseye"
-                        total={total_action}
+                        total={this.props.indicators.actions}
                         label="Acões"
                     />
 
@@ -725,12 +723,12 @@ class Indicators extends Component {
                     </div>
                     }
 
-                    {data_school_type.length > 1 &&
+                    {this.props.indicators.schoolTypes.length > 1 &&
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="chart-school-types ">
                                 <PieChartComponent
-                                    data_actions={data_school_type}
+                                    data_actions={this.props.indicators.dataSchoolTypes}
                                     chart_id="pie_school_types"
                                     options_publisher={options_school_type}
                                     label_card="Escolas por Tipo"
