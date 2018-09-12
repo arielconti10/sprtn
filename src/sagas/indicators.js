@@ -103,11 +103,34 @@ function* changeHierarchyFlow(action) {
   const total_action = yield call(getActions, action.hierarchy.value)
 
   const dataSchoolTypes = yield call(getDataSchoolType, schoolTypes)
-  // const dataCoverage = yield call(getDataCoverage, coverage)
+  const coverage = yield call(getCoverage, action.hierarchy.value)
+  const dataCoverage = yield call(getDataCoverage, coverage, total_action, totalSchools)
   const dataActions = yield call(getDataActions, actions)
   const dataActionTypes = yield call(getDataActionTypes, actionTypes)
+  const studentLevel = yield call(getStudentLevel, action.hierarchy.value)
+  const dataStudentLevel = yield call(getDataStudentLevel, studentLevel)
+  const dataStudentTypes = yield call(getDataStudentTypes, studentTypes)
 
-  yield put(changeHierarchySuccess(actions, actionTypes, contacts, studentTypes, schoolTypes, totalSchools, totalStudents, total_action, dataSchoolTypes, dataActions, dataActionTypes))
+  yield put(
+    changeHierarchySuccess(
+      actions,
+      actionTypes,
+      contacts,
+      coverage,
+      studentTypes,
+      schoolTypes,
+      totalSchools,
+      totalStudents,
+      total_action,
+      dataSchoolTypes,
+      dataActions,
+      dataActionTypes,
+      dataCoverage,
+      studentLevel,
+      dataStudentLevel,
+      dataStudentTypes
+    )
+  )
   yield put(updateRingLoad(false));
 
 }
@@ -157,9 +180,9 @@ function getActions(hierarchy_id = null) {
   return handleRequest(request)
 }
 
-function getCoverage() {
+function getCoverage(hierarchy_id = null) {
   let baseURL = `${apiUrl}/indicator/school/coverage`;
-  // baseURL = this.getUrlSearch(baseURL);
+  baseURL = getUrlSearch(baseURL, hierarchy_id);
 
   const request = fetch(baseURL, {
     method: 'GET',
@@ -210,9 +233,37 @@ function getDataSchoolType(schoolTypes) {
   return data_school_type
 }
 
-function getDataCoverage(coverage) {
-  const data_coverage = mapPieChart("Tipos de Escola", "school_type", "total", coverage.data);
-  return data_coverage
+function getDataCoverage(coverage, total_action, total_schools) {
+
+  let data_coverage = [];
+
+  coverage.data.map(item => {
+    data_coverage.push(Object.values(item))
+  })
+
+  let array_chart = []
+
+
+  total_action = total_action.data
+    if (total_action > 0) {
+      const not_coverage = parseFloat(total_schools) - parseFloat(total_action);
+
+      array_chart = [{
+          "name": "Coberto",
+          "total": parseFloat(total_action)
+        },
+        {
+          "name": "Nāo Coberto",
+          "total": not_coverage
+        },
+      ];
+
+    } else {
+      array_chart = [];
+    }
+  const action_return = mapPieChart("Ações", "name", "total", array_chart);
+
+  return action_return
 }
 
 function getDataActions(actions) {
@@ -221,10 +272,10 @@ function getDataActions(actions) {
 }
 
 function getDataActionTypes(actionTypes) {
-    const data_actions = mapPieChart("Tipos de Escola", "school_type", "total", actionTypes.data);
-    console.log(data_actions)
-    return data_actions
-  }
+  const data_actions = mapPieChart("Tipos de Escola", "school_type", "total", actionTypes.data);
+
+  return data_actions
+}
 
 function getActionsRealized(hierarchy_id = null) {
 
@@ -245,7 +296,7 @@ function getActionsRealized(hierarchy_id = null) {
 function getActionTypes(hierarchy_id = null) {
   let baseURL = `${apiUrl}/indicator/action/school-type`;
   baseURL = getUrlSearch(baseURL, hierarchy_id);
-  
+
   const request = fetch(baseURL, {
     method: 'GET',
     headers: {
@@ -255,27 +306,34 @@ function getActionTypes(hierarchy_id = null) {
   })
 
   return handleRequest(request)
-//   axios.get(action)
-//     .then(res => {
-//       const result = res.data.data;
-//       const data_action_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
-
-//       this.drawCustomOptions(data_action_type, "options_action_school");
-
-//       this.setState({
-//         data_action_type,
-//         action_type_initial: data_action_type
-//       });
-//     })
-//     .catch(error => {
-//       const response = error.response;
-//       this.setState({
-//         msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}`
-//       });
-//     })
+ 
 }
 
+function getStudentLevel(hierarchy_id = null) {
 
+    let baseURL = `${apiUrl}/indicator/student/level`;
+    baseURL = getUrlSearch(baseURL, hierarchy_id);
+    
+    const request = fetch(baseURL, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + sessionStorage.getItem('access_token') || undefined,
+      }
+    })
+  
+    return handleRequest(request)
+}
+
+function getDataStudentLevel(studentLevel) {
+  const data_student_level = mapPieChart("Tipos de Escola", "name", "total", studentLevel.data);
+  return data_student_level
+}
+
+function getDataStudentTypes(studentTypes) {
+    const data_student_type = mapPieChart("Tipos de Escola", "school_type", "total", studentTypes.data.total);
+    return data_student_type    
+}
 function* indicatorsRequestFlow(action) {
   yield put(updateRingLoad(true));
 
@@ -292,9 +350,13 @@ function* indicatorsRequestFlow(action) {
     const totalSchools = yield call(getTotalSchools, schoolTypes)
     const totalStudents = yield call(getTotalStudents, studentTypes)
     const dataSchoolTypes = yield call(getDataSchoolType, schoolTypes)
-    const dataCoverage = yield call(getDataCoverage, coverage)
+    const dataCoverage = yield call(getDataCoverage, coverage, total_action, totalSchools)
     const dataActions = yield call(getDataActions, actions)
     const dataActionTypes = yield call(getDataActionTypes, actionTypes)
+    const studentLevel = yield call(getStudentLevel)
+    const dataStudentLevel = yield call(getDataStudentLevel, studentLevel)
+    const dataStudentTypes = yield call(getDataStudentTypes, studentTypes)
+
     // dispatch the action with our indicators!
     yield put(
       indicatorsRequestSuccess(
@@ -312,7 +374,10 @@ function* indicatorsRequestFlow(action) {
         totalStudents,
         dataSchoolTypes,
         dataCoverage,
-        dataActionTypes
+        dataActionTypes,
+        studentLevel,
+        dataStudentLevel,
+        dataStudentTypes,
       )
     )
 

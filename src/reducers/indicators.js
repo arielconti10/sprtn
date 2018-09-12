@@ -67,6 +67,9 @@ const reducer = function contributorsReducer(state = initialState, action) {
         dataSchoolTypes: action.dataSchoolTypes,
         dataCoverage: action.dataCoverage,
         dataActionTypes: action.dataActionTypes,
+        studentLevel: action.studentLevel.data,
+        dataStudentLevel: action.dataStudentLevel,
+        dataStudentTypes: action.dataStudentTypes,        
         requesting: false,
         successful: true,
         messages: [{
@@ -77,13 +80,13 @@ const reducer = function contributorsReducer(state = initialState, action) {
       }
 
     case CHANGE_HIERARCHY_SUCCESS:
-    console.log(action)
       return {
         ...state,
         actions: action.actions.data,
         actionTypes: action.actionTypes.data,
         schoolTypes: action.schoolTypes.data,
         contacts: action.contacts.data.total,
+        coverage: action.coverage.data,
         studentTypes: action.studentTypes.data.total,
         total_schools: action.total_schools,
         total_students: action.total_students,
@@ -91,7 +94,10 @@ const reducer = function contributorsReducer(state = initialState, action) {
         dataActions: action.dataActions,      
         dataSchoolTypes: action.dataSchoolTypes,
         dataActionTypes: action.dataActionTypes,
-        // dataCoverage: action.dataCoverage,
+        dataCoverage: action.dataCoverage,
+        studentLevel: action.studentLevel.data,
+        dataStudentLevel: action.dataStudentLevel,
+        dataStudentTypes: action.dataStudentTypes,
         messages: [{
           body: 'Indicators updated!',
           time: new Date(),

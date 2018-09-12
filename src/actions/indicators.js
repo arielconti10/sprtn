@@ -32,6 +32,9 @@ export const indicatorsRequestSuccess = function indicatorsRequestSuccess (
     dataSchoolTypes,
     dataCoverage,
     dataActionTypes,
+    studentLevel,
+    dataStudentLevel,
+    dataStudentTypes,
 ){
   return {
     type: INDICATORS_REQUEST_SUCCESS,
@@ -50,6 +53,9 @@ export const indicatorsRequestSuccess = function indicatorsRequestSuccess (
     dataSchoolTypes,
     dataCoverage,
     dataActionTypes,
+    studentLevel,
+    dataStudentLevel,
+    dataStudentTypes,    
   }
 }
 
@@ -68,21 +74,25 @@ export const changeHierarchyRequest = function changeHierarchyRequest ( hierarch
     }
 }
 
-export const changeHierarchySuccess = function changeHierarchySuccess ( actions, actionTypes, contacts, studentTypes, schoolTypes, total_schools, total_students, total_action, dataSchoolTypes, dataActions, dataActionTypes) {
+export const changeHierarchySuccess = function changeHierarchySuccess ( actions, actionTypes, contacts, coverage, studentTypes, schoolTypes, total_schools, total_students, total_action, dataSchoolTypes, dataActions, dataActionTypes, dataCoverage, studentLevel, dataStudentLevel, dataStudentTypes) {
     return {
         type: CHANGE_HIERARCHY_SUCCESS,
         actions,
         actionTypes,        
         contacts,
+        coverage,
         studentTypes,
         schoolTypes,
         total_schools,
         total_students,
         total_action, 
         dataSchoolTypes, 
-        // dataCoverage, 
         dataActions,
         dataActionTypes,
+        dataCoverage,
+        studentLevel,
+        dataStudentLevel,
+        dataStudentTypes,
     }
 }
 

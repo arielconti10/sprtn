@@ -39,7 +39,6 @@ class Indicators extends Component {
     constructor(props) {
         super(props);
         const { indicatorsRequest, user } = this.props;
-        indicatorsRequest(user)
         this.state = {
             active_tab: 'chart_actions',
             total_schools: '00',
@@ -86,10 +85,10 @@ class Indicators extends Component {
          
     }
     
-    //o "callback hell" será aprimorado após estudo de promises
-    //foi utilizado por ser assíncrono, e se chamado de modo síncrono, nāo produz os valores desejados
+
     componentDidMount() {  
-              
+        this.props.indicatorsRequest(this.props.user)
+        
         this.getSchoolTypes();
         this.getActionsRealized();
         this.getStudentTypes(); 
@@ -126,7 +125,7 @@ class Indicators extends Component {
         })
 
         const total = this.groupBySchool(this.props.indicators.schools, data_coverage, "tmp_coverage", 'total_coverage');
-
+        console.log(total)
         let array_chart = []
 
         if (total > 0) {
@@ -184,9 +183,8 @@ class Indicators extends Component {
      * obtem o total de alunos, separadas por tipos de escola: público, privado e secretaria
      */
     getStudentTypes() {
-        const data_student_type = mapPieChart("Tipos de Escola", "school_type", "total", this.props.indicators.studentTypes);
-        this.groupBySchool(this.props.indicators.schools, data_student_type, "data_student_type", "total_students", "options_student_type");
-        this.setState ( { ring_load : false });
+        this.drawCustomOptions(this.props.indicators.dataStudentTypes, "options_student_type")
+
     }
 
     drawCustomOptions(chart_result, state_to) {
@@ -520,6 +518,7 @@ class Indicators extends Component {
     handleChangeHierarchy = ( selectedOption ) => {
         this.props.changeHierarchyRequest(selectedOption);
         const values = this.state;
+
         if(selectedOption) {
             values.hierarchy_id = selectedOption;
         }
@@ -528,20 +527,21 @@ class Indicators extends Component {
     mapSelect(dados) {
         const select_array = [];
         const general_object = {value: "", label: "TODOS"};
-
-        dados.map(item => {
-            const label = `${item.username} - ${item.full_name}`;
-            const item_object = {"value": item.id, "label": label};
-            select_array.push(item_object);
-        });
-
-        select_array.sort(function (a, b) {
-            if(a.label < b.label) return -1;
-            if(a.label > b.label) return 1;
-            return 0;
-        });
-
-        select_array.unshift(general_object);
+        if(dados){
+            dados.map(item => {
+                const label = `${item.username} - ${item.full_name}`;
+                const item_object = {"value": item.id, "label": label};
+                select_array.push(item_object);
+            });
+    
+            select_array.sort(function (a, b) {
+                if(a.label < b.label) return -1;
+                if(a.label > b.label) return 1;
+                return 0;
+            });
+    
+            select_array.unshift(general_object);
+        }
 
         return select_array;
     }
@@ -678,7 +678,7 @@ class Indicators extends Component {
                 </div>
                 
                 <div className="row">
-                    {this.props.indicators.dataActions && this.props.indicators.actions.length > 1 &&
+                    {this.props.indicators.dataActions &&
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="chart-actions ">
                             <PieChartComponent
@@ -691,7 +691,7 @@ class Indicators extends Component {
                     </div>
                     }
 
-                    {this.props.indicators.dataActionTypes && this.props.indicators.dataActionTypes.length > 1 &&
+                    {this.props.indicators.dataActionTypes &&
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="chart-actions-type ">
                             <PieChartComponent
@@ -704,12 +704,12 @@ class Indicators extends Component {
                     </div>
                     }
 
-                    {data_coverage.length > 1 &&
+                    {this.props.indicators.coverage && 
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="coverage-school">
                                 <PieChartComponent
-                                    data_actions={data_coverage}
+                                    data_actions={this.props.indicators.dataCoverage}
                                     chart_id="pie_coverage"
                                     options_publisher={options_publisher}
                                     label_card="Cobertura da Carteira"
@@ -719,7 +719,7 @@ class Indicators extends Component {
                     </div>
                     }
 
-                    {this.props.indicators.schoolTypes && this.props.indicators.schoolTypes.length > 1 &&
+                    {this.props.indicators.schoolTypes &&
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="chart-school-types ">
@@ -734,12 +734,12 @@ class Indicators extends Component {
                     </div>
                     }
 
-                    {data_student_type.length > 1 &&
+                    {this.props.indicators.studentTypes &&
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="chart-student-types ">
                                 <PieChartComponent
-                                    data_actions={data_student_type}
+                                    data_actions={this.props.indicators.dataStudentTypes}
                                     chart_id="pie_student_types"
                                     options_publisher={options_student_type}
                                     label_card="Alunos por tipo de escola"
@@ -749,12 +749,12 @@ class Indicators extends Component {
                     </div>
                     }
 
-                    {data_student_level.length > 1 &&
+                    {this.props.indicators.studentLevel &&
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="chart-student-level ">
                                 <PieChartComponent
-                                    data_actions={data_student_level}
+                                    data_actions={this.props.indicators.dataStudentLevel}
                                     chart_id="pie_student_level"
                                     options_publisher={options_publisher}
                                     label_card="Alunos por nível"
