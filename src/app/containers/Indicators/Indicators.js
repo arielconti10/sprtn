@@ -10,7 +10,7 @@ import { Async } from 'react-select';
 import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 
 import { connect } from 'react-redux'
-import { indicatorsRequest } from '../../../actions/indicators';
+import { indicatorsRequest, changeHierarchyRequest } from '../../../actions/indicators';
 import { PropTypes } from 'prop-types';
 
 import Select from 'react-select';
@@ -18,14 +18,17 @@ import Select from 'react-select';
 class Indicators extends Component {
     static propTypes = { 
         indicatorsRequest: PropTypes.func,
+        changeHierarchyRequest: PropTypes.func,
         indicators: PropTypes.shape({
-            contributors: PropTypes.array,
             schoolTypes: PropTypes.array,
             studentTypes: PropTypes.array,
             contacts: PropTypes.number,
-            actions: PropTypes.number,
+            total_action: PropTypes.number,
             coverage: PropTypes.array,
             total_schools: PropTypes.number,
+            ring_load: PropTypes.bool,
+            actions: PropTypes.array,
+            dataActionTypes: PropTypes.array,
         }),
         user: PropTypes.shape({
             username: PropTypes.string,
@@ -35,7 +38,8 @@ class Indicators extends Component {
 
     constructor(props) {
         super(props);
-        
+        const { indicatorsRequest, user } = this.props;
+        indicatorsRequest(user)
         this.state = {
             active_tab: 'chart_actions',
             total_schools: '00',
@@ -85,17 +89,13 @@ class Indicators extends Component {
     //o "callback hell" será aprimorado após estudo de promises
     //foi utilizado por ser assíncrono, e se chamado de modo síncrono, nāo produz os valores desejados
     componentDidMount() {  
-        const { indicatorsRequest, user } = this.props;
-        indicatorsRequest(user)
-
               
         this.getSchoolTypes();
         this.getActionsRealized();
-        this.getStudentTypes();
+        this.getStudentTypes(); 
         this.getActionTypes();
         this.getStudentLevel();   
 
-        // this.setState( { ring_load : true });
 
         this.setState({school_type_id: [
             { "value": "PARTICULAR", "label": "Particular" },
@@ -103,7 +103,7 @@ class Indicators extends Component {
             { "value": "SECRETARIA", "label": "Secretaria" }
         ]});
         this.setState({"total_contacts": this.props.indicators.contacts})     
-        this.setState({"total_action": this.props.indicators.actions}) 
+        this.setState({"total_action": this.props.indicators.total_action}) 
 
     }
 
@@ -165,7 +165,8 @@ class Indicators extends Component {
             })
             .catch(error => {
                 const response = error.response;
-                this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
+                console.log(error)
+                // this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
             })
     }
 
@@ -174,9 +175,9 @@ class Indicators extends Component {
      */
     getSchoolTypes() {
         // const data_school_type = mapPieChart("Tipos de Escola", "school_type", "total", this.props.indicators.schoolTypes);
-        this.groupBySchool(this.props.indicators.schools, this.props.indicators.dataSchoolTypes, "data_school_type", "total_schools", "options_school_type");
+        // this.groupBySchool(this.props.indicators.schools, this.props.indicators.dataSchoolTypes, "data_school_type", "total_schools", "options_school_type");
         this.getCoverage();
-
+        this.drawCustomOptions(this.props.indicators.dataSchoolTypes, "options_school_type")
     }
 
     /**
@@ -226,20 +227,7 @@ class Indicators extends Component {
      * obtem o total de ações, separadas por tipos de escola: público, privado e secretaria
      */
     getActionTypes() {
-        const action = "indicator/action/school-type";
-        axios.get(action)
-            .then(res => {
-                const result = res.data.data;
-                const data_action_type = mapPieChart("Tipos de Escola", "school_type", "total", result);
-
-                this.drawCustomOptions(data_action_type, "options_action_school");
-                
-                this.setState({ data_action_type, action_type_initial: data_action_type });
-            })
-            .catch(error => {
-                const response = error.response;
-                this.setState({ msg_error: `Ocorreu o seguinte erro: ${response.status} - ${response.statusText}` });
-            })
+        this.drawCustomOptions(this.props.indicators.dataActionTypes, "options_action_school");
     }
 
     /**
@@ -490,42 +478,50 @@ class Indicators extends Component {
         }
     }
 
-    handleChangeHierarchy = (selectedOption) => { 
-        this.setState( {ring_load_change : true });
+    // handleChangeHierarchy = (selectedOption) => { 
+    //     this.setState( {ring_load_change : true });
+    //     const values = this.state;
+    //     if(selectedOption) {
+    //         values.hierarchy_id = selectedOption;
+    //         this.setState({ values }, () => {
+    //             if (this.state.school_type_id.length === 0) {
+    //                 this.setState( {
+    //                     'data_actions': [],
+    //                     'data_action_type': [],
+    //                     'data_coverage': [],
+    //                     'data_action_type': [],
+    //                     'data_school_type': [],
+    //                     'data_student_type': [],
+    //                     'data_student_level': []
+    //                 });
+                    
+    //                 return true;
+    //             }
+    
+    //             this.getActionsBySchool(values.school_type_id);
+    //             this.sumBySchool(values.school_type_id, "total_schools", "data_school_type");
+    //             this.sumBySchool(values.school_type_id, "total_students", "data_student_type");
+    //             this.getCoverage();
+    //             this.getSchoolTypes();
+    //             this.getStudentTypes();
+    //             this.getStudentLevel();
+
+    //             let url_contact = "indicator/school/contact";
+    //             url_contact = this.getUrlSearch(url_contact);
+        
+    //             this.requestTotal(url_contact, "total_contacts", function () {});
+    //             this.sumBySchool(values.school_type_id, "total_action", "data_action_type");
+    //         });
+    //     } else {
+    //         this.setState( { ring_load_change: false });
+    //     }
+    // }
+
+    handleChangeHierarchy = ( selectedOption ) => {
+        this.props.changeHierarchyRequest(selectedOption);
         const values = this.state;
         if(selectedOption) {
             values.hierarchy_id = selectedOption;
-            this.setState({ values }, () => {
-                if (this.state.school_type_id.length === 0) {
-                    this.setState( {
-                        'data_actions': [],
-                        'data_action_type': [],
-                        'data_coverage': [],
-                        'data_action_type': [],
-                        'data_school_type': [],
-                        'data_student_type': [],
-                        'data_student_level': []
-                    });
-                    
-                    return true;
-                }
-    
-                this.getActionsBySchool(values.school_type_id);
-                this.sumBySchool(values.school_type_id, "total_schools", "data_school_type");
-                this.sumBySchool(values.school_type_id, "total_students", "data_student_type");
-                this.getCoverage();
-                this.getSchoolTypes();
-                this.getStudentTypes();
-                this.getStudentLevel();
-
-                let url_contact = "indicator/school/contact";
-                url_contact = this.getUrlSearch(url_contact);
-        
-                this.requestTotal(url_contact, "total_contacts", function () {});
-                // this.sumBySchool(values.school_type_id, "total_action", "data_action_type");
-            });
-        } else {
-            this.setState( { ring_load_change: false });
         }
     }
 
@@ -585,15 +581,15 @@ class Indicators extends Component {
 
     render() {
         const { 
-            data_actions, data_school_type, data_student_type, data_action_type, data_student_level,
+            data_school_type, data_student_type, data_action_type, data_student_level,
             data_coverage,
             options_publisher, options_school_type, options_action_school, options_student_type,
-            ring_load, ring_load_change
+            ring_load_change
         } = this.state;
 
         return (
             <div>
-                {(ring_load == true || ring_load_change == true) &&
+                {this.props.indicators.ring_load == true &&
                     <div className="loader">
                         <div className="backLoading">
                             <div className="load"><img src="https://www.ipswitch.com/library/img/loading.gif" /></div>
@@ -675,18 +671,18 @@ class Indicators extends Component {
                         backgroundColor="bg-warning"
                         shadowClass="actions shadow"
                         icon="fa fa-bullseye"
-                        total={this.props.indicators.actions}
+                        total={this.props.indicators.total_action}
                         label="Acões"
                     />
 
                 </div>
                 
                 <div className="row">
-                    {data_actions.length > 1 &&
+                    {this.props.indicators.dataActions && this.props.indicators.actions.length > 1 &&
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="chart-actions ">
                             <PieChartComponent
-                                data_actions={data_actions}
+                                data_actions={this.props.indicators.dataActions}
                                 chart_id="pie_actions"
                                 options_publisher={options_publisher}
                                 label_card="Ações Realizadas"
@@ -695,11 +691,11 @@ class Indicators extends Component {
                     </div>
                     }
 
-                    {data_action_type.length > 1 &&
+                    {this.props.indicators.dataActionTypes && this.props.indicators.dataActionTypes.length > 1 &&
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="chart-actions-type ">
                             <PieChartComponent
-                                data_actions={data_action_type}
+                                data_actions={this.props.indicators.dataActionTypes}
                                 chart_id="pie_actions_type"
                                 options_publisher={options_action_school}
                                 label_card="Ações por tipo de escola"
@@ -723,7 +719,7 @@ class Indicators extends Component {
                     </div>
                     }
 
-                    {this.props.indicators.schoolTypes.length > 1 &&
+                    {this.props.indicators.schoolTypes && this.props.indicators.schoolTypes.length > 1 &&
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="chart-school-types ">
@@ -773,9 +769,10 @@ class Indicators extends Component {
     }
 }
 
+
 const mapStateToProps = (state) => ({
     indicators: state.indicators,
     user: state.user
 })
 
-export default connect(mapStateToProps, {indicatorsRequest})(Indicators);
+export default connect(mapStateToProps, {indicatorsRequest, changeHierarchyRequest})(Indicators);
