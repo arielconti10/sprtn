@@ -471,8 +471,8 @@ class SchoolEventList extends Component {
                                         let school = row.original;
                 
                                         return (
-                                            <div style={{ padding: "20px" }}>
-                                                <b style={{ marginLeft: '20px' }}>Observação:</b> {school.observations}
+                                            <div style={{ padding: "20px 20px 20px 40px" }}>
+                                                <b>Observação:</b> {school.observations}
                                             </div>
                                         );
                                     }}
