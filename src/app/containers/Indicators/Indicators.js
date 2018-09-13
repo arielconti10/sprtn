@@ -527,7 +527,8 @@ class Indicators extends Component {
     mapSelect(dados) {
         const select_array = [];
         const general_object = {value: "", label: "TODOS"};
-        if(dados){
+        
+        if(Object.keys(dados).length !== 0 ){
             dados.map(item => {
                 const label = `${item.username} - ${item.full_name}`;
                 const item_object = {"value": item.id, "label": label};
