@@ -1,0 +1,7 @@
+.table-without-expand .rt-expandable {
+    display: none;
+}
+
+.table-without-expand .rt-th:first-child {
+    display: none;
+}

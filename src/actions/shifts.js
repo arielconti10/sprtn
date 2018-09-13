@@ -10,6 +10,7 @@ import {
     SHIFT_REQUESTING,
     SHIFT_REQUEST_SUCCESS,
     SHIFT_REQUEST_ERROR,
+    SHIFT_UNLOAD
   } from '../actionTypes/shifts'
   
   export const shiftCreate = function shiftCreate (user, shift) {
@@ -90,5 +91,11 @@ import {
       type: SHIFT_REQUEST_ERROR,
       error,
     }
+  }
+
+  export function shiftUnload() {
+      return {
+          type: SHIFT_UNLOAD
+      }
   }
   

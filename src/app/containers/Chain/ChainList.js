@@ -6,7 +6,7 @@ import GridApi from '../../common/GridApi';
 class ChainList extends Component {
     render() {
         return (
-            <div>
+            <div className="table-without-expand">
                 <div className="action-button">
                     <GridApi
                         apiSpartan="chain"

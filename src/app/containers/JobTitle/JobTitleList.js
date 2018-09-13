@@ -10,7 +10,7 @@ import { verifySelectChecked, createTable, savePreferences, verifyPreferences } 
 class JobTitleList extends Component {
     render() {
         return (
-            <div>
+            <div className="table-without-expand">
                 <div className="action-button">
                     <GridApi
                         apiSpartan="job-title"

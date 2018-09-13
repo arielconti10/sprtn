@@ -15,7 +15,9 @@ const apiPost = 'job-title';
 import { PropTypes } from 'prop-types'
 import { reduxForm, Field } from 'redux-form'
 import { connect } from 'react-redux'
-import { job_titleCreate, job_titleUpdate, job_titleLoad, job_titleCurrentClear } from '../../../actions/job_title';
+import { job_titleCreate, job_titleUpdate, job_titleLoad, job_titleCurrentClear, unloadJobTitle 
+
+} from '../../../actions/job_title';
 
 const fieldRequired = value => (value ? undefined : 'Este campo é de preenchimento obrigatório')
 
@@ -44,6 +46,7 @@ class JobTitleForm extends Component {
         job_titleCreate: PropTypes.func.isRequired,
         job_titleLoad: PropTypes.func.isRequired,
         job_titleCurrentClear: PropTypes.func.isRequired,
+        unloadJobTitle: PropTypes.func.isRequired,
         reset: PropTypes.func.isRequired,
         initialValues: PropTypes.object
     }
@@ -96,7 +99,9 @@ class JobTitleForm extends Component {
         const { job_titleLoad, user } = this.props
         this.checkPermission('job-title.insert');
         
-        this.setState({job_title_type_id: "0"})
+        this.setState({job_title_type_id: "0"});
+        this.props.unloadJobTitle();
+
         if (this.props.match.params.id !== undefined) {
             this.checkPermission('job-title.update');
             job_titleLoad(user, this.props.match.params.id)
@@ -274,7 +279,7 @@ InitializeFromStateForm = connect(
         job_titles: state.job_titles,
         initialValues: state.job_titles.current_job_title
     }),
-    { job_titleLoad, job_titleUpdate, job_titleCreate, job_titleCurrentClear }
+    { job_titleLoad, job_titleUpdate, job_titleCreate, job_titleCurrentClear, unloadJobTitle }
 )(InitializeFromStateForm)
 
 export default InitializeFromStateForm

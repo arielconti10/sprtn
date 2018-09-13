@@ -9,7 +9,7 @@ import { canUser } from '../../common/Permissions';
 class LevelList extends Component {
     render() {
         return (
-            <div>
+            <div className="table-without-expand">
                 <div className="action-button">
                     <GridApi
                         apiSpartan="level"

@@ -6,9 +6,12 @@ import { take, fork, cancel, call, put, cancelled, takeLatest, select } from 're
 import axios from '../app/common/axios';
 import { verifySelectChecked, createTableToggle, savePreferences, verifyPreferences } from '../app/common/ToggleTable';
 
+import { convertArrayOfObjectsToCSV } from '../app/common/GenerateCSV'
+
 import {
     setColumns, setCreateTable, setDropdownStatus, setColumnsSelected, setInitialColumns, setSelectAll,
-    setLoader, setTableInfo, setFilters, setDataAlternative, setCustomFilter
+    setLoader, setTableInfo, setFilters, setDataAlternative, setCustomFilter, 
+    setDropdownActionStatus, setExportData
 } from '../actions/gridApi'
 
 const gridUrl = `${process.env.API_URL}`;
@@ -18,22 +21,25 @@ const gridUrl = `${process.env.API_URL}`;
  * @param {Array} columns lista com as colunas
  * @return {Array} status_column lista incluindo a coluna de status
  */
-function buildStatusColumn(columns) {
+function buildStatusColumn(columns, hideButtons) {
     let status_column = columns;
-    status_column.unshift({
-        Header: "Status",
-        accessor: "",
-        width: 100,
-        headerClassName: 'text-left',
+    if (!hideButtons) {
+        status_column.unshift({
+            Header: "Status",
+            accessor: "",
+            width: 100,
+            headerClassName: 'text-left',
+    
+            sortable: false,
+            Cell: (element) => (
+                !element.value.deleted_at ?
+                    <div><span className="alert-success grid-record-status">Ativo</span></div>
+                    :
+                    <div><span className="alert-danger grid-record-status">Inativo</span></div>
+            )
+        });
+    }
 
-        sortable: false,
-        Cell: (element) => (
-            !element.value.deleted_at ?
-                <div><span className="alert-success grid-record-status">Ativo</span></div>
-                :
-                <div><span className="alert-danger grid-record-status">Inativo</span></div>
-        )
-    });
 
     return status_column;
 }
@@ -233,7 +239,7 @@ function* buildColumns(columns, hideButtons, urlLink, apiSpartan) {
 
     yield put(setDataAlternative(finalAltColumn));
 
-    let status_column = buildStatusColumn(newColumns);
+    let status_column = buildStatusColumn(newColumns, hideButtons);
     let actions_column = yield call(buildActionColumn, status_column, hideButtons, urlLink, apiSpartan);
 
     return newColumns;
@@ -294,23 +300,16 @@ function getUrlSearch(action) {
 
     let baseURL = `/${apiSpartan}?paginate=${pageSize}&page=${page}`;
 
+    if (action.hidePaginate) {
+        baseURL = `/${apiSpartan}?filter[active]=1`;
+    }
+
     if (filtered && filtered.length > 0) {
         filtered.map(function (item, key) {    
             let filter_by = item.id;
             baseURL += `&filter[${filter_by}]=${item.value}`;
         })
     }
-
-    /*
-    if (filtered.length === 0 && customFiltered && customFiltered.length > 0) {
-        customFiltered.map(function (item, key) {    
-            let filter_by = item.id;
-            baseURL += `&filter[${filter_by}]=${item.value}`;
-        })
-    }
-
-    console.log(action, filtered, customFiltered);
-    */
 
     if (defaultOrder && sorted.length === 0) {
         let order_by = defaultOrder;
@@ -321,7 +320,7 @@ function getUrlSearch(action) {
         for (let i = 0; i < sorted.length; i++) {
             let order_by = sorted[i]['id'];
 
-            if (order_by !== "full_name") {
+            if (order_by !== "full_name" && order_by !== "school_type.name") {
                 baseURL += "&order[" + order_by + "]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
             } else {
                 baseURL += "&order[name]=" + (sorted[i]['desc'] == false ? 'asc' : 'desc');
@@ -343,12 +342,13 @@ function searchData(baseURL) {
     return axios.get(baseURL)
     .then((response) => {
         const dados = response.data.data;
+
         const object_return = {
             data: dados,
-            totalSize: response.data.meta.pagination.total,
-            pages: response.data.meta.pagination.last_page,
-            page: response.data.meta.pagination.current_page,
-            pageSize: parseInt(response.data.meta.pagination.per_page),
+            totalSize: response.data.meta?response.data.meta.pagination.total:0,
+            pages: response.data.meta?response.data.meta.pagination.last_page:0,
+            page: response.data.meta?response.data.meta.pagination.current_page:0,
+            pageSize: response.data.meta?parseInt(response.data.meta.pagination.per_page):0,
             // sorted: sorted,
             // filtered: filtered,
             loading: false
@@ -384,6 +384,37 @@ function concatFilter(filtered, filter, sameApi) {
     return concat_filter;
 }
 
+/**
+ * realiza o mapeamento de dados para que seja possível realizar a exportaçāo
+ * @param {Array} data dados a serem percorridos
+ * @return {Array} newData dados mapeados a serem exportados
+ */
+function mapToExport(data) {
+    let newData = [];
+
+    data.map(school => {
+        let register = {};
+
+        for (let i in school) {
+            if (i != 'students' && i != 'events' && i != 'contacts' && i != 'users' && i != 'secretary' && i != 'marketshare') {
+                let value;
+                
+                if (i == 'school_type' || i == 'subsidiary' || i == 'sector' || i == 'state' || i == 'chain' || i == 'profile' || i == 'congregation') {
+                    school[i] ? value = school[i]['name'] : value = school[i];
+                } else {
+                    value = school[i];
+                }
+
+                register[i] = `'${value}`;
+            }
+        }
+
+        newData.push(register);
+    });
+
+    return newData;
+}
+
 function* loadColumnsFlow(action) {
     const columns = yield call(buildColumns, action.columnsGrid, action.hideButtons, action.urlLink, action.apiSpartan);
     yield put(setInitialColumns(columns));
@@ -414,6 +445,21 @@ function* fetchDataFlow(action) {
     const result_data = yield call(searchData, url_filter);
 
     yield put(setCreateTable(result_data));
+    yield put(setLoader(false));
+}
+
+function* exportTableFlow(action) {
+    yield put(setLoader(true));
+    
+    action.tableInfo.hidePaginate = true;
+    const url_filter = yield call(getUrlSearch, action.tableInfo);
+    const result_data = yield call(searchData, url_filter);
+    const maped_data = yield call(mapToExport, result_data.data);
+
+    convertArrayOfObjectsToCSV({ data: maped_data, fileName: 'spartan_escolas' });
+
+    yield put(setExportData(maped_data));
+
     yield put(setLoader(false));
 }
 
@@ -449,6 +495,13 @@ function* toggleDropdownFlow(action) {
     const status_dropdown = !status;
 
     yield put(setDropdownStatus(status_dropdown));
+}
+
+function* toggleDropdownActionFlow(action) {
+    const status = action.dropdownActionsOpen;
+    const status_dropdown = !status;
+
+    yield put(setDropdownActionStatus(status_dropdown));
 }
 
 function* selectColumnsFlow(action) {
@@ -497,7 +550,13 @@ function* loadFilterFlow(action) {
 
     let concat_filter = yield call(concatFilter, filtered, filter, sameApi);
     tableInfo.filtered = concat_filter;
-    tableInfo.sorted = [{id: filter.id, desc: false}];
+
+    let compostSearch = action.filter.id.indexOf(".");
+
+    if (compostSearch === -1 && action.filter.id !== "status") {
+        tableInfo.sorted = [{id: filter.id, desc: false}];
+    }
+    
 
     const url_filter = yield call(getUrlSearch, tableInfo);
     const result_data = yield call(searchData, url_filter);
@@ -516,10 +575,12 @@ function* gridApiWatcher() {
     takeLatest("ON_DELETE_DATA_FLOW", deleteDataFlow),
     takeLatest("ON_ACTIVE_DATA_FLOW", activeDataFlow),
     takeLatest("TOGGLE_DROPDOWN_FLOW", toggleDropdownFlow),
+    takeLatest("TOGGLE_DROPDOWN_ACTION_FLOW", toggleDropdownActionFlow),
     takeLatest("SELECT_COLUMNS_FLOW", selectColumnsFlow),
     takeLatest("SELECT_ALL_FLOW", selectAllFlow),
     takeLatest("LOAD_FILTER_FLOW", loadFilterFlow),
-    takeLatest("SELECT_OPTION_FLOW", selectOptionFlow)
+    takeLatest("SELECT_OPTION_FLOW", selectOptionFlow),
+    takeLatest("EXPORT_TABLE_FLOW", exportTableFlow)
   ]
 }
 

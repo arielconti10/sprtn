@@ -1,7 +1,8 @@
 import { LOAD_COLUMNS_FLOW, SET_COLUMNS, ON_FETCH_DATA_FLOW, SET_CREATE_TABLE, ON_DELETE_DATA_FLOW, ON_ACTIVE_DATA_FLOW,
     TOGGLE_DROPDOWN_FLOW, SET_DROPDOWN_STATUS, SELECT_COLUMNS_FLOW, SET_COLUMNS_SELECTED, SET_INITIAL_COLUMNS,
     SELECT_ALL, SELECT_ALL_FLOW, SET_LOADER, LOAD_FILTER_FLOW, SET_TABLE_INFO, SET_FILTERS, SET_DATA_ALTERNATIVE,
-    SELECT_OPTION_FLOW, SET_CUSTOM_FILTER
+    SELECT_OPTION_FLOW, SET_CUSTOM_FILTER, TOGGLE_DROPDOWN_ACTION_FLOW, SET_DROPDOWN_ACTION_STATUS,
+    EXPORT_TABLE_FLOW, SET_EXPORT_DATA
 } from '../actionTypes/gridApi';
 
 export function loadColumnsFlow(columnsGrid, hideButtons, urlLink, apiSpartan, tableInfo) {
@@ -62,10 +63,24 @@ export function toggleDropdownFlow(dropdownOpen) {
     }
 }
 
+export function toggleDropdownActionsFlow(dropdownActionsOpen) {
+    return {
+        type: TOGGLE_DROPDOWN_ACTION_FLOW,
+        dropdownActionsOpen
+    }
+}
+
 export function setDropdownStatus(dropdownOpen) {
     return {
         type: SET_DROPDOWN_STATUS,
         dropdownOpen
+    }
+}
+
+export function setDropdownActionStatus(dropdownActionsOpen) {
+    return {
+        type: SET_DROPDOWN_ACTION_STATUS,
+        dropdownActionsOpen
     }
 }
 
@@ -157,9 +172,22 @@ export function selectOptionFlow(updatedData, apiSpartan, info_id, tableInfo) {
 }
 
 export function setCustomFilter(customFilter) {
-    console.log("ACTION");
     return {
         type: SET_CUSTOM_FILTER,
         customFilter
+    }
+}
+
+export function exportTableFlow(tableInfo) {
+    return {
+        type: EXPORT_TABLE_FLOW,
+        tableInfo
+    }
+}
+
+export function setExportData(exportData) {
+    return {
+        type: SET_EXPORT_DATA,
+        exportData
     }
 }

@@ -9,13 +9,14 @@ import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem,
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-// import './GridApi.css'
-
+import axios from './axios';
+import { generateTermOfAccept } from './GenerateTermOfAccept'
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import { getSchoolAndVisitValues } from './ToggleTable'; 
 import { loadColumnsFlow, onFetchDataFlow, onDeleteDataFlow, onActiveDataFlow, toggleDropdownFlow, 
-    selectColumnsFlow, selectAllFlow, loadFilterFlow, selectOptionFlow, setTableInfo
+    selectColumnsFlow, selectAllFlow, loadFilterFlow, selectOptionFlow, setTableInfo,
+    toggleDropdownActionsFlow, setLoader, exportTableFlow
 } from '../../actions/gridApi';
 
 class GridApi extends Component {
@@ -26,11 +27,14 @@ class GridApi extends Component {
         onDeleteDataFlow: PropTypes.func,
         onActiveDataFlow: PropTypes.func,
         toggleDropdownFlow: PropTypes.func,
+        toggleDropdownActionsFlow: PropTypes.func,
         selectColumns: PropTypes.func,
         selectAllFlow: PropTypes.func, 
         loadFilterFlow: PropTypes.func,
         selectOptionFlow: PropTypes.func,
         setTableInfo: PropTypes.func,
+        setLoader: PropTypes.func,
+        exportTableFlow: PropTypes.func,
         gridApi: PropTypes.shape({
             columnsGrid: PropTypes.array,
             data: PropTypes.array,
@@ -46,9 +50,12 @@ class GridApi extends Component {
     constructor(props) {
         super(props);
         this.toggle = this.toggle.bind(this);
+        this.toggleActions = this.toggleActions.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleSelectAll = this.handleSelectAll.bind(this);
         this.onChangeTextFilter = this.onChangeTextFilter.bind(this);
+        this.exportTermOfAccept = this.exportTermOfAccept.bind(this);
+        this.exportCSV = this.exportCSV.bind(this);
     }
 
     componentWillMount() {
@@ -60,7 +67,7 @@ class GridApi extends Component {
         const columnsAlt = this.props.columnsAlt;
 
         columns.map(item => {
-            item.filterable === true?
+            item.filterable === true && !item.customFilter?
             item.Filter = ({ filter, onChange }) => (
                 <input type="text" value={filter} style={{width:  "100%"}} 
                     onBlur={event => this.onChangeTextFilter(event.target.value, item.accessor)}
@@ -96,6 +103,12 @@ class GridApi extends Component {
         this.props.toggleDropdownFlow(status);
     }
 
+    toggleActions() {
+        const gridApi = this.props.gridApi;
+        const status = gridApi.dropdownActionsOpen;
+        this.props.toggleDropdownActionsFlow(status);
+    }
+
     handleChange(e) {
         const target = e.currentTarget;
         const gridApi = this.props.gridApi;
@@ -112,6 +125,31 @@ class GridApi extends Component {
         const columsInitial = gridApi.columsInitial;
         
         this.props.selectAllFlow(selectAll, columsInitial);
+    }
+
+    exportTermOfAccept() {
+        this.props.setLoader(true);
+        axios.get('school?filter[portfolio]=1&filter[active]=1')
+            .then((response) => {
+                const user = this.props.user;
+                const data = response.data.data;
+                const userFullName = user.full_name;
+
+                generateTermOfAccept(userFullName, data);
+
+                this.props.setLoader(false);
+            })
+            .catch(function (error) {
+                console.log(error);
+                alert(error);
+            }.bind(this));
+    }
+
+    exportCSV() {
+        const gridApi = this.props.gridApi;
+        const tableInfo = gridApi.tableInfo;
+
+        this.props.exportTableFlow(tableInfo);
     }
 
     /**
@@ -231,7 +269,7 @@ class GridApi extends Component {
 
     render() {        
         const { columnsGrid, data, pages ,pageSize, dropdownOpen, columnsSelected, selectAll, loading, 
-            dataAlternative, tableInfo, filtered, apiFiltered 
+            dataAlternative, tableInfo, filtered, apiFiltered, dropdownActionsOpen 
         } = this.props.gridApi;
         const { apiSpartan, defaultOrder } = this.props;
 
@@ -246,10 +284,23 @@ class GridApi extends Component {
 
             <div>
                 <div className="section-dropdown">
-                    {!this.props.hideButtons 
+                    {(!this.props.hideButtons && !this.props.hideFirstButton) 
                         && <NavLink to={this.props.urlLink + "/novo"} exact>
                             <Button color='primary' ><i className="fa fa-plus-circle"></i> Adicionar</Button>
                         </NavLink>
+                    }
+
+                    {this.props.hasActions &&
+                    <ButtonDropdown isOpen={dropdownActionsOpen} toggle={this.toggleActions}>
+                            <DropdownToggle color='primary' caret>
+                                Ações
+                        </DropdownToggle>
+                            <DropdownMenu>
+                                <DropdownItem onClick={this.exportTermOfAccept}><i className="fa fa-file-text-o"></i> Termo de aceite</DropdownItem>
+                                <DropdownItem onClick={this.exportCSV}><i className="fa fa-file-excel-o"></i> Exportar</DropdownItem>
+                                <DropdownItem disabled><i className="fa fa-plus-circle"></i> Adicionar</DropdownItem>
+                            </DropdownMenu>
+                    </ButtonDropdown>
                     }
                     
                     <ButtonDropdown isOpen={dropdownOpen} 
@@ -293,17 +344,45 @@ class GridApi extends Component {
                 <br />
                 <ReactTable
                     getTdProps={(state, rowInfo, column, instance) => {
-                        return {
-                            onClick: e => {
-                                if (!rowInfo.original.deleted_at && (e.target.className === "fa fa-ban" || e.target.tagName === "BUTTON")) {
-                                    this.props.onDeleteDataFlow(apiSpartan, rowInfo, state);
-                                }
-
-                                if (rowInfo.original.deleted_at && (e.target.className === "fa fa-check-circle" || e.target.tagName === "BUTTON")) {
-                                    this.props.onActiveDataFlow(apiSpartan, rowInfo, state);
+                        if (column.Header) {
+                            return {
+                                onClick: e => {
+    
+                                    if (!rowInfo.original.deleted_at && (e.target.className === "fa fa-ban" || e.target.tagName === "BUTTON")) {
+                                        this.props.onDeleteDataFlow(apiSpartan, rowInfo, state);
+                                    }
+    
+                                    if (rowInfo.original.deleted_at && (e.target.className === "fa fa-check-circle" || e.target.tagName === "BUTTON")) {
+                                        this.props.onActiveDataFlow(apiSpartan, rowInfo, state);
+                                    }
+    
                                 }
                             }
+                        } else {
+                            return {}
                         }
+
+                    }}
+                    SubComponent={row => {
+
+                        let school = row.original;
+
+                        return (
+                            <div style={{ padding: "20px" }}>
+                                <b style={{ marginLeft: '20px' }}>Endereço:</b> {school.address}
+                                <b style={{ marginLeft: '20px' }}>Bairro:</b> {school.neighborhood}
+                                <b style={{ marginLeft: '20px' }}>Cidade:</b> {school.city}
+                                <b style={{ marginLeft: '20px' }}>UF:</b> {school.state.abbrev}
+                                <b style={{ marginLeft: '20px' }}>CEP:</b> {school.zip_code} <br />
+                                <b style={{ marginLeft: '20px' }}>TOTVS:</b> {school.school_code_totvs}
+                                <b style={{ marginLeft: '20px' }}>Tipo:</b> {school.school_type.name}
+                                <b style={{ marginLeft: '20px' }}>Localização:</b> {school.localization_type ? school.localization_type.name : school.localization_type_id ? school.localization_type_id + ' Desativado' : 'Não há registro'}
+                                {/* <b style={{ marginLeft: '20px' }}>Alunos:</b> {school.total_students || 0} */}
+                                <b style={{ marginLeft: '20px' }}>Contatos:</b> {school.contacts.length}
+                                <b style={{ marginLeft: '20px' }}>Telefone:</b> {school.phone}
+                                <b style={{ marginLeft: '20px' }}>E-mail:</b> {school.email}
+                            </div>
+                        );
                     }}
                     columns={final_grid}
                     data={data}
@@ -335,7 +414,8 @@ class GridApi extends Component {
 }
 
 const mapStateToProps =(state) => ({
-    gridApi : state.gridApi
+    gridApi : state.gridApi,
+    user: state.user
 });
 
 const functions_object = {
@@ -344,11 +424,14 @@ const functions_object = {
     onDeleteDataFlow,
     onActiveDataFlow,
     toggleDropdownFlow,
+    toggleDropdownActionsFlow,
     selectColumnsFlow,
     selectAllFlow,
     loadFilterFlow,
     selectOptionFlow,
-    setTableInfo
+    setTableInfo,
+    setLoader,
+    exportTableFlow
 }
 
 export default connect(mapStateToProps, functions_object )(GridApi);

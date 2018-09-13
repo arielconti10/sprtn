@@ -1,0 +1,7 @@
+export const LOAD_DASH_FLOW = 'LOAD_DASH_FLOW'
+export const SET_YEARS = 'SET_YEARS'
+export const CHANGE_YEAR_FLOW = 'CHANGE_YEAR_FLOW'
+export const SET_YEAR_PARAM = 'SET_YEAR_PARAM'
+export const SET_PUBLISHERS = 'SET_PUBLISHERS'
+export const UPDATE_LOADER = 'UPDATE_LOADER'
+export const SET_COLECTIONS = 'SET_COLECTIONS'
