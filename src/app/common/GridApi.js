@@ -159,7 +159,25 @@ class GridApi extends Component {
     renderGrid(columnsGrid, dataAlternative, tableInfo) {
         let final_grid = [];
         const { apiSpartan, defaultOrder } = this.props;
-
+        
+        final_grid.push({
+            expander: true,
+            headerClassName: 'text-left',
+            width: 30,
+            Expander: ({ isExpanded, ...rest }) =>
+                <div>
+                {isExpanded
+                    ? <span>&#x2296;</span>
+                    : <span>&#x2295;</span>}
+                </div>,
+            style: {
+                cursor: "pointer",
+                fontSize: 25,
+                padding: "0",
+                textAlign: "center",
+                userSelect: "none"
+            },
+        },)
 
         if (columnsGrid) {
             columnsGrid.map(item => {
@@ -343,6 +361,7 @@ class GridApi extends Component {
                 </div> 
                 <br />
                 <ReactTable
+
                     getTdProps={(state, rowInfo, column, instance) => {
                         if (column.Header) {
                             return {
