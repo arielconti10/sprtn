@@ -403,6 +403,25 @@ class SchoolEventList extends Component {
                                 <ReactTable
                                     columns={
                                         [
+                                            {
+                                                expander: true,
+                                                Header: "Observações",
+                                                headerClassName: 'text-left',
+                                                width: 96,
+                                                Expander: ({ isExpanded, ...rest }) =>
+                                                    <div>
+                                                    {isExpanded
+                                                        ? <span>&#x2296;</span>
+                                                        : <span>&#x2295;</span>}
+                                                    </div>,
+                                                style: {
+                                                    cursor: "pointer",
+                                                    fontSize: 25,
+                                                    padding: "0",
+                                                    textAlign: "center",
+                                                    userSelect: "none"
+                                                },
+                                            },
                                             { Header: "Data início", accessor: "start_date", headerClassName: 'text-left', 
                                                 Cell: (element) => (<span>{formatDateToBrazilian(element.original.start_date)}</span>) 
                                             },
@@ -410,7 +429,8 @@ class SchoolEventList extends Component {
                                             { Header: "Tipo visita", accessor: "visit_type.name", headerClassName: 'text-left' },
                                             { Header: "Usuário", accessor: "user.name", headerClassName: 'text-left' },
                                             { Header: "Ação", accessor: "action.name", headerClassName: 'text-left' },
-                                            { Header: "Observação", accessor: "observations", headerClassName: 'text-left' },
+                                            
+                                            
                                             {
                                                 Header: "Status",
                                                 accessor: "",
@@ -447,6 +467,15 @@ class SchoolEventList extends Component {
                                             }
                                         ]
                                     }
+                                    SubComponent={row => {
+                                        let school = row.original;
+                
+                                        return (
+                                            <div style={{ padding: "20px 20px 20px 40px" }}>
+                                                <b>Observação:</b> {school.observations}
+                                            </div>
+                                        );
+                                    }}
                                     data={schoolEvents}
                                     defaultPageSize={10}
                                     loadingText='Carregando...'
