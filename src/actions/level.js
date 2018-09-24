@@ -72,10 +72,10 @@ import {
     }
   }
   
-  export const levelRequest = function levelRequest (client) {
+  export const levelRequest = function levelRequest (user) {
     return {
       type: LEVEL_REQUESTING,
-      client,
+      user,
     }
   }
   
@@ -99,4 +99,6 @@ import {
           user
       }
   }
+
+  
   

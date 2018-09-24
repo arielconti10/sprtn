@@ -21,16 +21,20 @@ import {
     addContactFlow, findContactFlow
 } from '../../../actions/contact'
 
+import { levelRequest } from '../../../actions/level'
+
 class SchoolConctactList extends Component {
     // Pass the correct proptypes in for validation
     static propTypes = {
         loadContactsFlow: PropTypes.func,
+        levelRequest: PropTypes.func,
         onDeleteContactDataFlow: PropTypes.func,
         onActiveContactDataFlow: PropTypes.func,
         addContactFlow: PropTypes.func,
         findContactFlow: PropTypes.func,
         contact: PropTypes.shape({
         }),
+        levels: PropTypes.array,
     }
     
     constructor(props) {
@@ -41,6 +45,9 @@ class SchoolConctactList extends Component {
             view_mode: false,
             active_tab: 'dados',
         };
+    }
+
+    componentDidMount(){
     }
 
     toggle(tab) {
@@ -64,7 +71,17 @@ class SchoolConctactList extends Component {
             const nextContacts = nextProps.contacts;
             const collapse = nextProps.contact.collapse;
             this.props.loadContactsFlow(user, nextContacts, collapse);
+            this.props.levelRequest(user);
+
         }
+    }
+
+    renderDisciplines() {
+        return this.props.levels.list.map(level => 
+            <TabPane tabId={level.code}>
+                <SchoolDisciplineList level={level}/>
+            </TabPane>
+        );
     }
 
     render() {
@@ -109,15 +126,7 @@ class SchoolConctactList extends Component {
                                     </Col>
                                 </Row>
                             </TabPane>
-                            <TabPane tabId="ei">
-                                <SchoolDisciplineList />
-                            </TabPane>
-                            <TabPane tabId="ef1">
-                                Ensino Fundamental I
-                            </TabPane>
-                            <TabPane tabId="ef2">
-                                Ensino Fundamental II
-                            </TabPane>
+                            {this.renderDisciplines()}
 
                         </TabContent>
                         
@@ -242,10 +251,11 @@ class SchoolConctactList extends Component {
     }
 }
 
-const mapStateToProps =(state) => ({
+const mapStateToProps = (state) => ({
     contact : state.contact,
     user: state.user,
-    school: state.schools
+    school: state.schools,
+    levels: state.levels,
 });
 
 const functions_object = {
@@ -253,7 +263,8 @@ const functions_object = {
     onDeleteContactDataFlow,
     onActiveContactDataFlow,
     addContactFlow,
-    findContactFlow
+    findContactFlow,
+    levelRequest,
 }
 
 export default connect(mapStateToProps, functions_object )(SchoolConctactList);

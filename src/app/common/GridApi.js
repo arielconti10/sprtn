@@ -167,8 +167,8 @@ class GridApi extends Component {
             Expander: ({ isExpanded, ...rest }) =>
                 <div>
                 {isExpanded
-                    ? <span className="open">&#x2296;</span>
-                    : <span className="close">&#x2295;</span>}
+                    ? <span>&#x2296;</span>
+                    : <span>&#x2295;</span>}
                 </div>,
             style: {
                 cursor: "pointer",

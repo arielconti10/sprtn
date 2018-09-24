@@ -1,11 +1,15 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import { Table, Button, ButtonGroup } from 'reactstrap'
-
+import {levelLoad} from '../../../actions/level'
 class SchoolDisciplineList extends Component {
-  // static propTypes = { 
-  //     level:
-  // }
+  static propTypes = { 
+    levelLoad: PropTypes.func,
+    level: PropTypes.shape({
+
+    })
+  }
 
   constructor(props) {
     super(props)
@@ -30,8 +34,7 @@ class SchoolDisciplineList extends Component {
   }
 
   componentDidMount() {
-    // this.props.loadDisciplinesByLevel()
-    console.log(this.props)
+    this.props.levelLoad(this.props.level.id)
   }
 
   render() {
@@ -70,4 +73,14 @@ class SchoolDisciplineList extends Component {
   }
 }
 
-export default SchoolDisciplineList;
+const mapStateToProps = (state) => ({
+    user: state.user, 
+    // level: state.level,
+});
+
+const functions_object = {
+   loadLevel
+}
+
+export default connect(mapStateToProps, functions_object )(SchoolDisciplineList);
+

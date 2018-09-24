@@ -8,7 +8,8 @@ import {
     LEVEL_CREATING,
     LEVEL_UPDATING,
     LEVEL_REQUESTING,
-    LEVEL_LOADING 
+    LEVEL_LOADING,
+
   } from '../actionTypes/level'
   
   import {
@@ -18,6 +19,7 @@ import {
     levelRequestError,
     levelLoadSuccess,
     levelUpdateSuccess,
+    disciplineLevelSuccess,
   } from '../actions/level'
   
   const apiUrl = `${process.env.API_URL}/level`
@@ -118,17 +120,11 @@ import {
     try {
       // grab the user from our action
       const {
-        user,
-        level
+        user
       } = action
-  
-      if(level.id !== undefined){
-        const current_level = yield call(levelLoad, user, level)
-        yield put(levelLoadSuccess(current_level))      
-      } else {
-        const levels = yield call(levelRequest, user)
-        yield put(levelRequestSuccess(level))
-      }
+    
+      const levels = yield call(levelRequest, user)
+      yield put(levelRequestSuccess(levels))
       
     } catch (error) {
       yield put(levelRequestError(error))
@@ -162,6 +158,30 @@ import {
       return handleRequest(request)
   }
   
+//   function loadDisciplineByLevel(level) {
+//     const url = `${apiUrl}`
+//     const request = fetch(url, {
+//       method: 'GET',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         // passe our token as an "Authorization" header
+//         Authorization: 'Bearer ' + user.access_token || undefined,
+//       },
+//     })
+  
+//     return handleRequest(request)
+//   }
+
+//   function loadDisciplineByLevelFlow(level) {
+//       try{
+//         const discipline_levels = yield call(loadDisciplineByLevel(level))
+
+//         yield put (disciplineByLevelSuccess(discipline_levels))
+//       } catch (error) { 
+//           yield put(levelRequestError(error))
+//       }
+//   }
+
   function* levelWatcher() {
     // each of the below RECEIVES the action from the .. action
     yield [
@@ -169,6 +189,7 @@ import {
       takeLatest(LEVEL_UPDATING, levelCreateFlow),
       takeLatest(LEVEL_REQUESTING, levelRequestFlow),
       takeLatest(LEVEL_LOADING, levelLoadFlow),
+    //   takeLatest(DISCIPLINE_LEVEL_REQUESTING, loadDisciplineByLevelFlow),
     ]
   }
   
