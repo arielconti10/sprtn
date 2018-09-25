@@ -4,19 +4,14 @@ import { connect } from 'react-redux'
 import { Table, Button, ButtonGroup } from 'reactstrap'
 import {levelLoad} from '../../../actions/level'
 class SchoolDisciplineList extends Component {
-  static propTypes = { 
-    levelLoad: PropTypes.func,
-    level: PropTypes.shape({
-
-    })
-  }
-
+ 
   constructor(props) {
     super(props)
-    this.state = { cSelected: [] };
+    this.state = { cSelected: [], disciplines: [] };
 
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     this.onCheckboxBtnClick = this.onCheckboxBtnClick.bind(this);
+    console.log(this.props)
   }
 
   onRadioBtnClick(rSelected) {
@@ -33,38 +28,27 @@ class SchoolDisciplineList extends Component {
     this.setState({ cSelected: [...this.state.cSelected] });
   }
 
-  componentDidMount() {
-    this.props.levelLoad(this.props.level.id)
-  }
+//   componentDidMount() {      
+//     this.props.levelLoad(this.props.user, this.props.level.id)
+//   }
 
+//   componentWillReceiveProps(nextProps) {
+//       this.setState({disciplines: nextProps.level.disciplines})
+//   }
+
+//   renderDisciplines(){
+//     if(typeof this.state.disciplines !== 'undefined' && this.state.disciplines.length > 1) {
+
+//         return this.state.disciplines.map(discipline => console.log(discipline))
+//     }
+//   }
   render() {
-
     return (
       <div id="disciplines-contact-level">
         <Table responsive striped hover>
           <tbody>
-            <tr>
-              <td scope="row">Língua Portuguesa</td>
-              <td style={{textAlign: "right"}}>
-                <ButtonGroup>
-                  <Button color="primary" onClick={() => this.onCheckboxBtnClick(1)} active={this.state.cSelected.includes(1)}>2 anos</Button>
-                  <Button color="primary" onClick={() => this.onCheckboxBtnClick(2)} active={this.state.cSelected.includes(2)}>3 anos</Button>
-                  <Button color="primary" onClick={() => this.onCheckboxBtnClick(3)} active={this.state.cSelected.includes(3)}>4 anos</Button>
-                  <Button color="primary" onClick={() => this.onCheckboxBtnClick(4)} active={this.state.cSelected.includes(4)}>5 anos</Button>
-                </ButtonGroup>
-              </td>
-            </tr>
-            <tr>
-              <td scope="row">Matemática</td>
-              <td style={{textAlign: "right"}}>
-                <ButtonGroup>
-                  <Button color="primary" onClick={() => this.onCheckboxBtnClick(1)} active={this.state.cSelected.includes(1)}>2 anos</Button>
-                  <Button color="primary" onClick={() => this.onCheckboxBtnClick(2)} active={this.state.cSelected.includes(2)}>3 anos</Button>
-                  <Button color="primary" onClick={() => this.onCheckboxBtnClick(3)} active={this.state.cSelected.includes(3)}>4 anos</Button>
-                  <Button color="primary" onClick={() => this.onCheckboxBtnClick(4)} active={this.state.cSelected.includes(4)}>5 anos</Button>
-                </ButtonGroup>
-              </td>
-            </tr>
+              {this.props.level.disciplines.map(discipline => <tr>{discipline.name}</tr>)}
+
           </tbody>
         </Table>
       </div>
@@ -73,14 +57,4 @@ class SchoolDisciplineList extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
-    user: state.user, 
-    // level: state.level,
-});
-
-const functions_object = {
-   loadLevel
-}
-
-export default connect(mapStateToProps, functions_object )(SchoolDisciplineList);
-
+export default SchoolDisciplineList

@@ -34,7 +34,7 @@ class SchoolConctactList extends Component {
         findContactFlow: PropTypes.func,
         contact: PropTypes.shape({
         }),
-        levels: PropTypes.array,
+
     }
     
     constructor(props) {
@@ -44,6 +44,7 @@ class SchoolConctactList extends Component {
         this.state = {
             view_mode: false,
             active_tab: 'dados',
+            levels: []
         };
     }
 
@@ -72,16 +73,18 @@ class SchoolConctactList extends Component {
             const collapse = nextProps.contact.collapse;
             this.props.loadContactsFlow(user, nextContacts, collapse);
             this.props.levelRequest(user);
-
+            this.setState({levels: this.props.levels.list})
         }
     }
 
     renderDisciplines() {
-        return this.props.levels.list.map(level => 
-            <TabPane tabId={level.code}>
-                <SchoolDisciplineList level={level}/>
-            </TabPane>
-        );
+        if(typeof this.state.levels !== 'undefined' && this.state.levels.length > 1){
+            return this.state.levels.map(level =>
+                <TabPane tabId={level.code}>
+                    <SchoolDisciplineList level={level}/>
+                </TabPane>
+            );
+        }   
     }
 
     render() {

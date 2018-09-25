@@ -119,7 +119,8 @@ const reducer = function levelReducer(state = initialState, action) {
           id: action.level.data.id,
           name: action.level.data.name,
           code: action.level.data.code,
-          active: action.level.data.deleted_at !== null ? false : true
+          active: action.level.data.deleted_at !== null ? false : true,
+          disciplines: action.level.data.disciplines,
         }, // replace with fresh list
         requesting: false,
         successful: true,

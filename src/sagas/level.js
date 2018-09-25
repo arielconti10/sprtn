@@ -151,6 +151,7 @@ import {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json', 
           // passe our token as an "Authorization" header
           Authorization: 'Bearer ' + user.access_token || undefined,
         },
