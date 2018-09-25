@@ -29,15 +29,15 @@ const validate = values => {
 
 class SchoolMeeting extends Component {
     static propTypes = {
-        setMeetingProfileFlow: PropTypes.func.isRequired,
-        setMeetingUnifiedFlow: PropTypes.func.isRequired,
-        handleChangeDate: PropTypes.func.isRequired,
-        changeMeetingDateFlow: PropTypes.func.isRequired,
-        loadMeetingShiftsFlow: PropTypes.func.isRequired,
-        changeMeetingShiftFlow: PropTypes.func.isRequired,
-        insertSchoolMeetingFlow: PropTypes.func.isRequired,
-        unloadSchoolMeeting: PropTypes.func.isRequired,
-        setMeetingSubmited: PropTypes.func.isRequired
+        setMeetingProfileFlow: PropTypes.func,
+        setMeetingUnifiedFlow: PropTypes.func,
+        handleChangeDate: PropTypes.func,
+        changeMeetingDateFlow: PropTypes.func,
+        loadMeetingShiftsFlow: PropTypes.func,
+        changeMeetingShiftFlow: PropTypes.func,
+        insertSchoolMeetingFlow: PropTypes.func,
+        unloadSchoolMeeting: PropTypes.func,
+        setMeetingSubmited: PropTypes.func
     }
 
     constructor(props) {
