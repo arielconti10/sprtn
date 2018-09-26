@@ -9,11 +9,11 @@ import {
   LEVEL_REQUEST_ERROR,
   LEVEL_UPDATING,
   LEVEL_UPDATE_SUCCESS,
-  LEVEL_CURRENT_CLEAR
+  LEVEL_CURRENT_CLEAR,
 } from '../actionTypes/level'
 
 const initialState = {
-  list: [], 
+  list: [],
   current_level: null,
   requesting: false,
   successful: false,
@@ -72,7 +72,7 @@ const reducer = function levelReducer(state = initialState, action) {
         }],
         errors: [],
       }
-      
+
 
     case LEVEL_CREATE_ERROR:
       return {
@@ -91,7 +91,7 @@ const reducer = function levelReducer(state = initialState, action) {
         ...state, // ensure that we don't erase fetched ones
         requesting: false,
         successful: true,
-        current_level: null,        
+        current_level: null,
         messages: [{
           body: 'Fetching level...!',
           time: new Date(),
@@ -112,13 +112,15 @@ const reducer = function levelReducer(state = initialState, action) {
         errors: []
       }
 
+
     case LEVEL_LOAD_SUCCESS:
       return {
         current_level: {
           id: action.level.data.id,
           name: action.level.data.name,
           code: action.level.data.code,
-          active: action.level.data.deleted_at !== null ? false : true
+          active: action.level.data.deleted_at !== null ? false : true,
+          disciplines: action.level.data.disciplines,
         }, // replace with fresh list
         requesting: false,
         successful: true,
@@ -131,7 +133,7 @@ const reducer = function levelReducer(state = initialState, action) {
 
     case LEVEL_REQUEST_SUCCESS:
       return {
-        list: action.levels, // replace with fresh list
+        list: action.levels.data, // replace with fresh list
         requesting: false,
         successful: true,
         messages: [{
@@ -152,10 +154,10 @@ const reducer = function levelReducer(state = initialState, action) {
         }]),
       }
 
-      case LEVEL_CURRENT_CLEAR:
-        return {
-            current_level: null,
-        }
+    case LEVEL_CURRENT_CLEAR:
+      return {
+        current_level: null,
+      }
 
     default:
       return state

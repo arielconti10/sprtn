@@ -72,14 +72,16 @@ import {
     }
   }
   
-  export const disciplineRequest = function disciplineRequest (client) {
+  export const disciplineRequest = function disciplineRequest (user) {
+    console.log(user)  
     return {
       type: DISCIPLINE_REQUESTING,
-      client,
+      user,
     }
   }
   
   export const disciplineRequestSuccess = function disciplineRequestSuccess (disciplines) {
+    console.log(disciplines)  
     return {
       type: DISCIPLINE_REQUEST_SUCCESS,
       disciplines,

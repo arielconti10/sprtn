@@ -101,11 +101,7 @@ class Indicators extends Component {
         this.setState({"total_action": nextProps.indicators.total_action}) 
 
         if(nextProps){
-            // data_actions = nextProps.indicators.dataActions
-            // data_action_types = nextProps.indicators.dataActionTypes
-            // data_coverage = nextProps.indicators.dataCoverage
-            // data_student_level = nextProps.indicators.dataStudentLevel
-            // data_student_type = nextProps.indicators.dataStudentTypes
+
 
             this.setState({
                 "data_actions" : nextProps.indicators.dataActions, 
@@ -542,7 +538,7 @@ class Indicators extends Component {
                 </div>
                 
                 <div className="row">
-                    {data_actions && data_actions.length > 0 && 
+                    {data_actions && data_actions.length > 1 && 
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="chart-actions ">
                             <PieChartComponent
@@ -556,7 +552,7 @@ class Indicators extends Component {
                     }
 
                     
-                    {data_action_types && data_action_types.length > 0 && 
+                    {data_action_types && data_action_types.length > 1 && 
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="chart-actions-type ">
                             <PieChartComponent
@@ -568,7 +564,7 @@ class Indicators extends Component {
                         </div>
                     </div>
                     }
-                    {data_coverage && data_coverage.length > 0 && 
+                    {data_coverage && data_coverage.length > 1 && 
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="coverage-school">
@@ -583,7 +579,7 @@ class Indicators extends Component {
                     </div>
                     }
 
-                   {data_school_types && data_school_types.length > 0 && 
+                   {data_school_types && data_school_types.length > 1 && 
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="chart-school-types">
@@ -598,7 +594,7 @@ class Indicators extends Component {
                     </div>
                     }
 
-                    {data_student_types && data_student_types.length > 0 &&
+                    {data_student_types && data_student_types.length > 1 &&
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="chart-student-types ">
@@ -613,7 +609,7 @@ class Indicators extends Component {
                     </div>
                     }
 
-                    {data_student_level && data_student_level.length > 0 &&
+                    {data_student_level && data_student_level.length > 1 &&
                     <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <div className="tab-data">
                             <div className="chart-student-level ">

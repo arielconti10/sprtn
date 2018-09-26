@@ -1,13 +1,14 @@
 import React, { Component } from 'react'
 import axios from '../../../app/common/axios';
 import { Link } from 'react-router-dom';
-import { Collapse, Card, CardHeader, CardFooter, CardBody, CardTitle, CardText, Row, Col, Button, Label, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
+import { Collapse, Card, CardBody, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col } from 'reactstrap';
+import classnames from 'classnames';
 import { FormWithConstraints, FieldFeedback } from 'react-form-with-constraints';
 import ContactForm from '../Contact/ContactForm';
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
 import SchoolForm from './SchoolForm';
-
+import SchoolDisciplineList from './SchoolDisciplineList';
 const apiSpartan = 'contact';
 
 import { canUser } from '../../common/Permissions';
@@ -20,24 +21,38 @@ import {
     addContactFlow, findContactFlow
 } from '../../../actions/contact'
 
+import { levelRequest } from '../../../actions/level'
+
 class SchoolConctactList extends Component {
     // Pass the correct proptypes in for validation
     static propTypes = {
         loadContactsFlow: PropTypes.func,
+        levelRequest: PropTypes.func,
         onDeleteContactDataFlow: PropTypes.func,
         onActiveContactDataFlow: PropTypes.func,
         addContactFlow: PropTypes.func,
         findContactFlow: PropTypes.func,
         contact: PropTypes.shape({
         }),
+
     }
+    
     constructor(props) {
         super(props);
         this.toggle = this.toggle.bind(this);
         this.addContact = this.addContact.bind(this);
+        this.state = {
+            view_mode: false,
+            active_tab: 'dados',
+            levels: []
+        };
     }
 
-    toggle() {
+    componentDidMount(){
+    }
+
+    toggle(tab) {
+        if (this.state.active_tab !== tab) this.setState({ active_tab: tab });
     }
 
     addContact() {
@@ -57,29 +72,67 @@ class SchoolConctactList extends Component {
             const nextContacts = nextProps.contacts;
             const collapse = nextProps.contact.collapse;
             this.props.loadContactsFlow(user, nextContacts, collapse);
+            this.props.levelRequest(user);
+            this.setState({levels: this.props.levels.list})
         }
+    }
+
+    renderDisciplines() {
+        if(typeof this.state.levels !== 'undefined' && this.state.levels.length > 1){
+            return this.state.levels.map(level =>
+                <TabPane tabId={level.code}>
+                    <SchoolDisciplineList level={level}/>
+                </TabPane>
+            );
+        }   
     }
 
     render() {
         const { contactsList, collapse } = this.props.contact;
         const { user } = this.props;
         const { schoolInfo } = this.props.school;
+        const { active_tab, view_mode } = this.state;
 
         return (
             <div>
                 <div className="contact-action">
                     <Collapse isOpen={collapse}>
-                        <Card>
-                            <CardBody>
-                                <ContactForm 
-                                    schoolId={schoolInfo.id}
-                                    addContact={this.addContact}
-                                    // updateTable={this.updateTable.bind(this)} toggle={this.toggle.bind(this)}
-                                    // onClickCancel={this.onClickCancel.bind(this)} 
-                                    // viewMode={this.state.viewMode} 
-                                />
-                            </CardBody>
-                        </Card>
+                        <Nav tabs className="tab-contacts">
+                            <NavItem>
+                                <NavLink className={classnames({ active: active_tab === 'dados' })} onClick={() => { this.toggle('dados'); }}>Dados</NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink className={classnames({ active: active_tab === 'ei' })} onClick={() => { this.toggle('ei'); }}>EI</NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink className={classnames({ active: active_tab === 'ef1' })} onClick={() => { this.toggle('ef1'); }}>EF1</NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink className={classnames({ active: active_tab === 'ef2' })} onClick={() => { this.toggle('ef2'); }}>EF2</NavLink>
+                            </NavItem>
+                        </Nav>
+                        <TabContent activeTab={active_tab} className="cont-contacts">
+                            <TabPane tabId="dados">
+                                <Row>
+                                    <Col sm="12">
+                                        <Card>
+                                            <CardBody>
+                                                <ContactForm 
+                                                    schoolId={schoolInfo.id}
+                                                    addContact={this.addContact}
+                                                    // updateTable={this.updateTable.bind(this)} toggle={this.toggle.bind(this)}
+                                                    // onClickCancel={this.onClickCancel.bind(this)} 
+                                                    // viewMode={this.state.viewMode} 
+                                                />
+                                            </CardBody>
+                                        </Card>
+                                    </Col>
+                                </Row>
+                            </TabPane>
+                            {this.renderDisciplines()}
+
+                        </TabContent>
+                        
                     </Collapse>
 
                     <button className='btn btn-primary' onClick={this.addContact} disabled={collapse}>
@@ -201,10 +254,11 @@ class SchoolConctactList extends Component {
     }
 }
 
-const mapStateToProps =(state) => ({
+const mapStateToProps = (state) => ({
     contact : state.contact,
     user: state.user,
-    school: state.schools
+    school: state.schools,
+    levels: state.levels,
 });
 
 const functions_object = {
@@ -212,7 +266,8 @@ const functions_object = {
     onDeleteContactDataFlow,
     onActiveContactDataFlow,
     addContactFlow,
-    findContactFlow
+    findContactFlow,
+    levelRequest,
 }
 
 export default connect(mapStateToProps, functions_object )(SchoolConctactList);

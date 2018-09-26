@@ -119,16 +119,11 @@ import {
       // grab the user from our action
       const {
         user,
-        discipline
       } = action
   
-      if(discipline.id !== undefined){
-        const current_discipline = yield call(disciplineLoad, user, discipline)
-        yield put(disciplineLoadSuccess(current_discipline))      
-      } else {
-        const disciplines = yield call(disciplineRequest, user)
-        yield put(disciplineRequestSuccess(discipline))
-      }
+      const disciplines = yield call(disciplineRequest, user)
+      console.log(disciplines)
+      yield put(disciplineRequestSuccess(disciplines))
       
     } catch (error) {
       yield put(disciplineRequestError(error))
