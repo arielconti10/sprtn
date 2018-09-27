@@ -77,7 +77,6 @@ function loadPublishers(marketshare, year_param) {
         let register = item.key.split(':');
         let key = register[0];
         let label = register[1];
-
         if (key === 'EDITORAS') {
             if (label.search("FTD") !== -1) {
                 pubFTD = [label, item.value];
@@ -110,13 +109,17 @@ function loadColections(marketshare, year_param) {
 
     marketshare.map((item, i) => {
         if (item.year !== year_param.value) return;
-
+        
         let register = item.key.split(':');
         let key = register[0];
         let label = register[1];
-
+        
         if (key !== 'EDITORAS') {
-            colections.push([label, item.value, `color: ${paletteColors[i]}`]);
+            if(paletteColors[i]){
+                colections.push([label, item.value, `color: ${paletteColors[i]}`]);
+            } else {
+                colections.push([label, item.value, `color: ${paletteColors[Math.floor(Math.random()*paletteColors.length)]}`]);
+            }
         }
 
     });

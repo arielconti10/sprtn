@@ -38,7 +38,7 @@ class SchoolForm extends Component {
         };
     }
 
-    componentWillMount(){
+    componentDidMount(){
         const user = this.props.user;
         const school_id = this.props.match.params.id;
         this.props.loadSchoolFlow(user, school_id);
@@ -60,10 +60,10 @@ class SchoolForm extends Component {
 
         const { ringLoad, schoolInfo } = this.props.school;
 
-        const { id, name, portfolio, active, 
-            total_students_ei, total_students_ef1, total_students_ef2, total_students_em, 
-            total_students, school_type, contacts, school_code_totvs, sector_id, subsidiary_id
+        const { id, name, portfolio, active, total_students, total_students_ei, total_students_ef1, total_students_ef2, total_students_em, school_type, contacts, school_code_totvs, sector_id, subsidiary_id
         } = this.props.school.schoolInfo;
+
+        const { } = this.state;
 
         return (
             <div>
@@ -77,15 +77,15 @@ class SchoolForm extends Component {
                 
                 <h1 className="school-header">
                     <i className="fa fa-building-o"></i> {name}
-                    {<SchoolStudentIcon
-                        portfolio={portfolio}
-                        active={active}
-                        eiStudents={total_students_ei}
-                        ef1Students={total_students_ef1}
-                        ef2Students={total_students_ef2}
-                        emStudents={total_students_em}
-                        numStudents={total_students}
-                    /> }
+                        <SchoolStudentIcon
+                            portfolio={portfolio}
+                            active={active}
+                            eiStudents={total_students_ei}
+                            ef1Students={total_students_ef1}
+                            ef2Students={total_students_ef2}
+                            emStudents={total_students_em}
+                            numStudents={total_students}
+                        />   
                 </h1>
                 <br />
                 <Nav tabs className={`tab-${schoolInfo.school_type?school_type.identify.toLowerCase():''}`}>

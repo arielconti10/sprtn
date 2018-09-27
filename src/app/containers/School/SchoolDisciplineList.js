@@ -37,6 +37,10 @@ constructor(props) {
 
 
   componentWillReceiveProps(nextProps) {
+<<<<<<< HEAD
+=======
+    // console.log(nextProps)
+>>>>>>> develop
 
     switch(nextProps.level.code){
         case 'ei':

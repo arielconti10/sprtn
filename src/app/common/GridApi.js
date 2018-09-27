@@ -16,7 +16,7 @@ import 'react-select/dist/react-select.css';
 import { getSchoolAndVisitValues } from './ToggleTable'; 
 import { loadColumnsFlow, onFetchDataFlow, onDeleteDataFlow, onActiveDataFlow, toggleDropdownFlow, 
     selectColumnsFlow, selectAllFlow, loadFilterFlow, selectOptionFlow, setTableInfo,
-    toggleDropdownActionsFlow, setLoader, exportTableFlow
+    toggleDropdownActionsFlow, setLoader, exportTableFlow, setFilters
 } from '../../actions/gridApi';
 
 class GridApi extends Component {
@@ -45,6 +45,7 @@ class GridApi extends Component {
             dropdownOpen: PropTypes.bool,
             loading: PropTypes.bool
         }),
+        setFilters: PropTypes.func,
     }
 
     constructor(props) {
@@ -71,7 +72,8 @@ class GridApi extends Component {
             item.Filter = ({ filter, onChange }) => (
                 <input type="text" value={filter} style={{width:  "100%"}} 
                     onBlur={event => this.onChangeTextFilter(event.target.value, item.accessor)}
-                    onKeyDown={event => event.keyCode === 13?this.onChangeTextFilter(event.target.value, item.accessor):''}
+                    onKeyDown={
+                        event => event.keyCode === 13? event.target.blur() :'' }
                 />
             ):""
         })
@@ -95,6 +97,8 @@ class GridApi extends Component {
         const new_object = {id: accessor, value: filter};
 
         this.props.loadFilterFlow(new_object, filtered, tableInfo, gridApi.apiFiltered);
+
+        document.getElementById('root').focus()
     }
 
     toggle() {
@@ -430,6 +434,14 @@ class GridApi extends Component {
             </div>
         )
     }
+
+    componentWillUnmount() {
+        const clear = this.props.gridApi.tableInfo;
+        clear.filtered = []
+        this.props.setTableInfo([])
+        this.props.setFilters([], [])
+        console.log(clear)
+    }
 }
 
 const mapStateToProps =(state) => ({
@@ -450,7 +462,9 @@ const functions_object = {
     selectOptionFlow,
     setTableInfo,
     setLoader,
-    exportTableFlow
+    exportTableFlow, 
+    setTableInfo, 
+    setFilters
 }
 
 export default connect(mapStateToProps, functions_object )(GridApi);

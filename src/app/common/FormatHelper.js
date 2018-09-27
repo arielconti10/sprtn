@@ -5,7 +5,8 @@
  * @return { Float } number_format número após formataçāo
  */
 export const formatNumber=(number_str)=> {
-    if (isNaN(number_str)) {
+    
+    if (isNaN(number_str) || number_str == '' || number_str == 'undefined' || number_str == null) {
         return '00';
     }
 
