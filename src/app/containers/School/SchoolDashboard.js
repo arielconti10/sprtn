@@ -15,10 +15,10 @@ import 'react-select/dist/react-select.css';
 const paletteColors = ["#009de8", "#FD0006", "#1aaf5d", "#f45b00", "#8e0000", "#000000", "#7D7D7D", "#00CB19", "#8C0172", "#F70060", "#1B7474", "#0a3b60", "#f2c500", "#BCF25B", "#00DDCD"];
 
 const options_publisher = {
-    pieSliceText: 'value',
+    // pieSliceText: 'value',
     pieHole: 0.2,
     is3D: false,
-    tooltip: {text: 'value'}
+    // tooltip: {text: 'value'}
 };
 
 const options_colection = {
