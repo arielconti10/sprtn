@@ -30,7 +30,7 @@ class SchoolDisciplineList extends Component {
 
 
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps)
+    // console.log(nextProps)
 
     switch(nextProps.level.code){
         case 'ei':
