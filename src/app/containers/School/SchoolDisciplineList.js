@@ -19,16 +19,19 @@ constructor(props) {
     this.setState({ rSelected });
   }
 
-  onCheckboxBtnClick(grade, selected) {    
-    selected = { [selected.id]: grade };
-    const index = -1;
 
-    console.log(this.state.cSelected, index)
-
+  onCheckboxBtnClick(selected, grade) {
+    selected = {[grade]: selected}
+    
+    let index = this.state.cSelected.findIndex(function(item){
+        // console.log(selected, item)
+        return selected !== item
+    })
+    console.log(index)
     if (index < 0) {
-      this.state.cSelected.push(selected)
+        this.state.cSelected.push(selected);
     } else {
-      this.state.cSelected.splice(index, 1);
+        this.state.cSelected.splice(index, 1);
     }
     this.setState({ cSelected: [...this.state.cSelected] });
 
@@ -37,10 +40,7 @@ constructor(props) {
 
 
   componentWillReceiveProps(nextProps) {
-<<<<<<< HEAD
-=======
-    // console.log(nextProps)
->>>>>>> develop
+    // console.log(nextProps)s
 
     switch(nextProps.level.code){
         case 'ei':
@@ -83,7 +83,7 @@ constructor(props) {
                     <td  style={{textAlign: 'right'}}>
                         <ButtonGroup>
                             {Object.keys(grades).map( (item, i) => (
-                                <Button color="primary" onClick={() => this.onCheckboxBtnClick(item, discipline)} active={this.state.cSelected.includes(1)}>{ grades[item] }</Button>
+                                <Button color="primary" onClick={() => this.onCheckboxBtnClick(discipline.id, item)} active={this.state.cSelected.includes({[item]: discipline.id})}>{ grades[item] }</Button>
                              )
                             ) }
                         </ButtonGroup>
