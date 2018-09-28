@@ -81,7 +81,7 @@ class SchoolConctactList extends Component {
         if(typeof this.state.levels !== 'undefined' && this.state.levels.length > 1){
             return this.state.levels.map(level =>
                 <TabPane tabId={level.code}>
-                    <SchoolDisciplineList level={level}/>
+                    <SchoolDisciplineList level={level} schoolInfo={this.props.school.schoolInfo}/>
                 </TabPane>
             );
         }   

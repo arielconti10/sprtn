@@ -10,33 +10,42 @@ constructor(props) {
     super(props)
     this.state = { cSelected: [], disciplines: [], grades:[] };
 
-    this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     this.onCheckboxBtnClick = this.onCheckboxBtnClick.bind(this);
-
   }
 
-  onRadioBtnClick(rSelected) {
-    this.setState({ rSelected });
-  }
+  onCheckboxBtnClick(discipline, item, checked) {
+      let arr_final = [];
+      this.state.cSelected[discipline][item] = checked;
 
+      this.setState({cSelected: [...this.state.cSelected]})
+    //   console.log(this.state.cSelected)  
 
-  onCheckboxBtnClick(discipline, item) {
-    console.log(discipline, item)
+    // arr_final.push({[discipline]: {[item]: checked}});
 
-    this.setState({cSelected: {discipline: item}})
-    // selected = {[grade]: selected}
+    // this.setState({cSelected: arr_final})
+
+    // console.log(arr_final)
+
+    // this.setState({cSelected:{
+    //     [discipline]: {[item]: checked
+    //     }
+    // }})
+
+    // console.log(this.state)
+    // console.log(discipline, item)
+
     
-    let index = this.state.cSelected.indexOf(discipline)
+    // let index = this.state.cSelected.discipline.indexOf(item)
 
-    console.log(index)
+    // console.log(index)
     
-    if (index < 0) {
-        this.state.cSelected.push(selected);
-    } else {
-        this.state.cSelected.splice(index, 1);
-    }
-    this.setState({ cSelected: [...this.state.cSelected]})
-    console.log(this.state.cSelected)
+    // if (index < 0) {
+    //     this.setState({cSelected: {discipline: item}})
+    // } else {
+    //     this.state.cSelected.discipline.splice(index, 1);
+    // }
+    // this.setState({ cSelected: [...this.state.cSelected]})
+    // console.log(this.state.cSelected)
 
     // this.setState({ cSelected: [...this.state.cSelected] });
 
@@ -45,35 +54,47 @@ constructor(props) {
 
 
   componentWillReceiveProps(nextProps) {
-    // console.log(nextProps)s
+    let array_disciplines = []
+    let array_grades = []
+    if(nextProps.level.disciplines){
+        nextProps.level.disciplines.map(discipline => {
+            array_disciplines[discipline.id] = {
+                first_grade:false, 
+                second_grade:false, 
+                third_grade:false, 
+                fourth_grade:false, 
+                fifth_grade:false, 
+            }
+        })
+       this.state.cSelected = array_disciplines;
+    }
+    
+    if(nextProps.level.code == 'ei' )
+            this.state.grades = {first_grade: '2 anos', second_grade: '3 anos', third_grade: '4 anos', fourth_grade: '5 anos'}
+    else if ( nextProps.level.code ==  'ef1' )
+        this.state.grades = {first_grade: '1 ano', second_grade: '2 ano', third_grade: '3 ano', fourth_grade: '4 ano'}
+    else if ( nextProps.level.code ==  'ef2' )
+        this.state.grades = {first_grade: '5 ano', second_grade: '6 ano', third_grade: '7 ano', fourth_grade: '8 ano', fifth_grade: '9 ano'}
+    else if ( nextProps.level.code ==  'em' )
+        this.state.grades = {first_grade: '1', second_grade: '2', third_grade: '3'}
 
-    switch(nextProps.level.code){
-        case 'ei':
-            return this.setState({
-                grades: {first_grade: '2 anos', second_grade: '3 anos', third_grade: '4 anos', fourth_grade: '5 anos'}
+    if(nextProps.contact.contactInfo){
+        if(nextProps.contact.contactInfo.disciplines){
+            nextProps.contact.contactInfo.disciplines.map(discipline => { 
+                this.state.cSelected[discipline.discipline_id] = {
+                    first_grade: discipline.fifth_grade,
+                    second_grade: discipline.second_grade,
+                    third_grade: discipline.third_grade,
+                    fourth_grade: discipline.fourth_grade,
+                    fifth_grade: discipline. fifth_grade,
+                }
             })
-        case 'ef1':
-            return this.setState({
-                grades: {first_grade: '1 ano', second_grade: '2 ano', third_grade: '3 ano', fourth_grade: '4 ano'}
-            })     
-        case 'ef2':
-            return this.setState({
-                grades: {first_grade: '5 ano', second_grade: '6 ano', third_grade: '7 ano', fourth_grade: '8 ano', fifth_grade: '9 ano'}
-            })   
-        case 'efm':
-            return this.setState({
-                grades: {first_grade: '1', second_grade: '2', third_grade: '3'}
-            })        
         }
+    }
 
+    return this.setState(this.state)
   }
 
-//   renderDisciplines(){
-//     if(typeof this.state.disciplines !== 'undefined' && this.state.disciplines.length > 1) {
-
-//         return this.state.disciplines.map(discipline => console.log(discipline))
-//     }
-//   }
   render() {
     let grades = this.state.grades;
     return (
@@ -86,10 +107,15 @@ constructor(props) {
                         {discipline.name}
                     </td>
                     <td style={{textAlign: 'right'}}>
-                        <div className="row">
-                            {Object.keys(grades).map( (item, i) => (
-                                <div className="col-sm-3">
-                                    <Input onChange={() => this.onCheckboxBtnClick(discipline.id, item)} type="checkbox" id={item+"."+discipline.id} />
+                        <div className="row" style={{justifyContent: 'space-evenly', alignContent: 'flex-end'}}>
+                        {Object.keys(grades).map( (item, i) => (
+                                <div>
+                                    <Input 
+                                        onChange={(event) => this.onCheckboxBtnClick(discipline.id, item, event.target.checked)} 
+                                        type="checkbox" 
+                                        id={item+"."+discipline.id} 
+                                        checked={this.state.cSelected[discipline.id][item]}
+                                        />
                                     <label htmlFor={item+"."+discipline.id}>{ grades[item] }</label>
                                 </div>      
                              )
