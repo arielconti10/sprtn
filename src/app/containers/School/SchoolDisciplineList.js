@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Table, Button, ButtonGroup } from 'reactstrap'
+import { Table, Button, ButtonGroup, Input } from 'reactstrap'
 import {levelLoad} from '../../../actions/level'
 import { select } from 'redux-saga/effects';
 class SchoolDisciplineList extends Component {
@@ -81,12 +81,14 @@ constructor(props) {
                         {discipline.name}
                     </td>
                     <td  style={{textAlign: 'right'}}>
-                        <ButtonGroup>
                             {Object.keys(grades).map( (item, i) => (
-                                <Button color="primary" onClick={() => this.onCheckboxBtnClick(discipline.id, item)} active={this.state.cSelected.includes({[item]: discipline.id})}>{ grades[item] }</Button>
+                                <label htmlFor={i}>{ grades[item] }
+                                    <Input type="checkbox" id={discipline.id} />
+                                </label>
+                                // <Button color="primary" onClick={() => this.onCheckboxBtnClick(discipline.id, item)} active={this.state.cSelected.includes({[item]: discipline.id})}></Button>
                              )
                             ) }
-                        </ButtonGroup>
+
                     </td>
                 </tr>
               )}
