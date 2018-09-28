@@ -65,7 +65,6 @@ class SchoolDashboard extends Component {
 
     render() {
         const { years, year_param, publishers, ringLoad, colections } = this.props.schoolDash;
-        console.log(publishers)
         return (
             <div>
 

@@ -20,22 +20,27 @@ constructor(props) {
   }
 
 
-  onCheckboxBtnClick(selected, grade) {
-    selected = {[grade]: selected}
+  onCheckboxBtnClick(discipline, item) {
+    console.log(discipline, item)
+
+    this.setState({cSelected: {discipline: item}})
+    // selected = {[grade]: selected}
     
-    let index = this.state.cSelected.findIndex(function(item){
-        // console.log(selected, item)
-        return selected !== item
-    })
+    let index = this.state.cSelected.indexOf(discipline)
+
     console.log(index)
+    
     if (index < 0) {
         this.state.cSelected.push(selected);
     } else {
         this.state.cSelected.splice(index, 1);
     }
-    this.setState({ cSelected: [...this.state.cSelected] });
+    this.setState({ cSelected: [...this.state.cSelected]})
+    console.log(this.state.cSelected)
 
-    console.log(this.state)
+    // this.setState({ cSelected: [...this.state.cSelected] });
+
+    // console.log(this.state)
   }
 
 
@@ -80,15 +85,16 @@ constructor(props) {
                     <td >
                         {discipline.name}
                     </td>
-                    <td  style={{textAlign: 'right'}}>
+                    <td style={{textAlign: 'right'}}>
+                        <div className="row">
                             {Object.keys(grades).map( (item, i) => (
-                                <label htmlFor={i}>{ grades[item] }
-                                    <Input type="checkbox" id={discipline.id} />
-                                </label>
-                                // <Button color="primary" onClick={() => this.onCheckboxBtnClick(discipline.id, item)} active={this.state.cSelected.includes({[item]: discipline.id})}></Button>
+                                <div className="col-sm-3">
+                                    <Input onChange={() => this.onCheckboxBtnClick(discipline.id, item)} type="checkbox" id={item+"."+discipline.id} />
+                                    <label htmlFor={item+"."+discipline.id}>{ grades[item] }</label>
+                                </div>      
                              )
                             ) }
-
+                        </div>
                     </td>
                 </tr>
               )}
