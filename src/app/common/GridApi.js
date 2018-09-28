@@ -435,13 +435,13 @@ class GridApi extends Component {
         )
     }
 
-    componentWillUnmount() {
-        const clear = this.props.gridApi.tableInfo;
-        clear.filtered = []
-        this.props.setTableInfo([])
-        this.props.setFilters([], [])
-        console.log(clear)
-    }
+    // componentWillUnmount() {
+    //     const clear = this.props.gridApi.tableInfo;
+    //     clear.filtered = []
+    //     this.props.setTableInfo([])
+    //     this.props.setFilters([], [])
+    //     console.log(clear)
+    // }
 }
 
 const mapStateToProps =(state) => ({

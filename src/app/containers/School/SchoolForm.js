@@ -143,7 +143,9 @@ class SchoolForm extends Component {
                     <TabPane tabId="register">
                         <Row>
                             <Col sm="12">
+                            {id && 
                                 <SchoolRegister viewMode={view_mode} schoolId={id} />
+                            }
                             </Col>
                         </Row>
                     </TabPane>

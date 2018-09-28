@@ -40,7 +40,7 @@ const selectsValidade = [
 export default class SchoolRegister extends Component {
     constructor(props) {
         super(props);
-
+        // console.log(this.props)
         this.state = {
             viewMode: this.props.viewMode,
             back_error: '',
@@ -48,8 +48,7 @@ export default class SchoolRegister extends Component {
             saved: false,
             selectedOption: '',
             ringLoad: false,
-
-            id: this.props.schoolId,
+            id: this.props.schoolId ,
             school_types: [],
             school_type_id: '0',
             subsidiaries: [],
@@ -105,7 +104,26 @@ export default class SchoolRegister extends Component {
         this.validarEmail = this.validarEmail.bind(this);
     }
 
-    componentDidMount() {
+    componentWillReceiveProps(nextProps) {
+
+        if(nextProps.schoolId !== this.state.id){
+            return 
+                this.setState({
+                    id: nextProps.schoolId
+                }
+            )
+        } else {
+            return 
+                this.setState({
+                    id: this.props.match.params.id
+                }
+            )
+        }
+    }
+
+    componentDidMount() {   
+        console.log(this.props)
+
         apis.map(item => {
             axios.get(`${item.api}?order[name]=asc`)
                 .then(response => {
@@ -118,18 +136,6 @@ export default class SchoolRegister extends Component {
                 })
                 .catch(err => console.log(err));
         });
-    }
-
-    checkPermission() {
-        canUser('school.update', this.props.history, "change", function(rules){
-            if (rules.length == 0) {
-                this.setState({viewMode:true, submitButtonDisabled: true});
-            }
-        }.bind(this));
-    }
-
-    componentWillMount() {        
-        this.checkPermission();
 
         if (this.state.id !== undefined) {
             axios.get(`${apiPost}/${this.state.id}`)
@@ -164,6 +170,51 @@ export default class SchoolRegister extends Component {
                 })
                 .catch(err => console.log(4, err));
         }
+    }
+
+    checkPermission() {
+        canUser('school.update', this.props.history, "change", function(rules){
+            if (rules.length == 0) {
+                this.setState({viewMode:true, submitButtonDisabled: true});
+            }
+        }.bind(this));
+    }
+
+    componentWillMount() {        
+        this.checkPermission();
+        // if (this.state.id !== undefined) {
+        //     axios.get(`${apiPost}/${this.state.id}`)
+        //         .then(response => {
+        //             let dados = response.data.data;
+
+        //             this.setState({
+        //                 school_type_id: dados.school_type_id || '0',
+        //                 subsidiary_id: dados.subsidiary_id || '0',
+        //                 sector_id: dados.sector_id || '0',
+        //                 school_code_totvs: dados.school_code_totvs || '',
+        //                 profile_id: dados.profile_id || '0',
+        //                 congregation_id: dados.congregation_id || '0',
+        //                 name: dados.name || '',
+        //                 trading_name: dados.trading_name || '',
+        //                 cnpj: dados.cnpj || '',
+        //                 mec_inep_code: dados.mec_inep_code || '',
+        //                 zip_code: dados.zip_code || '',
+        //                 address: dados.address || '',
+        //                 number: dados.number || '',
+        //                 neighborhood: dados.neighborhood || '',
+        //                 city: dados.city || '',
+        //                 state_id: dados.state_id || '0',
+        //                 phone: dados.phone || '',
+        //                 email: dados.email || '',
+        //                 chain_id: dados.chain_id || '0',
+        //                 localization_type_id: dados.localization_type_id || '0',
+        //                 maintainer: dados.maintainer || '',
+
+        //                 ringLoad: false
+        //             });
+        //         })
+        //         .catch(err => console.log(4, err));
+        // }
     }
 
     searchStateWithCep(state_uf) {
