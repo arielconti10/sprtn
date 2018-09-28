@@ -14,44 +14,11 @@ constructor(props) {
   }
 
   onCheckboxBtnClick(discipline, item, checked) {
-      let arr_final = [];
       this.state.cSelected[discipline][item] = checked;
-
+      console.log('ondisciplinechange')
       this.setState({cSelected: [...this.state.cSelected]})
-    //   console.log(this.state.cSelected)  
-
-    // arr_final.push({[discipline]: {[item]: checked}});
-
-    // this.setState({cSelected: arr_final})
-
-    // console.log(arr_final)
-
-    // this.setState({cSelected:{
-    //     [discipline]: {[item]: checked
-    //     }
-    // }})
-
-    // console.log(this.state)
-    // console.log(discipline, item)
-
-    
-    // let index = this.state.cSelected.discipline.indexOf(item)
-
-    // console.log(index)
-    
-    // if (index < 0) {
-    //     this.setState({cSelected: {discipline: item}})
-    // } else {
-    //     this.state.cSelected.discipline.splice(index, 1);
-    // }
-    // this.setState({ cSelected: [...this.state.cSelected]})
-    // console.log(this.state.cSelected)
-
-    // this.setState({ cSelected: [...this.state.cSelected] });
-
-    // console.log(this.state)
+      this.props.onDisciplineChange(discipline, item, checked, this.state.cSelected)
   }
-
 
   componentWillReceiveProps(nextProps) {
     let array_disciplines = []

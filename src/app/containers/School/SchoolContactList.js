@@ -42,10 +42,19 @@ class SchoolConctactList extends Component {
         this.toggle = this.toggle.bind(this);
         this.addContact = this.addContact.bind(this);
         this.state = {
+            cSelected: [],
             view_mode: false,
             active_tab: 'dados',
             levels: []
         };
+
+        this.onDisciplineListChange = this.onDisciplineListChange.bind(this)
+    }
+
+    onDisciplineListChange(discipline, item, checked,list) {
+        this.state.cSelected = list;         
+        this.setState({cSelected: [...this.state.cSelected]})
+        console.log(this.state.cSelected)
     }
 
     componentDidMount(){
@@ -81,7 +90,7 @@ class SchoolConctactList extends Component {
         if(typeof this.state.levels !== 'undefined' && this.state.levels.length > 1){
             return this.state.levels.map(level =>
                 <TabPane tabId={level.code}>
-                    <SchoolDisciplineList level={level} schoolInfo={this.props.school.schoolInfo}/>
+                    <SchoolDisciplineList level={level} schoolInfo={this.props.school.schoolInfo} onDisciplineChange = { this.onDisciplineListChange }/>
                 </TabPane>
             );
         }   
