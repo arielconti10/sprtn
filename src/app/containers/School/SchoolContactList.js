@@ -110,6 +110,9 @@ class SchoolConctactList extends Component {
                             <NavItem>
                                 <NavLink className={classnames({ active: active_tab === 'ef2' })} onClick={() => { this.toggle('ef2'); }}>EF2</NavLink>
                             </NavItem>
+                            <NavItem>
+                                <NavLink className={classnames({ active: active_tab === 'em' })} onClick={() => { this.toggle('em'); }}>EM</NavLink>
+                            </NavItem>
                         </Nav>
                         <TabContent activeTab={active_tab} className="cont-contacts">
                             <TabPane tabId="dados">
