@@ -45,7 +45,8 @@ class SchoolConctactList extends Component {
             cSelected: [],
             view_mode: false,
             active_tab: 'dados',
-            levels: []
+            levels: [],
+            contactInfo: [],
         };
 
         this.onDisciplineListChange = this.onDisciplineListChange.bind(this)
@@ -74,6 +75,7 @@ class SchoolConctactList extends Component {
         const user = this.props.user;
         const contactProp = this.props.contact;
         const contacts = this.props.contacts;
+        const contactInfo = this.props.contact.contactInfo;
 
         if (contacts !== nextProps.contacts || contactProp.collapse !== nextProps.contact.collapse
             && nextProps.contact.contactsList.length === 0
@@ -83,6 +85,10 @@ class SchoolConctactList extends Component {
             this.props.loadContactsFlow(user, nextContacts, collapse);
             this.props.levelRequest(user);
             this.setState({levels: this.props.levels.list})
+        }
+
+        if(contactInfo) {
+            this.setState({contactInfo: contactInfo})
         }
     }
 
@@ -100,29 +106,36 @@ class SchoolConctactList extends Component {
         const { contactsList, collapse } = this.props.contact;
         const { user } = this.props;
         const { schoolInfo } = this.props.school;
-        const { active_tab, view_mode } = this.state;
+        const { active_tab, view_mode, contactInfo } = this.state;
+
 
         return (
             <div>
                 <div className="contact-action">
                     <Collapse isOpen={collapse}>
-                        <Nav tabs className="tab-contacts">
-                            <NavItem>
-                                <NavLink className={classnames({ active: active_tab === 'dados' })} onClick={() => { this.toggle('dados'); }}>Dados</NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink className={classnames({ active: active_tab === 'ei' })} onClick={() => { this.toggle('ei'); }}>EI</NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink className={classnames({ active: active_tab === 'ef1' })} onClick={() => { this.toggle('ef1'); }}>EF1</NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink className={classnames({ active: active_tab === 'ef2' })} onClick={() => { this.toggle('ef2'); }}>EF2</NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink className={classnames({ active: active_tab === 'em' })} onClick={() => { this.toggle('em'); }}>EM</NavLink>
-                            </NavItem>
-                        </Nav>
+                            { 
+                                Object.keys(this.state.contactInfo).length > 0 && this.state.contactInfo.job_title.code == 'PROFESSOR' ? 
+                                <Nav tabs className="tab-contacts">
+                                    <NavItem>
+                                        <NavLink className={classnames({ active: active_tab === 'dados' })} onClick={() => { this.toggle('dados'); }}>Dados</NavLink>
+                                    </NavItem>
+                                    <NavItem>
+                                        <NavLink className={classnames({ active: active_tab === 'ei' })} onClick={() => { this.toggle('ei'); }}>EI</NavLink>
+                                    </NavItem>
+                                    <NavItem>
+                                        <NavLink className={classnames({ active: active_tab === 'ef1' })} onClick={() => { this.toggle('ef1'); }}>EF1</NavLink>
+                                    </NavItem>
+                                    <NavItem>
+                                        <NavLink className={classnames({ active: active_tab === 'ef2' })} onClick={() => { this.toggle('ef2'); }}>EF2</NavLink>
+                                    </NavItem>
+                                    <NavItem>
+                                        <NavLink className={classnames({ active: active_tab === 'em' })} onClick={() => { this.toggle('em'); }}>EM</NavLink>
+                                    </NavItem>
+                                </Nav>
+                                :
+                                ''
+                            }
+                            
                         <TabContent activeTab={active_tab} className="cont-contacts">
                             <TabPane tabId="dados">
                                 <Row>
