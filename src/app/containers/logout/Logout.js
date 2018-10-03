@@ -20,11 +20,18 @@ export default class Logout extends Component {
         sessionStorage.removeItem("superior");
         sessionStorage.removeItem("role_name");
         sessionStorage.removeItem('sso_token');
-        window.location.href = "/#/login";
-        window.location.reload();
+
+        //limpa o localStorage antes de redirecionar
+        localStorage.clear();
+
+        // window.location.href = "/#/login";
+        // window.location.reload();
+
+        //força o redirect como manual
+        window.location.replace('/');
     }
     render() {
-        return ( 
+        return (
             <div id="">
             </div>
         )
