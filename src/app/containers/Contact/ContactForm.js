@@ -163,7 +163,7 @@ class ContactForm extends Component {
     handleChangeSelect(selectedOption) {
         const user = this.props.user;
         this.props.selectJobFlow(user, selectedOption);
-    }
+    }   
 
     handleChangeSelectState(selectedOption) {
         const user = this.props.user;
@@ -260,6 +260,15 @@ class ContactForm extends Component {
         const contact = this.props.contact;
         const collapse = contact.collapse;
         this.props.addContactFlow(collapse);
+
+        this.props.onClickCancel();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.contact.jobTitleId !== this.props.contact.jobTitleId){
+            this.props.onChangeJobTitle(nextProps.contact.jobTitleId)
+        }
+
     }
 
     render() {

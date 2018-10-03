@@ -21,6 +21,10 @@ import {
     addContactFlow, findContactFlow
 } from '../../../actions/contact'
 
+import { 
+    job_titleLoad
+} from '../../../actions/job_title'
+
 import { levelRequest } from '../../../actions/level'
 
 class SchoolConctactList extends Component {
@@ -32,6 +36,7 @@ class SchoolConctactList extends Component {
         onActiveContactDataFlow: PropTypes.func,
         addContactFlow: PropTypes.func,
         findContactFlow: PropTypes.func,
+        job_titleLoad: PropTypes.func,
         contact: PropTypes.shape({
         }),
 
@@ -50,12 +55,19 @@ class SchoolConctactList extends Component {
         };
 
         this.onDisciplineListChange = this.onDisciplineListChange.bind(this)
+        this.onChangeJobTitle = this.onChangeJobTitle.bind(this)
+
+        console.log(this.state)
     }
 
     onDisciplineListChange(discipline, item, checked,list) {
         this.state.cSelected = list;         
         this.setState({cSelected: [...this.state.cSelected]})
         console.log(this.state.cSelected)
+    }
+
+    onChangeJobTitle(jobTitle){
+        this.props.job_titleLoad(this.props.user, jobTitle.value)
     }
 
     componentDidMount(){
@@ -71,11 +83,19 @@ class SchoolConctactList extends Component {
         this.props.addContactFlow(collapse);
     }
 
+    onClickCancel(){
+        this.state.contactInfo = []
+        this.setState({contactInfo: [...this.state.contactInfo]})
+
+        console.log(this.state.contactInfo)
+    }
+
     componentWillReceiveProps(nextProps) {
         const user = this.props.user;
         const contactProp = this.props.contact;
         const contacts = this.props.contacts;
         const contactInfo = this.props.contact.contactInfo;
+        const job_title = this.props.job_title;
 
         if (contacts !== nextProps.contacts || contactProp.collapse !== nextProps.contact.collapse
             && nextProps.contact.contactsList.length === 0
@@ -90,6 +110,15 @@ class SchoolConctactList extends Component {
         if(contactInfo) {
             this.setState({contactInfo: contactInfo})
         }
+
+        if(nextProps.job_title && job_title !== nextProps.job_title.current_job_title) {
+            this.setState({
+                contactInfo: {
+                    job_title: nextProps.job_title.current_job_title
+                }
+            });
+        }
+        
     }
 
     renderDisciplines() {
@@ -101,7 +130,7 @@ class SchoolConctactList extends Component {
             );
         }   
     }
-
+    
     render() {
         const { contactsList, collapse } = this.props.contact;
         const { user } = this.props;
@@ -114,24 +143,8 @@ class SchoolConctactList extends Component {
                 <div className="contact-action">
                     <Collapse isOpen={collapse}>
                             { 
-                                Object.keys(this.state.contactInfo).length > 0 && this.state.contactInfo.job_title.code == 'PROFESSOR' ? 
-                                <Nav tabs className="tab-contacts">
-                                    <NavItem>
-                                        <NavLink className={classnames({ active: active_tab === 'dados' })} onClick={() => { this.toggle('dados'); }}>Dados</NavLink>
-                                    </NavItem>
-                                    <NavItem>
-                                        <NavLink className={classnames({ active: active_tab === 'ei' })} onClick={() => { this.toggle('ei'); }}>EI</NavLink>
-                                    </NavItem>
-                                    <NavItem>
-                                        <NavLink className={classnames({ active: active_tab === 'ef1' })} onClick={() => { this.toggle('ef1'); }}>EF1</NavLink>
-                                    </NavItem>
-                                    <NavItem>
-                                        <NavLink className={classnames({ active: active_tab === 'ef2' })} onClick={() => { this.toggle('ef2'); }}>EF2</NavLink>
-                                    </NavItem>
-                                    <NavItem>
-                                        <NavLink className={classnames({ active: active_tab === 'em' })} onClick={() => { this.toggle('em'); }}>EM</NavLink>
-                                    </NavItem>
-                                </Nav>
+                                this.state.contactInfo.job_title !== null && Object.keys(this.state.contactInfo).length > 0  && this.state.contactInfo.job_title.code == 'PROFESSOR' ? 
+                                console.log(this.state.contactInfo)
                                 :
                                 ''
                             }
@@ -145,8 +158,9 @@ class SchoolConctactList extends Component {
                                                 <ContactForm 
                                                     schoolId={schoolInfo.id}
                                                     addContact={this.addContact}
+                                                    onChangeJobTitle={this.onChangeJobTitle}
                                                     // updateTable={this.updateTable.bind(this)} toggle={this.toggle.bind(this)}
-                                                    // onClickCancel={this.onClickCancel.bind(this)} 
+                                                    onClickCancel={this.onClickCancel.bind(this)} 
                                                     // viewMode={this.state.viewMode} 
                                                 />
                                             </CardBody>
@@ -284,6 +298,7 @@ const mapStateToProps = (state) => ({
     user: state.user,
     school: state.schools,
     levels: state.levels,
+    job_title: state.job_titles
 });
 
 const functions_object = {
@@ -293,6 +308,7 @@ const functions_object = {
     addContactFlow,
     findContactFlow,
     levelRequest,
+    job_titleLoad
 }
 
 export default connect(mapStateToProps, functions_object )(SchoolConctactList);
