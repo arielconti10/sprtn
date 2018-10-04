@@ -619,6 +619,7 @@ export default class SchoolRegister extends Component {
                                 <Select
                                     name="subsidiary_id"
                                     id="subsidiary_id"
+                                    labelKey="code_name"
                                     disabled={this.state.viewMode}
                                     value={this.state.subsidiary_id}
                                     onChange={this.handleChangeSubsidiary}
