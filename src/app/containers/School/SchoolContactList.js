@@ -58,13 +58,11 @@ class SchoolConctactList extends Component {
         this.onDisciplineListChange = this.onDisciplineListChange.bind(this)
         this.onChangeJobTitle = this.onChangeJobTitle.bind(this)
 
-        console.log(this.state)
     }
 
     onDisciplineListChange(discipline, item, checked,list) {
         this.state.cSelected = list;         
         this.setState({cSelected: [...this.state.cSelected]})
-        console.log(this.state.cSelected)
     }
 
     onChangeJobTitle(jobTitle){
@@ -179,6 +177,7 @@ class SchoolConctactList extends Component {
                                                     schoolId={schoolInfo.id}
                                                     addContact={this.addContact}
                                                     onChangeJobTitle={this.onChangeJobTitle}
+                                                    disciplineList={this.state.cSelected}
                                                     // updateTable={this.updateTable.bind(this)} toggle={this.toggle.bind(this)}
                                                     onClickCancel={this.onClickCancel.bind(this)} 
                                                     // viewMode={this.state.viewMode} 

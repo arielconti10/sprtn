@@ -132,6 +132,7 @@ class ContactForm extends Component {
         const contactList = contactObject.contactsList;
         const schoolId = this.props.schoolId;
         const phoneData = contactObject.phoneData;
+        let disciplines = this.props.disciplineList;
 
         if (!jobTitleId) {
             this.setState({invalid_job: true});
@@ -147,6 +148,24 @@ class ContactForm extends Component {
         
         contact.school_id = schoolId;
         contact.birthday = formatDateToAmerican(contact.birthday);
+        
+        let listDisciplines = []; 
+        disciplines = disciplines.map( (item, key) => {
+            if(typeof item !== 'undefined') {
+                console.log(item)
+                listDisciplines.push({
+                    'discipline_id' : key,
+                    'level_id': 1,
+                    'first_grade': item.first_grade,
+                    'second_grade': item.second_grade,
+                    'third_grade': item.third_grade,
+                    'forth_grade': item.fourth_grade,
+                    'fifth_grade': item.fifth_grade,
+                })
+            }
+        })
+
+        contact.disciplines = listDisciplines;
 
         if (contactObject.contactInfo.id) { 
             const contactId = contactObject.contactInfo.id;
@@ -190,6 +209,10 @@ class ContactForm extends Component {
         const user = this.props.user;
         this.props.unloadContact();
         this.props.loadContactInitialFlow(user);
+    }
+
+    componentDidMount() {
+        console.log(this.props.disciplineList)
     }
 
     renderNameInput = ({ input, type, disabled, valueOption ,meta: { touched, error } }) => (
