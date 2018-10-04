@@ -134,11 +134,14 @@ class ContactForm extends Component {
         const phoneData = contactObject.phoneData;
         let disciplines = this.props.disciplineList;
 
+        contact.address = this.props.contact.contactAddress.address;
+
         if (!jobTitleId) {
             this.setState({invalid_job: true});
             return false;
         }
 
+        
         contact.job_title_id = jobTitleId.value;
         contact.favorite = contactObject.favorite;
         contact.authorize_email = contactObject.authorizeEmail;
@@ -152,7 +155,6 @@ class ContactForm extends Component {
         let listDisciplines = []; 
         disciplines = disciplines.map( (item, key) => {
             if(typeof item !== 'undefined') {
-                console.log(item)
                 listDisciplines.push({
                     'discipline_id' : key,
                     'level_id': 1,
@@ -175,6 +177,7 @@ class ContactForm extends Component {
             this.props.contactCreateFlow(user, contact, contactList, phoneData);
             this.resetForm();
         }
+
 
         this.resetForm();
     }
@@ -223,7 +226,6 @@ class ContactForm extends Component {
                 {...input}
                 type={type}
                 disabled={disabled}
-                // value={valueOption}
             />
             {touched && error && (
                 <div style={{ color: 'red'}}>
@@ -403,19 +405,19 @@ class ContactForm extends Component {
                                 />
                             </div>
                         </div>
-
                         <div className="col-md-6">
-                            <label htmlFor="address">
+                            <label htmlFor="endereco">
                                 Endereço
                             </label>
                             <Field
-                                name="address"
-                                id="address"
+                                name="endereco"
+                                id="endereco"
                                 component={this.renderCustomInput}
                                 placeholder="Endereço"
-                                valueOption={contactAddress.address?contactAddress.address:''}
+                                valueOption={contactAddress.address ? contactAddress.address : ''}
                             />
                         </div>
+
 
                         <div className="col-md-2">
                             <label htmlFor="number">
@@ -453,7 +455,7 @@ class ContactForm extends Component {
                                 id="neighborhood"
                                 component={this.renderCustomInput}
                                 placeholder="Bairro"
-                                valueOption={contactAddress.neighborhood?contactAddress.neighborhood:''}
+                                valueOption={contactAddress.neighborhood ? contactAddress.neighborhood : ''}
                             />
                         </div>
 

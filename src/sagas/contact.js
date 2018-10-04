@@ -459,7 +459,7 @@ function* findContactFlow(action) {
 }
 
 function* addPhoneFlow(action) {
-    const phoneData = action.phoneData;
+    const phoneData = action.phoneData ? action.phoneData : [];
     const phone = action.phone;
 
     let phoneFormat = phone;
@@ -467,8 +467,10 @@ function* addPhoneFlow(action) {
     if (phoneFormat.phone_number && phoneFormat.phone_number.indexOf("_") !== -1) {
         phoneFormat.phone_number = phone.phone_number.replace("_","");
     }
-    
+
+    // if(phoneData){
     const concatPhone = phoneData.concat(phoneFormat);
+
     yield put(setPhoneData(concatPhone));
 }
 
