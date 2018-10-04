@@ -99,19 +99,24 @@ class UserSchools extends Component {
         const school_type_id = selectedOption;
         const schools = user_school.schools;
         const schools_wallet = user_school.wallet_schools;
-        
+
         this.props.changeSchoolType(selectedOption);
         this.props.changeSectorFlow(sector_id, subsidiary_id, school_type_id, schools, schools_wallet);
     }
 
     handleSelect = (selectedOptions) => {
-        const userSchool = this.props.userSchool;
-        const user_id = userSchool.user_id;
-        const available_options = selectedOptions;
-        const schools = userSchool.schools;
-        const schools_wallet = userSchool.wallet_schools;
+            const userSchool = this.props.userSchool;
+            const user_id = userSchool.user_id;
+            const available_options = selectedOptions;
+            const schools = userSchool.schools;
+            const schools_wallet = userSchool.wallet_schools;
 
-        this.props.selectSchoolFlow(user_id, available_options, schools, schools_wallet);
+            //se tem o usuario faz a inserção no Flow
+            if(user_id != null) {
+                this.props.selectSchoolFlow(user_id, available_options, schools, schools_wallet);
+            }   else{
+                alert('Selecione um Consultor antes de adicionar uma escola!');
+            }
     }
 
     /**
