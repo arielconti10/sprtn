@@ -14,44 +14,11 @@ constructor(props) {
   }
 
   onCheckboxBtnClick(discipline, item, checked) {
-      let arr_final = [];
       this.state.cSelected[discipline][item] = checked;
-
+      console.log('ondisciplinechange')
       this.setState({cSelected: [...this.state.cSelected]})
-    //   console.log(this.state.cSelected)  
-
-    // arr_final.push({[discipline]: {[item]: checked}});
-
-    // this.setState({cSelected: arr_final})
-
-    // console.log(arr_final)
-
-    // this.setState({cSelected:{
-    //     [discipline]: {[item]: checked
-    //     }
-    // }})
-
-    // console.log(this.state)
-    // console.log(discipline, item)
-
-    
-    // let index = this.state.cSelected.discipline.indexOf(item)
-
-    // console.log(index)
-    
-    // if (index < 0) {
-    //     this.setState({cSelected: {discipline: item}})
-    // } else {
-    //     this.state.cSelected.discipline.splice(index, 1);
-    // }
-    // this.setState({ cSelected: [...this.state.cSelected]})
-    // console.log(this.state.cSelected)
-
-    // this.setState({ cSelected: [...this.state.cSelected] });
-
-    // console.log(this.state)
+      this.props.onDisciplineChange(discipline, item, checked, this.state.cSelected)
   }
-
 
   componentWillReceiveProps(nextProps) {
     let array_disciplines = []
@@ -76,16 +43,16 @@ constructor(props) {
     else if ( nextProps.level.code ==  'ef2' )
         this.state.grades = {first_grade: '5 ano', second_grade: '6 ano', third_grade: '7 ano', fourth_grade: '8 ano', fifth_grade: '9 ano'}
     else if ( nextProps.level.code ==  'em' )
-        this.state.grades = {first_grade: '1', second_grade: '2', third_grade: '3'}
+        this.state.grades = {first_grade: '1 ano', second_grade: '2 ano', third_grade: '3 ano'}
 
     if(nextProps.contact.contactInfo){
         if(nextProps.contact.contactInfo.disciplines){
             nextProps.contact.contactInfo.disciplines.map(discipline => { 
                 this.state.cSelected[discipline.discipline_id] = {
-                    first_grade: discipline.fifth_grade,
+                    first_grade: discipline.first_grade,
                     second_grade: discipline.second_grade,
                     third_grade: discipline.third_grade,
-                    fourth_grade: discipline.fourth_grade,
+                    fourth_grade: discipline.forth_grade,
                     fifth_grade: discipline. fifth_grade,
                 }
             })
