@@ -268,6 +268,8 @@ class ContactForm extends Component {
                 placeholder="Selecione..."
                 labelKey={labelKey}
                 valueKey={valueKey}
+                isClearable={false}
+                clearable={false}
                 onBlur={() => input.onBlur(input.value)}
             />
 

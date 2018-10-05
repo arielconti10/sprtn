@@ -209,7 +209,7 @@ class PhoneForm extends Component {
         }
     }
 
-    renderSelectInput = ({ input, name, valueOption, options, labelKey, valueKey, onChangeFunction ,meta: { touched, error } }) => (
+    renderSelectInput = ({ input, name, valueOption, options, labelKey, valueKey, onChangeFunction, clearable, meta: { touched, error } }) => (
         <div className="form-group group-select">
             <Select
                 {...input}
@@ -222,6 +222,8 @@ class PhoneForm extends Component {
                 placeholder="Selecione..."
                 labelKey={labelKey}
                 valueKey={valueKey}
+                isClearable={false}
+                clearable={false}
                 onBlur={() => input.onBlur(input.value)}
             />
 
@@ -290,6 +292,7 @@ class PhoneForm extends Component {
                             onChangeFunction={this.handleChangePhone}
                             placeholder="Selecione..."
                             valueOption={phoneTypeId}
+                            clearable={false}
                             component={this.renderSelectInput}
                         />
                         { this.state.invalid_phone && 
