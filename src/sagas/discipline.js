@@ -61,6 +61,7 @@ import {
       'name': discipline.name,
       'active': discipline.active,
       'code': discipline.code,
+      'order' : discipline.order,
     }
 
     const url = `${apiUrl}/${discipline.id}`

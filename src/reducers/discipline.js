@@ -118,6 +118,7 @@ const reducer = function disciplineReducer(state = initialState, action) {
           id: action.discipline.data.id,
           name: action.discipline.data.name,
           code: action.discipline.data.code,
+          order: action.discipline.data.order,
           active: action.discipline.data.deleted_at !== null ? false : true
         }, // replace with fresh list
         requesting: false,
