@@ -6,6 +6,8 @@ import { verifySelectChecked, createTable, savePreferences, verifyPreferences } 
 
 import GridApi from '../../common/GridApi';
 import { canUser } from '../../common/Permissions';
+import {SortableContainer, SortableElement} from 'react-sortable-hoc';
+
 
 class DisciplineList extends Component {
     render() {
@@ -16,7 +18,8 @@ class DisciplineList extends Component {
                         apiSpartan="discipline"
                         columns={[
                             { Header: "Código", accessor: "code", filterable: true, headerClassName: 'text-left', is_checked: true },
-                            { Header: "Nome", accessor: "name", filterable: true, headerClassName: 'text-left', is_checked: true }
+                            { Header: "Nome", accessor: "name", filterable: true, headerClassName: 'text-left', is_checked: true },
+                            { Header: "Ordenação", accessor: "order", filterable: true, headerClassName: 'text-left', is_checked: true }
                         ]}
                         urlLink={this.props.match.url}
                     />

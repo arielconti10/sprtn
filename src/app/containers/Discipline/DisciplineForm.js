@@ -36,6 +36,7 @@ class DisciplineForm extends Component {
                 active: PropTypes.bool,
                 name: PropTypes.string,
                 code: PropTypes.string,
+                order: PropTypes.string,
             })
         }).isRequired,
         disciplineUpdate: PropTypes.func.isRequired,
@@ -93,6 +94,7 @@ class DisciplineForm extends Component {
             }
         </div>
     )
+
 
     handleChange(e) {
         const target = e.currentTarget;
@@ -184,6 +186,18 @@ class DisciplineForm extends Component {
                                 component={this.renderInput}
                                 validate={fieldRequired}
                                 placeholder="Nome da disciplina"
+                            />
+                        </div>   
+                        <div className="form-group">
+                            <label htmlFor="name">Ordenação da disciplina</label>
+                            <Field
+                                name="order"
+                                id="order"
+                                validate={fieldRequired}
+                                type="number"
+                                min="0"
+                                component={this.renderInput}
+                                placeholder="Ordenação das disciplinas"
                             />
                         </div>                        
                     {statusField}     
