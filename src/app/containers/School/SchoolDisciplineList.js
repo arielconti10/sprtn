@@ -69,14 +69,14 @@ constructor(props) {
         <Table responsive striped hover>
           <tbody>
               {this.props.level.disciplines.map((discipline, id) =>
-                <tr >
-                    <td >
+                <tr key={id}>
+                    <td key={{id}}>
                         {discipline.name}
                     </td>
                     <td style={{textAlign: 'right'}}>
                         <div className="row" style={{justifyContent: 'space-evenly', alignContent: 'flex-end'}}>
                         {Object.keys(grades).map( (item, i) => (
-                                <div>
+                                <div key={i}>
                                     <Input 
                                         onChange={(event) => this.onCheckboxBtnClick(discipline.id, item, event.target.checked)} 
                                         type="checkbox" 
