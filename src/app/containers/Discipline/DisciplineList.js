@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, 
+import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem,
     FormGroup, Label, Input } from 'reactstrap';
-import { verifySelectChecked, createTable, savePreferences, verifyPreferences } from '../../common/ToggleTable'; 
+import { verifySelectChecked, createTable, savePreferences, verifyPreferences } from '../../common/ToggleTable';
 
 import GridApi from '../../common/GridApi';
 import { canUser } from '../../common/Permissions';
-import {SortableContainer, SortableElement} from 'react-sortable-hoc';
+// import {SortableContainer, SortableElement} from 'react-sortable-hoc';
 
 
 class DisciplineList extends Component {
@@ -24,7 +24,7 @@ class DisciplineList extends Component {
                         urlLink={this.props.match.url}
                     />
 
-                </div>  
+                </div>
             </div>
         )
     }
