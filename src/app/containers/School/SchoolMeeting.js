@@ -13,7 +13,7 @@ import 'react-select/dist/react-select.css';
 import { PropTypes } from 'prop-types'
 import { reduxForm, Field } from 'redux-form'
 import { connect } from 'react-redux'
-import { 
+import {
     setMeetingProfileFlow, setMeetingUnifiedFlow, changeMeetingDateFlow,
     loadMeetingShiftsFlow, changeMeetingShiftFlow, insertSchoolMeetingFlow,
     unloadSchoolMeeting, setMeetingSubmited
@@ -69,8 +69,8 @@ class SchoolMeeting extends Component {
             this.props.insertSchoolMeetingFlow(user, objectSave);
             this.props.unloadSchoolMeeting();
         }
-        
-        
+
+
     }
 
     componentWillMount() {
@@ -103,7 +103,7 @@ class SchoolMeeting extends Component {
                 className="form-control"
                 options={{ minDate: 'today', dateFormat: 'd/m/Y' }}
                 value={valueOption}
-                onChange={onChangeFunction}      
+                onChange={onChangeFunction}
             />
 
             {touched && error && (
@@ -115,12 +115,14 @@ class SchoolMeeting extends Component {
         </div>
     )
 
-    renderSelectInput = ({ input, name, valueOption, options, labelKey, valueKey, onChangeFunction ,meta: { touched, error } }) => (
+    renderSelectInput = ({ input, name, valueOption, options, labelKey, valueKey, onChangeFunction, clearable ,meta: { touched, error } }) => (
         <div className="form-group group-select">
             <Select
                 {...input}
                 name={name}
                 id={name}
+                clearable={clearable}
+                isClearable={clearable}
                 // disabled={this.state.viewMode}
                 value={valueOption}
                 onChange={onChangeFunction}
@@ -172,8 +174,9 @@ class SchoolMeeting extends Component {
                             <Field
                                 name="form_profile"
                                 id="form_profile"
+                                clearable={false}
                                 options={[
-                                    { value: 1, label: 'Descentralizado', field: 'form_profile' }, 
+                                    { value: 1, label: 'Descentralizado', field: 'form_profile' },
                                     { value: 2, label: 'Unificado', field: 'form_profile' }
                                 ]}
                                 onChangeFunction={this.handleChange}
@@ -188,9 +191,8 @@ class SchoolMeeting extends Component {
                             <Field
                                 name="form_unified"
                                 id="form_unified"
-                                clearable={false}
                                 options={[
-                                    { value: 1, label: 'Voto' }, 
+                                    { value: 1, label: 'Voto' },
                                     { value: 2, label: 'Decisão do gestor' }
                                 ]}
                                 onChangeFunction={this.handleChangeUnified}
@@ -215,7 +217,7 @@ class SchoolMeeting extends Component {
                                 name="profile_choose"
                                 disabled={true}
                                 valueOption={meetingDate}
-                                onChangeFunction={this.handleChangeDate}      
+                                onChangeFunction={this.handleChangeDate}
                                 component={this.renderDateInput}
                             />
                             {(submited == 1 && !meetingDate) &&
@@ -247,8 +249,8 @@ class SchoolMeeting extends Component {
                         <Row>
                             <Col md="1">
                                 <Button color='primary' disabled={profileId.value !== 2?true:false} >
-                                    <i className="fa fa-plus-circle"></i> 
-                                    Salvar
+                                    <i className="fa fa-plus-circle"> </i>
+                                     Salvar
                                 </Button>
                             </Col>
                         </Row>
