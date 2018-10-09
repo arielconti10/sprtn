@@ -105,14 +105,14 @@ class ActionForm extends Component {
     }
 
     createTypeTable(){
-        let col = [            
+        let col = [
             {
                 Header: "Ações", accessor: "", sortable: false, width: 50, headerClassName: 'text-left', Cell: (element) =>
                     (
                         <button type="button" className='btn btn-danger btn-sm' onClick={() => this.onClickDelete(element)}>
                             <i className='fa fa-ban'></i>
                         </button>
-                            
+
                     )
             },
             { Header: "Tipo de visita", accessor: "visit_type_id", headerClassName: 'text-left', Cell: (element) =>  (<span>{this.getVisitType(element)}</span>)},
@@ -128,7 +128,7 @@ class ActionForm extends Component {
                 this.setState({viewMode:true, submitButtonDisabled: true});
                 console.log(this.state.viewMode);
             }
-        }.bind(this));       
+        }.bind(this));
     }
 
     componentWillMount() {
@@ -171,7 +171,7 @@ class ActionForm extends Component {
     }
 
     validSelects(){
-        // Validate selects 
+        // Validate selects
         let stopSubmit = false;
         selectsValidade.map(select => {
             let objState = `valid_select_${select.name}`;
@@ -213,7 +213,7 @@ class ActionForm extends Component {
 
         return objectArray.find(function (obj) { return obj.visit_type_id === visit &&  obj.school_type_id === school; });
 
-        
+
     }
 
     saveData(){
@@ -234,7 +234,7 @@ class ActionForm extends Component {
                     objectArray.push(objectData);
                 }
 
-                
+
                 // if(objectArray.length > 0){
                 //     objectArray.map(original => {
                 //         console.log('objectArray:', objectArray)
@@ -250,7 +250,7 @@ class ActionForm extends Component {
                 //         let objectData = {};
                 //         objectData['visit_type_id'] = parseInt(visit);
                 //         objectData['school_type_id'] = parseInt(school);
-        
+
                 //         objectArray.push(objectData);
                 //         newArray.push(objectData);
 
@@ -261,18 +261,18 @@ class ActionForm extends Component {
                 //     let objectData = {};
                 //     objectData['visit_type_id'] = parseInt(visit);
                 //     objectData['school_type_id'] = parseInt(school);
-    
+
                 //     objectArray.push(objectData);
                 // }
             });
         });
 
         console.log('objectArray:', objectArray)
-        
-        
+
+
         this.setState({ tableData: objectArray });
 
-        this.clearSelects();        
+        this.clearSelects();
         this.createTypeTable();
     }
 
@@ -358,9 +358,9 @@ class ActionForm extends Component {
             })
         }).catch(function (error) {
             let data_error = error.response.data.errors;
-            let filterId = Object.keys(data_error).toString();
+            let filterId = Object.keys(data_error)[0].toString();
             this.setState({ back_error: data_error[filterId] });
-        })
+        }.bind(this));
     }
 
     handleSubmit(e) {
@@ -368,7 +368,7 @@ class ActionForm extends Component {
 
         this.form.validateFields();
 
-        this.setState({ submitButtonDisabled: !this.form.isValid() });        
+        this.setState({ submitButtonDisabled: !this.form.isValid() });
 
         if (this.form.isValid()) {
             if (this.props.match.params.id !== undefined) {
@@ -410,7 +410,7 @@ class ActionForm extends Component {
                     {this.state.back_error !== '' &&
                         <h4 className="alert alert-danger"> {this.state.back_error} </h4>
                     }
-                    <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints} 
+                    <FormWithConstraints ref={formWithConstraints => this.form = formWithConstraints}
                         onSubmit={this.handleSubmit} noValidate>
 
                         <div className="">
@@ -426,8 +426,8 @@ class ActionForm extends Component {
                             </FormGroup>
                         </div>
                         <Row>
-                            <Col xs="5" sm="5" md="5"> 
-                            
+                            <Col xs="5" sm="5" md="5">
+
                                 <FormGroup for="user_id">
                                     <FormControlLabel htmlFor="visit_type_id">Tipo de Visita</FormControlLabel>
                                     <Select
@@ -443,10 +443,10 @@ class ActionForm extends Component {
                                     {this.state.valid_select_visit_type_id == 0 &&
                                         <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
                                     }
-                                </FormGroup>  
+                                </FormGroup>
                             </Col>
-                            <Col xs="5" sm="5" md="5"> 
-                                
+                            <Col xs="5" sm="5" md="5">
+
                                 <FormGroup for="subsidiary_id">
                                     <FormControlLabel htmlFor="school_type_id">Tipo de Escola</FormControlLabel>
                                     <Select
@@ -462,18 +462,18 @@ class ActionForm extends Component {
                                     {this.state.valid_select_school_type_id == 0 &&
                                         <div className="form-control-feedback"><div className="error">Este campo é de preenchimento obrigatório</div></div>
                                     }
-                                </FormGroup>  
+                                </FormGroup>
                             </Col>
-                            <Col xs="2" sm="2" md="2"> 
-                                
+                            <Col xs="2" sm="2" md="2">
+
                                 <FormGroup for="sector_id">
                                     <FormControlLabel htmlFor="sector_id"> </FormControlLabel>
                                     <Button onClick={this.validSelects} disabled={this.state.viewMode}>Adicionar</Button>
-                                </FormGroup>  
+                                </FormGroup>
                             </Col>
                         </Row>
                         <Row>
-                            <Col xs="12" sm="12" md="12"> 
+                            <Col xs="12" sm="12" md="12">
                                 <ReactTable
                                     columns={this.state.columns}
                                     data={this.state.tableData}
