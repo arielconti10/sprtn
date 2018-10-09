@@ -8,7 +8,7 @@ import { canUser } from '../../common/Permissions';
 import GridApi from '../../common/GridApi';
 
 import { connect } from 'react-redux'
-import { loadColumnsFlow, onFetchDataFlow, onDeleteDataFlow, onActiveDataFlow, toggleDropdownFlow, 
+import { loadColumnsFlow, onFetchDataFlow, onDeleteDataFlow, onActiveDataFlow, toggleDropdownFlow,
     selectColumnsFlow, selectAllFlow, loadFilterFlow, selectOptionFlow, setTableInfo
 } from '../../../actions/gridApi';
 
@@ -24,7 +24,7 @@ class SchoolList extends Component {
             if (rules.length == 0) {
                 this.setState({ viewMode: true });
             }
-        }.bind(this));       
+        }.bind(this));
     }
 
     onChangeTextFilter(filter, accessor) {
@@ -78,23 +78,23 @@ class SchoolList extends Component {
                                 Cell: props => <span>{this.showMarketShare(props.value) + '%'}</span>
                             },
                             { Header: "Nome", accessor: "name", filterable: true, width: 400, headerClassName: 'text-left', is_checked: true },
-                            { Header: 'Tipo', 
-                                accessor: 'school_type.name', 
-                                sortable: true, 
-                                filterable: true, width: 160, headerClassName: 'text-left', sortable: false 
-                                ,is_checked: true 
+                            { Header: 'Tipo',
+                                accessor: 'school_type.name',
+                                sortable: true,
+                                filterable: true, width: 160, headerClassName: 'text-left', sortable: false
+                                ,is_checked: true
                             },
                             {
                                 Header: "Identificação", accessor: "school_type", filterable: true, width: 120, headerClassName: 'text-left', sortable: false,
                                 is_checked: true,
                                 customFilter: true,
-                                Cell: props => props.value? 
+                                Cell: props => props.value?
                                     <span className={`escola-${props.value.identify.toLowerCase()}`}>{props.value.identify}
                                     </span>:'',
                                 Filter: ({ filter, onChange }) => (
-                                    <select id="school_type" 
-                                    onChange={event => this.onChangeTextFilter(event.target.value, "school_type.identify")} 
-                                    
+                                    <select id="school_type"
+                                    onChange={event => this.onChangeTextFilter(event.target.value, "school_type.identify")}
+
                                     style={{ width: "100%" }} >
                                         <option value="">Todos</option>
                                         <option value="particular">Particular</option>
@@ -103,18 +103,18 @@ class SchoolList extends Component {
                                     </select>
                                 )
                             },
-                            { Header: 'Perfil', accessor: 'profile.name', sortable: true, filterable: true, width: 100, headerClassName: 'text-left', 
-                                sortable: false ,is_checked: true 
+                            { Header: 'Perfil', accessor: 'profile.name', sortable: true, filterable: true, width: 100, headerClassName: 'text-left',
+                                sortable: false ,is_checked: true
                             },
-                            { Header: 'Filial', 
-                                accessor: 'subsidiary.name', filterable: true, width: 60, headerClassName: 'text-left', sortable: false 
-                                ,is_checked: true 
+                            { Header: 'Filial',
+                                accessor: 'subsidiary.name', filterable: true, width: 60, headerClassName: 'text-left', sortable: false
+                                ,is_checked: true
                             },
-                            { Header: 'Setor', accessor: 'sector.name', filterable: true, width: 60, headerClassName: 'text-left', sortable: false 
+                            { Header: 'Setor', accessor: 'sector.name', filterable: true, width: 60, headerClassName: 'text-left', sortable: false
                                 ,is_checked: true },
-                            { Header: "TOTVS", accessor: "school_code_totvs", filterable: true, width: 100, headerClassName: 'text-left' 
-                                ,is_checked: true 
-                            },    
+                            { Header: "TOTVS", accessor: "school_code_totvs", filterable: true, width: 100, headerClassName: 'text-left'
+                                ,is_checked: true
+                            },
                             {
                                 Header: "Status",
                                 accessor: "",
@@ -131,28 +131,28 @@ class SchoolList extends Component {
                                 ),
                                 filterable: true,
                                 Filter: ({ filter, onChange }) => (
-                                    <select id="active" onChange={event => this.onChangeFilter([event.target])} style={{ width: "100%" }} 
+                                    <select id="active" onChange={event => this.onChangeFilter([event.target])} style={{ width: "100%" }}
                                     onChange={event => this.onChangeTextFilter(event.target.value, "active")} >
                                         <option value="">Todos</option>
                                         <option value="1">Ativo</option>
                                         <option value="0">Inativo</option>
                                     </select>
                                 )
-                                
+
                             },
-                            { Header: "CEP", accessor: "zip_code", filterable: true, width: 100, headerClassName: 'text-left' 
+                            { Header: "CEP", accessor: "zip_code", filterable: true, width: 100, headerClassName: 'text-left'
                                 ,is_checked: true
                             },
-                            { Header: "Cidade", accessor: "city", filterable: true, width: 160, headerClassName: 'text-left' 
+                            { Header: "Cidade", accessor: "city", filterable: true, width: 160, headerClassName: 'text-left'
                                 ,is_checked: true
                             },
-                            { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left',is_checked: true }
+                            { Header: "UF", accessor: "state.abbrev", filterable: true, width: 50, headerClassName: 'text-left',sortable: false, is_checked: true }
                         ]}
                         hideButtons={true}
                         hasActions={true}
                         urlLink={this.props.match.url}
                     />
-                </div>  
+                </div>
 
             </div>
         )
@@ -165,7 +165,7 @@ const mapStateToProps =(state) => ({
 
 const functions_object = {
     loadColumnsFlow,
-    onFetchDataFlow, 
+    onFetchDataFlow,
     onDeleteDataFlow,
     onActiveDataFlow,
     toggleDropdownFlow,
